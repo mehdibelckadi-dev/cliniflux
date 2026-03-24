@@ -11,201 +11,254 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg: #000000;
-      --card: #0a0a10;
-      --border: #1a1a28;
-      --text: #ffffff;
-      --text-muted: rgba(255,255,255,0.55);
-      --text-dim: rgba(255,255,255,0.35);
-      --accent: #3B5BF6;
-      --accent-hover: #4f6fff;
-      --label: #c8a96e;
+      /* Colors */
+      --bg:            #000000;
+      --surface:       #0a0a12;
+      --surface-2:     #0f0f1a;
+      --border:        rgba(255,255,255,0.07);
+      --text:          #ffffff;
+      --text-secondary: rgba(255,255,255,0.55);
+      --text-tertiary:  rgba(255,255,255,0.30);
+      --accent:        #3B5BF6;
+      --accent-hover:  #5470ff;
+      --label-color:   #b8976a;
+
+      /* Spacing */
+      --section-y:     96px;
+      --container-max: 1160px;
+      --container-px:  48px;
+
+      /* Radius */
+      --radius-sm:  8px;
+      --radius-md: 12px;
+      --radius-lg: 18px;
     }
 
     html { scroll-behavior: smooth; }
 
     body {
-      font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
       background: var(--bg);
       color: var(--text);
       line-height: 1.6;
       overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
     }
 
-    /* NAVBAR */
+    /* ── CONTAINER ── */
+    .container {
+      width: 100%;
+      max-width: var(--container-max);
+      margin: 0 auto;
+      padding: 0 var(--container-px);
+    }
+
+    /* ── NAVBAR ── */
     nav {
       position: fixed;
       top: 0; left: 0; right: 0;
       z-index: 100;
+      background: rgba(0,0,0,0.65);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-inner {
+      max-width: var(--container-max);
+      margin: 0 auto;
+      padding: 0 var(--container-px);
+      height: 64px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 22px 64px;
-      background: rgba(0,0,0,0.6);
-      backdrop-filter: blur(24px);
-      -webkit-backdrop-filter: blur(24px);
     }
 
     .nav-logo {
-      font-size: 18px;
+      font-size: 17px;
       font-weight: 700;
-      color: #fff;
+      color: var(--text);
       text-decoration: none;
       letter-spacing: -0.3px;
     }
 
     .nav-links {
       display: flex;
-      gap: 36px;
+      gap: 32px;
       list-style: none;
     }
 
     .nav-links a {
       font-size: 14px;
       font-weight: 500;
-      color: rgba(255,255,255,0.65);
+      color: var(--text-secondary);
       text-decoration: none;
       transition: color 0.2s;
     }
-    .nav-links a:hover { color: #fff; }
+    .nav-links a:hover { color: var(--text); }
 
-    .btn-outline {
+    .nav-cta {
       font-family: inherit;
-      font-size: 14px;
-      font-weight: 500;
-      color: #fff;
-      background: rgba(255,255,255,0.07);
-      border: 1px solid rgba(255,255,255,0.15);
-      padding: 10px 20px;
-      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      background: var(--surface-2);
+      border: 1px solid rgba(255,255,255,0.12);
+      padding: 9px 18px;
+      border-radius: var(--radius-md);
       cursor: pointer;
       text-decoration: none;
-      transition: background 0.2s;
+      transition: background 0.2s, border-color 0.2s;
+      white-space: nowrap;
     }
-    .btn-outline:hover { background: rgba(255,255,255,0.12); }
+    .nav-cta:hover {
+      background: rgba(255,255,255,0.1);
+      border-color: rgba(255,255,255,0.2);
+    }
 
-    /* HERO */
+    /* ── HERO ── */
     .hero {
       position: relative;
       min-height: 100vh;
       display: flex;
       align-items: center;
-      padding: 130px 64px 80px;
       overflow: hidden;
+      padding-top: 64px; /* nav height */
     }
 
     .hero-glow {
       position: absolute;
-      top: -10%;
-      right: -5%;
-      width: 65%;
-      height: 120%;
-      background: radial-gradient(ellipse at 65% 45%,
-        rgba(40,80,220,0.55) 0%,
-        rgba(30,60,180,0.3) 30%,
-        rgba(20,40,140,0.1) 60%,
-        transparent 75%);
+      inset: 0;
+      background:
+        radial-gradient(ellipse 70% 80% at 80% 40%,
+          rgba(40,80,220,0.45) 0%,
+          rgba(30,55,180,0.2)  40%,
+          transparent          70%);
       pointer-events: none;
     }
 
-    .hero-content {
+    .hero-inner {
       position: relative;
       z-index: 1;
-      max-width: 620px;
+      width: 100%;
+      max-width: var(--container-max);
+      margin: 0 auto;
+      padding: 80px var(--container-px);
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: end;
+      gap: 48px;
+      min-height: calc(100vh - 64px);
     }
+
+    .hero-body { align-self: center; max-width: 580px; }
 
     .hero h1 {
-      font-size: clamp(40px, 5.2vw, 72px);
+      font-size: clamp(36px, 5vw, 68px);
       font-weight: 800;
-      line-height: 1.04;
-      letter-spacing: -2.5px;
-      margin-bottom: 28px;
-      animation: fadeUp 0.8s cubic-bezier(0.22,1,0.36,1) both;
+      line-height: 1.05;
+      letter-spacing: -2px;
+      margin-bottom: 24px;
+      animation: fadeUp 0.7s cubic-bezier(0.22,1,0.36,1) both;
     }
 
-    .hero-sub {
+    .hero-desc {
       font-size: 15px;
-      color: var(--text-muted);
-      max-width: 400px;
+      color: var(--text-secondary);
       line-height: 1.75;
-      margin-bottom: 18px;
-      animation: fadeUp 0.8s 0.15s cubic-bezier(0.22,1,0.36,1) both;
+      max-width: 400px;
+      margin-bottom: 16px;
+      animation: fadeUp 0.7s 0.1s cubic-bezier(0.22,1,0.36,1) both;
     }
 
-    .hero-meta {
-      font-size: 14px;
-      color: var(--text-dim);
-      margin-bottom: 8px;
-      animation: fadeUp 0.8s 0.25s cubic-bezier(0.22,1,0.36,1) both;
+    .hero-micro {
+      font-size: 13px;
+      color: var(--text-tertiary);
+      margin-bottom: 6px;
+      animation: fadeUp 0.7s 0.2s cubic-bezier(0.22,1,0.36,1) both;
     }
 
     .hero-tags {
       font-size: 13px;
-      color: var(--text-dim);
-      margin-bottom: 40px;
-      animation: fadeUp 0.8s 0.3s cubic-bezier(0.22,1,0.36,1) both;
+      color: var(--text-tertiary);
+      animation: fadeUp 0.7s 0.25s cubic-bezier(0.22,1,0.36,1) both;
     }
 
-    .hero-cta {
-      position: absolute;
-      bottom: 80px;
-      right: 64px;
-      animation: fadeUp 0.8s 0.5s cubic-bezier(0.22,1,0.36,1) both;
+    .hero-cta-wrap {
+      align-self: flex-end;
+      padding-bottom: 80px;
+      animation: fadeUp 0.7s 0.4s cubic-bezier(0.22,1,0.36,1) both;
     }
 
     .btn-primary {
-      display: inline-block;
+      display: inline-flex;
+      align-items: center;
       font-family: inherit;
-      font-size: 15px;
+      font-size: 14px;
       font-weight: 600;
-      color: #fff;
+      color: var(--text);
       background: var(--accent);
       border: none;
-      padding: 15px 28px;
-      border-radius: 10px;
+      padding: 14px 26px;
+      border-radius: var(--radius-md);
       cursor: pointer;
       text-decoration: none;
       transition: background 0.2s, transform 0.15s;
+      white-space: nowrap;
     }
     .btn-primary:hover {
       background: var(--accent-hover);
-      transform: translateY(-2px);
+      transform: translateY(-1px);
     }
 
     @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(30px); }
+      from { opacity: 0; transform: translateY(24px); }
       to   { opacity: 1; transform: translateY(0); }
     }
 
-    /* TESTIMONIALS */
-    .testimonials {
-      padding: 0 64px 80px;
+    /* ── SECTION LABEL ── */
+    .label {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--label-color);
+      margin-bottom: 16px;
+    }
+
+    /* ── TESTIMONIALS ── */
+    .testimonials-section {
+      padding-bottom: var(--section-y);
     }
 
     .testimonials-track {
       display: flex;
-      gap: 14px;
+      gap: 12px;
       overflow-x: auto;
       scrollbar-width: none;
       scroll-snap-type: x mandatory;
+      padding: 0 var(--container-px);
+      max-width: calc(var(--container-max) + var(--container-px) * 2);
+      margin: 0 auto;
     }
     .testimonials-track::-webkit-scrollbar { display: none; }
 
     .t-card {
-      flex: 0 0 300px;
+      flex: 0 0 290px;
       scroll-snap-align: start;
-      background: rgba(10,15,40,0.7);
-      border: 1px solid rgba(255,255,255,0.07);
-      border-radius: 18px;
-      padding: 28px;
-      backdrop-filter: blur(12px);
+      background: rgba(8,12,35,0.75);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      backdrop-filter: blur(16px);
     }
 
     .t-quote {
-      font-size: 14px;
-      color: rgba(255,255,255,0.8);
-      line-height: 1.65;
-      margin-bottom: 28px;
+      font-size: 13px;
+      color: rgba(255,255,255,0.78);
+      line-height: 1.7;
+      margin-bottom: 24px;
     }
 
     .t-footer {
@@ -214,116 +267,103 @@
       justify-content: space-between;
     }
 
-    .t-clinic {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
+    .t-clinic { display: flex; align-items: center; gap: 8px; }
 
     .t-icon {
-      width: 30px;
-      height: 30px;
-      background: rgba(59,91,246,0.2);
-      border: 1px solid rgba(59,91,246,0.3);
-      border-radius: 7px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 13px;
-    }
-
-    .t-name {
+      width: 28px; height: 28px;
+      background: rgba(59,91,246,0.18);
+      border: 1px solid rgba(59,91,246,0.28);
+      border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
       font-size: 12px;
-      font-weight: 600;
-      color: rgba(255,255,255,0.6);
     }
 
-    .t-score { text-align: right; }
+    .t-name { font-size: 11px; font-weight: 600; color: var(--text-secondary); }
 
     .t-score-num {
-      font-size: 28px;
-      font-weight: 800;
-      color: #6b8aff;
-      line-height: 1;
+      font-size: 26px; font-weight: 800;
+      color: #7b9aff; line-height: 1;
     }
 
     .t-score-label {
-      font-size: 10px;
-      color: rgba(255,255,255,0.35);
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
+      font-size: 9px; color: var(--text-tertiary);
+      text-transform: uppercase; letter-spacing: 1px;
+      text-align: right;
     }
 
-    /* TWO COLUMN */
-    .two-col {
+    /* ── DIVIDERS ── */
+    .section-divider {
+      width: 100%; height: 1px;
+      background: var(--border);
+      margin: 0;
+    }
+
+    /* ── TWO-COLUMN CONTENT ── */
+    .two-col-section {
+      padding: var(--section-y) 0;
+      border-top: 1px solid var(--border);
+    }
+
+    .two-col-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      border-top: 1px solid #111118;
+      gap: 0;
     }
 
-    .col { padding: 72px 64px; }
-
-    .col:last-child {
-      border-left: 1px solid #111118;
-    }
-
-    .label {
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      color: var(--label);
-      margin-bottom: 22px;
-    }
+    .col-left  { padding-right: 64px; }
+    .col-right { padding-left: 64px; border-left: 1px solid var(--border); }
 
     .sec-title {
-      font-size: clamp(26px, 3vw, 42px);
+      font-size: clamp(24px, 2.8vw, 38px);
       font-weight: 800;
       line-height: 1.1;
-      letter-spacing: -1.5px;
-      margin-bottom: 20px;
+      letter-spacing: -1.2px;
+      margin-bottom: 18px;
+      color: var(--text);
     }
 
-    .sec-text {
+    .sec-body {
       font-size: 14px;
-      color: var(--text-muted);
+      color: var(--text-secondary);
       line-height: 1.8;
-      margin-bottom: 14px;
+      margin-bottom: 12px;
     }
 
-    .plain-list { list-style: none; margin-bottom: 16px; }
-
-    .plain-list li {
+    .dot-list { list-style: none; margin-bottom: 14px; }
+    .dot-list li {
       font-size: 14px;
-      color: var(--text-muted);
-      padding: 3px 0;
-      line-height: 1.7;
+      color: var(--text-secondary);
+      line-height: 1.75;
+      padding: 2px 0 2px 14px;
+      position: relative;
+    }
+    .dot-list li::before {
+      content: "·";
+      position: absolute; left: 0;
+      color: var(--text-tertiary);
+      font-size: 18px; line-height: 1.4;
     }
 
-    .plain-list li::before { content: "· "; color: rgba(255,255,255,0.25); }
-
-    .check-list { list-style: none; margin-bottom: 18px; }
-
+    .check-list { list-style: none; margin-bottom: 16px; }
     .check-list li {
       font-size: 14px;
-      color: var(--text-muted);
-      padding: 5px 0 5px 22px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      padding: 4px 0 4px 20px;
       position: relative;
-      line-height: 1.5;
     }
-
     .check-list li::before {
       content: "✔";
-      position: absolute;
-      left: 0;
-      color: #6b8aff;
-      font-size: 12px;
+      position: absolute; left: 0;
+      color: #7b9aff;
+      font-size: 11px;
+      top: 6px;
     }
 
-    /* PROCESS */
-    .process {
-      padding: 80px 64px;
-      border-top: 1px solid #111118;
+    /* ── PROCESS ── */
+    .process-section {
+      padding: var(--section-y) 0;
+      border-top: 1px solid var(--border);
     }
 
     .process-header {
@@ -333,78 +373,80 @@
       margin-bottom: 40px;
     }
 
-    .process-steps {
+    .process-cards {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 14px;
-      margin-bottom: 28px;
+      gap: 12px;
+      margin-bottom: 24px;
     }
 
     .step-card {
-      background: #080810;
-      border: 1px solid #16162a;
-      border-radius: 18px;
-      padding: 36px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 32px;
     }
 
     .step-label {
-      font-size: 10px;
+      font-size: 9px;
       font-weight: 700;
-      letter-spacing: 2px;
+      letter-spacing: 2.5px;
       text-transform: uppercase;
-      color: var(--label);
-      margin-bottom: 16px;
+      color: var(--label-color);
+      margin-bottom: 14px;
     }
 
     .step-card h3 {
-      font-size: 26px;
+      font-size: 22px;
       font-weight: 800;
       letter-spacing: -0.5px;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
+      color: var(--text);
     }
 
-    .step-card p { font-size: 14px; color: var(--text-muted); }
+    .step-card p { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
 
-    .arrows { display: flex; gap: 10px; justify-content: flex-end; }
+    .arrows { display: flex; gap: 8px; justify-content: flex-end; }
 
     .arrow {
-      width: 42px;
-      height: 42px;
+      width: 38px; height: 38px;
       border-radius: 50%;
       background: var(--accent);
-      border: none;
-      color: #fff;
-      font-size: 20px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      border: none; color: var(--text);
+      font-size: 18px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
       transition: background 0.2s;
-      line-height: 1;
     }
     .arrow:hover { background: var(--accent-hover); }
 
-    /* TECH */
-    .tech {
-      padding: 80px 64px;
-      border-top: 1px solid #111118;
+    /* ── TECH ── */
+    .tech-section {
+      padding: var(--section-y) 0;
+      border-top: 1px solid var(--border);
+    }
+
+    .tech-subtitle {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      margin-bottom: 36px;
     }
 
     .pills {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 10px;
-      max-width: 760px;
+      max-width: 680px;
     }
 
     .pill {
-      background: #060610;
-      border: 1px solid #14142a;
-      border-radius: 12px;
-      padding: 18px 24px;
-      font-size: 14px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 16px 20px;
+      font-size: 13px;
       font-weight: 500;
-      color: rgba(255,255,255,0.75);
+      color: rgba(255,255,255,0.7);
       text-align: center;
       position: relative;
       overflow: hidden;
@@ -412,105 +454,118 @@
 
     .pill::after {
       content: '';
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(ellipse at center, rgba(59,91,246,0.1) 0%, transparent 70%);
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at center, rgba(59,91,246,0.08) 0%, transparent 70%);
       pointer-events: none;
     }
 
-    /* CONTACT */
-    .contact {
-      display: grid;
-      grid-template-columns: 1fr 1.3fr;
-      gap: 80px;
-      align-items: start;
-      padding: 80px 64px;
-      border-top: 1px solid #111118;
+    /* ── CONTACT ── */
+    .contact-section {
+      padding: var(--section-y) 0;
+      border-top: 1px solid var(--border);
     }
 
-    .form { display: flex; flex-direction: column; gap: 14px; }
+    .contact-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.4fr;
+      gap: 80px;
+      align-items: start;
+    }
 
-    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .contact-left .sec-title { margin-bottom: 12px; }
 
-    .field { display: flex; flex-direction: column; gap: 7px; }
+    .form { display: flex; flex-direction: column; gap: 12px; }
+
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+    .field { display: flex; flex-direction: column; gap: 6px; }
 
     .field label {
       font-size: 12px;
       font-weight: 500;
-      color: rgba(255,255,255,0.5);
+      color: var(--text-tertiary);
+      letter-spacing: 0.3px;
     }
 
     .field input,
     .field select {
       font-family: inherit;
-      font-size: 14px;
+      font-size: 13px;
       color: rgba(255,255,255,0.75);
-      background: #080812;
-      border: 1px solid #1c1c2e;
-      border-radius: 8px;
-      padding: 13px 15px;
+      background: var(--surface);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: var(--radius-sm);
+      padding: 11px 14px;
       outline: none;
       transition: border-color 0.2s;
       -webkit-appearance: none;
     }
 
-    .field input::placeholder { color: rgba(255,255,255,0.2); }
-    .field input:focus, .field select:focus { border-color: var(--accent); }
-    .field select option { background: #0a0a1a; }
+    .field input::placeholder { color: rgba(255,255,255,0.18); }
+    .field input:focus,
+    .field select:focus { border-color: rgba(59,91,246,0.6); }
+    .field select option { background: #0a0a14; }
 
-    .form-note { font-size: 12px; color: var(--text-dim); }
+    .form-note {
+      font-size: 11px;
+      color: var(--text-tertiary);
+    }
 
     .btn-submit {
       font-family: inherit;
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 700;
-      letter-spacing: 0.8px;
+      letter-spacing: 1px;
       text-transform: uppercase;
-      color: #fff;
+      color: var(--text);
       background: var(--accent);
       border: none;
-      border-radius: 8px;
-      padding: 15px;
+      border-radius: var(--radius-sm);
+      padding: 14px;
       cursor: pointer;
       width: 100%;
       transition: background 0.2s;
     }
     .btn-submit:hover { background: var(--accent-hover); }
 
-    /* FAQ */
-    .faq {
-      padding: 20px 64px 80px;
-      max-width: 860px;
+    /* ── FAQ ── */
+    .faq-section {
+      padding-bottom: var(--section-y);
+    }
+
+    .faq-inner {
+      max-width: 720px;
     }
 
     .faq-item {
-      border: 1px solid #14142a;
-      border-radius: 12px;
-      margin-bottom: 8px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      margin-bottom: 6px;
       overflow: hidden;
     }
 
     .faq-q {
       width: 100%;
-      background: #060610;
+      background: var(--surface);
       border: none;
-      color: rgba(255,255,255,0.85);
+      color: rgba(255,255,255,0.82);
       font-family: inherit;
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 500;
-      padding: 18px 22px;
+      padding: 16px 20px;
       text-align: left;
       cursor: pointer;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      gap: 16px;
       transition: background 0.2s;
     }
-    .faq-q:hover { background: #0a0a18; }
+    .faq-q:hover { background: var(--surface-2); }
 
     .faq-icon {
-      font-size: 22px;
-      color: rgba(255,255,255,0.4);
+      font-size: 20px;
+      color: var(--text-tertiary);
       transition: transform 0.25s;
       flex-shrink: 0;
       line-height: 1;
@@ -520,120 +575,153 @@
       max-height: 0;
       overflow: hidden;
       transition: max-height 0.3s ease;
-      background: #060610;
+      background: var(--surface);
     }
 
     .faq-body-inner {
-      padding: 0 22px 18px;
-      font-size: 14px;
-      color: var(--text-muted);
+      padding: 0 20px 16px;
+      font-size: 13px;
+      color: var(--text-secondary);
       line-height: 1.75;
     }
 
-    .faq-item.open .faq-body { max-height: 160px; }
+    .faq-item.open .faq-body { max-height: 200px; }
     .faq-item.open .faq-icon { transform: rotate(45deg); }
 
-    /* FOOTER */
+    /* ── FOOTER ── */
     footer {
-      padding: 64px 64px 40px;
-      border-top: 1px solid #0d0d1a;
+      border-top: 1px solid var(--border);
+      padding: 64px 0 36px;
     }
 
-    .footer-main {
+    .footer-grid {
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
       margin-bottom: 48px;
+      gap: 40px;
     }
 
-    .footer-left p {
-      font-size: 14px;
-      color: rgba(255,255,255,0.4);
-      margin-bottom: 5px;
+    .footer-info p {
+      font-size: 13px;
+      color: var(--text-tertiary);
+      margin-bottom: 4px;
     }
 
     .footer-wordmark {
-      font-size: 72px;
+      font-size: 64px;
       font-weight: 800;
-      letter-spacing: -4px;
-      color: #fff;
-      margin-top: 18px;
+      letter-spacing: -3.5px;
+      color: var(--text);
       line-height: 1;
+      margin-top: 20px;
     }
 
     .footer-links {
       display: grid;
-      grid-template-columns: repeat(3, auto);
-      gap: 12px 36px;
-      padding-top: 4px;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px 40px;
+      padding-top: 2px;
     }
 
     .footer-links a {
       font-size: 13px;
-      color: rgba(255,255,255,0.45);
+      color: var(--text-tertiary);
       text-decoration: none;
       transition: color 0.2s;
+      white-space: nowrap;
     }
-    .footer-links a:hover { color: #fff; }
+    .footer-links a:hover { color: var(--text); }
 
     .footer-bottom {
       font-size: 12px;
-      color: rgba(255,255,255,0.2);
+      color: rgba(255,255,255,0.15);
       text-align: center;
-      padding-top: 28px;
-      border-top: 1px solid #0a0a14;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
     }
 
-    /* RESPONSIVE */
-    @media (max-width: 960px) {
-      nav { padding: 18px 24px; }
+    /* ── RESPONSIVE ── */
+    @media (max-width: 1024px) {
+      :root {
+        --container-px: 32px;
+        --section-y: 72px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      :root {
+        --container-px: 20px;
+        --section-y: 56px;
+      }
+
       .nav-links { display: none; }
-      .hero { padding: 110px 24px 140px; }
-      .hero-cta { right: 24px; bottom: 40px; }
-      .testimonials { padding: 0 24px 60px; }
-      .two-col { grid-template-columns: 1fr; }
-      .col { padding: 48px 24px; }
-      .col:last-child { border-left: none; border-top: 1px solid #111118; }
-      .process, .tech { padding: 60px 24px; }
-      .process-steps { grid-template-columns: 1fr; }
-      .contact { grid-template-columns: 1fr; padding: 60px 24px; gap: 40px; }
-      .pills { grid-template-columns: 1fr; }
+
+      .nav-inner { padding: 0 20px; }
+
+      .hero-inner {
+        grid-template-columns: 1fr;
+        padding: 48px 20px 64px;
+        min-height: auto;
+      }
+
+      .hero-cta-wrap { padding-bottom: 0; align-self: auto; }
+
+      .hero h1 { font-size: 36px; letter-spacing: -1.5px; }
+
+      .testimonials-track { padding: 0 20px; }
+
+      .two-col-grid { grid-template-columns: 1fr; }
+      .col-left  { padding-right: 0; padding-bottom: 48px; }
+      .col-right { padding-left: 0; border-left: none; padding-top: 48px; border-top: 1px solid var(--border); }
+
+      .process-cards { grid-template-columns: 1fr; }
+      .process-header { flex-direction: column; gap: 16px; }
+
+      .pills { grid-template-columns: 1fr; max-width: 100%; }
+
+      .contact-grid { grid-template-columns: 1fr; gap: 40px; }
       .form-row { grid-template-columns: 1fr; }
-      .faq { padding: 20px 24px 60px; }
-      footer { padding: 48px 24px 32px; }
-      .footer-main { flex-direction: column; gap: 32px; }
-      .footer-wordmark { font-size: 52px; }
+
+      .footer-grid { flex-direction: column; gap: 28px; }
+      .footer-wordmark { font-size: 48px; }
+      .footer-links { grid-template-columns: repeat(2, 1fr); gap: 10px 24px; }
     }
   </style>
 </head>
 <body>
 
+  <!-- NAV -->
   <nav>
-    <a href="/" class="nav-logo">cliniflux</a>
-    <ul class="nav-links">
-      <li><a href="/about">About</a></li>
-      <li><a href="#blog">Blog</a></li>
-      <li><a href="#contacto">Contacto</a></li>
-    </ul>
-    <a href="#contacto" class="btn-outline">Solicitar llamada</a>
+    <div class="nav-inner">
+      <a href="/" class="nav-logo">cliniflux</a>
+      <ul class="nav-links">
+        <li><a href="/about">About</a></li>
+        <li><a href="#blog">Blog</a></li>
+        <li><a href="#contacto">Contacto</a></li>
+      </ul>
+      <a href="#contacto" class="nav-cta">Solicitar llamada</a>
+    </div>
   </nav>
 
   <!-- HERO -->
   <section class="hero">
     <div class="hero-glow"></div>
-    <div class="hero-content">
-      <h1>Automatización inteligente de WhatsApp para clínicas que quieren más citas y menos carga administrativa</h1>
-      <p class="hero-sub">Implementamos un sistema avanzado que responde automáticamente a pacientes, reactiva bases de datos inactivas y agenda citas directamente en tu calendario.</p>
-      <p class="hero-meta">Operativo 24/7. Configuración en 48 horas.</p>
-      <p class="hero-tags">Implementación profesional · Sin permanencia · Soporte incluido</p>
-    </div>
-    <div class="hero-cta">
-      <a href="#contacto" class="btn-primary">Solicitar demostración privada</a>
+    <div class="hero-inner">
+      <div class="hero-body">
+        <h1>Automatización inteligente de WhatsApp para clínicas que quieren más citas y menos carga administrativa</h1>
+        <p class="hero-desc">Implementamos un sistema avanzado que responde automáticamente a pacientes, reactiva bases de datos inactivas y agenda citas directamente en tu calendario.</p>
+        <p class="hero-micro">Operativo 24/7. Configuración en 48 horas.</p>
+        <p class="hero-tags">Implementación profesional · Sin permanencia · Soporte incluido</p>
+      </div>
+      <div class="hero-cta-wrap">
+        <a href="#contacto" class="btn-primary">Solicitar demostración privada</a>
+      </div>
     </div>
   </section>
 
   <!-- TESTIMONIALS -->
-  <div class="testimonials">
+  <div class="testimonials-section">
     <div class="testimonials-track">
       <div class="t-card">
         <p class="t-quote">"El sistema redujo significativamente el tiempo que el equipo dedicaba a responder consultas repetitivas."</p>
@@ -642,7 +730,7 @@
             <div class="t-icon">🏥</div>
             <span class="t-name">Centro Médico Privado</span>
           </div>
-          <div class="t-score">
+          <div>
             <div class="t-score-num">8/10</div>
             <div class="t-score-label">Satisfacción</div>
           </div>
@@ -655,7 +743,7 @@
             <div class="t-icon">⚕️</div>
             <span class="t-name">Consulta Especializada</span>
           </div>
-          <div class="t-score">
+          <div>
             <div class="t-score-num">10/10</div>
             <div class="t-score-label">Satisfacción</div>
           </div>
@@ -668,7 +756,7 @@
             <div class="t-icon">✨</div>
             <span class="t-name">Clínica Estética</span>
           </div>
-          <div class="t-score">
+          <div>
             <div class="t-score-num">9/10</div>
             <div class="t-score-label">Satisfacción</div>
           </div>
@@ -681,7 +769,7 @@
             <div class="t-icon">🦷</div>
             <span class="t-name">Clínica Dental</span>
           </div>
-          <div class="t-score">
+          <div>
             <div class="t-score-num">9/10</div>
             <div class="t-score-label">Satisfacción</div>
           </div>
@@ -691,209 +779,231 @@
   </div>
 
   <!-- PROBLEM / SOLUTION -->
-  <div class="two-col">
-    <div class="col">
-      <div class="label">El Problema Real</div>
-      <h2 class="sec-title">Las clínicas no pierden pacientes por falta de demanda</h2>
-      <p class="sec-text">Los pierden por falta de sistema.</p>
-      <ul class="plain-list">
-        <li>Pacientes escriben fuera del horario.</li>
-        <li>Mensajes quedan sin seguimiento.</li>
-        <li>Contactos antiguos nunca se vuelven a activar.</li>
-        <li>Citas potenciales se enfrían en horas.</li>
-      </ul>
-      <p class="sec-text">Cada conversación no gestionada es una oportunidad perdida.</p>
-    </div>
-    <div class="col">
-      <div class="label">Claridad Tecnológica</div>
-      <h2 class="sec-title">Cliniflux convierte tu WhatsApp en un sistema automatizado de captación y gestión de citas</h2>
-      <p class="sec-text">No es un chatbot básico.<br>Es una estructura de automatización diseñada específicamente para clínicas.</p>
-      <p class="sec-text">Integra:</p>
-      <ul class="plain-list">
-        <li>Respuesta automática inteligente</li>
-        <li>Reactivación segmentada de pacientes antiguos</li>
-        <li>Agendamiento sincronizado con calendario</li>
-        <li>Recordatorios automáticos para reducir ausencias</li>
-      </ul>
-      <p class="sec-text">Todo funcionando sin intervención manual constante.</p>
+  <div class="two-col-section">
+    <div class="container">
+      <div class="two-col-grid">
+        <div class="col-left">
+          <div class="label">El Problema Real</div>
+          <h2 class="sec-title">Las clínicas no pierden pacientes por falta de demanda</h2>
+          <p class="sec-body">Los pierden por falta de sistema.</p>
+          <ul class="dot-list">
+            <li>Pacientes escriben fuera del horario.</li>
+            <li>Mensajes quedan sin seguimiento.</li>
+            <li>Contactos antiguos nunca se vuelven a activar.</li>
+            <li>Citas potenciales se enfrían en horas.</li>
+          </ul>
+          <p class="sec-body">Cada conversación no gestionada es una oportunidad perdida.</p>
+        </div>
+        <div class="col-right">
+          <div class="label">Claridad Tecnológica</div>
+          <h2 class="sec-title">Cliniflux convierte tu WhatsApp en un sistema automatizado de captación y gestión de citas</h2>
+          <p class="sec-body">No es un chatbot básico. Es una estructura de automatización diseñada específicamente para clínicas.</p>
+          <p class="sec-body">Integra:</p>
+          <ul class="dot-list">
+            <li>Respuesta automática inteligente</li>
+            <li>Reactivación segmentada de pacientes antiguos</li>
+            <li>Agendamiento sincronizado con calendario</li>
+            <li>Recordatorios automáticos para reducir ausencias</li>
+          </ul>
+          <p class="sec-body">Todo funcionando sin intervención manual constante.</p>
+        </div>
+      </div>
     </div>
   </div>
 
   <!-- BENEFITS / DIFFERENTIATION -->
-  <div class="two-col" style="border-top:none;">
-    <div class="col" style="padding-top:0;">
-      <div class="label">Beneficios Medibles</div>
-      <h2 class="sec-title">Impacto operativo esperado</h2>
-      <ul class="check-list">
-        <li>Respuesta inmediata 24/7</li>
-        <li>Reducción significativa de carga administrativa</li>
-        <li>Recuperación de pacientes inactivos</li>
-        <li>Incremento sostenible de citas mensuales</li>
-        <li>Menor dependencia de llamadas telefónicas</li>
-      </ul>
-      <p class="sec-text">Las clínicas que implementan automatización estructurada observan mejoras en eficiencia operativa y conversión de consultas a cita.</p>
-    </div>
-    <div class="col" style="padding-top:0;">
-      <div class="label">Diferenciación</div>
-      <h2 class="sec-title">Diseñado exclusivamente para clínicas</h2>
-      <p class="sec-text">Cliniflux no es una solución genérica.</p>
-      <p class="sec-text">Está estructurado para:</p>
-      <ul class="plain-list">
-        <li>Clínicas dentales</li>
-        <li>Clínicas estéticas</li>
-        <li>Centros médicos especializados</li>
-        <li>Consultas privadas</li>
-      </ul>
-      <p class="sec-text">El sistema se adapta a tus horarios, tratamientos y flujo interno.</p>
+  <div class="two-col-section" style="border-top: none; padding-top: 0;">
+    <div class="container">
+      <div class="two-col-grid">
+        <div class="col-left">
+          <div class="label">Beneficios Medibles</div>
+          <h2 class="sec-title">Impacto operativo esperado</h2>
+          <ul class="check-list">
+            <li>Respuesta inmediata 24/7</li>
+            <li>Reducción significativa de carga administrativa</li>
+            <li>Recuperación de pacientes inactivos</li>
+            <li>Incremento sostenible de citas mensuales</li>
+            <li>Menor dependencia de llamadas telefónicas</li>
+          </ul>
+          <p class="sec-body">Las clínicas que implementan automatización estructurada observan mejoras en eficiencia operativa y conversión de consultas a cita.</p>
+        </div>
+        <div class="col-right">
+          <div class="label">Diferenciación</div>
+          <h2 class="sec-title">Diseñado exclusivamente para clínicas</h2>
+          <p class="sec-body">Cliniflux no es una solución genérica.</p>
+          <p class="sec-body">Está estructurado para:</p>
+          <ul class="dot-list">
+            <li>Clínicas dentales</li>
+            <li>Clínicas estéticas</li>
+            <li>Centros médicos especializados</li>
+            <li>Consultas privadas</li>
+          </ul>
+          <p class="sec-body">El sistema se adapta a tus horarios, tratamientos y flujo interno.</p>
+        </div>
+      </div>
     </div>
   </div>
 
   <!-- PROCESS -->
-  <section class="process">
-    <div class="process-header">
-      <div>
-        <div class="label">Proceso</div>
-        <h2 class="sec-title">Implementación clara<br>y profesional</h2>
-        <p class="sec-text" style="max-width:340px;">Proceso simple. Sin interrupciones en tu operativa.</p>
+  <section class="process-section">
+    <div class="container">
+      <div class="process-header">
+        <div>
+          <div class="label">Proceso</div>
+          <h2 class="sec-title">Implementación clara y profesional</h2>
+          <p class="sec-body" style="max-width:320px;">Proceso simple. Sin interrupciones en tu operativa.</p>
+        </div>
       </div>
-    </div>
-    <div class="process-steps" id="stepsContainer">
-      <div class="step-card" data-pair="0">
-        <div class="step-label">Paso 01</div>
-        <h3>Diagnóstico inicial.</h3>
-        <p>Analizamos tu flujo actual de mensajes y citas.</p>
+      <div class="process-cards" id="stepsContainer">
+        <div class="step-card" data-pair="0">
+          <div class="step-label">Paso 01</div>
+          <h3>Diagnóstico inicial.</h3>
+          <p>Analizamos tu flujo actual de mensajes y citas.</p>
+        </div>
+        <div class="step-card" data-pair="0">
+          <div class="step-label">Paso 02</div>
+          <h3>Configuración personalizada.</h3>
+          <p>Adaptamos automatizaciones a tu especialidad.</p>
+        </div>
+        <div class="step-card" data-pair="1" style="display:none">
+          <div class="step-label">Paso 03</div>
+          <h3>Activación en 24–48h.</h3>
+          <p>Sistema operativo en tu WhatsApp actual.</p>
+        </div>
+        <div class="step-card" data-pair="1" style="display:none">
+          <div class="step-label">Paso 04</div>
+          <h3>Optimización continua.</h3>
+          <p>Ajustamos mensajes y flujos según resultados.</p>
+        </div>
       </div>
-      <div class="step-card" data-pair="0">
-        <div class="step-label">Paso 02</div>
-        <h3>Configuración personalizada.</h3>
-        <p>Adaptamos automatizaciones a tu especialidad.</p>
+      <div class="arrows">
+        <button class="arrow" onclick="changeStep(-1)">‹</button>
+        <button class="arrow" onclick="changeStep(1)">›</button>
       </div>
-      <div class="step-card" data-pair="1" style="display:none">
-        <div class="step-label">Paso 03</div>
-        <h3>Activación en 24–48h.</h3>
-        <p>Sistema operativo en tu WhatsApp actual.</p>
-      </div>
-      <div class="step-card" data-pair="1" style="display:none">
-        <div class="step-label">Paso 04</div>
-        <h3>Optimización continua.</h3>
-        <p>Ajustamos mensajes y flujos según resultados.</p>
-      </div>
-    </div>
-    <div class="arrows">
-      <button class="arrow" onclick="changeStep(-1)">‹</button>
-      <button class="arrow" onclick="changeStep(1)">›</button>
     </div>
   </section>
 
   <!-- TECH -->
-  <section class="tech">
-    <div class="label">Consultar</div>
-    <h2 class="sec-title">Tecnología con enfoque clínico</h2>
-    <p class="sec-text" style="margin-bottom:32px;">Tu equipo solo recibe citas confirmadas.<br>El sistema gestiona el resto.</p>
-    <div class="pills">
-      <div class="pill">Compatible con tu WhatsApp actual</div>
-      <div class="pill">Sin necesidad de cambiar número</div>
-      <div class="pill">Sin curva de aprendizaje compleja</div>
-      <div class="pill">Cumplimiento de estándares de privacidad</div>
+  <section class="tech-section">
+    <div class="container">
+      <div class="label">Consultar</div>
+      <h2 class="sec-title">Tecnología con enfoque clínico</h2>
+      <p class="tech-subtitle">Tu equipo solo recibe citas confirmadas.<br>El sistema gestiona el resto.</p>
+      <div class="pills">
+        <div class="pill">Compatible con tu WhatsApp actual</div>
+        <div class="pill">Sin necesidad de cambiar número</div>
+        <div class="pill">Sin curva de aprendizaje compleja</div>
+        <div class="pill">Cumplimiento de estándares de privacidad</div>
+      </div>
     </div>
   </section>
 
   <!-- CONTACT -->
-  <section class="contact" id="contacto">
-    <div>
-      <div class="label">Consultar</div>
-      <h2 class="sec-title">Solicita una demostración privada</h2>
-      <p class="sec-text">Te mostramos exactamente cómo funcionaría el sistema aplicado a tu clínica.</p>
+  <section class="contact-section" id="contacto">
+    <div class="container">
+      <div class="contact-grid">
+        <div class="contact-left">
+          <div class="label">Consultar</div>
+          <h2 class="sec-title">Solicita una demostración privada</h2>
+          <p class="sec-body">Te mostramos exactamente cómo funcionaría el sistema aplicado a tu clínica.</p>
+        </div>
+        <form class="form" id="contactForm" onsubmit="handleSubmit(event)">
+          <div class="field">
+            <label>Nombre</label>
+            <input type="text" placeholder="Carles Esteban" required>
+          </div>
+          <div class="form-row">
+            <div class="field">
+              <label>Teléfono</label>
+              <input type="tel" placeholder="+34 633 824 000" required>
+            </div>
+            <div class="field">
+              <label>Email</label>
+              <input type="email" placeholder="contacto@clinicamolar.com" required>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="field">
+              <label>Centro Médico</label>
+              <input type="text" placeholder="Clínica Moral">
+            </div>
+            <div class="field">
+              <label>Tipo de clínica</label>
+              <select>
+                <option value="">Seleccionar...</option>
+                <option>Clínica dental</option>
+                <option>Clínica estética</option>
+                <option>Centro médico</option>
+                <option>Consulta privada</option>
+                <option>Otra</option>
+              </select>
+            </div>
+          </div>
+          <p class="form-note">Sin compromiso. Evaluación personalizada.</p>
+          <button type="submit" class="btn-submit">Solicitar</button>
+        </form>
+      </div>
     </div>
-    <form class="form" id="contactForm" onsubmit="handleSubmit(event)">
-      <div class="field">
-        <label>Nombre</label>
-        <input type="text" placeholder="Carles Esteban" required>
-      </div>
-      <div class="form-row">
-        <div class="field">
-          <label>Teléfono</label>
-          <input type="tel" placeholder="+34 633 824 000" required>
-        </div>
-        <div class="field">
-          <label>Email</label>
-          <input type="email" placeholder="contacto@clinicamolar.com" required>
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="field">
-          <label>Centro Médico</label>
-          <input type="text" placeholder="Clínica Moral">
-        </div>
-        <div class="field">
-          <label>Clínica</label>
-          <select>
-            <option value="">Select...</option>
-            <option>Clínica dental</option>
-            <option>Clínica estética</option>
-            <option>Centro médico</option>
-            <option>Consulta privada</option>
-            <option>Otra</option>
-          </select>
-        </div>
-      </div>
-      <p class="form-note">Sin compromiso. Evaluación personalizada.</p>
-      <button type="submit" class="btn-submit">Solicitar</button>
-    </form>
   </section>
 
   <!-- FAQ -->
-  <section class="faq">
-    <div class="faq-item">
-      <button class="faq-q" onclick="toggleFaq(this)">
-        ¿Es complejo de gestionar?
-        <span class="faq-icon">+</span>
-      </button>
-      <div class="faq-body">
-        <div class="faq-body-inner">No. Nosotros realizamos la configuración completa. Tu equipo solo valida citas confirmadas.</div>
-      </div>
-    </div>
-    <div class="faq-item">
-      <button class="faq-q" onclick="toggleFaq(this)">
-        ¿Interfiere con nuestro sistema actual?
-        <span class="faq-icon">+</span>
-      </button>
-      <div class="faq-body">
-        <div class="faq-body-inner">No. Se integra sobre tu WhatsApp y calendario existentes sin alterar tus procesos actuales.</div>
-      </div>
-    </div>
-    <div class="faq-item">
-      <button class="faq-q" onclick="toggleFaq(this)">
-        ¿Cuánto tiempo tarda en implementarse?
-        <span class="faq-icon">+</span>
-      </button>
-      <div class="faq-body">
-        <div class="faq-body-inner">Entre 24 y 48 horas desde la aprobación. Incluye diagnóstico, configuración y pruebas de validación.</div>
+  <section class="faq-section">
+    <div class="container">
+      <div class="faq-inner">
+        <div class="faq-item">
+          <button class="faq-q" onclick="toggleFaq(this)">
+            ¿Es complejo de gestionar?
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-body">
+            <div class="faq-body-inner">No. Nosotros realizamos la configuración completa. Tu equipo solo valida citas confirmadas.</div>
+          </div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q" onclick="toggleFaq(this)">
+            ¿Interfiere con nuestro sistema actual?
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-body">
+            <div class="faq-body-inner">No. Se integra sobre tu WhatsApp y calendario existentes sin alterar tus procesos actuales.</div>
+          </div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q" onclick="toggleFaq(this)">
+            ¿Cuánto tiempo tarda en implementarse?
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-body">
+            <div class="faq-body-inner">Entre 24 y 48 horas desde la aprobación. Incluye diagnóstico, configuración y pruebas de validación.</div>
+          </div>
+        </div>
       </div>
     </div>
   </section>
 
   <!-- FOOTER -->
   <footer>
-    <div class="footer-main">
-      <div class="footer-left">
-        <p>Automatización avanzada de WhatsApp para clínicas</p>
-        <p>contacto@cliniflux.com</p>
-        <div class="footer-wordmark">cliniflux</div>
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-info">
+          <p>Automatización avanzada de WhatsApp para clínicas</p>
+          <p>contacto@cliniflux.com</p>
+          <div class="footer-wordmark">cliniflux</div>
+        </div>
+        <div class="footer-links">
+          <a href="/about">About</a>
+          <a href="#contacto">Contact</a>
+          <a href="#">X (Twitter)</a>
+          <a href="#">Roles</a>
+          <a href="#">Blog</a>
+          <a href="#">Instagram</a>
+          <a href="#">Hiring</a>
+          <a href="#">Terms</a>
+          <a href="#">LinkedIn</a>
+        </div>
       </div>
-      <div class="footer-links">
-        <a href="/about">About</a>
-        <a href="#contacto">Contact</a>
-        <a href="#">X (Twitter)</a>
-        <a href="#">Roles</a>
-        <a href="#">Blog</a>
-        <a href="#">Instagram</a>
-        <a href="#">Hiring</a>
-        <a href="#">Terms</a>
-        <a href="#">LinkedIn</a>
-      </div>
+      <div class="footer-bottom">© 2026 Cliniflux — Soluciones de automatización clínica</div>
     </div>
-    <div class="footer-bottom">© 2026 Cliniflux — Soluciones de automatización clínica</div>
   </footer>
 
   <script>
@@ -914,7 +1024,7 @@
 
     async function handleSubmit(e) {
       e.preventDefault();
-      const btn = document.querySelector('.btn-submit');
+      const btn = e.target.querySelector('.btn-submit');
       btn.textContent = 'Enviando...';
       btn.disabled = true;
       try {
