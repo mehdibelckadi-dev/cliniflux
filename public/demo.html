@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cliniflux — Demo del asistente</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #000;
+      --text: #fff;
+      --muted: rgba(255,255,255,0.45);
+      --accent: #3B5BF6;
+      --wa-header: #075E54;
+      --wa-bg: #ECE5DD;
+      --wa-bubble-in: #fff;
+      --wa-bubble-out: #DCF8C6;
+      --wa-time: rgba(0,0,0,0.38);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── NAVBAR ── */
+    nav {
+      position: fixed;
+      inset: 0 0 auto;
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 48px;
+      background: rgba(0,0,0,0.80);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+
+    .nav-logo {
+      font-size: 19px;
+      font-weight: 600;
+      letter-spacing: -0.4px;
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 28px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      font-size: 14px;
+      color: rgba(255,255,255,0.6);
+      text-decoration: none;
+      transition: color .2s;
+    }
+    .nav-links a:hover { color: var(--text); }
+
+    .btn-dark {
+      background: #191919;
+      color: var(--text);
+      border: 1px solid #2A2A2A;
+      padding: 9px 18px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background .2s;
+    }
+    .btn-dark:hover { background: #222; }
+
+    /* ── MAIN ── */
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 100px 24px 60px;
+    }
+
+    .demo-header {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+
+    .demo-header h1 {
+      font-size: clamp(28px, 4vw, 44px);
+      font-weight: 800;
+      letter-spacing: -1.5px;
+      margin-bottom: 10px;
+    }
+
+    .demo-header p {
+      font-size: 18px;
+      color: rgba(255,255,255,0.45);
+      font-weight: 500;
+      letter-spacing: -0.3px;
+    }
+
+    /* ── PHONE FRAME ── */
+    .phone-wrap {
+      background: #0D1117;
+      border-radius: 32px;
+      padding: 24px;
+      width: 100%;
+      max-width: 380px;
+      box-shadow: 0 40px 120px rgba(0,0,0,0.8);
+    }
+
+    .phone {
+      background: var(--wa-bg);
+      border-radius: 20px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      height: 580px;
+    }
+
+    /* WA Header */
+    .wa-header {
+      background: var(--wa-header);
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+
+    .wa-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+
+    .wa-info { flex: 1; min-width: 0; }
+
+    .wa-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: #fff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .wa-status {
+      font-size: 11px;
+      color: rgba(255,255,255,0.7);
+    }
+
+    /* WA Chat area */
+    .wa-chat {
+      flex: 1;
+      overflow-y: auto;
+      padding: 14px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      scroll-behavior: smooth;
+    }
+
+    .wa-chat::-webkit-scrollbar { width: 3px; }
+    .wa-chat::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 2px; }
+
+    .bubble {
+      max-width: 82%;
+      padding: 8px 12px;
+      border-radius: 12px;
+      font-size: 13px;
+      line-height: 1.55;
+      position: relative;
+      word-break: break-word;
+    }
+
+    .bubble-in {
+      background: var(--wa-bubble-in);
+      color: #111;
+      align-self: flex-start;
+      border-top-left-radius: 3px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    }
+
+    .bubble-out {
+      background: var(--wa-bubble-out);
+      color: #111;
+      align-self: flex-end;
+      border-top-right-radius: 3px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    }
+
+    .bubble-time {
+      font-size: 10px;
+      color: var(--wa-time);
+      float: right;
+      margin-left: 8px;
+      margin-top: 2px;
+    }
+
+    .typing-indicator {
+      display: none;
+      align-self: flex-start;
+      background: var(--wa-bubble-in);
+      border-radius: 12px;
+      border-top-left-radius: 3px;
+      padding: 10px 16px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    }
+
+    .typing-dots {
+      display: flex;
+      gap: 4px;
+      align-items: center;
+    }
+
+    .typing-dots span {
+      width: 6px;
+      height: 6px;
+      background: #999;
+      border-radius: 50%;
+      animation: bounce 1.2s infinite;
+    }
+    .typing-dots span:nth-child(2) { animation-delay: .2s; }
+    .typing-dots span:nth-child(3) { animation-delay: .4s; }
+
+    @keyframes bounce {
+      0%, 60%, 100% { transform: translateY(0); }
+      30% { transform: translateY(-5px); }
+    }
+
+    /* WA Input */
+    .wa-input-bar {
+      background: #F0F0F0;
+      padding: 8px 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .wa-input {
+      flex: 1;
+      background: #fff;
+      border: none;
+      border-radius: 24px;
+      padding: 10px 16px;
+      font-size: 13px;
+      font-family: inherit;
+      color: #111;
+      outline: none;
+      resize: none;
+    }
+
+    .wa-input::placeholder { color: #aaa; }
+
+    .wa-send {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #4CAF7D;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: background .2s;
+    }
+    .wa-send:hover { background: #3d9e6a; }
+    .wa-send:disabled { background: #aaa; cursor: not-allowed; }
+
+    .wa-send svg {
+      width: 18px;
+      height: 18px;
+      fill: #fff;
+      margin-left: 2px;
+    }
+
+    /* ── FOOTER ── */
+    .demo-footer {
+      margin-top: 32px;
+      text-align: center;
+    }
+
+    .demo-footer p {
+      font-size: 13px;
+      color: rgba(255,255,255,0.3);
+      margin-bottom: 12px;
+    }
+
+    .demo-footer a {
+      font-size: 13px;
+      color: var(--accent);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(59,91,246,0.4);
+      padding-bottom: 1px;
+      transition: border-color .2s;
+    }
+    .demo-footer a:hover { border-color: var(--accent); }
+
+    /* Page footer */
+    .page-footer {
+      padding: 20px 48px;
+      border-top: 1px solid #0D0D0D;
+      text-align: center;
+    }
+    .page-footer p {
+      font-size: 12px;
+      color: rgba(255,255,255,0.2);
+    }
+
+    @media (max-width: 600px) {
+      nav { padding: 14px 20px; }
+      .nav-links { display: none; }
+      main { padding: 80px 16px 40px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav>
+    <a href="/landing.html" class="nav-logo">cliniflux</a>
+    <ul class="nav-links">
+      <li><a href="/landing.html#about">About</a></li>
+      <li><a href="/landing.html#blog">Blog</a></li>
+      <li><a href="/landing.html#contacto">Contacto</a></li>
+    </ul>
+    <a href="/landing.html#contacto" class="btn-dark">Solicitar llamada</a>
+  </nav>
+
+  <main>
+    <div class="demo-header">
+      <h1>Demostración del asistente</h1>
+      <p>Prueba el asistente automatizado para pacientes</p>
+    </div>
+
+    <div class="phone-wrap">
+      <div class="phone">
+        <!-- WhatsApp Header -->
+        <div class="wa-header">
+          <div class="wa-avatar">🏥</div>
+          <div class="wa-info">
+            <div class="wa-name" id="clinicName">Clínica Demo</div>
+            <div class="wa-status" id="clinicStatus">en línea</div>
+          </div>
+        </div>
+
+        <!-- Chat messages -->
+        <div class="wa-chat" id="chatMessages">
+          <!-- Welcome message -->
+          <div class="bubble bubble-in">
+            <span>¡Hola! Soy Natalia, asistente de la clínica. ¿En qué puedo ayudarte hoy? 😊</span>
+            <span class="bubble-time" id="initTime"></span>
+          </div>
+
+          <!-- Typing indicator -->
+          <div class="typing-indicator" id="typingIndicator">
+            <div class="typing-dots">
+              <span></span><span></span><span></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Input bar -->
+        <div class="wa-input-bar">
+          <input
+            class="wa-input"
+            id="msgInput"
+            type="text"
+            placeholder="Message"
+            maxlength="500"
+            autocomplete="off"
+          >
+          <button class="wa-send" id="sendBtn" onclick="sendMessage()">
+            <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="demo-footer">
+      <p>Esto es una demo en vivo — el asistente responde como lo haría en una clínica real.</p>
+      <a href="/landing.html#contacto">Solicitar implementación para tu clínica →</a>
+    </div>
+  </main>
+
+  <div class="page-footer">
+    <p>Automatización avanzada de WhatsApp para clínicas</p>
+  </div>
+
+  <script>
+    // Config — apunta a tu backend
+    const BACKEND_URL = ''; // vacío = mismo origen, e.g. 'https://tu-app.railway.app'
+    const SESSION_ID = 'demo-' + Math.random().toString(36).slice(2, 10);
+
+    // Hora actual formateada
+    function nowTime() {
+      return new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+    }
+
+    // Poner hora en el mensaje de bienvenida
+    document.getElementById('initTime').textContent = nowTime();
+
+    const chat = document.getElementById('chatMessages');
+    const input = document.getElementById('msgInput');
+    const sendBtn = document.getElementById('sendBtn');
+    const typing = document.getElementById('typingIndicator');
+
+    function scrollBottom() {
+      chat.scrollTop = chat.scrollHeight;
+    }
+
+    function addBubble(text, direction) {
+      const time = nowTime();
+      const div = document.createElement('div');
+      div.className = `bubble bubble-${direction}`;
+      div.innerHTML = `<span>${escapeHtml(text)}</span><span class="bubble-time">${time}</span>`;
+
+      // Insert before typing indicator
+      chat.insertBefore(div, typing);
+      scrollBottom();
+      return div;
+    }
+
+    function escapeHtml(str) {
+      return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/\n/g, '<br>');
+    }
+
+    function setTyping(visible) {
+      typing.style.display = visible ? 'block' : 'none';
+      if (visible) scrollBottom();
+    }
+
+    async function sendMessage() {
+      const msg = input.value.trim();
+      if (!msg) return;
+
+      input.value = '';
+      sendBtn.disabled = true;
+      input.disabled = true;
+
+      // User bubble
+      addBubble(msg, 'out');
+
+      // Show typing
+      setTyping(true);
+
+      try {
+        const res = await fetch(`${BACKEND_URL}/chat`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ session_id: SESSION_ID, msg })
+        });
+
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+        const data = await res.json();
+        setTyping(false);
+        addBubble(data.reply || data.response || data.message || 'No se recibió respuesta.', 'in');
+
+      } catch (err) {
+        setTyping(false);
+        addBubble('Lo siento, hay un problema de conexión. Por favor inténtalo de nuevo.', 'in');
+        console.error('Chat error:', err);
+      } finally {
+        sendBtn.disabled = false;
+        input.disabled = false;
+        input.focus();
+      }
+    }
+
+    // Send on Enter
+    input.addEventListener('keydown', e => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+      }
+    });
+
+    // Focus input on load
+    setTimeout(() => input.focus(), 300);
+  </script>
+</body>
+</html>

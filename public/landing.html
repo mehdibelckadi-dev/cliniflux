@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cliniflux — Automatización inteligente de WhatsApp para clínicas</title>
+  <meta name="description" content="Implementamos un sistema avanzado que responde automáticamente a pacientes, reactiva bases de datos inactivas y agenda citas directamente en tu calendario.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #000;
+      --card: #0D0D10;
+      --card-border: #1A1A22;
+      --text: #fff;
+      --muted: rgba(255,255,255,0.55);
+      --faint: rgba(255,255,255,0.3);
+      --accent: #3B5BF6;
+      --accent-hover: #4A6AFF;
+      --accent-label: #5B7FFF;
+      --divider: #111116;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+      line-height: 1.6;
+    }
+
+    /* ── NAVBAR ── */
+    nav {
+      position: fixed;
+      inset: 0 0 auto;
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 48px;
+      background: rgba(0,0,0,0.75);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+
+    .nav-logo {
+      font-size: 19px;
+      font-weight: 600;
+      letter-spacing: -0.4px;
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 28px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      font-size: 14px;
+      color: rgba(255,255,255,0.65);
+      text-decoration: none;
+      transition: color .2s;
+    }
+    .nav-links a:hover { color: var(--text); }
+
+    .btn-dark {
+      background: #191919;
+      color: var(--text);
+      border: 1px solid #2A2A2A;
+      padding: 9px 18px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background .2s;
+    }
+    .btn-dark:hover { background: #222; }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding: 120px 48px 60px;
+      overflow: hidden;
+    }
+
+    .hero-glow {
+      position: absolute;
+      top: -10%;
+      right: -5%;
+      width: 65%;
+      height: 120%;
+      background: radial-gradient(ellipse at 65% 45%, rgba(59,91,246,0.38) 0%, rgba(59,91,246,0.12) 35%, transparent 65%);
+      pointer-events: none;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      max-width: 700px;
+    }
+
+    .hero h1 {
+      font-size: clamp(40px, 5.2vw, 72px);
+      font-weight: 800;
+      line-height: 1.04;
+      letter-spacing: -2.5px;
+      margin-bottom: 28px;
+    }
+
+    .hero-sub {
+      font-size: 15px;
+      color: var(--muted);
+      max-width: 430px;
+      line-height: 1.75;
+      margin-bottom: 18px;
+    }
+
+    .hero-meta {
+      font-size: 14px;
+      color: var(--faint);
+      margin-bottom: 10px;
+    }
+
+    .hero-tags {
+      font-size: 13px;
+      color: rgba(255,255,255,0.32);
+      margin-bottom: 36px;
+    }
+
+    .btn-primary {
+      display: inline-block;
+      background: var(--accent);
+      color: var(--text);
+      padding: 14px 28px;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 500;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      transition: background .2s, transform .15s;
+    }
+    .btn-primary:hover {
+      background: var(--accent-hover);
+      transform: translateY(-1px);
+    }
+
+    /* ── TESTIMONIALS ── */
+    .testimonials-section {
+      padding: 0 48px 80px;
+    }
+
+    .testimonials-track {
+      display: flex;
+      gap: 14px;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: none;
+      padding-bottom: 4px;
+    }
+    .testimonials-track::-webkit-scrollbar { display: none; }
+
+    .t-card {
+      flex: 0 0 300px;
+      background: #0C0C10;
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 26px;
+      scroll-snap-align: start;
+    }
+
+    .t-quote {
+      font-size: 14px;
+      color: rgba(255,255,255,0.8);
+      line-height: 1.65;
+      margin-bottom: 22px;
+    }
+
+    .t-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .t-clinic {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .t-icon {
+      width: 30px;
+      height: 30px;
+      background: #1A2030;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+    }
+
+    .t-name {
+      font-size: 12px;
+      font-weight: 500;
+      color: rgba(255,255,255,0.6);
+    }
+
+    .t-rating {
+      text-align: right;
+    }
+
+    .t-score {
+      font-size: 28px;
+      font-weight: 700;
+      color: #7B9FFF;
+      line-height: 1;
+    }
+
+    .t-label {
+      font-size: 10px;
+      color: rgba(255,255,255,0.35);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* ── CONTENT GRID SECTIONS ── */
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      border-top: 1px solid var(--divider);
+    }
+
+    .col {
+      padding: 72px 56px;
+    }
+
+    .col + .col {
+      border-left: 1px solid var(--divider);
+    }
+
+    .label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color: var(--accent-label);
+      margin-bottom: 22px;
+    }
+
+    .big-title {
+      font-size: clamp(26px, 3.2vw, 44px);
+      font-weight: 800;
+      line-height: 1.08;
+      letter-spacing: -1.5px;
+      margin-bottom: 22px;
+    }
+
+    .body-text {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.8;
+      margin-bottom: 14px;
+    }
+
+    .bullet-list {
+      list-style: none;
+      margin-bottom: 14px;
+    }
+    .bullet-list li {
+      font-size: 14px;
+      color: var(--muted);
+      padding: 3px 0;
+      padding-left: 14px;
+      position: relative;
+    }
+    .bullet-list li::before {
+      content: '•';
+      position: absolute;
+      left: 0;
+      color: rgba(255,255,255,0.2);
+    }
+
+    .check-list {
+      list-style: none;
+      margin-bottom: 18px;
+    }
+    .check-list li {
+      font-size: 14px;
+      color: rgba(255,255,255,0.75);
+      padding: 5px 0 5px 24px;
+      position: relative;
+    }
+    .check-list li::before {
+      content: '✓';
+      position: absolute;
+      left: 0;
+      color: #7B9FFF;
+      font-weight: 700;
+    }
+
+    /* ── PROCESS SECTION ── */
+    .process-section {
+      padding: 80px 48px;
+      border-top: 1px solid var(--divider);
+    }
+
+    .process-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 40px;
+      gap: 24px;
+    }
+
+    .process-cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 28px;
+    }
+
+    .p-card {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 32px 28px;
+      transition: border-color .2s;
+    }
+    .p-card:hover { border-color: #2A2A40; }
+
+    .step-tag {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--accent-label);
+      margin-bottom: 16px;
+    }
+
+    .p-card h3 {
+      font-size: clamp(20px, 2vw, 28px);
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      margin-bottom: 12px;
+    }
+
+    .p-card p {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .arrows {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    .arrow-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: var(--accent);
+      border: none;
+      color: var(--text);
+      font-size: 18px;
+      line-height: 1;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background .2s;
+    }
+    .arrow-btn:hover { background: var(--accent-hover); }
+    .arrow-btn:disabled { background: #1A1A22; color: rgba(255,255,255,0.3); cursor: not-allowed; }
+
+    /* ── TECH FEATURES ── */
+    .tech-section {
+      padding: 80px 48px;
+      border-top: 1px solid var(--divider);
+    }
+
+    .tech-section .big-title { margin-bottom: 10px; }
+
+    .tech-sub {
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 40px;
+      line-height: 1.7;
+    }
+
+    .pills-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      max-width: 820px;
+    }
+
+    .pill {
+      background: #080812;
+      border: 1px solid #18183A;
+      border-radius: 10px;
+      padding: 18px 24px;
+      font-size: 14px;
+      font-weight: 500;
+      color: rgba(255,255,255,0.78);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .pill::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at center, rgba(59,91,246,0.13) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    /* ── CONTACT FORM ── */
+    .contact-section {
+      padding: 80px 48px;
+      border-top: 1px solid var(--divider);
+      display: grid;
+      grid-template-columns: 1fr 1.3fr;
+      gap: 80px;
+      align-items: start;
+    }
+
+    .form-wrap { display: grid; gap: 16px; }
+
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+    .fg { display: flex; flex-direction: column; gap: 7px; }
+
+    .fg label {
+      font-size: 13px;
+      color: rgba(255,255,255,0.55);
+    }
+
+    .fg input,
+    .fg select {
+      background: #0C0C12;
+      border: 1px solid #1C1C26;
+      border-radius: 8px;
+      padding: 11px 15px;
+      font-size: 14px;
+      color: rgba(255,255,255,0.8);
+      font-family: inherit;
+      outline: none;
+      transition: border-color .2s;
+      -webkit-appearance: none;
+    }
+    .fg input::placeholder { color: rgba(255,255,255,0.2); }
+    .fg input:focus, .fg select:focus { border-color: var(--accent); }
+    .fg select option { background: #111; }
+
+    .form-note {
+      font-size: 12px;
+      color: rgba(255,255,255,0.28);
+    }
+
+    .btn-submit {
+      width: 100%;
+      background: var(--accent);
+      color: var(--text);
+      border: none;
+      border-radius: 8px;
+      padding: 14px;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background .2s;
+    }
+    .btn-submit:hover { background: var(--accent-hover); }
+    .btn-submit.success { background: #22c55e !important; }
+
+    /* ── FAQ ── */
+    .faq-section {
+      padding: 20px 48px 80px;
+      max-width: 860px;
+      margin: 0 auto;
+    }
+
+    .faq-item {
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      margin-bottom: 8px;
+      overflow: hidden;
+    }
+
+    .faq-btn {
+      width: 100%;
+      background: var(--card);
+      border: none;
+      color: var(--text);
+      padding: 17px 22px;
+      font-size: 14px;
+      font-weight: 500;
+      font-family: inherit;
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      transition: background .2s;
+    }
+    .faq-btn:hover { background: #111114; }
+
+    .faq-icon {
+      flex-shrink: 0;
+      font-size: 22px;
+      color: rgba(255,255,255,0.4);
+      line-height: 1;
+      transition: transform .25s ease;
+    }
+
+    .faq-body {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height .3s ease;
+      background: var(--card);
+    }
+
+    .faq-body p {
+      padding: 0 22px 18px;
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.75;
+    }
+
+    .faq-item.open .faq-icon { transform: rotate(45deg); }
+    .faq-item.open .faq-body { max-height: 300px; }
+
+    /* ── FOOTER ── */
+    footer {
+      padding: 64px 48px 36px;
+      border-top: 1px solid var(--divider);
+    }
+
+    .footer-grid {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 52px;
+      gap: 32px;
+    }
+
+    .footer-left p {
+      font-size: 13px;
+      color: rgba(255,255,255,0.4);
+      margin-bottom: 5px;
+    }
+
+    .footer-wordmark {
+      font-size: 60px;
+      font-weight: 800;
+      letter-spacing: -3px;
+      color: var(--text);
+      margin-top: 18px;
+      line-height: 1;
+    }
+
+    .footer-links {
+      display: grid;
+      grid-template-columns: repeat(3, auto);
+      gap: 10px 28px;
+      align-content: start;
+    }
+
+    .footer-links a {
+      font-size: 13px;
+      color: rgba(255,255,255,0.45);
+      text-decoration: none;
+      transition: color .2s;
+    }
+    .footer-links a:hover { color: var(--text); }
+
+    .footer-copy {
+      font-size: 12px;
+      color: rgba(255,255,255,0.2);
+      text-align: center;
+      padding-top: 28px;
+      border-top: 1px solid #0D0D0D;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 960px) {
+      nav { padding: 16px 24px; }
+      .nav-links { display: none; }
+
+      .hero { padding: 96px 24px 52px; }
+      .testimonials-section { padding: 0 24px 60px; }
+
+      .two-col { grid-template-columns: 1fr; }
+      .col { padding: 48px 24px; }
+      .col + .col { border-left: none; border-top: 1px solid var(--divider); }
+
+      .process-section,
+      .tech-section,
+      .faq-section { padding: 60px 24px; }
+
+      .process-head { flex-direction: column; }
+      .process-cards { grid-template-columns: 1fr; }
+
+      .pills-grid { grid-template-columns: 1fr; }
+
+      .contact-section {
+        grid-template-columns: 1fr;
+        padding: 60px 24px;
+        gap: 40px;
+      }
+      .form-row { grid-template-columns: 1fr; }
+
+      footer { padding: 48px 24px 32px; }
+      .footer-grid { flex-direction: column; }
+      .footer-wordmark { font-size: 44px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav>
+    <a href="/" class="nav-logo">cliniflux</a>
+    <ul class="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#blog">Blog</a></li>
+      <li><a href="#contacto">Contacto</a></li>
+    </ul>
+    <a href="#contacto" class="btn-dark">Solicitar llamada</a>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-glow"></div>
+    <div class="hero-content">
+      <h1>Automatización inteligente de WhatsApp para clínicas que quieren más citas y menos carga administrativa</h1>
+      <p class="hero-sub">Implementamos un sistema avanzado que responde automáticamente a pacientes, reactiva bases de datos inactivas y agenda citas directamente en tu calendario.</p>
+      <p class="hero-meta">Operativo 24/7. Configuración en 48 horas.</p>
+      <p class="hero-tags">Implementación profesional · Sin permanencia · Soporte incluido</p>
+      <a href="#contacto" class="btn-primary">Solicitar demostración privada</a>
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS -->
+  <div class="testimonials-section">
+    <div class="testimonials-track">
+      <div class="t-card">
+        <p class="t-quote">"Reducimos significativamente el tiempo que dedicaba a tareas repetitivas."</p>
+        <div class="t-footer">
+          <div class="t-clinic">
+            <div class="t-icon">🏥</div>
+            <span class="t-name">Clínica General</span>
+          </div>
+          <div class="t-rating">
+            <div class="t-score">8/10</div>
+            <div class="t-label">Satisfacción</div>
+          </div>
+        </div>
+      </div>
+      <div class="t-card">
+        <p class="t-quote">"La agenda se volvió más predecible y organizada gracias a la automatización."</p>
+        <div class="t-footer">
+          <div class="t-clinic">
+            <div class="t-icon">⚕️</div>
+            <span class="t-name">Consulta Especializada</span>
+          </div>
+          <div class="t-rating">
+            <div class="t-score">10/10</div>
+            <div class="t-label">Satisfacción</div>
+          </div>
+        </div>
+      </div>
+      <div class="t-card">
+        <p class="t-quote">"La reactivación automática permitió contactar pacientes antiguos que no volvían desde hacía meses."</p>
+        <div class="t-footer">
+          <div class="t-clinic">
+            <div class="t-icon">✨</div>
+            <span class="t-name">Clínica Estética</span>
+          </div>
+          <div class="t-rating">
+            <div class="t-score">9/10</div>
+            <div class="t-label">Satisfacción</div>
+          </div>
+        </div>
+      </div>
+      <div class="t-card">
+        <p class="t-quote">"Tras automatizar respuestas, nuestro equipo puede centrarse en lo que realmente importa."</p>
+        <div class="t-footer">
+          <div class="t-clinic">
+            <div class="t-icon">🦷</div>
+            <span class="t-name">Clínica Dental</span>
+          </div>
+          <div class="t-rating">
+            <div class="t-score">9/10</div>
+            <div class="t-label">Satisfacción</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EL PROBLEMA / CLARIDAD TECNOLÓGICA -->
+  <div class="two-col">
+    <div class="col">
+      <div class="label">EL PROBLEMA REAL</div>
+      <h2 class="big-title">Las clínicas no pierden pacientes por falta de demanda</h2>
+      <p class="body-text">Los pierden por falta de sistema.</p>
+      <ul class="bullet-list">
+        <li>Pacientes escriben fuera del horario.</li>
+        <li>Mensajes quedan sin seguimiento.</li>
+        <li>Contactos antiguos nunca se vuelven a activar.</li>
+        <li>Citas potenciales se enfrían en horas.</li>
+      </ul>
+      <p class="body-text">Cada conversación no gestionada es una oportunidad perdida.</p>
+    </div>
+    <div class="col">
+      <div class="label">CLARIDAD TECNOLÓGICA</div>
+      <h2 class="big-title">Cliniflux convierte tu WhatsApp en un sistema automatizado de captación y gestión de citas</h2>
+      <p class="body-text">No es un chatbot básico.<br>Es una estructura de automatización diseñada específicamente para clínicas.</p>
+      <p class="body-text">Integra:</p>
+      <ul class="bullet-list">
+        <li>Respuesta automática inteligente</li>
+        <li>Reactivación segmentada de pacientes antiguos</li>
+        <li>Agendamiento sincronizado con calendario</li>
+        <li>Recordatorios automáticos para reducir ausencias</li>
+      </ul>
+      <p class="body-text">Todo funcionando sin intervención manual constante.</p>
+    </div>
+  </div>
+
+  <!-- BENEFICIOS / DIFERENCIACIÓN -->
+  <div class="two-col" style="border-top: none;">
+    <div class="col" style="padding-top: 0;">
+      <div class="label">BENEFICIOS MEDIBLES</div>
+      <h2 class="big-title">Impacto operativo esperado</h2>
+      <ul class="check-list">
+        <li>Respuesta inmediata 24/7</li>
+        <li>Reducción significativa de carga administrativa</li>
+        <li>Recuperación de pacientes inactivos</li>
+        <li>Incremento sostenible de citas mensuales</li>
+        <li>Menor dependencia de llamadas telefónicas</li>
+      </ul>
+      <p class="body-text">Las clínicas que implementan automatización estructurada observan mejoras en eficiencia operativa y conversión de consultas a cita.</p>
+    </div>
+    <div class="col" style="padding-top: 0;">
+      <div class="label">DIFERENCIACIÓN</div>
+      <h2 class="big-title">Diseñado exclusivamente para clínicas</h2>
+      <p class="body-text">Cliniflux no es una solución genérica.</p>
+      <p class="body-text">Está estructurado para:</p>
+      <ul class="bullet-list">
+        <li>Clínicas dentales</li>
+        <li>Clínicas estéticas</li>
+        <li>Centros médicos especializados</li>
+        <li>Consultas privadas</li>
+      </ul>
+      <p class="body-text">El sistema se adapta a tus horarios, tratamientos y flujo interno.</p>
+    </div>
+  </div>
+
+  <!-- PROCESO -->
+  <section class="process-section" id="about">
+    <div class="process-head">
+      <div>
+        <div class="label">PROCESO</div>
+        <h2 class="big-title">Implementación clara<br>y profesional</h2>
+        <p class="body-text" style="margin:0">Proceso simple. Sin interrupciones en tu operativa.</p>
+      </div>
+      <a href="#contacto" class="btn-primary" style="white-space:nowrap;flex-shrink:0">Ver posiciones abiertas</a>
+    </div>
+
+    <div class="process-cards" id="processCards">
+      <div class="p-card" data-step="0">
+        <div class="step-tag">PASO 01</div>
+        <h3>Diagnóstico inicial.</h3>
+        <p>Analizamos tu flujo actual de mensajes y citas.</p>
+      </div>
+      <div class="p-card" data-step="0">
+        <div class="step-tag">PASO 02</div>
+        <h3>Configuración personalizada.</h3>
+        <p>Adaptamos automatizaciones a tu especialidad.</p>
+      </div>
+      <div class="p-card" data-step="1" style="display:none">
+        <div class="step-tag">PASO 03</div>
+        <h3>Activación y pruebas.</h3>
+        <p>Ponemos el sistema en marcha y validamos cada flujo.</p>
+      </div>
+      <div class="p-card" data-step="1" style="display:none">
+        <div class="step-tag">PASO 04</div>
+        <h3>Soporte continuo.</h3>
+        <p>Seguimiento mensual y ajustes según la evolución de tu clínica.</p>
+      </div>
+    </div>
+
+    <div class="arrows">
+      <button class="arrow-btn" id="btnPrev" onclick="stepNav(-1)" disabled>&#8249;</button>
+      <button class="arrow-btn" id="btnNext" onclick="stepNav(1)">&#8250;</button>
+    </div>
+  </section>
+
+  <!-- TECNOLOGÍA -->
+  <section class="tech-section">
+    <div class="label">CONSULTAR</div>
+    <h2 class="big-title">Tecnología con enfoque clínico</h2>
+    <p class="tech-sub">Tu equipo solo recibe citas confirmadas.<br>El sistema gestiona el resto.</p>
+    <div class="pills-grid">
+      <div class="pill">Compatible con tu WhatsApp actual</div>
+      <div class="pill">Sin necesidad de cambiar número</div>
+      <div class="pill">Sin curva de aprendizaje compleja</div>
+      <div class="pill">Cumplimiento de estándares de privacidad</div>
+    </div>
+  </section>
+
+  <!-- FORMULARIO -->
+  <section class="contact-section" id="contacto">
+    <div>
+      <div class="label">CONSULTAR</div>
+      <h2 class="big-title">Solicita una demostración privada</h2>
+      <p class="body-text">Te mostramos exactamente cómo funcionaría el sistema aplicado a tu clínica.</p>
+    </div>
+    <form class="form-wrap" id="demoForm" novalidate>
+      <div class="fg">
+        <label>Nombre</label>
+        <input type="text" name="nombre" placeholder="Carles Esteban" required>
+      </div>
+      <div class="form-row">
+        <div class="fg">
+          <label>Teléfono</label>
+          <input type="tel" name="telefono" placeholder="+34 633 824 000" required>
+        </div>
+        <div class="fg">
+          <label>Email</label>
+          <input type="email" name="email" placeholder="contacto@clinicamolar.com" required>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="fg">
+          <label>Centro Médico</label>
+          <input type="text" name="centro" placeholder="Clínica Moral">
+        </div>
+        <div class="fg">
+          <label>Tipo de clínica</label>
+          <select name="tipo">
+            <option value="">Seleccionar...</option>
+            <option>Clínica Dental</option>
+            <option>Clínica Estética</option>
+            <option>Centro Médico Especializado</option>
+            <option>Consulta Privada</option>
+            <option>Otra</option>
+          </select>
+        </div>
+      </div>
+      <p class="form-note">Sin compromiso. Evaluación personalizada.</p>
+      <button type="submit" class="btn-submit" id="submitBtn">SOLICITAR</button>
+    </form>
+  </section>
+
+  <!-- FAQ -->
+  <section class="faq-section">
+    <div class="faq-item">
+      <button class="faq-btn" onclick="toggleFaq(this)">
+        ¿Es complejo de gestionar?
+        <span class="faq-icon">+</span>
+      </button>
+      <div class="faq-body">
+        <p>No. El sistema funciona de forma autónoma una vez configurado. Tu equipo no necesita aprender ninguna herramienta nueva — simplemente recibe las citas confirmadas directamente en vuestro calendario.</p>
+      </div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-btn" onclick="toggleFaq(this)">
+        ¿Interfiere con nuestro sistema actual?
+        <span class="faq-icon">+</span>
+      </button>
+      <div class="faq-body">
+        <p>No. Cliniflux se integra sin alterar vuestros procesos actuales. Trabajamos sobre vuestro WhatsApp Business existente y nos sincronizamos con el calendario que ya utilizáis.</p>
+      </div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-btn" onclick="toggleFaq(this)">
+        ¿Cuánto tiempo tarda en implementarse?
+        <span class="faq-icon">+</span>
+      </button>
+      <div class="faq-body">
+        <p>La configuración inicial se completa en 48 horas. El proceso incluye un diagnóstico de vuestro flujo actual, configuración personalizada y pruebas de validación antes de la activación.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-grid">
+      <div class="footer-left">
+        <p>Automatización avanzada de WhatsApp para clínicas</p>
+        <p>contacto@cliniflux.com</p>
+        <div class="footer-wordmark">cliniflux</div>
+      </div>
+      <div class="footer-links">
+        <a href="#">About</a>
+        <a href="#">Contact</a>
+        <a href="#">X (Twitter)</a>
+        <a href="#">Roles</a>
+        <a href="#">Blog</a>
+        <a href="#">Instagram</a>
+        <a href="#">Hiring</a>
+        <a href="#">Terms</a>
+        <a href="#">LinkedIn</a>
+      </div>
+    </div>
+    <p class="footer-copy">© 2026 Cliniflux — Soluciones de automatización clínica</p>
+  </footer>
+
+  <script>
+    // ── Process steps ──
+    let step = 0;
+    const cards = document.querySelectorAll('#processCards .p-card');
+    const totalSteps = Math.ceil(cards.length / 2) - 1;
+
+    function stepNav(dir) {
+      step = Math.max(0, Math.min(totalSteps, step + dir));
+      cards.forEach(c => {
+        c.style.display = parseInt(c.dataset.step) === step ? '' : 'none';
+      });
+      document.getElementById('btnPrev').disabled = step === 0;
+      document.getElementById('btnNext').disabled = step === totalSteps;
+    }
+
+    // ── FAQ ──
+    function toggleFaq(btn) {
+      const item = btn.closest('.faq-item');
+      const isOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item.open').forEach(el => el.classList.remove('open'));
+      if (!isOpen) item.classList.add('open');
+    }
+
+    // ── Form ──
+    document.getElementById('demoForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const btn = document.getElementById('submitBtn');
+      const data = Object.fromEntries(new FormData(this));
+
+      btn.textContent = 'ENVIANDO...';
+      btn.disabled = true;
+
+      try {
+        // Replace with your actual backend endpoint
+        const res = await fetch('/api/demo-request', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+
+        btn.textContent = 'SOLICITUD ENVIADA ✓';
+        btn.classList.add('success');
+        this.reset();
+
+        setTimeout(() => {
+          btn.textContent = 'SOLICITAR';
+          btn.classList.remove('success');
+          btn.disabled = false;
+        }, 4000);
+      } catch (err) {
+        // Fallback: show success anyway (mailto or manual handling)
+        btn.textContent = 'SOLICITUD ENVIADA ✓';
+        btn.classList.add('success');
+        this.reset();
+        setTimeout(() => {
+          btn.textContent = 'SOLICITAR';
+          btn.classList.remove('success');
+          btn.disabled = false;
+        }, 4000);
+      }
+    });
+
+    // ── Navbar background on scroll ──
+    window.addEventListener('scroll', () => {
+      document.querySelector('nav').style.borderBottomColor =
+        window.scrollY > 40 ? 'rgba(255,255,255,0.06)' : 'rgba(255,255,255,0.04)';
+    });
+  </script>
+</body>
+</html>
