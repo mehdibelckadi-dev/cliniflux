@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cliniflux — About</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #000000;
+      --text: #ffffff;
+      --text-muted: rgba(255,255,255,0.55);
+      --text-dim: rgba(255,255,255,0.35);
+      --accent: #3B5BF6;
+      --accent-hover: #4f6fff;
+      --label: #c8a96e;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* NAVBAR */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 22px 64px;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(24px);
+    }
+
+    .nav-logo {
+      font-size: 18px;
+      font-weight: 700;
+      color: #fff;
+      text-decoration: none;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 36px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      font-size: 14px;
+      font-weight: 500;
+      color: rgba(255,255,255,0.65);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover, .nav-links a.active { color: #fff; }
+
+    .btn-outline {
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 500;
+      color: #fff;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.15);
+      padding: 10px 20px;
+      border-radius: 10px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+    .btn-outline:hover { background: rgba(255,255,255,0.12); }
+
+    /* HERO */
+    .hero {
+      position: relative;
+      min-height: 80vh;
+      display: flex;
+      align-items: center;
+      padding: 130px 64px 80px;
+      overflow: hidden;
+    }
+
+    .hero-glow {
+      position: absolute;
+      top: -10%; right: -5%;
+      width: 65%; height: 120%;
+      background: radial-gradient(ellipse at 65% 45%,
+        rgba(40,80,220,0.5) 0%,
+        rgba(30,60,180,0.25) 35%,
+        rgba(20,40,140,0.08) 60%,
+        transparent 75%);
+      pointer-events: none;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      max-width: 580px;
+    }
+
+    .hero h1 {
+      font-size: clamp(36px, 4.5vw, 62px);
+      font-weight: 800;
+      line-height: 1.06;
+      letter-spacing: -2px;
+      margin-bottom: 28px;
+      animation: fadeUp 0.8s cubic-bezier(0.22,1,0.36,1) both;
+    }
+
+    .hero p {
+      font-size: 15px;
+      color: var(--text-muted);
+      line-height: 1.8;
+      margin-bottom: 16px;
+      max-width: 420px;
+      animation: fadeUp 0.8s 0.15s cubic-bezier(0.22,1,0.36,1) both;
+    }
+
+    .hero-cta {
+      position: absolute;
+      bottom: 80px;
+      right: 64px;
+      animation: fadeUp 0.8s 0.4s cubic-bezier(0.22,1,0.36,1) both;
+    }
+
+    .btn-primary {
+      display: inline-block;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 600;
+      color: #fff;
+      background: var(--accent);
+      border: none;
+      padding: 15px 28px;
+      border-radius: 10px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.2s, transform 0.15s;
+    }
+    .btn-primary:hover { background: var(--accent-hover); transform: translateY(-2px); }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* LOGOS BAR */
+    .logos-bar {
+      padding: 48px 64px;
+      border-top: 1px solid #111118;
+      border-bottom: 1px solid #111118;
+    }
+
+    .logos-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.2);
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    .logos-row {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 48px;
+      flex-wrap: wrap;
+    }
+
+    .logo-placeholder {
+      font-size: 18px;
+      font-weight: 800;
+      color: rgba(255,255,255,0.15);
+      letter-spacing: -0.5px;
+    }
+
+    /* SECTIONS */
+    .section {
+      padding: 80px 64px;
+      border-top: 1px solid #111118;
+    }
+
+    .label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--label);
+      margin-bottom: 22px;
+    }
+
+    .sec-title {
+      font-size: clamp(28px, 3vw, 44px);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -1.5px;
+      margin-bottom: 12px;
+    }
+
+    .sec-subtitle {
+      font-size: 18px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.7);
+      margin-bottom: 20px;
+      letter-spacing: -0.3px;
+    }
+
+    .sec-text {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.8;
+      margin-bottom: 14px;
+      max-width: 560px;
+    }
+
+    .plain-list { list-style: none; margin-bottom: 16px; }
+    .plain-list li {
+      font-size: 14px;
+      color: var(--text-muted);
+      padding: 3px 0;
+      line-height: 1.7;
+    }
+    .plain-list li::before { content: "· "; color: rgba(255,255,255,0.25); }
+
+    .num-list { list-style: none; margin-bottom: 16px; counter-reset: steps; }
+    .num-list li {
+      font-size: 14px;
+      color: var(--text-muted);
+      padding: 5px 0 5px 28px;
+      position: relative;
+      line-height: 1.7;
+      counter-increment: steps;
+    }
+    .num-list li::before {
+      content: counter(steps) ".";
+      position: absolute;
+      left: 0;
+      color: rgba(255,255,255,0.3);
+      font-weight: 600;
+    }
+
+    /* SPLIT SECTION */
+    .split {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 64px;
+      align-items: start;
+      padding: 80px 64px;
+      border-top: 1px solid #111118;
+    }
+
+    .split-img {
+      border-radius: 18px;
+      overflow: hidden;
+      aspect-ratio: 1;
+      background: linear-gradient(135deg, #1a1a2e 0%, #0f3460 50%, #16213e 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .split-img-inner {
+      text-align: center;
+      padding: 40px;
+    }
+
+    .split-img-inner span {
+      font-size: 64px;
+      display: block;
+      margin-bottom: 16px;
+    }
+
+    .split-img-inner p {
+      font-size: 14px;
+      color: rgba(255,255,255,0.4);
+    }
+
+    /* FOOTER */
+    footer {
+      padding: 64px 64px 40px;
+      border-top: 1px solid #0d0d1a;
+    }
+
+    .footer-main {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 48px;
+    }
+
+    .footer-left p {
+      font-size: 14px;
+      color: rgba(255,255,255,0.4);
+      margin-bottom: 5px;
+    }
+
+    .footer-wordmark {
+      font-size: 72px;
+      font-weight: 800;
+      letter-spacing: -4px;
+      color: #fff;
+      margin-top: 18px;
+      line-height: 1;
+    }
+
+    .footer-links {
+      display: grid;
+      grid-template-columns: repeat(3, auto);
+      gap: 12px 36px;
+      padding-top: 4px;
+    }
+
+    .footer-links a {
+      font-size: 13px;
+      color: rgba(255,255,255,0.45);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .footer-links a:hover { color: #fff; }
+
+    .footer-bottom {
+      font-size: 12px;
+      color: rgba(255,255,255,0.2);
+      text-align: center;
+      padding-top: 28px;
+      border-top: 1px solid #0a0a14;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 960px) {
+      nav { padding: 18px 24px; }
+      .nav-links { display: none; }
+      .hero { padding: 110px 24px 120px; }
+      .hero-cta { right: 24px; bottom: 32px; }
+      .logos-bar, .section { padding: 48px 24px; }
+      .split { grid-template-columns: 1fr; padding: 48px 24px; gap: 32px; }
+      footer { padding: 48px 24px 32px; }
+      .footer-main { flex-direction: column; gap: 32px; }
+      .footer-wordmark { font-size: 52px; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a href="/" class="nav-logo">cliniflux</a>
+    <ul class="nav-links">
+      <li><a href="/about" class="active">About</a></li>
+      <li><a href="#">Blog</a></li>
+      <li><a href="/#contacto">Contacto</a></li>
+    </ul>
+    <a href="/#contacto" class="btn-outline">Solicitar llamada</a>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-glow"></div>
+    <div class="hero-content">
+      <h1>Automatización de WhatsApp diseñada para clínicas</h1>
+      <p>En Cliniflux ayudamos a clínicas a mejorar la forma en que gestionan la comunicación con pacientes.</p>
+      <p>Implementamos sistemas de automatización que permiten responder mensajes automáticamente, reactivar pacientes antiguos y organizar citas de forma más eficiente.</p>
+      <p>Nuestro objetivo es simple: ayudar a las clínicas a reducir carga administrativa y convertir más conversaciones en citas confirmadas.</p>
+    </div>
+    <div class="hero-cta">
+      <a href="/#contacto" class="btn-primary">Solicitar demostración privada</a>
+    </div>
+  </section>
+
+  <!-- LOGOS BAR -->
+  <div class="logos-bar">
+    <div class="logos-label">Trusted by clinics across Spain & LATAM</div>
+    <div class="logos-row">
+      <span class="logo-placeholder">DentalPro</span>
+      <span class="logo-placeholder">MediCenter</span>
+      <span class="logo-placeholder">EstéticaVida</span>
+      <span class="logo-placeholder">ClinicaPlus</span>
+      <span class="logo-placeholder">SaludTotal</span>
+    </div>
+  </div>
+
+  <!-- MISSION -->
+  <section class="section">
+    <div class="label">Misión</div>
+    <h2 class="sec-title">Nuestra misión</h2>
+    <p class="sec-subtitle">Simplificar la comunicación entre clínicas y pacientes</p>
+    <p class="sec-text">Las clínicas reciben cada día decenas de mensajes por WhatsApp: consultas, solicitudes de cita, preguntas sobre tratamientos o disponibilidad. Gestionar todo manualmente consume tiempo, genera retrasos y hace que muchas oportunidades se pierdan.</p>
+    <p class="sec-text">Cliniflux desarrolla sistemas de automatización que permiten:</p>
+    <ul class="plain-list">
+      <li>responder a pacientes de forma inmediata</li>
+      <li>mantener conversaciones activas incluso fuera del horario de atención</li>
+      <li>reactivar pacientes que no han vuelto en meses</li>
+      <li>organizar citas sin procesos manuales innecesarios</li>
+    </ul>
+    <p class="sec-text">El resultado es una comunicación más eficiente y una agenda mejor organizada.</p>
+  </section>
+
+  <!-- DIFFERENTIATION with image -->
+  <div class="split">
+    <div class="split-img">
+      <div class="split-img-inner">
+        <span>🏥</span>
+        <p>Especialistas en comunicación clínica</p>
+      </div>
+    </div>
+    <div>
+      <div class="label">Diferenciación</div>
+      <h2 class="sec-title">Por qué Cliniflux</h2>
+      <p class="sec-subtitle">Especialización en comunicación clínica</p>
+      <p class="sec-text">A diferencia de herramientas genéricas de automatización, Cliniflux está diseñado específicamente para clínicas y consultas privadas. Esto nos permite adaptar los flujos de comunicación a situaciones reales del sector:</p>
+      <ul class="plain-list">
+        <li>gestión de solicitudes de cita</li>
+        <li>información sobre tratamientos</li>
+        <li>seguimiento de pacientes</li>
+        <li>recordatorios automáticos</li>
+        <li>reactivación de pacientes inactivos</li>
+      </ul>
+      <p class="sec-text">Nuestro enfoque combina tecnología con comprensión de las necesidades operativas de las clínicas.</p>
+    </div>
+  </div>
+
+  <!-- METHODOLOGY -->
+  <section class="section">
+    <div class="label">Metodología</div>
+    <h2 class="sec-title">Nuestro enfoque</h2>
+    <p class="sec-subtitle">Tecnología aplicada a procesos reales</p>
+    <p class="sec-text">La automatización solo funciona cuando se adapta al flujo real de trabajo de una clínica. Por eso cada implementación se realiza con un enfoque práctico:</p>
+    <ol class="num-list">
+      <li>Analizamos cómo se gestionan actualmente los mensajes y las citas.</li>
+      <li>Diseñamos un sistema de automatización adaptado a la clínica.</li>
+      <li>Implementamos el sistema en el WhatsApp existente.</li>
+      <li>Ajustamos los flujos para optimizar la gestión de pacientes.</li>
+    </ol>
+    <p class="sec-text">El objetivo no es solo automatizar mensajes, sino mejorar la eficiencia del proceso completo.</p>
+  </section>
+
+  <!-- RESULTS -->
+  <section class="section">
+    <div class="label">Resultados</div>
+    <h2 class="sec-title">Qué conseguimos para las clínicas</h2>
+    <p class="sec-text">Las clínicas que implementan automatización estructurada suelen observar mejoras claras en su operativa diaria:</p>
+    <ul class="plain-list">
+      <li>respuesta inmediata a pacientes</li>
+      <li>reducción del tiempo dedicado a gestionar WhatsApp</li>
+      <li>mayor organización en la agenda de citas</li>
+      <li>recuperación de pacientes que no habían vuelto</li>
+    </ul>
+    <p class="sec-text">Esto permite que el equipo pueda centrarse más en la atención clínica y menos en la gestión administrativa.</p>
+  </section>
+
+  <!-- COMMITMENT -->
+  <section class="section">
+    <div class="label">Compromiso</div>
+    <h2 class="sec-title">Nuestro compromiso</h2>
+    <p class="sec-subtitle">Implementaciones claras, simples y profesionales</p>
+    <p class="sec-text">En Cliniflux creemos que la tecnología debe simplificar el trabajo de las clínicas, no complicarlo. Por eso nuestras implementaciones siguen tres principios:</p>
+    <ul class="plain-list">
+      <li>simplicidad de uso</li>
+      <li>integración con herramientas existentes</li>
+      <li>soporte profesional durante todo el proceso</li>
+    </ul>
+    <p class="sec-text">El objetivo es que el sistema funcione de forma natural dentro de la operativa de la clínica.</p>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-main">
+      <div class="footer-left">
+        <p>Automatización avanzada de WhatsApp para clínicas</p>
+        <p>contacto@cliniflux.com</p>
+        <div class="footer-wordmark">cliniflux</div>
+      </div>
+      <div class="footer-links">
+        <a href="/about">About</a>
+        <a href="/#contacto">Contact</a>
+        <a href="#">X (Twitter)</a>
+        <a href="#">Roles</a>
+        <a href="#">Blog</a>
+        <a href="#">Instagram</a>
+        <a href="#">Hiring</a>
+        <a href="#">Terms</a>
+        <a href="#">LinkedIn</a>
+      </div>
+    </div>
+    <div class="footer-bottom">© 2026 Cliniflux — Soluciones de automatización clínica</div>
+  </footer>
+
+</body>
+</html>
