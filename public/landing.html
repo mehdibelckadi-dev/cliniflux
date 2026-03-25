@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cliniflux — WhatsApp IA para clínicas</title>
+  <title>cliniflux — WhatsApp IA para clínicas</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -52,8 +52,8 @@
     nav{position:fixed;top:0;left:0;right:0;z-index:200;transition:background .3s,box-shadow .3s}
     nav.scrolled{background:rgba(255,255,255,0.92);backdrop-filter:blur(20px);box-shadow:0 1px 0 rgba(0,0,0,0.07)}
     .nav-inner{max-width:var(--cmax);margin:0 auto;padding:0 var(--px);height:66px;display:flex;align-items:center;gap:32px}
-    .nav-logo{display:flex;align-items:center;gap:9px;font-size:17px;font-weight:700;color:var(--text);text-decoration:none;letter-spacing:-.4px;flex-shrink:0}
-    .logo-mark{width:30px;height:30px;background:linear-gradient(135deg,#22c55e,#16a34a);border-radius:8px;display:flex;align-items:center;justify-content:center}
+    .nav-logo{display:flex;align-items:center;gap:10px;font-size:18px;font-weight:700;color:var(--text);text-decoration:none;letter-spacing:-.5px;flex-shrink:0}
+    .logo-mark{width:34px;height:34px;background:linear-gradient(135deg,#22c55e,#16a34a);border-radius:9px;display:flex;align-items:center;justify-content:center}
     .nav-links{display:flex;gap:2px;list-style:none;margin:0 auto}
     .nav-links a{font-size:14px;font-weight:500;color:var(--text2);text-decoration:none;padding:7px 13px;border-radius:var(--r-sm);transition:color .2s,background .2s}
     .nav-links a:hover{color:var(--text);background:rgba(0,0,0,0.04)}
@@ -224,48 +224,52 @@
     .col-tag.bad{background:rgba(239,68,68,.08);color:#dc2626;border:1px solid rgba(239,68,68,.18)}
     .col-tag.good{background:var(--green-dim2);color:var(--green);border:1px solid rgba(22,163,74,.2)}
     .col-h{font-size:19px;font-weight:800;letter-spacing:-.5px;line-height:1.2;margin-bottom:20px;color:var(--text)}
-    .pi{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid rgba(0,0,0,0.05);font-size:13px;color:var(--text2);line-height:1.5}
+    .pi{display:flex;align-items:flex-start;gap:0;padding:11px 0;border-bottom:1px solid rgba(0,0,0,0.05);font-size:14px;color:var(--text2);line-height:1.55}
     .pi:last-child{border-bottom:none}
     .pi-ic{flex-shrink:0;font-size:14px;margin-top:2px}
 
     /* FLOW */
-    .flow-section{padding:var(--sy) 0;border-top:1px solid var(--border)}
-    .flow-hd{text-align:center;margin-bottom:64px}
+    .flow-section{padding:var(--sy) 0;border-top:1px solid var(--border);overflow:hidden}
+    .flow-bg{border-radius:var(--r-xl);background:linear-gradient(135deg,#bfdbfe 0%,#c4b5fd 35%,#a5f3fc 65%,#bbf7d0 100%);padding:72px 48px;position:relative;margin-top:56px}
+    .flow-hd{text-align:center;margin-bottom:0}
     .flow-hd .sec-p{margin:0 auto;text-align:center}
-    .flow-wrap{max-width:820px;margin:0 auto}
-    .flow-row{display:flex;align-items:center;justify-content:center}
-    .fn{background:#fff;border:1px solid var(--border2);border-radius:var(--r-lg);padding:20px 24px;min-width:155px;text-align:center;box-shadow:var(--shadow-sm);transition:box-shadow .3s,transform .3s}
-    .fn:hover{box-shadow:var(--shadow-md);transform:translateY(-2px)}
-    .fn.trigger{border-color:rgba(59,130,246,.3);background:#f0f7ff}
-    .fn.ai{border-color:rgba(139,92,246,.3);background:#faf5ff}
-    .fn.act{border-color:rgba(22,163,74,.3);background:#f0fdf4}
-    .fn.oa{border-color:rgba(22,163,74,.4);background:#f0fdf4}
-    .fn.ob{border-color:rgba(59,130,246,.4);background:#eff6ff}
-    .fn.oc{border-color:rgba(249,115,22,.4);background:#fff7ed}
-    .fn-ic{font-size:24px;margin-bottom:7px;display:block}
-    .fn-t{font-size:12px;font-weight:700;color:var(--text);line-height:1.3;margin-bottom:2px}
-    .fn-s{font-size:10px;color:var(--text3);line-height:1.4}
-    .fc{padding:0 8px;display:flex;align-items:center}
-    .fc-line{height:1px;width:40px;background:linear-gradient(90deg,rgba(0,0,0,0.12),var(--green));position:relative}
-    .fc-line::after{content:'';position:absolute;right:-5px;top:-4px;width:0;height:0;border-left:7px solid var(--green);border-top:4px solid transparent;border-bottom:4px solid transparent}
-    .flow-vert{display:flex;flex-direction:column;align-items:center}
-    .flow-vert-line{width:1px;height:36px;background:linear-gradient(180deg,var(--green),rgba(0,0,0,0.1))}
-    .flow-branches{display:flex;justify-content:center;gap:14px}
-    .flow-branch-item{display:flex;flex-direction:column;align-items:center}
-    .flow-branch-vl{width:1px;height:22px;background:rgba(0,0,0,0.1)}
+    /* Main horizontal nodes row */
+    .flow-main-row{display:flex;align-items:center;justify-content:center;gap:0;position:relative;z-index:2}
+    /* Node pill */
+    .fn{background:#fff;border-radius:100px;padding:14px 22px;display:flex;align-items:center;gap:10px;box-shadow:0 4px 20px rgba(0,0,0,0.1),0 1px 4px rgba(0,0,0,0.06);white-space:nowrap;position:relative}
+    .fn-dot{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .fn-dot svg{width:14px;height:14px}
+    .fn-t{font-size:14px;font-weight:700;color:#0f172a;letter-spacing:-.3px}
+    /* Connector line between nodes */
+    .fn-conn{width:40px;height:1px;background:rgba(255,255,255,0.7);flex-shrink:0;position:relative}
+    .fn-conn::after{content:'';position:absolute;right:-4px;top:-3px;width:0;height:0;border-left:6px solid rgba(255,255,255,0.7);border-top:3px solid transparent;border-bottom:3px solid transparent}
+    /* Branch cards above/below */
+    .flow-branches-wrap{display:flex;justify-content:center;gap:0;margin-top:0;position:relative}
+    .flow-branch-col{display:flex;flex-direction:column;align-items:center;position:relative}
+    .branch-line-v{width:1px;height:28px;background:rgba(255,255,255,0.6)}
+    .branch-card{background:#fff;border-radius:var(--r-lg);padding:14px 18px;box-shadow:0 4px 20px rgba(0,0,0,0.1);min-width:190px}
+    .branch-item{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:12px;font-weight:500;color:#334155;padding:4px 0}
+    .branch-item:not(:last-child){border-bottom:1px solid rgba(0,0,0,0.05)}
+    .branch-check{width:16px;height:16px;border-radius:50%;background:#dcfce7;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .branch-check svg{width:8px;height:8px;color:#16a34a}
+    /* spacers to align branches under correct node */
+    .flow-spacer{flex:1}
 
     /* FEATURES */
     .features-section{padding:var(--sy) 0;border-top:1px solid var(--border)}
     .feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:52px}
-    .fc-card{background:#fff;border:1px solid var(--border);border-radius:var(--r-xl);padding:28px;box-shadow:var(--shadow-sm);transition:box-shadow .3s,transform .3s}
+    .fc-card{background:#fff;border:1px solid var(--border);border-radius:var(--r-xl);padding:28px 28px 24px;box-shadow:var(--shadow-sm);transition:box-shadow .3s,transform .3s;display:flex;flex-direction:column}
     .fc-card:hover{box-shadow:var(--shadow-md);transform:translateY(-3px)}
     .fc-ic{width:44px;height:44px;border-radius:var(--r-md);display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:16px}
     .ic-g{background:var(--green-dim2);border:1px solid rgba(22,163,74,.15)}
     .ic-b{background:var(--blue-dim);border:1px solid rgba(59,130,246,.15)}
     .ic-o{background:var(--orange-dim);border:1px solid rgba(249,115,22,.15)}
     .ic-p{background:var(--purple-dim);border:1px solid rgba(139,92,246,.15)}
+    .fc-card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:12px}
+    .fc-link{display:inline-flex;align-items:center;font-size:13px;font-weight:600;color:var(--green);text-decoration:none;gap:4px;transition:gap .2s}
+    .fc-link:hover{gap:8px}
     .fc-t{font-size:16px;font-weight:800;letter-spacing:-.3px;margin-bottom:8px;line-height:1.2;color:var(--text)}
-    .fc-b{font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:16px}
+    .fc-b{font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:14px;flex:1}
     .fc-pill{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:3px 10px;border-radius:100px}
     .pg{background:var(--green-dim2);color:var(--green)}
     .pb{background:var(--blue-dim);color:var(--blue)}
@@ -430,9 +434,9 @@
   <div class="nav-inner">
     <a href="/" class="nav-logo">
       <div class="logo-mark">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.557 4.116 1.534 5.845L.073 23.927l6.263-1.637C8.038 23.402 9.976 24 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818c-1.898 0-3.668-.517-5.187-1.416l-.371-.22-3.851 1.006 1.026-3.75-.242-.385A9.801 9.801 0 0 1 2.182 12C2.182 6.57 6.57 2.182 12 2.182S21.818 6.57 21.818 12 17.43 21.818 12 21.818z"/></svg>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M13 2L3 14h8l-1 8 10-12h-8z"/></svg>
       </div>
-      Cliniflux
+      cliniflux
     </a>
     <ul class="nav-links">
       <li><a href="#producto">Producto</a></li>
@@ -604,20 +608,20 @@
       <div class="prob-col bad reveal d1">
         <div class="col-tag bad">✕ Sin Cliniflux</div>
         <div class="col-h">Tu equipo saturado.<br>Pacientes sin respuesta.</div>
-        <div class="pi"><span class="pi-ic">⏰</span>Mensajes de WhatsApp sin responder durante horas o días</div>
-        <div class="pi"><span class="pi-ic">💸</span>Pacientes que se van directamente a la competencia</div>
-        <div class="pi"><span class="pi-ic">🔄</span>Recepcionistas gestionando decenas de preguntas repetitivas</div>
-        <div class="pi"><span class="pi-ic">📅</span>Citas perdidas fuera del horario de atención</div>
-        <div class="pi"><span class="pi-ic">😤</span>Equipo frustrado, pacientes insatisfechos</div>
+        <div class="pi">Mensajes de WhatsApp sin responder durante horas o días</div>
+        <div class="pi">Pacientes que se van directamente a la competencia</div>
+        <div class="pi">Recepcionistas gestionando decenas de preguntas repetitivas</div>
+        <div class="pi">Citas perdidas fuera del horario de atención</div>
+        <div class="pi">Equipo frustrado, pacientes insatisfechos</div>
       </div>
       <div class="prob-col good reveal d2">
         <div class="col-tag good">✓ Con Cliniflux</div>
         <div class="col-h">Respuesta instantánea.<br>Agenda siempre llena.</div>
-        <div class="pi"><span class="pi-ic">⚡</span>Respuesta automática en menos de 2 segundos, 24/7</div>
-        <div class="pi"><span class="pi-ic">📈</span>+40% de citas confirmadas al primer contacto</div>
-        <div class="pi"><span class="pi-ic">🤖</span>IA que gestiona preguntas frecuentes sin intervención</div>
-        <div class="pi"><span class="pi-ic">🌙</span>Captación activa de citas fuera de horario laboral</div>
-        <div class="pi"><span class="pi-ic">😊</span>Equipo enfocado en pacientes, no en el móvil</div>
+        <div class="pi">Respuesta automática en menos de 2 segundos, 24/7</div>
+        <div class="pi">+40% de citas confirmadas al primer contacto</div>
+        <div class="pi">IA que gestiona preguntas frecuentes sin intervención</div>
+        <div class="pi">Captación activa de citas fuera de horario laboral</div>
+        <div class="pi">Equipo enfocado en pacientes, no en el móvil</div>
       </div>
     </div>
   </div>
@@ -629,21 +633,77 @@
     <div class="flow-hd">
       <div class="reveal"><div class="label">Automatización inteligente</div></div>
       <h2 class="sec-h reveal d1">Del mensaje al paciente<br>atendido. Automático.</h2>
-      <p class="sec-p reveal d2">Nuestro sistema procesa cada mensaje, identifica la intención del paciente y ejecuta la acción correcta en tiempo real.</p>
+      <p class="sec-p reveal d2">Nuestro sistema procesa cada mensaje en tiempo real, identifica la intención del paciente y ejecuta la acción correcta sin intervención humana.</p>
     </div>
-    <div class="flow-wrap reveal d1">
-      <div class="flow-row">
-        <div class="fn trigger"><span class="fn-ic">💬</span><div class="fn-t">Paciente escribe</div><div class="fn-s">WhatsApp, cualquier hora</div></div>
-        <div class="fc"><div class="fc-line"></div></div>
-        <div class="fn ai"><span class="fn-ic">🧠</span><div class="fn-t">IA analiza intención</div><div class="fn-s">NLP + contexto clínica</div></div>
-        <div class="fc"><div class="fc-line"></div></div>
-        <div class="fn act"><span class="fn-ic">⚡</span><div class="fn-t">Decisión instantánea</div><div class="fn-s">Menos de 2 segundos</div></div>
+
+    <div class="flow-bg reveal d2">
+      <!-- Nodes row -->
+      <div class="flow-main-row">
+        <div class="fn">
+          <div class="fn-dot" style="background:#ede9fe">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 0 1-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+          </div>
+          <span class="fn-t">Mensaje</span>
+        </div>
+        <div class="fn-conn"></div>
+        <div class="fn">
+          <div class="fn-dot" style="background:#dbeafe">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round"><path d="M9.663 17h4.673M12 3v1m6.364 1.636-.707.707M21 12h-1M4 12H3m3.343-5.657-.707-.707m2.828 9.9a5 5 0 1 1 7.072 0l-.548.547A3.374 3.374 0 0 0 14 18.469V19a2 2 0 1 1-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+          </div>
+          <span class="fn-t">Análisis IA</span>
+        </div>
+        <div class="fn-conn"></div>
+        <div class="fn">
+          <div class="fn-dot" style="background:#fef9c3">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#ca8a04" stroke-width="2" stroke-linecap="round"><path d="M13 2L3 14h8l-1 8 10-12h-8z"/></svg>
+          </div>
+          <span class="fn-t">Ejecución</span>
+        </div>
+        <div class="fn-conn"></div>
+        <div class="fn">
+          <div class="fn-dot" style="background:#dcfce7">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2" stroke-linecap="round"><path d="M9 12l2 2 4-4m6 2a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"/></svg>
+          </div>
+          <span class="fn-t">Confirmado</span>
+        </div>
       </div>
-      <div class="flow-vert"><div class="flow-vert-line"></div></div>
-      <div class="flow-branches">
-        <div class="flow-branch-item"><div class="flow-branch-vl"></div><div class="fn oa"><span class="fn-ic">📅</span><div class="fn-t">Cita agendada</div><div class="fn-s">Confirmación automática</div></div></div>
-        <div class="flow-branch-item"><div class="flow-branch-vl"></div><div class="fn ob"><span class="fn-ic">✅</span><div class="fn-t">Consulta resuelta</div><div class="fn-s">FAQ respondida al instante</div></div></div>
-        <div class="flow-branch-item"><div class="flow-branch-vl"></div><div class="fn oc"><span class="fn-ic">👤</span><div class="fn-t">Derivado al equipo</div><div class="fn-s">Solo cuando es necesario</div></div></div>
+
+      <!-- Branches -->
+      <div class="flow-branches-wrap" style="margin-top:0">
+        <!-- spacer under "Mensaje" -->
+        <div style="flex:1"></div>
+        <!-- branch under "Análisis IA" -->
+        <div class="flow-branch-col" style="width:160px">
+          <div class="branch-line-v"></div>
+          <div class="branch-card">
+            <div class="branch-item">
+              <span>Intención detectada</span>
+              <div class="branch-check"><svg viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></div>
+            </div>
+            <div class="branch-item">
+              <span>Contexto aplicado</span>
+              <div class="branch-check"><svg viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></div>
+            </div>
+          </div>
+        </div>
+        <!-- spacer between -->
+        <div style="flex:1"></div>
+        <!-- branch under "Ejecución" -->
+        <div class="flow-branch-col" style="width:190px">
+          <div class="branch-line-v"></div>
+          <div class="branch-card">
+            <div class="branch-item">
+              <span>Flujo conversacional</span>
+              <div class="branch-check"><svg viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></div>
+            </div>
+            <div class="branch-item">
+              <span>Integración con API</span>
+              <div class="branch-check"><svg viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></div>
+            </div>
+          </div>
+        </div>
+        <!-- spacer under "Confirmado" -->
+        <div style="flex:1"></div>
       </div>
     </div>
   </div>
@@ -655,12 +715,12 @@
     <div class="reveal"><div class="label">Funcionalidades</div></div>
     <h2 class="sec-h reveal d1">Todo lo que necesita<br>tu clínica para crecer</h2>
     <div class="feat-grid">
-      <div class="fc-card reveal"><div class="fc-ic ic-g">💬</div><h3 class="fc-t">Respuesta automática 24/7</h3><p class="fc-b">Tu clínica nunca duerme. La IA responde a cada paciente en segundos, a cualquier hora, incluidos festivos.</p><span class="fc-pill pg">⚡ Menos de 2s</span></div>
-      <div class="fc-card reveal d1"><div class="fc-ic ic-b">📅</div><h3 class="fc-t">Agenda inteligente</h3><p class="fc-b">Agendamos citas en tu calendario con confirmación automática, recordatorios y gestión de cancelaciones.</p><span class="fc-pill pb">🔗 Integración calendar</span></div>
-      <div class="fc-card reveal d2"><div class="fc-ic ic-o">📊</div><h3 class="fc-t">Reactivación de pacientes</h3><p class="fc-b">Identificamos pacientes inactivos y lanzamos campañas personalizadas por WhatsApp para recuperarlos.</p><span class="fc-pill po">📈 +30% reactivados</span></div>
-      <div class="fc-card reveal d1"><div class="fc-ic ic-p">🔒</div><h3 class="fc-t">Cumplimiento RGPD</h3><p class="fc-b">Toda la automatización cumple con la normativa europea de protección de datos. Siempre protegidos.</p><span class="fc-pill pp">🇪🇺 Conforme RGPD</span></div>
-      <div class="fc-card reveal d2"><div class="fc-ic ic-g">📋</div><h3 class="fc-t">Panel en tiempo real</h3><p class="fc-b">Visualiza conversaciones, métricas de respuesta y rendimiento desde un dashboard centralizado.</p><span class="fc-pill pg">📡 Datos en tiempo real</span></div>
-      <div class="fc-card reveal d3"><div class="fc-ic ic-b">⚙️</div><h3 class="fc-t">Implementación en 48h</h3><p class="fc-b">Sin desarrollos complejos. Configuramos y activamos tu sistema en 48 horas. Tú solo ves las citas llegar.</p><span class="fc-pill pb">🚀 Activo en 2 días</span></div>
+      <div class="fc-card reveal"><div class="fc-card-top"><h3 class="fc-t">Respuesta automática 24/7</h3><span class="fc-pill pg">Menos de 2 segundos</span></div><p class="fc-b">Tu clínica nunca duerme. La IA responde a cada paciente en segundos, a cualquier hora, incluidos festivos.</p><a href="#" class="fc-link">Ver cómo funciona →</a></div>
+      <div class="fc-card reveal d1"><div class="fc-card-top"><h3 class="fc-t">Agenda inteligente</h3><span class="fc-pill pb">Integración calendar</span></div><p class="fc-b">Agendamos citas en tu calendario con confirmación automática, recordatorios y gestión de cancelaciones.</p><a href="#" class="fc-link">Ver cómo funciona →</a></div>
+      <div class="fc-card reveal d2"><div class="fc-card-top"><h3 class="fc-t">Reactivación de pacientes</h3><span class="fc-pill po">+30% pacientes reactivados</span></div><p class="fc-b">Identificamos pacientes inactivos y lanzamos campañas personalizadas por WhatsApp para recuperarlos.</p><a href="#" class="fc-link">Ver cómo funciona →</a></div>
+      <div class="fc-card reveal d1"><div class="fc-card-top"><h3 class="fc-t">Cumplimiento RGPD</h3><span class="fc-pill pp">Conforme RGPD</span></div><p class="fc-b">Toda la automatización cumple con la normativa europea de protección de datos. Siempre protegidos.</p><a href="#" class="fc-link">Ver más →</a></div>
+      <div class="fc-card reveal d2"><div class="fc-card-top"><h3 class="fc-t">Panel en tiempo real</h3><span class="fc-pill pg">Datos en tiempo real</span></div><p class="fc-b">Visualiza conversaciones, métricas de respuesta y rendimiento desde un dashboard centralizado.</p><a href="#" class="fc-link">Ver cómo funciona →</a></div>
+      <div class="fc-card reveal d3"><div class="fc-card-top"><h3 class="fc-t">Implementación en 48h</h3><span class="fc-pill pb">Activo en 48h</span></div><p class="fc-b">Sin desarrollos complejos. Configuramos y activamos tu sistema en 48 horas. Tú solo ves las citas llegar.</p><a href="#" class="fc-link">Ver proceso →</a></div>
     </div>
   </div>
 </section>
@@ -903,7 +963,7 @@
       <div class="ft-brand">
         <a href="/" class="ft-logo">
           <div class="logo-mark" style="width:24px;height:24px;border-radius:6px"><svg width="12" height="12" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.557 4.116 1.534 5.845L.073 23.927l6.263-1.637C8.038 23.402 9.976 24 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818c-1.898 0-3.668-.517-5.187-1.416l-.371-.22-3.851 1.006 1.026-3.75-.242-.385A9.801 9.801 0 0 1 2.182 12C2.182 6.57 6.57 2.182 12 2.182S21.818 6.57 21.818 12 17.43 21.818 12 21.818z"/></svg></div>
-          Cliniflux
+          cliniflux
         </a>
         <p class="ft-desc">Automatización inteligente de WhatsApp para clínicas que quieren crecer sin aumentar el equipo.</p>
       </div>
