@@ -10,275 +10,362 @@
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     :root{
-      --bg:#030712;--bg2:#060d1c;--surface:#0d1117;--surface2:#161b22;
-      --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);
-      --text:#f0f6fc;--text2:rgba(240,246,252,0.58);--text3:rgba(240,246,252,0.30);
-      --green:#25d366;--green2:#22c55e;
-      --green-glow:rgba(37,211,102,0.18);--green-dim:rgba(37,211,102,0.09);
-      --blue:#3b82f6;--blue-dim:rgba(59,130,246,0.1);
-      --orange:#f97316;--orange-dim:rgba(249,115,22,0.1);
-      --purple:#8b5cf6;--purple-dim:rgba(139,92,246,0.1);
-      --r-sm:8px;--r-md:14px;--r-lg:20px;--r-xl:26px;
-      --sy:120px;--cmax:1160px;--px:48px;
+      --bg:#ffffff;
+      --bg2:#f8f9fb;
+      --surface:#ffffff;
+      --surface2:#f4f5f7;
+      --border:rgba(0,0,0,0.07);
+      --border2:rgba(0,0,0,0.12);
+      --text:#0f172a;
+      --text2:rgba(15,23,42,0.60);
+      --text3:rgba(15,23,42,0.36);
+      --green:#16a34a;
+      --green-btn:#22c55e;
+      --green-dim:rgba(22,163,74,0.08);
+      --green-dim2:rgba(22,163,74,0.14);
+      --blue:#3b82f6;--blue-dim:rgba(59,130,246,0.08);
+      --orange:#f97316;--orange-dim:rgba(249,115,22,0.08);
+      --purple:#8b5cf6;--purple-dim:rgba(139,92,246,0.08);
+      --shadow-sm:0 1px 3px rgba(0,0,0,0.07),0 1px 2px rgba(0,0,0,0.04);
+      --shadow-md:0 4px 16px rgba(0,0,0,0.08),0 1px 3px rgba(0,0,0,0.04);
+      --shadow-lg:0 16px 48px rgba(0,0,0,0.10),0 4px 12px rgba(0,0,0,0.05);
+      --r-sm:8px;--r-md:12px;--r-lg:18px;--r-xl:24px;
+      --sy:112px;--cmax:1160px;--px:48px;
     }
     html{scroll-behavior:smooth}
-    body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;overflow-x:hidden;-webkit-font-smoothing:antialiased}
-
+    body{
+      font-family:'Plus Jakarta Sans',system-ui,sans-serif;
+      background:
+        radial-gradient(ellipse 90% 55% at 50% -5%,rgba(22,163,74,0.055) 0%,transparent 65%),
+        radial-gradient(ellipse 60% 45% at 92% 55%,rgba(59,130,246,0.04) 0%,transparent 65%),
+        #ffffff;
+      color:var(--text);line-height:1.6;overflow-x:hidden;-webkit-font-smoothing:antialiased;
+    }
     .c{width:100%;max-width:var(--cmax);margin:0 auto;padding:0 var(--px)}
 
     /* REVEAL */
-    .reveal{opacity:0;transform:translateY(28px);transition:opacity .7s cubic-bezier(.22,1,.36,1),transform .7s cubic-bezier(.22,1,.36,1)}
+    .reveal{opacity:0;transform:translateY(24px);transition:opacity .65s cubic-bezier(.22,1,.36,1),transform .65s cubic-bezier(.22,1,.36,1)}
     .reveal.on{opacity:1;transform:none}
     .d1{transition-delay:.1s}.d2{transition-delay:.2s}.d3{transition-delay:.3s}.d4{transition-delay:.4s}
 
     /* NAV */
-    nav{position:fixed;top:0;left:0;right:0;z-index:200;transition:background .3s,border-color .3s}
-    nav.scrolled{background:rgba(3,7,18,.9);backdrop-filter:blur(24px);border-bottom:1px solid var(--border)}
-    .nav-inner{max-width:var(--cmax);margin:0 auto;padding:0 var(--px);height:68px;display:flex;align-items:center;gap:32px}
+    nav{position:fixed;top:0;left:0;right:0;z-index:200;transition:background .3s,box-shadow .3s}
+    nav.scrolled{background:rgba(255,255,255,0.92);backdrop-filter:blur(20px);box-shadow:0 1px 0 rgba(0,0,0,0.07)}
+    .nav-inner{max-width:var(--cmax);margin:0 auto;padding:0 var(--px);height:66px;display:flex;align-items:center;gap:32px}
     .nav-logo{display:flex;align-items:center;gap:9px;font-size:17px;font-weight:700;color:var(--text);text-decoration:none;letter-spacing:-.4px;flex-shrink:0}
-    .logo-mark{width:32px;height:32px;background:linear-gradient(135deg,#25d366,#16a34a);border-radius:9px;display:flex;align-items:center;justify-content:center}
+    .logo-mark{width:30px;height:30px;background:linear-gradient(135deg,#22c55e,#16a34a);border-radius:8px;display:flex;align-items:center;justify-content:center}
     .nav-links{display:flex;gap:2px;list-style:none;margin:0 auto}
-    .nav-links a{font-size:14px;font-weight:500;color:var(--text2);text-decoration:none;padding:8px 14px;border-radius:var(--r-sm);transition:color .2s,background .2s}
-    .nav-links a:hover{color:var(--text);background:rgba(255,255,255,0.06)}
+    .nav-links a{font-size:14px;font-weight:500;color:var(--text2);text-decoration:none;padding:7px 13px;border-radius:var(--r-sm);transition:color .2s,background .2s}
+    .nav-links a:hover{color:var(--text);background:rgba(0,0,0,0.04)}
     .nav-actions{display:flex;align-items:center;gap:8px;flex-shrink:0}
-    .btn-ghost{font-family:inherit;font-size:14px;font-weight:500;color:var(--text2);background:none;border:none;padding:8px 14px;border-radius:var(--r-sm);cursor:pointer;text-decoration:none;transition:color .2s,background .2s}
-    .btn-ghost:hover{color:var(--text);background:rgba(255,255,255,0.06)}
-    .btn-primary{font-family:inherit;font-size:14px;font-weight:600;color:#000;background:var(--green);border:none;padding:10px 20px;border-radius:var(--r-md);cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px;transition:background .2s,transform .15s,box-shadow .2s;white-space:nowrap}
-    .btn-primary:hover{background:#20c75a;box-shadow:0 0 28px rgba(37,211,102,.35);transform:translateY(-1px)}
-    .btn-secondary{font-family:inherit;font-size:14px;font-weight:500;color:var(--text);background:rgba(255,255,255,0.06);border:1px solid var(--border2);padding:10px 20px;border-radius:var(--r-md);cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px;transition:background .2s,transform .15s}
-    .btn-secondary:hover{background:rgba(255,255,255,0.1);transform:translateY(-1px)}
+    .btn-ghost{font-family:inherit;font-size:14px;font-weight:500;color:var(--text2);background:none;border:none;padding:7px 13px;border-radius:var(--r-sm);cursor:pointer;text-decoration:none;transition:color .2s,background .2s}
+    .btn-ghost:hover{color:var(--text);background:rgba(0,0,0,0.04)}
+    .btn-primary{font-family:inherit;font-size:14px;font-weight:600;color:#fff;background:var(--green);border:none;padding:10px 20px;border-radius:var(--r-md);cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px;transition:background .2s,transform .15s,box-shadow .2s;white-space:nowrap}
+    .btn-primary:hover{background:#15803d;box-shadow:0 4px 20px rgba(22,163,74,0.35);transform:translateY(-1px)}
+    .btn-secondary{font-family:inherit;font-size:14px;font-weight:500;color:var(--text);background:var(--surface);border:1px solid var(--border2);padding:10px 20px;border-radius:var(--r-md);cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px;transition:background .2s,box-shadow .2s,transform .15s}
+    .btn-secondary:hover{background:var(--bg2);box-shadow:var(--shadow-sm);transform:translateY(-1px)}
 
     /* HERO */
-    .hero{position:relative;min-height:100vh;display:flex;align-items:center;padding-top:68px;overflow:hidden}
-    .hero-bg{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse 55% 70% at 72% 50%,rgba(37,211,102,.08) 0%,transparent 70%),radial-gradient(ellipse 40% 60% at 20% 60%,rgba(59,130,246,.06) 0%,transparent 70%)}
-    .hero-grid{position:absolute;inset:0;pointer-events:none;background-image:linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.018) 1px,transparent 1px);background-size:64px 64px;mask-image:radial-gradient(ellipse 80% 80% at 50% 40%,black 20%,transparent 80%)}
-    .hero-inner{position:relative;z-index:2;width:100%;max-width:var(--cmax);margin:0 auto;padding:80px var(--px);display:grid;grid-template-columns:1fr 1fr;align-items:center;gap:80px;min-height:calc(100vh - 68px)}
-    .hero-badge{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:600;color:var(--green);letter-spacing:.5px;background:var(--green-dim);border:1px solid rgba(37,211,102,.2);padding:6px 14px;border-radius:100px;margin-bottom:28px}
+    .hero{position:relative;min-height:100vh;display:flex;align-items:center;padding-top:66px;overflow:hidden}
+    .hero-inner{position:relative;z-index:2;width:100%;max-width:var(--cmax);margin:0 auto;padding:80px var(--px);display:grid;grid-template-columns:1fr 1.1fr;align-items:center;gap:72px;min-height:calc(100vh - 66px)}
+    .hero-badge{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:600;color:var(--green);letter-spacing:.4px;background:var(--green-dim);border:1px solid rgba(22,163,74,0.18);padding:5px 13px;border-radius:100px;margin-bottom:26px}
     .badge-dot{width:6px;height:6px;background:var(--green);border-radius:50%;animation:pulse 2s ease infinite}
-    @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.5)}}
-    .hero h1{font-size:clamp(38px,4.4vw,66px);font-weight:800;line-height:1.0;letter-spacing:-3px;margin-bottom:22px}
+    @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(1.5)}}
+    .hero h1{font-size:clamp(36px,4.2vw,62px);font-weight:800;line-height:1.0;letter-spacing:-2.5px;margin-bottom:20px;color:var(--text)}
     .hero h1 .g{color:var(--green)}
-    .hero-desc{font-size:16px;color:var(--text2);line-height:1.75;max-width:420px;margin-bottom:34px}
-    .hero-ctas{display:flex;align-items:center;gap:12px;margin-bottom:44px}
-    .hero-proof{display:flex;align-items:center;gap:12px}
+    .hero-desc{font-size:16px;color:var(--text2);line-height:1.75;max-width:420px;margin-bottom:32px}
+    .hero-ctas{display:flex;align-items:center;gap:10px;margin-bottom:40px}
+    .hero-proof{display:flex;align-items:center;gap:11px}
     .avatars{display:flex}
-    .av{width:28px;height:28px;border-radius:50%;border:2px solid var(--bg);margin-left:-8px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff}
+    .av{width:26px;height:26px;border-radius:50%;border:2px solid #fff;margin-left:-7px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff}
     .av:first-child{margin-left:0}
     .proof-text{font-size:13px;color:var(--text3)}
     .proof-text strong{color:var(--text2)}
 
-    /* DASHBOARD */
+    /* ── DASHBOARD INTERCOM STYLE ── */
     .hero-visual{animation:float 6s ease-in-out infinite}
-    @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
-    .dashboard{background:var(--surface);border:1px solid var(--border2);border-radius:var(--r-xl);overflow:hidden;box-shadow:0 40px 100px rgba(0,0,0,.7),0 0 0 1px rgba(255,255,255,.04),inset 0 1px 0 rgba(255,255,255,.07)}
-    .dash-bar{background:var(--surface2);border-bottom:1px solid var(--border);padding:13px 18px;display:flex;align-items:center;gap:7px}
+    @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+    .dashboard{
+      background:#f0ede8;
+      border-radius:var(--r-xl);
+      overflow:hidden;
+      box-shadow:0 32px 80px rgba(0,0,0,0.15),0 8px 24px rgba(0,0,0,0.08),0 0 0 1px rgba(0,0,0,0.06);
+    }
+    /* Chrome top bar */
+    .dash-chrome{
+      background:#f0ede8;
+      padding:10px 14px;
+      display:flex;align-items:center;gap:7px;
+      border-bottom:1px solid rgba(0,0,0,0.07);
+    }
     .tl{width:11px;height:11px;border-radius:50%}
     .tl-r{background:#ff5f57}.tl-y{background:#febc2e}.tl-g{background:#28c840}
-    .dash-bar-title{margin-left:8px;font-size:12px;font-weight:600;color:var(--text3)}
-    .dash-bar-live{margin-left:auto;display:flex;align-items:center;gap:5px;font-size:11px;color:var(--green);font-weight:600}
+    .dash-chrome-title{margin-left:10px;font-size:11px;font-weight:600;color:rgba(0,0,0,0.4);letter-spacing:.2px}
+    .dash-chrome-live{margin-left:auto;display:flex;align-items:center;gap:5px;font-size:11px;color:var(--green);font-weight:600}
     .live-dot{width:6px;height:6px;background:var(--green);border-radius:50%;animation:pulse 2s ease infinite}
-    .dash-body{display:grid;grid-template-columns:190px 1fr;height:370px}
-    .dash-side{border-right:1px solid var(--border);display:flex;flex-direction:column;background:rgba(13,17,23,.6)}
-    .dash-side-hd{padding:12px 14px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--text3)}
-    .chat-row{padding:9px 12px;display:flex;align-items:center;gap:9px;border-left:2px solid transparent;transition:background .15s}
-    .chat-row.active{background:rgba(37,211,102,.07);border-left-color:var(--green)}
-    .chat-row:hover:not(.active){background:rgba(255,255,255,.03)}
-    .ava{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0}
-    .ag{background:linear-gradient(135deg,#6366f1,#8b5cf6)}
-    .ab{background:linear-gradient(135deg,#0ea5e9,#0284c7)}
-    .ar{background:linear-gradient(135deg,#f43f5e,#e11d48)}
-    .ao{background:linear-gradient(135deg,#f97316,#ea580c)}
-    .ci{flex:1;min-width:0}
-    .cn{font-size:12px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .cp{font-size:11px;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .cm{display:flex;flex-direction:column;align-items:flex-end;gap:3px}
-    .ct{font-size:10px;color:var(--text3)}
-    .ai-tag{font-size:9px;font-weight:700;background:var(--green-dim);color:var(--green);padding:2px 5px;border-radius:4px;border:1px solid rgba(37,211,102,.15)}
-    .mini-stats{margin-top:auto;padding:12px;border-top:1px solid var(--border);display:grid;grid-template-columns:1fr 1fr;gap:8px}
-    .ms{background:var(--surface2);border-radius:var(--r-sm);padding:8px}
-    .ms-n{font-size:16px;font-weight:800;line-height:1;margin-bottom:2px;letter-spacing:-.5px}
-    .ms-l{font-size:9px;color:var(--text3)}
-    .dash-main{display:flex;flex-direction:column}
-    .dash-main-hd{padding:11px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:9px}
-    .dm-name{font-size:13px;font-weight:700}
-    .dm-sub{font-size:11px;color:var(--text3)}
-    .ai-live{margin-left:auto;font-size:10px;font-weight:600;color:var(--green);background:var(--green-dim);border:1px solid rgba(37,211,102,.2);padding:4px 10px;border-radius:100px;display:flex;align-items:center;gap:4px}
-    .msgs{flex:1;padding:14px;display:flex;flex-direction:column;gap:8px;overflow:hidden}
-    .msg{max-width:80%;padding:9px 13px;border-radius:var(--r-md);font-size:12px;line-height:1.5}
-    .mi{background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text2);align-self:flex-start;border-bottom-left-radius:4px}
-    .mo{background:linear-gradient(135deg,#1a3d2b,#1e4d34);border:1px solid rgba(37,211,102,.15);color:var(--text);align-self:flex-end;border-bottom-right-radius:4px}
-    .msg-meta{font-size:10px;color:rgba(37,211,102,.7);margin-top:3px;text-align:right}
-    .typing{display:flex;gap:5px;align-items:center;padding:4px 0}
-    .td{width:6px;height:6px;border-radius:50%;background:var(--green);animation:tb 1.2s ease infinite}
+    /* 4-panel body */
+    .dash-body{display:grid;grid-template-columns:40px 190px 1fr 155px;height:360px}
+    /* Panel 1: icon nav */
+    .dash-icons{
+      background:#e8e4df;
+      border-right:1px solid rgba(0,0,0,0.07);
+      display:flex;flex-direction:column;align-items:center;
+      padding:10px 0;gap:4px;
+    }
+    .di{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px;cursor:pointer;transition:background .15s;color:rgba(0,0,0,0.4)}
+    .di:hover,.di.active{background:rgba(0,0,0,0.1);color:rgba(0,0,0,0.7)}
+    .di.active{background:rgba(0,0,0,0.12)}
+    /* Panel 2: conversation list */
+    .dash-convs{
+      background:#fff;
+      border-right:1px solid rgba(0,0,0,0.07);
+      display:flex;flex-direction:column;overflow:hidden;
+    }
+    .convs-hd{
+      padding:8px 12px;
+      font-size:11px;font-weight:600;color:rgba(0,0,0,0.45);
+      border-bottom:1px solid rgba(0,0,0,0.06);
+      display:flex;align-items:center;justify-content:space-between;
+    }
+    .conv-item{
+      padding:9px 12px;display:flex;align-items:flex-start;gap:8px;
+      border-left:2px solid transparent;cursor:pointer;
+      transition:background .12s;border-bottom:1px solid rgba(0,0,0,0.04);
+    }
+    .conv-item.active{background:#f0f7ff;border-left-color:#3b82f6}
+    .conv-item:hover:not(.active){background:#fafafa}
+    .c-ava{width:26px;height:26px;border-radius:50%;font-size:10px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+    .c-info{flex:1;min-width:0}
+    .c-name{font-size:12px;font-weight:600;color:#0f172a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .c-prev{font-size:11px;color:rgba(0,0,0,0.4);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .c-meta{display:flex;flex-direction:column;align-items:flex-end;gap:2px;flex-shrink:0}
+    .c-time{font-size:10px;color:rgba(0,0,0,0.35)}
+    .c-badge{font-size:9px;font-weight:700;background:#fef3c7;color:#92400e;padding:1px 5px;border-radius:4px}
+    .c-ai{font-size:9px;font-weight:700;background:#dcfce7;color:#15803d;padding:1px 5px;border-radius:4px}
+    .convs-stats{margin-top:auto;padding:10px 12px;border-top:1px solid rgba(0,0,0,0.06);display:grid;grid-template-columns:1fr 1fr;gap:6px}
+    .cs{background:#f4f5f7;border-radius:6px;padding:6px 8px}
+    .cs-n{font-size:14px;font-weight:800;color:var(--text);letter-spacing:-.5px;line-height:1}
+    .cs-l{font-size:9px;color:rgba(0,0,0,0.4);margin-top:1px}
+    /* Panel 3: main chat */
+    .dash-chat{display:flex;flex-direction:column;background:#fff}
+    .chat-hd{
+      padding:8px 12px;border-bottom:1px solid rgba(0,0,0,0.07);
+      display:flex;align-items:center;gap:6px;
+    }
+    .chat-hd-title{font-size:12px;font-weight:700;color:var(--text);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .chat-status{font-size:10px;font-weight:600;background:#fef3c7;color:#92400e;padding:3px 8px;border-radius:5px}
+    .chat-ticket{
+      padding:7px 12px;border-bottom:1px solid rgba(0,0,0,0.06);
+      display:flex;align-items:center;gap:6px;
+    }
+    .ticket-id{font-size:10px;font-weight:600;color:rgba(0,0,0,0.4)}
+    .ticket-who{display:flex;align-items:center;gap:4px;font-size:10px;font-weight:500;color:rgba(0,0,0,0.5)}
+    .ticket-dot{width:14px;height:14px;border-radius:50%;font-size:7px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center}
+    .chat-subject{
+      padding:7px 12px;border-bottom:1px solid rgba(0,0,0,0.06);
+      font-size:11px;color:rgba(0,0,0,0.4);
+    }
+    .msgs{flex:1;padding:10px 12px;display:flex;flex-direction:column;gap:7px;overflow:hidden}
+    .msg{max-width:85%;padding:8px 11px;border-radius:var(--r-md);font-size:11px;line-height:1.5}
+    .mi{background:#f1f5f9;color:#334155;align-self:flex-start;border-bottom-left-radius:3px}
+    .mo{background:#e0edff;color:#1e3a5f;align-self:flex-end;border-bottom-right-radius:3px}
+    .mo-green{background:#dcfce7;color:#14532d;align-self:flex-end;border-bottom-right-radius:3px}
+    .msg-ts{font-size:9px;margin-top:2px;text-align:right;opacity:.6}
+    .typing{display:flex;gap:4px;align-items:center;padding:3px 0}
+    .td{width:5px;height:5px;border-radius:50%;background:var(--green);animation:tb 1.2s ease infinite}
     .td:nth-child(2){animation-delay:.2s}.td:nth-child(3){animation-delay:.4s}
-    @keyframes tb{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-5px);opacity:1}}
-    .dash-input-row{padding:10px 12px;border-top:1px solid var(--border);display:flex;align-items:center;gap:8px}
-    .dash-input{flex:1;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:var(--r-sm);padding:7px 11px;font-size:12px;color:var(--text3);font-family:inherit}
-    .send-btn{width:30px;height:30px;background:var(--green);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    @keyframes tb{0%,60%,100%{transform:translateY(0);opacity:.35}30%{transform:translateY(-4px);opacity:1}}
+    .dash-input-row{
+      padding:8px 10px;border-top:1px solid rgba(0,0,0,0.07);
+      display:flex;align-items:center;gap:6px;
+    }
+    .dash-input{flex:1;background:#f4f5f7;border:1px solid rgba(0,0,0,0.08);border-radius:6px;padding:6px 10px;font-size:11px;color:rgba(0,0,0,0.35);font-family:inherit}
+    .send-btn{width:26px;height:26px;background:var(--green);border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;cursor:pointer}
+    /* Panel 4: details */
+    .dash-details{
+      background:#fff;border-left:1px solid rgba(0,0,0,0.07);
+      display:flex;flex-direction:column;overflow:hidden;
+    }
+    .det-hd{padding:10px 12px;border-bottom:1px solid rgba(0,0,0,0.07);font-size:12px;font-weight:700;color:var(--text);display:flex;align-items:center;justify-content:space-between}
+    .det-section{padding:8px 12px;border-bottom:1px solid rgba(0,0,0,0.05)}
+    .det-section-t{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:rgba(0,0,0,0.35);margin-bottom:7px}
+    .det-row{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:5px;gap:4px}
+    .det-key{font-size:10px;color:rgba(0,0,0,0.4);flex-shrink:0}
+    .det-val{font-size:10px;font-weight:600;color:var(--text);text-align:right}
+    .det-tag{font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px}
+    .tag-green{background:#dcfce7;color:#15803d}
+    .tag-blue{background:#dbeafe;color:#1d4ed8}
+    .tag-yellow{background:#fef3c7;color:#92400e}
+    .det-ai-note{margin:8px 12px;background:#f0fdf4;border:1px solid rgba(22,163,74,0.15);border-radius:8px;padding:8px}
+    .det-ai-note-t{font-size:9px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px}
+    .det-ai-note-b{font-size:10px;color:#15803d;line-height:1.4}
 
-    /* LABEL + SECTION TITLES */
-    .label{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--green);margin-bottom:14px}
-    .sec-h{font-size:clamp(30px,3.4vw,50px);font-weight:800;line-height:1.05;letter-spacing:-2px;margin-bottom:16px}
+    /* LABEL */
+    .label{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--green);margin-bottom:12px}
+    .sec-h{font-size:clamp(28px,3.2vw,48px);font-weight:800;line-height:1.05;letter-spacing:-2px;margin-bottom:14px;color:var(--text)}
     .sec-p{font-size:16px;color:var(--text2);line-height:1.75;max-width:560px}
 
     /* LOGOS */
-    .logos-section{padding:56px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
-    .logos-lbl{text-align:center;font-size:11px;font-weight:600;color:var(--text3);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:28px}
+    .logos-section{padding:52px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:var(--bg2)}
+    .logos-lbl{text-align:center;font-size:11px;font-weight:600;color:var(--text3);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:24px}
     .logos-mq{overflow:hidden;mask-image:linear-gradient(to right,transparent,black 10%,black 90%,transparent)}
     .logos-track{display:flex;width:max-content;animation:lscroll 22s linear infinite}
     @keyframes lscroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-    .logo-chip{display:flex;align-items:center;gap:9px;padding:0 36px;font-size:14px;font-weight:600;color:var(--text3);white-space:nowrap;border-right:1px solid var(--border)}
-    .lc-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+    .logo-chip{display:flex;align-items:center;gap:8px;padding:0 32px;font-size:13px;font-weight:600;color:var(--text3);white-space:nowrap;border-right:1px solid var(--border)}
+    .lc-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
 
     /* PROBLEM */
     .problem-section{padding:var(--sy) 0}
-    .prob-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:56px}
-    .prob-col{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);padding:36px}
-    .prob-col.bad{border-color:rgba(239,68,68,.18)}
-    .prob-col.good{border-color:rgba(37,211,102,.18);background:rgba(37,211,102,.02)}
-    .col-tag{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;padding:5px 12px;border-radius:100px;margin-bottom:24px}
-    .col-tag.bad{background:rgba(239,68,68,.1);color:#f87171;border:1px solid rgba(239,68,68,.2)}
-    .col-tag.good{background:var(--green-dim);color:var(--green);border:1px solid rgba(37,211,102,.2)}
-    .col-h{font-size:20px;font-weight:800;letter-spacing:-.6px;line-height:1.2;margin-bottom:22px}
-    .pi{display:flex;align-items:flex-start;gap:11px;padding:11px 0;border-bottom:1px solid var(--border);font-size:14px;color:var(--text2);line-height:1.5}
+    .prob-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:52px}
+    .prob-col{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);padding:34px;box-shadow:var(--shadow-sm)}
+    .prob-col.bad{border-color:rgba(239,68,68,0.15);background:#fffafa}
+    .prob-col.good{border-color:rgba(22,163,74,0.18);background:#f0fdf4}
+    .col-tag{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;padding:5px 11px;border-radius:100px;margin-bottom:22px}
+    .col-tag.bad{background:rgba(239,68,68,.08);color:#dc2626;border:1px solid rgba(239,68,68,.18)}
+    .col-tag.good{background:var(--green-dim2);color:var(--green);border:1px solid rgba(22,163,74,.2)}
+    .col-h{font-size:19px;font-weight:800;letter-spacing:-.5px;line-height:1.2;margin-bottom:20px;color:var(--text)}
+    .pi{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid rgba(0,0,0,0.05);font-size:13px;color:var(--text2);line-height:1.5}
     .pi:last-child{border-bottom:none}
-    .pi-ic{flex-shrink:0;font-size:15px;margin-top:2px}
+    .pi-ic{flex-shrink:0;font-size:14px;margin-top:2px}
 
     /* FLOW */
     .flow-section{padding:var(--sy) 0;border-top:1px solid var(--border)}
-    .flow-hd{text-align:center;margin-bottom:72px}
+    .flow-hd{text-align:center;margin-bottom:64px}
     .flow-hd .sec-p{margin:0 auto;text-align:center}
-    .flow-wrap{max-width:860px;margin:0 auto}
+    .flow-wrap{max-width:820px;margin:0 auto}
     .flow-row{display:flex;align-items:center;justify-content:center}
-    .fn{background:var(--surface);border:1px solid var(--border2);border-radius:var(--r-lg);padding:22px 26px;min-width:164px;text-align:center;transition:border-color .3s,box-shadow .3s}
-    .fn:hover{box-shadow:0 0 24px rgba(37,211,102,.07)}
-    .fn.trigger{border-color:rgba(59,130,246,.3)}
-    .fn.ai{border-color:rgba(139,92,246,.3)}
-    .fn.act{border-color:rgba(37,211,102,.3)}
-    .fn.oa{border-color:rgba(37,211,102,.4);background:rgba(37,211,102,.03)}
-    .fn.ob{border-color:rgba(59,130,246,.4);background:rgba(59,130,246,.03)}
-    .fn.oc{border-color:rgba(249,115,22,.4);background:rgba(249,115,22,.03)}
-    .fn-ic{font-size:26px;margin-bottom:8px;display:block}
-    .fn-t{font-size:13px;font-weight:700;color:var(--text);line-height:1.3;margin-bottom:3px}
-    .fn-s{font-size:11px;color:var(--text3);line-height:1.4}
-    .fc{padding:0 10px;display:flex;align-items:center}
-    .fc-line{height:1px;width:44px;background:linear-gradient(90deg,var(--border2),var(--green));position:relative}
-    .fc-line::after{content:'';position:absolute;right:-5px;top:-4px;width:0;height:0;border-left:8px solid var(--green);border-top:4px solid transparent;border-bottom:4px solid transparent}
-    .flow-branches{display:flex;justify-content:center;gap:16px;margin-top:0;position:relative}
+    .fn{background:#fff;border:1px solid var(--border2);border-radius:var(--r-lg);padding:20px 24px;min-width:155px;text-align:center;box-shadow:var(--shadow-sm);transition:box-shadow .3s,transform .3s}
+    .fn:hover{box-shadow:var(--shadow-md);transform:translateY(-2px)}
+    .fn.trigger{border-color:rgba(59,130,246,.3);background:#f0f7ff}
+    .fn.ai{border-color:rgba(139,92,246,.3);background:#faf5ff}
+    .fn.act{border-color:rgba(22,163,74,.3);background:#f0fdf4}
+    .fn.oa{border-color:rgba(22,163,74,.4);background:#f0fdf4}
+    .fn.ob{border-color:rgba(59,130,246,.4);background:#eff6ff}
+    .fn.oc{border-color:rgba(249,115,22,.4);background:#fff7ed}
+    .fn-ic{font-size:24px;margin-bottom:7px;display:block}
+    .fn-t{font-size:12px;font-weight:700;color:var(--text);line-height:1.3;margin-bottom:2px}
+    .fn-s{font-size:10px;color:var(--text3);line-height:1.4}
+    .fc{padding:0 8px;display:flex;align-items:center}
+    .fc-line{height:1px;width:40px;background:linear-gradient(90deg,rgba(0,0,0,0.12),var(--green));position:relative}
+    .fc-line::after{content:'';position:absolute;right:-5px;top:-4px;width:0;height:0;border-left:7px solid var(--green);border-top:4px solid transparent;border-bottom:4px solid transparent}
     .flow-vert{display:flex;flex-direction:column;align-items:center}
-    .flow-vert-line{width:1px;height:40px;background:linear-gradient(180deg,var(--green),var(--border2))}
-    .flow-hline-wrap{display:flex;align-items:center;justify-content:center;width:100%;height:1px;margin-bottom:0}
-    .flow-hline{height:1px;background:var(--border2)}
+    .flow-vert-line{width:1px;height:36px;background:linear-gradient(180deg,var(--green),rgba(0,0,0,0.1))}
+    .flow-branches{display:flex;justify-content:center;gap:14px}
     .flow-branch-item{display:flex;flex-direction:column;align-items:center}
-    .flow-branch-vl{width:1px;height:24px;background:var(--border2)}
+    .flow-branch-vl{width:1px;height:22px;background:rgba(0,0,0,0.1)}
 
     /* FEATURES */
     .features-section{padding:var(--sy) 0;border-top:1px solid var(--border)}
-    .feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:56px}
-    .fc-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);padding:30px;transition:border-color .3s,transform .3s,box-shadow .3s}
-    .fc-card:hover{border-color:var(--border2);transform:translateY(-4px);box-shadow:0 24px 60px rgba(0,0,0,.4)}
-    .fc-ic{width:46px;height:46px;border-radius:var(--r-md);display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:18px}
-    .ic-g{background:var(--green-dim);border:1px solid rgba(37,211,102,.15)}
+    .feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:52px}
+    .fc-card{background:#fff;border:1px solid var(--border);border-radius:var(--r-xl);padding:28px;box-shadow:var(--shadow-sm);transition:box-shadow .3s,transform .3s}
+    .fc-card:hover{box-shadow:var(--shadow-md);transform:translateY(-3px)}
+    .fc-ic{width:44px;height:44px;border-radius:var(--r-md);display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:16px}
+    .ic-g{background:var(--green-dim2);border:1px solid rgba(22,163,74,.15)}
     .ic-b{background:var(--blue-dim);border:1px solid rgba(59,130,246,.15)}
     .ic-o{background:var(--orange-dim);border:1px solid rgba(249,115,22,.15)}
     .ic-p{background:var(--purple-dim);border:1px solid rgba(139,92,246,.15)}
-    .fc-t{font-size:17px;font-weight:800;letter-spacing:-.4px;margin-bottom:10px;line-height:1.2}
-    .fc-b{font-size:14px;color:var(--text2);line-height:1.7;margin-bottom:18px}
-    .fc-pill{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:4px 11px;border-radius:100px}
-    .pg{background:var(--green-dim);color:var(--green)}
+    .fc-t{font-size:16px;font-weight:800;letter-spacing:-.3px;margin-bottom:8px;line-height:1.2;color:var(--text)}
+    .fc-b{font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:16px}
+    .fc-pill{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:3px 10px;border-radius:100px}
+    .pg{background:var(--green-dim2);color:var(--green)}
     .pb{background:var(--blue-dim);color:var(--blue)}
     .po{background:var(--orange-dim);color:var(--orange)}
     .pp{background:var(--purple-dim);color:var(--purple)}
 
     /* STATS */
-    .stats-section{padding:var(--sy) 0;border-top:1px solid var(--border);background:var(--surface)}
+    .stats-section{padding:var(--sy) 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:var(--bg2)}
     .stats-grid{display:grid;grid-template-columns:repeat(4,1fr)}
     .si{padding:0 40px;border-right:1px solid var(--border)}
     .si:first-child{padding-left:0}.si:last-child{border-right:none}
-    .sn{font-size:clamp(42px,4.5vw,62px);font-weight:800;letter-spacing:-3px;line-height:1;margin-bottom:10px}
+    .sn{font-size:clamp(40px,4.2vw,58px);font-weight:800;letter-spacing:-3px;line-height:1;margin-bottom:10px;color:var(--text)}
     .sn em{font-style:normal;color:var(--green)}
     .sl{font-size:14px;color:var(--text2);line-height:1.5}
 
     /* TESTIMONIALS */
     .t-section{padding:var(--sy) 0;border-top:1px solid var(--border);overflow:hidden}
-    .t-hd{text-align:center;margin-bottom:56px}
+    .t-hd{text-align:center;margin-bottom:52px}
     .t-hd .sec-p{margin:0 auto}
     .t-mq{overflow:hidden;mask-image:linear-gradient(to right,transparent,black 8%,black 92%,transparent)}
-    .t-track{display:flex;gap:16px;width:max-content;animation:tscroll 38s linear infinite}
+    .t-track{display:flex;gap:14px;width:max-content;animation:tscroll 38s linear infinite}
     .t-track:hover{animation-play-state:paused}
     @keyframes tscroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-    .t-card{flex:0 0 310px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);padding:26px}
-    .t-stars{font-size:13px;margin-bottom:14px;letter-spacing:2px}
-    .t-q{font-size:14px;color:var(--text2);line-height:1.7;margin-bottom:18px}
-    .t-auth{display:flex;align-items:center;gap:10px}
-    .t-av{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0}
-    .t-name{font-size:13px;font-weight:700}
+    .t-card{flex:0 0 300px;background:#fff;border:1px solid var(--border);border-radius:var(--r-xl);padding:24px;box-shadow:var(--shadow-sm)}
+    .t-stars{font-size:12px;margin-bottom:12px;color:#f59e0b}
+    .t-q{font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:16px}
+    .t-auth{display:flex;align-items:center;gap:9px}
+    .t-av{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0}
+    .t-name{font-size:12px;font-weight:700;color:var(--text)}
     .t-clinic{font-size:11px;color:var(--text3)}
 
     /* PRICING */
     .pricing-section{padding:var(--sy) 0;border-top:1px solid var(--border)}
-    .pr-hd{text-align:center;margin-bottom:56px}
+    .pr-hd{text-align:center;margin-bottom:52px}
     .pr-hd .sec-p{margin:0 auto}
-    .pr-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
-    .pr-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);padding:34px;position:relative}
-    .pr-card.hot{border-color:var(--green);box-shadow:0 0 0 1px rgba(37,211,102,.2),0 24px 60px rgba(37,211,102,.06)}
-    .hot-badge{position:absolute;top:-13px;left:50%;transform:translateX(-50%);font-size:11px;font-weight:700;background:var(--green);color:#000;padding:4px 16px;border-radius:100px;white-space:nowrap}
-    .pr-plan{font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
-    .pr-amt{font-size:50px;font-weight:800;letter-spacing:-3px;line-height:1;margin-bottom:4px}
-    .pr-amt sup{font-size:20px;font-weight:700;vertical-align:super}
-    .pr-per{font-size:13px;color:var(--text3);margin-bottom:22px}
-    .pr-div{height:1px;background:var(--border);margin-bottom:22px}
-    .pr-feats{list-style:none;margin-bottom:28px;display:flex;flex-direction:column;gap:11px}
-    .pr-feats li{display:flex;align-items:flex-start;gap:10px;font-size:14px;color:var(--text2);line-height:1.4}
-    .pfc{width:18px;height:18px;border-radius:50%;background:var(--green-dim);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;font-size:10px;color:var(--green)}
-    .btn-pl{display:block;width:100%;font-family:inherit;font-size:14px;font-weight:600;text-align:center;padding:13px;border-radius:var(--r-md);cursor:pointer;text-decoration:none;transition:all .2s}
+    .pr-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+    .pr-card{background:#fff;border:1px solid var(--border);border-radius:var(--r-xl);padding:32px;position:relative;box-shadow:var(--shadow-sm)}
+    .pr-card.hot{border-color:var(--green);box-shadow:0 0 0 1px rgba(22,163,74,.2),0 16px 48px rgba(22,163,74,.08)}
+    .hot-badge{position:absolute;top:-12px;left:50%;transform:translateX(-50%);font-size:11px;font-weight:700;background:var(--green);color:#fff;padding:3px 14px;border-radius:100px;white-space:nowrap}
+    .pr-plan{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:7px}
+    .pr-amt{font-size:46px;font-weight:800;letter-spacing:-2.5px;line-height:1;color:var(--text);margin-bottom:3px}
+    .pr-amt sup{font-size:18px;font-weight:700;vertical-align:super;letter-spacing:0}
+    .pr-per{font-size:12px;color:var(--text3);margin-bottom:20px}
+    .pr-div{height:1px;background:var(--border);margin-bottom:20px}
+    .pr-feats{list-style:none;margin-bottom:26px;display:flex;flex-direction:column;gap:10px}
+    .pr-feats li{display:flex;align-items:flex-start;gap:9px;font-size:13px;color:var(--text2);line-height:1.4}
+    .pfc{width:17px;height:17px;border-radius:50%;background:var(--green-dim2);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;font-size:9px;color:var(--green)}
+    .btn-pl{display:block;width:100%;font-family:inherit;font-size:14px;font-weight:600;text-align:center;padding:12px;border-radius:var(--r-md);cursor:pointer;text-decoration:none;transition:all .2s}
     .btn-pl-out{background:transparent;border:1px solid var(--border2);color:var(--text)}
-    .btn-pl-out:hover{background:rgba(255,255,255,.06)}
-    .btn-pl-sol{background:var(--green);border:none;color:#000}
-    .btn-pl-sol:hover{background:#20c75a;box-shadow:0 0 24px rgba(37,211,102,.3)}
+    .btn-pl-out:hover{background:var(--bg2);box-shadow:var(--shadow-sm)}
+    .btn-pl-sol{background:var(--green);border:none;color:#fff}
+    .btn-pl-sol:hover{background:#15803d;box-shadow:0 4px 16px rgba(22,163,74,.3)}
 
     /* CTA */
-    .cta-section{padding:var(--sy) 0;border-top:1px solid var(--border);position:relative;overflow:hidden}
-    .cta-bg{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse 60% 100% at 50% 100%,rgba(37,211,102,.07),transparent)}
-    .cta-in{position:relative;z-index:1;text-align:center;max-width:600px;margin:0 auto}
-    .cta-in .sec-p{margin:0 auto 32px;text-align:center}
-    .cta-btns{display:flex;justify-content:center;gap:12px}
+    .cta-section{padding:var(--sy) 0;border-top:1px solid var(--border);position:relative;overflow:hidden;background:var(--bg2)}
+    .cta-bg{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse 60% 100% at 50% 100%,rgba(22,163,74,.06),transparent)}
+    .cta-in{position:relative;z-index:1;text-align:center;max-width:580px;margin:0 auto}
+    .cta-in .sec-p{margin:0 auto 28px;text-align:center}
+    .cta-btns{display:flex;justify-content:center;gap:10px}
 
     /* FOOTER */
-    footer{border-top:1px solid var(--border);padding:48px 0}
+    footer{border-top:1px solid var(--border);padding:44px 0;background:var(--bg2)}
     .ft-inner{display:flex;justify-content:space-between;align-items:flex-start;gap:40px}
-    .ft-brand{max-width:240px}
-    .ft-logo{display:flex;align-items:center;gap:8px;font-size:16px;font-weight:700;color:var(--text);text-decoration:none;margin-bottom:10px}
+    .ft-brand{max-width:230px}
+    .ft-logo{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:700;color:var(--text);text-decoration:none;margin-bottom:9px}
     .ft-desc{font-size:13px;color:var(--text3);line-height:1.6}
-    .ft-links{display:flex;gap:56px}
-    .ft-col-t{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--text3);margin-bottom:14px}
-    .ft-col ul{list-style:none;display:flex;flex-direction:column;gap:9px}
+    .ft-links{display:flex;gap:52px}
+    .ft-col-t{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--text3);margin-bottom:12px}
+    .ft-col ul{list-style:none;display:flex;flex-direction:column;gap:8px}
     .ft-col a{font-size:13px;color:var(--text3);text-decoration:none;transition:color .2s}
     .ft-col a:hover{color:var(--text2)}
-    .ft-bot{margin-top:36px;padding-top:22px;border-top:1px solid var(--border);display:flex;justify-content:space-between}
+    .ft-bot{margin-top:32px;padding-top:20px;border-top:1px solid var(--border);display:flex;justify-content:space-between}
     .ft-bot p{font-size:12px;color:var(--text3)}
 
     /* RESPONSIVE */
     @media(max-width:1024px){
       :root{--sy:80px;--px:32px}
-      .hero-inner{grid-template-columns:1fr;gap:48px;min-height:auto;padding-top:100px;padding-bottom:60px}
+      .hero-inner{grid-template-columns:1fr;gap:48px;min-height:auto;padding-top:96px;padding-bottom:56px}
       .feat-grid{grid-template-columns:1fr 1fr}
-      .stats-grid{grid-template-columns:1fr 1fr;gap:32px 0}
-      .si{border-right:none;border-bottom:1px solid var(--border);padding:0 0 32px}
+      .stats-grid{grid-template-columns:1fr 1fr;gap:28px 0}
+      .si{border-right:none;border-bottom:1px solid var(--border);padding:0 0 28px}
       .si:last-child{border-bottom:none}
-      .pr-grid{grid-template-columns:1fr;max-width:420px;margin:0 auto}
+      .pr-grid{grid-template-columns:1fr;max-width:400px;margin:0 auto}
       .prob-grid{grid-template-columns:1fr}
+      .dash-details{display:none}
+      .dash-body{grid-template-columns:40px 180px 1fr}
     }
     @media(max-width:640px){
-      :root{--px:20px;--sy:64px}
+      :root{--px:20px;--sy:60px}
       .nav-links{display:none}
-      .hero h1{font-size:36px;letter-spacing:-1.5px}
+      .hero h1{font-size:34px;letter-spacing:-1.5px}
       .feat-grid{grid-template-columns:1fr}
       .hero-ctas{flex-direction:column;align-items:flex-start}
       .ft-inner{flex-direction:column}
-      .ft-links{flex-direction:column;gap:28px}
+      .ft-links{flex-direction:column;gap:24px}
       .flow-row{flex-direction:column;gap:0}
       .fc{transform:rotate(90deg)}
+      .dash-icons{display:none}
+      .dash-body{grid-template-columns:1fr 1fr}
+      .dash-details{display:none}
     }
   </style>
 </head>
@@ -289,7 +376,7 @@
   <div class="nav-inner">
     <a href="/" class="nav-logo">
       <div class="logo-mark">
-        <svg width="17" height="17" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.557 4.116 1.534 5.845L.073 23.927l6.263-1.637C8.038 23.402 9.976 24 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818c-1.898 0-3.668-.517-5.187-1.416l-.371-.22-3.851 1.006 1.026-3.75-.242-.385A9.801 9.801 0 0 1 2.182 12C2.182 6.57 6.57 2.182 12 2.182S21.818 6.57 21.818 12 17.43 21.818 12 21.818z"/></svg>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.557 4.116 1.534 5.845L.073 23.927l6.263-1.637C8.038 23.402 9.976 24 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818c-1.898 0-3.668-.517-5.187-1.416l-.371-.22-3.851 1.006 1.026-3.75-.242-.385A9.801 9.801 0 0 1 2.182 12C2.182 6.57 6.57 2.182 12 2.182S21.818 6.57 21.818 12 17.43 21.818 12 21.818z"/></svg>
       </div>
       Cliniflux
     </a>
@@ -308,20 +395,18 @@
 
 <!-- HERO -->
 <section class="hero">
-  <div class="hero-bg"></div>
-  <div class="hero-grid"></div>
   <div class="hero-inner">
     <div class="hero-body">
-      <div class="hero-badge"><span class="badge-dot"></span> Automatización IA para clínicas</div>
+      <div class="hero-badge"><span class="badge-dot"></span>Automatización IA para clínicas</div>
       <h1>Tu clínica<br>responde <span class="g">24/7.</span><br>Sin equipo<br>extra.</h1>
       <p class="hero-desc">Cliniflux automatiza WhatsApp para que cada paciente reciba respuesta instantánea, agende su cita y tu equipo se centre en lo que importa.</p>
       <div class="hero-ctas">
-        <a href="#precios" class="btn-primary" style="font-size:15px;padding:13px 26px">Solicitar demo gratuita <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg></a>
-        <a href="#flujo" class="btn-secondary" style="font-size:15px;padding:13px 26px">Ver cómo funciona</a>
+        <a href="#precios" class="btn-primary" style="font-size:15px;padding:12px 24px">Solicitar demo gratuita <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg></a>
+        <a href="#flujo" class="btn-secondary" style="font-size:15px;padding:12px 24px">Ver cómo funciona</a>
       </div>
       <div class="hero-proof">
         <div class="avatars">
-          <div class="av" style="background:linear-gradient(135deg,#25d366,#16a34a)">A</div>
+          <div class="av" style="background:linear-gradient(135deg,#22c55e,#16a34a)">A</div>
           <div class="av" style="background:linear-gradient(135deg,#0ea5e9,#0284c7)">B</div>
           <div class="av" style="background:linear-gradient(135deg,#f43f5e,#e11d48)">C</div>
           <div class="av" style="background:linear-gradient(135deg,#f97316,#ea580c)">D</div>
@@ -330,57 +415,98 @@
       </div>
     </div>
 
-    <!-- DASHBOARD -->
+    <!-- DASHBOARD 4-PANEL -->
     <div class="hero-visual">
       <div class="dashboard">
-        <div class="dash-bar">
+        <!-- Chrome -->
+        <div class="dash-chrome">
           <div class="tl tl-r"></div><div class="tl tl-y"></div><div class="tl tl-g"></div>
-          <span class="dash-bar-title">Cliniflux — Panel de control</span>
-          <div class="dash-bar-live"><div class="live-dot"></div> IA activa</div>
+          <span class="dash-chrome-title">Cliniflux — Bandeja de entrada</span>
+          <div class="dash-chrome-live"><div class="live-dot"></div>IA activa</div>
         </div>
+        <!-- Body -->
         <div class="dash-body">
-          <div class="dash-side">
-            <div class="dash-side-hd">Conversaciones</div>
-            <div class="chat-row active">
-              <div class="ava ag">MG</div>
-              <div class="ci"><div class="cn">María García</div><div class="cp">Quiero una cita...</div></div>
-              <div class="cm"><span class="ct">2m</span><span class="ai-tag">IA</span></div>
+          <!-- Col 1: icon nav -->
+          <div class="dash-icons">
+            <div class="di active">💬</div>
+            <div class="di">⚡</div>
+            <div class="di">📊</div>
+            <div class="di">👥</div>
+            <div class="di" style="margin-top:auto">⚙️</div>
+          </div>
+          <!-- Col 2: conversations -->
+          <div class="dash-convs">
+            <div class="convs-hd"><span>4 Activas</span><span>Recientes ↓</span></div>
+            <div class="conv-item active">
+              <div class="c-ava" style="background:linear-gradient(135deg,#6366f1,#8b5cf6)">MG</div>
+              <div class="c-info"><div class="c-name">María García</div><div class="c-prev">Quiero pedir una cita...</div></div>
+              <div class="c-meta"><span class="c-time">2m</span><span class="c-ai">IA</span></div>
             </div>
-            <div class="chat-row">
-              <div class="ava ab">JM</div>
-              <div class="ci"><div class="cn">Juan Martínez</div><div class="cp">¿Tenéis ortodoncia?</div></div>
-              <div class="cm"><span class="ct">5m</span><span class="ai-tag">IA</span></div>
+            <div class="conv-item">
+              <div class="c-ava" style="background:linear-gradient(135deg,#0ea5e9,#0284c7)">JP</div>
+              <div class="c-info"><div class="c-name">Juan Pérez</div><div class="c-prev">¿Tenéis ortodoncia?</div></div>
+              <div class="c-meta"><span class="c-time">8m</span><span class="c-badge">3min</span></div>
             </div>
-            <div class="chat-row">
-              <div class="ava ar">AL</div>
-              <div class="ci"><div class="cn">Ana López</div><div class="cp">Confirmada para...</div></div>
-              <div class="cm"><span class="ct">12m</span><span class="ai-tag">IA</span></div>
+            <div class="conv-item">
+              <div class="c-ava" style="background:linear-gradient(135deg,#f43f5e,#e11d48)">AL</div>
+              <div class="c-info"><div class="c-name">Ana López</div><div class="c-prev">Confirmada para mañana</div></div>
+              <div class="c-meta"><span class="c-time">17m</span><span class="c-ai">IA</span></div>
             </div>
-            <div class="chat-row">
-              <div class="ava ao">PS</div>
-              <div class="ci"><div class="cn">Pedro Sánchez</div><div class="cp">Muchas gracias!</div></div>
-              <div class="cm"><span class="ct">18m</span><span class="ai-tag">IA</span></div>
+            <div class="conv-item">
+              <div class="c-ava" style="background:linear-gradient(135deg,#f97316,#ea580c)">PS</div>
+              <div class="c-info"><div class="c-name">Pedro Sánchez</div><div class="c-prev">#2302 — Gracias!</div></div>
+              <div class="c-meta"><span class="c-time">23m</span><span class="c-ai">IA</span></div>
             </div>
-            <div class="mini-stats">
-              <div class="ms"><div class="ms-n" style="color:var(--green)">94%</div><div class="ms-l">Resueltos</div></div>
-              <div class="ms"><div class="ms-n">1.2s</div><div class="ms-l">Resp. media</div></div>
+            <div class="convs-stats">
+              <div class="cs"><div class="cs-n" style="color:var(--green)">94%</div><div class="cs-l">Resueltos</div></div>
+              <div class="cs"><div class="cs-n">1.2s</div><div class="cs-l">Resp. media</div></div>
             </div>
           </div>
-          <div class="dash-main">
-            <div class="dash-main-hd">
-              <div class="ava ag" style="width:34px;height:34px;font-size:11px">MG</div>
-              <div><div class="dm-name">María García</div><div class="dm-sub">Clínica Dental Norte · 2 min</div></div>
-              <div class="ai-live"><div class="live-dot"></div> IA respondiendo</div>
+          <!-- Col 3: main chat -->
+          <div class="dash-chat">
+            <div class="chat-hd">
+              <div class="chat-hd-title">Solicitud de cita dental...</div>
+              <div class="chat-status">En progreso</div>
             </div>
+            <div class="chat-ticket">
+              <span class="ticket-id">#8521</span>
+              <div class="ticket-who">
+                <div class="ticket-dot" style="background:linear-gradient(135deg,#6366f1,#8b5cf6)">MG</div>
+                María García
+              </div>
+              <span style="font-size:10px;color:rgba(0,0,0,0.35);margin-left:4px">· Compartido</span>
+            </div>
+            <div class="chat-subject">Paciente solicita cita para limpieza dental</div>
             <div class="msgs">
               <div class="msg mi">Hola, quería pedir una cita con el dentista 🦷</div>
-              <div class="msg mo">¡Hola María! 👋 Claro, te ayudo. ¿Para qué servicio necesitas la cita?<div class="msg-meta">✓✓ Enviado · IA</div></div>
+              <div class="msg mo">¡Hola María! 👋 Claro, te ayudo con tu cita. ¿Para qué servicio la necesitas?<div class="msg-ts">Visto · 9min · IA</div></div>
               <div class="msg mi">Para una limpieza, ¿tenéis mañana por la mañana?</div>
-              <div class="msg mo"><div class="typing"><div class="td"></div><div class="td"></div><div class="td"></div></div></div>
+              <div class="msg mo-green">¡Perfecto! ✅ He encontrado disponibilidad mañana a las 10:00h. ¿Te confirmo la cita?<div class="msg-ts">Visto · 4min · IA</div></div>
+              <div class="msg mi"><div class="typing"><div class="td"></div><div class="td"></div><div class="td"></div></div></div>
             </div>
             <div class="dash-input-row">
               <div class="dash-input">Escribir respuesta manual...</div>
-              <div class="send-btn"><svg width="13" height="13" viewBox="0 0 24 24" fill="white"><path d="m22 2-7 20-4-9-9-4 20-7z"/></svg></div>
+              <div class="send-btn"><svg width="12" height="12" viewBox="0 0 24 24" fill="white"><path d="m22 2-7 20-4-9-9-4 20-7z"/></svg></div>
+            </div>
+          </div>
+          <!-- Col 4: details -->
+          <div class="dash-details">
+            <div class="det-hd">Detalles <span style="font-size:11px;color:var(--text3);font-weight:400">✕</span></div>
+            <div class="det-section">
+              <div class="det-section-t">Paciente</div>
+              <div class="det-row"><span class="det-key">Nombre</span><span class="det-val">María García</span></div>
+              <div class="det-row"><span class="det-key">Clínica</span><span class="det-val">Dental Norte</span></div>
+              <div class="det-row"><span class="det-key">Estado</span><span class="det-tag tag-yellow">En progreso</span></div>
+            </div>
+            <div class="det-section">
+              <div class="det-section-t">Cita</div>
+              <div class="det-row"><span class="det-key">Servicio</span><span class="det-val">Limpieza</span></div>
+              <div class="det-row"><span class="det-key">Fecha</span><span class="det-val">Mañana 10h</span></div>
+              <div class="det-row"><span class="det-key">Canal</span><span class="det-tag tag-green">WhatsApp</span></div>
+            </div>
+            <div class="det-ai-note">
+              <div class="det-ai-note-t">✦ Resumen IA</div>
+              <div class="det-ai-note-b">Paciente confirmará cita en los próximos 2 minutos según patrón de respuesta.</div>
             </div>
           </div>
         </div>
@@ -394,7 +520,7 @@
   <div class="logos-lbl">Especialidades que confían en Cliniflux</div>
   <div class="logos-mq">
     <div class="logos-track">
-      <div class="logo-chip"><div class="lc-dot" style="background:#25d366"></div>Clínicas Dentales</div>
+      <div class="logo-chip"><div class="lc-dot" style="background:#22c55e"></div>Clínicas Dentales</div>
       <div class="logo-chip"><div class="lc-dot" style="background:#3b82f6"></div>Centros de Estética</div>
       <div class="logo-chip"><div class="lc-dot" style="background:#f97316"></div>Fisioterapia</div>
       <div class="logo-chip"><div class="lc-dot" style="background:#8b5cf6"></div>Dermatología</div>
@@ -402,7 +528,7 @@
       <div class="logo-chip"><div class="lc-dot" style="background:#0ea5e9"></div>Psicología</div>
       <div class="logo-chip"><div class="lc-dot" style="background:#22c55e"></div>Nutrición</div>
       <div class="logo-chip"><div class="lc-dot" style="background:#eab308"></div>Podología</div>
-      <div class="logo-chip"><div class="lc-dot" style="background:#25d366"></div>Clínicas Dentales</div>
+      <div class="logo-chip"><div class="lc-dot" style="background:#22c55e"></div>Clínicas Dentales</div>
       <div class="logo-chip"><div class="lc-dot" style="background:#3b82f6"></div>Centros de Estética</div>
       <div class="logo-chip"><div class="lc-dot" style="background:#f97316"></div>Fisioterapia</div>
       <div class="logo-chip"><div class="lc-dot" style="background:#8b5cf6"></div>Dermatología</div>
@@ -424,20 +550,20 @@
       <div class="prob-col bad reveal d1">
         <div class="col-tag bad">✕ Sin Cliniflux</div>
         <div class="col-h">Tu equipo saturado.<br>Pacientes sin respuesta.</div>
-        <div class="pi"><span class="pi-ic">⏰</span>Mensajes de WhatsApp sin responder durante horas o días enteros</div>
-        <div class="pi"><span class="pi-ic">💸</span>Pacientes potenciales que se van directamente a la competencia</div>
-        <div class="pi"><span class="pi-ic">🔄</span>Recepcionistas gestionando decenas de preguntas repetitivas al día</div>
+        <div class="pi"><span class="pi-ic">⏰</span>Mensajes de WhatsApp sin responder durante horas o días</div>
+        <div class="pi"><span class="pi-ic">💸</span>Pacientes que se van directamente a la competencia</div>
+        <div class="pi"><span class="pi-ic">🔄</span>Recepcionistas gestionando decenas de preguntas repetitivas</div>
         <div class="pi"><span class="pi-ic">📅</span>Citas perdidas fuera del horario de atención</div>
         <div class="pi"><span class="pi-ic">😤</span>Equipo frustrado, pacientes insatisfechos</div>
       </div>
       <div class="prob-col good reveal d2">
         <div class="col-tag good">✓ Con Cliniflux</div>
         <div class="col-h">Respuesta instantánea.<br>Agenda siempre llena.</div>
-        <div class="pi"><span class="pi-ic">⚡</span>Respuesta automática en menos de 2 segundos, disponible 24/7</div>
-        <div class="pi"><span class="pi-ic">📈</span>+40% de citas confirmadas al primer contacto del paciente</div>
-        <div class="pi"><span class="pi-ic">🤖</span>IA que gestiona preguntas frecuentes sin intervención humana</div>
+        <div class="pi"><span class="pi-ic">⚡</span>Respuesta automática en menos de 2 segundos, 24/7</div>
+        <div class="pi"><span class="pi-ic">📈</span>+40% de citas confirmadas al primer contacto</div>
+        <div class="pi"><span class="pi-ic">🤖</span>IA que gestiona preguntas frecuentes sin intervención</div>
         <div class="pi"><span class="pi-ic">🌙</span>Captación activa de citas fuera de horario laboral</div>
-        <div class="pi"><span class="pi-ic">😊</span>Equipo enfocado en pacientes, no atendiendo el móvil</div>
+        <div class="pi"><span class="pi-ic">😊</span>Equipo enfocado en pacientes, no en el móvil</div>
       </div>
     </div>
   </div>
@@ -449,58 +575,21 @@
     <div class="flow-hd">
       <div class="reveal"><div class="label">Automatización inteligente</div></div>
       <h2 class="sec-h reveal d1">Del mensaje al paciente<br>atendido. Automático.</h2>
-      <p class="sec-p reveal d2">Nuestro sistema procesa cada mensaje, identifica la intención del paciente y ejecuta la acción correcta en tiempo real, sin intervención humana.</p>
+      <p class="sec-p reveal d2">Nuestro sistema procesa cada mensaje, identifica la intención del paciente y ejecuta la acción correcta en tiempo real.</p>
     </div>
     <div class="flow-wrap reveal d1">
       <div class="flow-row">
-        <div class="fn trigger">
-          <span class="fn-ic">💬</span>
-          <div class="fn-t">Paciente escribe</div>
-          <div class="fn-s">WhatsApp, cualquier hora</div>
-        </div>
+        <div class="fn trigger"><span class="fn-ic">💬</span><div class="fn-t">Paciente escribe</div><div class="fn-s">WhatsApp, cualquier hora</div></div>
         <div class="fc"><div class="fc-line"></div></div>
-        <div class="fn ai">
-          <span class="fn-ic">🧠</span>
-          <div class="fn-t">IA analiza intención</div>
-          <div class="fn-s">NLP + contexto de la clínica</div>
-        </div>
+        <div class="fn ai"><span class="fn-ic">🧠</span><div class="fn-t">IA analiza intención</div><div class="fn-s">NLP + contexto clínica</div></div>
         <div class="fc"><div class="fc-line"></div></div>
-        <div class="fn act">
-          <span class="fn-ic">⚡</span>
-          <div class="fn-t">Decisión instantánea</div>
-          <div class="fn-s">Menos de 2 segundos</div>
-        </div>
+        <div class="fn act"><span class="fn-ic">⚡</span><div class="fn-t">Decisión instantánea</div><div class="fn-s">Menos de 2 segundos</div></div>
       </div>
-
-      <div class="flow-vert" style="margin-top:0">
-        <div class="flow-vert-line"></div>
-      </div>
-
-      <div class="flow-branches" style="margin-top:0">
-        <div class="flow-branch-item">
-          <div class="flow-branch-vl"></div>
-          <div class="fn oa">
-            <span class="fn-ic">📅</span>
-            <div class="fn-t">Cita agendada</div>
-            <div class="fn-s">Confirmación automática</div>
-          </div>
-        </div>
-        <div class="flow-branch-item">
-          <div class="flow-branch-vl"></div>
-          <div class="fn ob">
-            <span class="fn-ic">✅</span>
-            <div class="fn-t">Consulta resuelta</div>
-            <div class="fn-s">FAQ respondida al instante</div>
-          </div>
-        </div>
-        <div class="flow-branch-item">
-          <div class="flow-branch-vl"></div>
-          <div class="fn oc">
-            <span class="fn-ic">👤</span>
-            <div class="fn-t">Derivado al equipo</div>
-            <div class="fn-s">Solo cuando es necesario</div>
-          </div>
-        </div>
+      <div class="flow-vert"><div class="flow-vert-line"></div></div>
+      <div class="flow-branches">
+        <div class="flow-branch-item"><div class="flow-branch-vl"></div><div class="fn oa"><span class="fn-ic">📅</span><div class="fn-t">Cita agendada</div><div class="fn-s">Confirmación automática</div></div></div>
+        <div class="flow-branch-item"><div class="flow-branch-vl"></div><div class="fn ob"><span class="fn-ic">✅</span><div class="fn-t">Consulta resuelta</div><div class="fn-s">FAQ respondida al instante</div></div></div>
+        <div class="flow-branch-item"><div class="flow-branch-vl"></div><div class="fn oc"><span class="fn-ic">👤</span><div class="fn-t">Derivado al equipo</div><div class="fn-s">Solo cuando es necesario</div></div></div>
       </div>
     </div>
   </div>
@@ -512,42 +601,12 @@
     <div class="reveal"><div class="label">Funcionalidades</div></div>
     <h2 class="sec-h reveal d1">Todo lo que necesita<br>tu clínica para crecer</h2>
     <div class="feat-grid">
-      <div class="fc-card reveal">
-        <div class="fc-ic ic-g">💬</div>
-        <h3 class="fc-t">Respuesta automática 24/7</h3>
-        <p class="fc-b">Tu clínica nunca duerme. La IA responde a cada paciente en segundos, a cualquier hora del día, incluidos fines de semana y festivos.</p>
-        <span class="fc-pill pg">⚡ Menos de 2s de respuesta</span>
-      </div>
-      <div class="fc-card reveal d1">
-        <div class="fc-ic ic-b">📅</div>
-        <h3 class="fc-t">Agenda inteligente</h3>
-        <p class="fc-b">Agendamos citas directamente en tu calendario con confirmación automática, recordatorios y gestión de cancelaciones sin intervención.</p>
-        <span class="fc-pill pb">🔗 Integración con tu calendar</span>
-      </div>
-      <div class="fc-card reveal d2">
-        <div class="fc-ic ic-o">📊</div>
-        <h3 class="fc-t">Reactivación de pacientes</h3>
-        <p class="fc-b">Identificamos pacientes inactivos y lanzamos campañas personalizadas por WhatsApp para recuperarlos de forma completamente automática.</p>
-        <span class="fc-pill po">📈 +30% pacientes reactivados</span>
-      </div>
-      <div class="fc-card reveal d1">
-        <div class="fc-ic ic-p">🔒</div>
-        <h3 class="fc-t">Cumplimiento RGPD</h3>
-        <p class="fc-b">Toda la automatización cumple con la normativa europea de protección de datos. Tus pacientes y tu clínica siempre protegidos y seguros.</p>
-        <span class="fc-pill pp">🇪🇺 Conforme RGPD</span>
-      </div>
-      <div class="fc-card reveal d2">
-        <div class="fc-ic ic-g">📋</div>
-        <h3 class="fc-t">Panel en tiempo real</h3>
-        <p class="fc-b">Visualiza todas las conversaciones, métricas de respuesta y rendimiento del sistema desde un dashboard centralizado y fácil de usar.</p>
-        <span class="fc-pill pg">📡 Datos en tiempo real</span>
-      </div>
-      <div class="fc-card reveal d3">
-        <div class="fc-ic ic-b">⚙️</div>
-        <h3 class="fc-t">Implementación en 48h</h3>
-        <p class="fc-b">Sin desarrollos complejos ni integraciones costosas. Configuramos y activamos tu sistema en 48 horas. Tú solo ves llegar las citas.</p>
-        <span class="fc-pill pb">🚀 Activo en 2 días</span>
-      </div>
+      <div class="fc-card reveal"><div class="fc-ic ic-g">💬</div><h3 class="fc-t">Respuesta automática 24/7</h3><p class="fc-b">Tu clínica nunca duerme. La IA responde a cada paciente en segundos, a cualquier hora, incluidos festivos.</p><span class="fc-pill pg">⚡ Menos de 2s</span></div>
+      <div class="fc-card reveal d1"><div class="fc-ic ic-b">📅</div><h3 class="fc-t">Agenda inteligente</h3><p class="fc-b">Agendamos citas en tu calendario con confirmación automática, recordatorios y gestión de cancelaciones.</p><span class="fc-pill pb">🔗 Integración calendar</span></div>
+      <div class="fc-card reveal d2"><div class="fc-ic ic-o">📊</div><h3 class="fc-t">Reactivación de pacientes</h3><p class="fc-b">Identificamos pacientes inactivos y lanzamos campañas personalizadas por WhatsApp para recuperarlos.</p><span class="fc-pill po">📈 +30% reactivados</span></div>
+      <div class="fc-card reveal d1"><div class="fc-ic ic-p">🔒</div><h3 class="fc-t">Cumplimiento RGPD</h3><p class="fc-b">Toda la automatización cumple con la normativa europea de protección de datos. Siempre protegidos.</p><span class="fc-pill pp">🇪🇺 Conforme RGPD</span></div>
+      <div class="fc-card reveal d2"><div class="fc-ic ic-g">📋</div><h3 class="fc-t">Panel en tiempo real</h3><p class="fc-b">Visualiza conversaciones, métricas de respuesta y rendimiento desde un dashboard centralizado.</p><span class="fc-pill pg">📡 Datos en tiempo real</span></div>
+      <div class="fc-card reveal d3"><div class="fc-ic ic-b">⚙️</div><h3 class="fc-t">Implementación en 48h</h3><p class="fc-b">Sin desarrollos complejos. Configuramos y activamos tu sistema en 48 horas. Tú solo ves las citas llegar.</p><span class="fc-pill pb">🚀 Activo en 2 días</span></div>
     </div>
   </div>
 </section>
@@ -556,10 +615,10 @@
 <section class="stats-section">
   <div class="c">
     <div class="stats-grid">
-      <div class="si reveal"><div class="sn"><em>24</em>/7</div><div class="sl">Disponibilidad total, sin interrupciones ni festivos</div></div>
+      <div class="si reveal"><div class="sn"><em>24</em>/7</div><div class="sl">Disponibilidad total, sin interrupciones ni días festivos</div></div>
       <div class="si reveal d1"><div class="sn"><em>+</em>40<em>%</em></div><div class="sl">Incremento medio en citas confirmadas al mes</div></div>
       <div class="si reveal d2"><div class="sn">48<em>h</em></div><div class="sl">Tiempo de implementación completa desde el inicio</div></div>
-      <div class="si reveal d3"><div class="sn">100<em>%</em></div><div class="sl">Mensajes respondidos fuera de horario de atención</div></div>
+      <div class="si reveal d3"><div class="sn">100<em>%</em></div><div class="sl">Mensajes respondidos fuera del horario de atención</div></div>
     </div>
   </div>
 </section>
@@ -573,14 +632,14 @@
   </div>
   <div class="t-mq">
     <div class="t-track">
-      <div class="t-card"><div class="t-stars">★★★★★</div><p class="t-q">"Desde que implementamos Cliniflux, nuestra agenda está siempre llena. Los pacientes reciben respuesta inmediata y nosotros nos despreocupamos del WhatsApp por completo."</p><div class="t-auth"><div class="t-av" style="background:linear-gradient(135deg,#6366f1,#8b5cf6)">CM</div><div><div class="t-name">Carmen Molina</div><div class="t-clinic">Centro Dental Molina, Madrid</div></div></div></div>
-      <div class="t-card"><div class="t-stars">★★★★★</div><p class="t-q">"Reactivamos más de 80 pacientes inactivos en el primer mes. El ROI fue inmediato. No podría imaginar la clínica sin esta herramienta ahora mismo."</p><div class="t-auth"><div class="t-av" style="background:linear-gradient(135deg,#0ea5e9,#0284c7)">RG</div><div><div class="t-name">Roberto García</div><div class="t-clinic">Clínica Estética RG, Barcelona</div></div></div></div>
-      <div class="t-card"><div class="t-stars">★★★★★</div><p class="t-q">"Mis recepcionistas ahora se centran en atender a los pacientes presentes. El sistema gestiona WhatsApp perfectamente y sin errores. Una maravilla."</p><div class="t-auth"><div class="t-av" style="background:linear-gradient(135deg,#f43f5e,#e11d48)">LP</div><div><div class="t-name">Laura Pérez</div><div class="t-clinic">Fisio &amp; Salud, Valencia</div></div></div></div>
-      <div class="t-card"><div class="t-stars">★★★★★</div><p class="t-q">"La implementación fue increíblemente rápida. En menos de 48 horas ya teníamos el sistema funcionando y captando citas fuera de horario sin parar."</p><div class="t-auth"><div class="t-av" style="background:linear-gradient(135deg,#f97316,#ea580c)">MA</div><div><div class="t-name">Miguel Ángel Torres</div><div class="t-clinic">Derma Clinic, Sevilla</div></div></div></div>
-      <div class="t-card"><div class="t-stars">★★★★★</div><p class="t-q">"Desde que implementamos Cliniflux, nuestra agenda está siempre llena. Los pacientes reciben respuesta inmediata y nosotros nos despreocupamos del WhatsApp por completo."</p><div class="t-auth"><div class="t-av" style="background:linear-gradient(135deg,#6366f1,#8b5cf6)">CM</div><div><div class="t-name">Carmen Molina</div><div class="t-clinic">Centro Dental Molina, Madrid</div></div></div></div>
-      <div class="t-card"><div class="t-stars">★★★★★</div><p class="t-q">"Reactivamos más de 80 pacientes inactivos en el primer mes. El ROI fue inmediato. No podría imaginar la clínica sin esta herramienta ahora mismo."</p><div class="t-auth"><div class="t-av" style="background:linear-gradient(135deg,#0ea5e9,#0284c7)">RG</div><div><div class="t-name">Roberto García</div><div class="t-clinic">Clínica Estética RG, Barcelona</div></div></div></div>
-      <div class="t-card"><div class="t-stars">★★★★★</div><p class="t-q">"Mis recepcionistas ahora se centran en atender a los pacientes presentes. El sistema gestiona WhatsApp perfectamente y sin errores. Una maravilla."</p><div class="t-auth"><div class="t-av" style="background:linear-gradient(135deg,#f43f5e,#e11d48)">LP</div><div><div class="t-name">Laura Pérez</div><div class="t-clinic">Fisio &amp; Salud, Valencia</div></div></div></div>
-      <div class="t-card"><div class="t-stars">★★★★★</div><p class="t-q">"La implementación fue increíblemente rápida. En menos de 48 horas ya teníamos el sistema funcionando y captando citas fuera de horario sin parar."</p><div class="t-auth"><div class="t-av" style="background:linear-gradient(135deg,#f97316,#ea580c)">MA</div><div><div class="t-name">Miguel Ángel Torres</div><div class="t-clinic">Derma Clinic, Sevilla</div></div></div></div>
+      <div class="t-card"><div class="t-stars">★★★★★</div><p class="t-q">"Desde que implementamos Cliniflux, nuestra agenda está siempre llena. Los pacientes reciben respuesta inmediata y nosotros nos despreocupamos del WhatsApp."</p><div class="t-auth"><div class="t-av" style="background:linear-gradient(135deg,#6366f1,#8b5cf6)">CM</div><div><div class="t-name">Carmen Molina</div><div class="t-clinic">Centro Dental Molina, Madrid</div></div></div></div>
+      <div class="t-card"><div class="t-stars">★★★★★</div><p class="t-q">"Reactivamos más de 80 pacientes inactivos en el primer mes. El ROI fue inmediato. No podría imaginar la clínica sin esta herramienta."</p><div class="t-auth"><div class="t-av" style="background:linear-gradient(135deg,#0ea5e9,#0284c7)">RG</div><div><div class="t-name">Roberto García</div><div class="t-clinic">Clínica Estética RG, Barcelona</div></div></div></div>
+      <div class="t-card"><div class="t-stars">★★★★★</div><p class="t-q">"Mis recepcionistas ahora se centran en los pacientes presentes. El sistema gestiona WhatsApp perfectamente solo."</p><div class="t-auth"><div class="t-av" style="background:linear-gradient(135deg,#f43f5e,#e11d48)">LP</div><div><div class="t-name">Laura Pérez</div><div class="t-clinic">Fisio &amp; Salud, Valencia</div></div></div></div>
+      <div class="t-card"><div class="t-stars">★★★★★</div><p class="t-q">"La implementación fue increíblemente rápida. En menos de 48 horas teníamos el sistema captando citas fuera de horario."</p><div class="t-auth"><div class="t-av" style="background:linear-gradient(135deg,#f97316,#ea580c)">MA</div><div><div class="t-name">Miguel Ángel Torres</div><div class="t-clinic">Derma Clinic, Sevilla</div></div></div></div>
+      <div class="t-card"><div class="t-stars">★★★★★</div><p class="t-q">"Desde que implementamos Cliniflux, nuestra agenda está siempre llena. Los pacientes reciben respuesta inmediata y nosotros nos despreocupamos del WhatsApp."</p><div class="t-auth"><div class="t-av" style="background:linear-gradient(135deg,#6366f1,#8b5cf6)">CM</div><div><div class="t-name">Carmen Molina</div><div class="t-clinic">Centro Dental Molina, Madrid</div></div></div></div>
+      <div class="t-card"><div class="t-stars">★★★★★</div><p class="t-q">"Reactivamos más de 80 pacientes inactivos en el primer mes. El ROI fue inmediato. No podría imaginar la clínica sin esta herramienta."</p><div class="t-auth"><div class="t-av" style="background:linear-gradient(135deg,#0ea5e9,#0284c7)">RG</div><div><div class="t-name">Roberto García</div><div class="t-clinic">Clínica Estética RG, Barcelona</div></div></div></div>
+      <div class="t-card"><div class="t-stars">★★★★★</div><p class="t-q">"Mis recepcionistas ahora se centran en los pacientes presentes. El sistema gestiona WhatsApp perfectamente solo."</p><div class="t-auth"><div class="t-av" style="background:linear-gradient(135deg,#f43f5e,#e11d48)">LP</div><div><div class="t-name">Laura Pérez</div><div class="t-clinic">Fisio &amp; Salud, Valencia</div></div></div></div>
+      <div class="t-card"><div class="t-stars">★★★★★</div><p class="t-q">"La implementación fue increíblemente rápida. En menos de 48 horas teníamos el sistema captando citas fuera de horario."</p><div class="t-auth"><div class="t-av" style="background:linear-gradient(135deg,#f97316,#ea580c)">MA</div><div><div class="t-name">Miguel Ángel Torres</div><div class="t-clinic">Derma Clinic, Sevilla</div></div></div></div>
     </div>
   </div>
 </section>
@@ -600,7 +659,7 @@
         <div class="pr-per">/ mes · 1 clínica</div>
         <div class="pr-div"></div>
         <ul class="pr-feats">
-          <li><div class="pfc">✓</div>Respuesta automática 24/7</li>
+          <li><div class="pfc">✓</div>Respuesta automática WhatsApp 24/7</li>
           <li><div class="pfc">✓</div>Gestión de citas automática</li>
           <li><div class="pfc">✓</div>Hasta 500 conversaciones/mes</li>
           <li><div class="pfc">✓</div>Panel de control básico</li>
@@ -618,7 +677,7 @@
           <li><div class="pfc">✓</div>Todo lo de Starter</li>
           <li><div class="pfc">✓</div>Reactivación de pacientes inactivos</li>
           <li><div class="pfc">✓</div>Conversaciones ilimitadas</li>
-          <li><div class="pfc">✓</div>Integración con software de gestión</li>
+          <li><div class="pfc">✓</div>Integración software de gestión</li>
           <li><div class="pfc">✓</div>Campañas WhatsApp personalizadas</li>
           <li><div class="pfc">✓</div>Soporte prioritario 24/7</li>
         </ul>
@@ -650,10 +709,10 @@
     <div class="cta-in reveal">
       <div class="label" style="justify-content:center">Empieza hoy</div>
       <h2 class="sec-h" style="text-align:center">¿Tu clínica lista para<br>el siguiente nivel?</h2>
-      <p class="sec-p" style="text-align:center;margin:0 auto 32px">Solicita tu demo gratuita y te mostramos cómo funciona Cliniflux en tu clínica en menos de 30 minutos. Sin compromiso.</p>
+      <p class="sec-p" style="text-align:center;margin:0 auto 28px">Solicita tu demo gratuita y te mostramos cómo funciona Cliniflux en tu clínica en menos de 30 minutos.</p>
       <div class="cta-btns">
-        <a href="#" class="btn-primary" style="font-size:15px;padding:14px 28px">Solicitar demo gratuita →</a>
-        <a href="/demo" class="btn-secondary" style="font-size:15px;padding:14px 28px">Ver demo interactiva</a>
+        <a href="#" class="btn-primary" style="font-size:15px;padding:13px 26px">Solicitar demo gratuita →</a>
+        <a href="/demo" class="btn-secondary" style="font-size:15px;padding:13px 26px">Ver demo interactiva</a>
       </div>
     </div>
   </div>
@@ -665,7 +724,7 @@
     <div class="ft-inner">
       <div class="ft-brand">
         <a href="/" class="ft-logo">
-          <div class="logo-mark" style="width:26px;height:26px;border-radius:7px"><svg width="13" height="13" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.557 4.116 1.534 5.845L.073 23.927l6.263-1.637C8.038 23.402 9.976 24 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818c-1.898 0-3.668-.517-5.187-1.416l-.371-.22-3.851 1.006 1.026-3.75-.242-.385A9.801 9.801 0 0 1 2.182 12C2.182 6.57 6.57 2.182 12 2.182S21.818 6.57 21.818 12 17.43 21.818 12 21.818z"/></svg></div>
+          <div class="logo-mark" style="width:24px;height:24px;border-radius:6px"><svg width="12" height="12" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.557 4.116 1.534 5.845L.073 23.927l6.263-1.637C8.038 23.402 9.976 24 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818c-1.898 0-3.668-.517-5.187-1.416l-.371-.22-3.851 1.006 1.026-3.75-.242-.385A9.801 9.801 0 0 1 2.182 12C2.182 6.57 6.57 2.182 12 2.182S21.818 6.57 21.818 12 17.43 21.818 12 21.818z"/></svg></div>
           Cliniflux
         </a>
         <p class="ft-desc">Automatización inteligente de WhatsApp para clínicas que quieren crecer sin aumentar el equipo.</p>
@@ -681,25 +740,12 @@
 </footer>
 
 <script>
-  // Navbar scroll
   const nav = document.getElementById('nav');
   window.addEventListener('scroll', () => nav.classList.toggle('scrolled', scrollY > 20), {passive:true});
-
-  // Scroll reveal
-  const els = document.querySelectorAll('.reveal');
-  new IntersectionObserver((entries) => {
-    entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('on') });
-  }, {threshold: 0.1, rootMargin: '0px 0px -40px 0px'}).observe
-  ? new IntersectionObserver((entries) => {
-      entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('on') });
-    }, {threshold: 0.1, rootMargin: '0px 0px -40px 0px'})
-  : null;
-
-  // Correct observer
   const io = new IntersectionObserver((entries) => {
     entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('on') });
-  }, {threshold: 0.1, rootMargin: '0px 0px -40px 0px'});
-  els.forEach(el => io.observe(el));
+  }, {threshold:0.1, rootMargin:'0px 0px -40px 0px'});
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
 </script>
 </body>
 </html>
