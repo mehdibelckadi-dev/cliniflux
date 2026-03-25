@@ -25,7 +25,7 @@
       --green-dim2:rgba(22,163,74,0.14);
       --blue:#3b82f6;--blue-dim:rgba(59,130,246,0.08);
       --orange:#f97316;--orange-dim:rgba(249,115,22,0.08);
-      --purple:#8b5cf6;--purple-dim:rgba(139,92,246,0.08);
+      --purple:#16a34a;--purple-dim:rgba(22,163,74,0.08);
       --shadow-sm:0 1px 3px rgba(0,0,0,0.07),0 1px 2px rgba(0,0,0,0.04);
       --shadow-md:0 4px 16px rgba(0,0,0,0.08),0 1px 3px rgba(0,0,0,0.04);
       --shadow-lg:0 16px 48px rgba(0,0,0,0.10),0 4px 12px rgba(0,0,0,0.05);
@@ -312,7 +312,7 @@
     .ic-g{background:var(--green-dim2);border:1px solid rgba(22,163,74,.15)}
     .ic-b{background:var(--blue-dim);border:1px solid rgba(59,130,246,.15)}
     .ic-o{background:var(--orange-dim);border:1px solid rgba(249,115,22,.15)}
-    .ic-p{background:var(--purple-dim);border:1px solid rgba(139,92,246,.15)}
+    .ic-p{background:var(--purple-dim);border:1px solid rgba(22,163,74,.15)}
     .fc-card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:12px}
     .fc-link{display:inline-flex;align-items:center;font-size:13px;font-weight:600;color:var(--green);text-decoration:none;gap:4px;transition:gap .2s}
     .fc-link:hover{gap:8px}
@@ -322,7 +322,7 @@
     .pg{background:var(--green-dim2);color:var(--green)}
     .pb{background:var(--blue-dim);color:var(--blue)}
     .po{background:var(--orange-dim);color:var(--orange)}
-    .pp{background:var(--purple-dim);color:var(--purple)}
+    .pp{background:var(--green-dim2);color:var(--green)}
 
     /* STATS */
     .stats-section{padding:var(--sy) 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:var(--bg2)}
@@ -433,7 +433,7 @@
     .sc-check{width:20px;height:20px;border-radius:50%;background:var(--green-dim2);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--green);flex-shrink:0;margin-top:1px}
     .sc-card{border-radius:var(--r-xl);overflow:hidden;box-shadow:var(--shadow-lg)}
     .sc-card-teal{background:linear-gradient(135deg,#0f766e 0%,#0e7490 40%,#1d4ed8 100%)}
-    .sc-card-purple{background:linear-gradient(135deg,#6d28d9 0%,#7c3aed 40%,#4f46e5 100%)}
+    .sc-card-purple{background:linear-gradient(135deg,#14532d 0%,#16a34a 45%,#166534 100%)}
     .sc-inner{padding:32px}
     .sc-top-bar{display:flex;align-items:center;gap:6px;margin-bottom:20px}
     .sc-top-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,0.4)}
@@ -539,7 +539,7 @@
             <div class="dp-conv-list">
               <div class="convs-hd"><span>4 Activas</span><span class="c-ai-badge">IA ON</span></div>
               <div class="conv-item active">
-                <div class="c-ava" style="background:linear-gradient(135deg,#6366f1,#8b5cf6)">MG</div>
+                <div class="c-ava" style="background:linear-gradient(135deg,#16a34a,#22c55e)">MG</div>
                 <div class="c-info"><div class="c-name">María García</div><div class="c-prev">Quiero pedir cita...</div></div>
                 <div class="c-meta"><span class="c-time">2m</span><span class="c-ai">IA</span></div>
               </div>
@@ -626,7 +626,7 @@
                 <div class="dp-ag-badge pend">● Pendiente</div>
               </div>
             </div>
-            <div class="dp-ag-side"><div class="dp-ag-side-title">Resumen del día</div><div class="dp-ag-side-stats"><div class="dp-ag-side-stat"><div class="dp-ag-side-n" style="color:var(--green)">6</div><div class="dp-ag-side-l">Confirmadas</div></div><div class="dp-ag-side-stat"><div class="dp-ag-side-n" style="color:#f59e0b">2</div><div class="dp-ag-side-l">Pendientes</div></div><div class="dp-ag-side-stat"><div class="dp-ag-side-n">8</div><div class="dp-ag-side-l">Total</div></div></div><div class="dp-ag-side-title" style="margin-top:16px">Por doctor</div><div class="dp-ag-side-doc"><div class="dp-ag-side-doc-name">Dr. Ruiz</div><div class="dp-src-bar" style="margin:4px 0"><div class="dp-src-fill" style="width:62%;background:var(--green)"></div></div><span style="font-size:10px;color:rgba(0,0,0,0.4)">3 citas</span></div><div class="dp-ag-side-doc"><div class="dp-ag-side-doc-name">Dra. Vega</div><div class="dp-src-bar" style="margin:4px 0"><div class="dp-src-fill" style="width:48%;background:#6366f1"></div></div><span style="font-size:10px;color:rgba(0,0,0,0.4)">2 citas</span></div><div class="dp-ag-side-doc"><div class="dp-ag-side-doc-name">Dr. López</div><div class="dp-src-bar" style="margin:4px 0"><div class="dp-src-fill" style="width:32%;background:#0ea5e9"></div></div><span style="font-size:10px;color:rgba(0,0,0,0.4)">2 citas</span></div></div></div>
+            <div class="dp-ag-side"><div class="dp-ag-side-title">Resumen del día</div><div class="dp-ag-side-stats"><div class="dp-ag-side-stat"><div class="dp-ag-side-n" style="color:var(--green)">6</div><div class="dp-ag-side-l">Confirmadas</div></div><div class="dp-ag-side-stat"><div class="dp-ag-side-n" style="color:#f59e0b">2</div><div class="dp-ag-side-l">Pendientes</div></div><div class="dp-ag-side-stat"><div class="dp-ag-side-n">8</div><div class="dp-ag-side-l">Total</div></div></div><div class="dp-ag-side-title" style="margin-top:16px">Por doctor</div><div class="dp-ag-side-doc"><div class="dp-ag-side-doc-name">Dr. Ruiz</div><div class="dp-src-bar" style="margin:4px 0"><div class="dp-src-fill" style="width:62%;background:var(--green)"></div></div><span style="font-size:10px;color:rgba(0,0,0,0.4)">3 citas</span></div><div class="dp-ag-side-doc"><div class="dp-ag-side-doc-name">Dra. Vega</div><div class="dp-src-bar" style="margin:4px 0"><div class="dp-src-fill" style="width:48%;background:#22c55e"></div></div><span style="font-size:10px;color:rgba(0,0,0,0.4)">2 citas</span></div><div class="dp-ag-side-doc"><div class="dp-ag-side-doc-name">Dr. López</div><div class="dp-src-bar" style="margin:4px 0"><div class="dp-src-fill" style="width:32%;background:#0ea5e9"></div></div><span style="font-size:10px;color:rgba(0,0,0,0.4)">2 citas</span></div></div></div>
             <div class="dp-ag-footer">
               <div class="dp-ag-stat"><span class="dp-ag-stat-n" style="color:var(--green)">6</span>confirmadas</div>
               <div class="dp-ag-stat"><span class="dp-ag-stat-n" style="color:#f59e0b">2</span>pendientes</div>
@@ -673,7 +673,7 @@
             <div class="dp-met-sources">
               <div class="dp-src"><div class="dp-src-dot" style="background:#25d366"></div><span class="dp-src-name">WhatsApp</span><div class="dp-src-bar"><div class="dp-src-fill" style="width:82%;background:#25d366"></div></div><span class="dp-src-pct">82%</span></div>
               <div class="dp-src"><div class="dp-src-dot" style="background:#3b82f6"></div><span class="dp-src-name">Web</span><div class="dp-src-bar"><div class="dp-src-fill" style="width:12%;background:#3b82f6"></div></div><span class="dp-src-pct">12%</span></div>
-              <div class="dp-src"><div class="dp-src-dot" style="background:#8b5cf6"></div><span class="dp-src-name">Otros</span><div class="dp-src-bar"><div class="dp-src-fill" style="width:6%;background:#8b5cf6"></div></div><span class="dp-src-pct">6%</span></div>
+              <div class="dp-src"><div class="dp-src-dot" style="background:#4ade80"></div><span class="dp-src-name">Otros</span><div class="dp-src-bar"><div class="dp-src-fill" style="width:6%;background:#4ade80"></div></div><span class="dp-src-pct">6%</span></div>
             </div>
           </div>
 
@@ -691,24 +691,24 @@
       <div class="logo-chip" style="color:#16a34a;font-size:15px">Dental Norte</div>
       <div class="logo-chip">PieloSkin</div>
       <div class="logo-chip">Clínica Fortes</div>
-      <div class="logo-chip" style="color:#6366f1">NovaDent</div>
+      <div class="logo-chip" style="color:#16a34a">NovaDent</div>
       <div class="logo-chip">FisioPro</div>
       <div class="logo-chip">Centro Médico Alonso</div>
       <div class="logo-chip" style="color:#0ea5e9">DermLab</div>
       <div class="logo-chip">Clínica Vidal</div>
-      <div class="logo-chip" style="color:#8b5cf6">Healths</div>
+      <div class="logo-chip" style="color:#22c55e">Healths</div>
       <div class="logo-chip">Ortholife</div>
       <div class="logo-chip">Salud &amp; Vida</div>
       <div class="logo-chip" style="color:#f97316">NutriMed</div>
       <div class="logo-chip" style="color:#16a34a;font-size:15px">Dental Norte</div>
       <div class="logo-chip">PieloSkin</div>
       <div class="logo-chip">Clínica Fortes</div>
-      <div class="logo-chip" style="color:#6366f1">NovaDent</div>
+      <div class="logo-chip" style="color:#16a34a">NovaDent</div>
       <div class="logo-chip">FisioPro</div>
       <div class="logo-chip">Centro Médico Alonso</div>
       <div class="logo-chip" style="color:#0ea5e9">DermLab</div>
       <div class="logo-chip">Clínica Vidal</div>
-      <div class="logo-chip" style="color:#8b5cf6">Healths</div>
+      <div class="logo-chip" style="color:#22c55e">Healths</div>
       <div class="logo-chip">Ortholife</div>
       <div class="logo-chip">Salud &amp; Vida</div>
       <div class="logo-chip" style="color:#f97316">NutriMed</div>
@@ -759,7 +759,7 @@
       <div class="flow-main-row">
         <div class="fn">
           <div class="fn-dot" style="background:#ede9fe">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 0 1-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2" stroke-linecap="round"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 0 1-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
           </div>
           <span class="fn-t">Mensaje</span>
         </div>
@@ -864,11 +864,11 @@
   </div>
   <div class="t-mq">
     <div class="t-track">
-      <div class="t-card"><div class="t-stars">★★★★★</div><p class="t-q">"Desde que implementamos Cliniflux, nuestra agenda está siempre llena. Los pacientes reciben respuesta inmediata y nosotros nos despreocupamos del WhatsApp."</p><div class="t-auth"><div class="t-av" style="background:linear-gradient(135deg,#6366f1,#8b5cf6)">CM</div><div><div class="t-name">Carmen Molina</div><div class="t-clinic">Centro Dental Molina, Madrid</div></div></div></div>
+      <div class="t-card"><div class="t-stars">★★★★★</div><p class="t-q">"Desde que implementamos Cliniflux, nuestra agenda está siempre llena. Los pacientes reciben respuesta inmediata y nosotros nos despreocupamos del WhatsApp."</p><div class="t-auth"><div class="t-av" style="background:linear-gradient(135deg,#16a34a,#22c55e)">CM</div><div><div class="t-name">Carmen Molina</div><div class="t-clinic">Centro Dental Molina, Madrid</div></div></div></div>
       <div class="t-card"><div class="t-stars">★★★★★</div><p class="t-q">"Reactivamos más de 80 pacientes inactivos en el primer mes. El ROI fue inmediato. No podría imaginar la clínica sin esta herramienta."</p><div class="t-auth"><div class="t-av" style="background:linear-gradient(135deg,#0ea5e9,#0284c7)">RG</div><div><div class="t-name">Roberto García</div><div class="t-clinic">Clínica Estética RG, Barcelona</div></div></div></div>
       <div class="t-card"><div class="t-stars">★★★★★</div><p class="t-q">"Mis recepcionistas ahora se centran en los pacientes presentes. El sistema gestiona WhatsApp perfectamente solo."</p><div class="t-auth"><div class="t-av" style="background:linear-gradient(135deg,#f43f5e,#e11d48)">LP</div><div><div class="t-name">Laura Pérez</div><div class="t-clinic">Fisio &amp; Salud, Valencia</div></div></div></div>
       <div class="t-card"><div class="t-stars">★★★★★</div><p class="t-q">"La implementación fue increíblemente rápida. En menos de 48 horas teníamos el sistema captando citas fuera de horario."</p><div class="t-auth"><div class="t-av" style="background:linear-gradient(135deg,#f97316,#ea580c)">MA</div><div><div class="t-name">Miguel Ángel Torres</div><div class="t-clinic">Derma Clinic, Sevilla</div></div></div></div>
-      <div class="t-card"><div class="t-stars">★★★★★</div><p class="t-q">"Desde que implementamos Cliniflux, nuestra agenda está siempre llena. Los pacientes reciben respuesta inmediata y nosotros nos despreocupamos del WhatsApp."</p><div class="t-auth"><div class="t-av" style="background:linear-gradient(135deg,#6366f1,#8b5cf6)">CM</div><div><div class="t-name">Carmen Molina</div><div class="t-clinic">Centro Dental Molina, Madrid</div></div></div></div>
+      <div class="t-card"><div class="t-stars">★★★★★</div><p class="t-q">"Desde que implementamos Cliniflux, nuestra agenda está siempre llena. Los pacientes reciben respuesta inmediata y nosotros nos despreocupamos del WhatsApp."</p><div class="t-auth"><div class="t-av" style="background:linear-gradient(135deg,#16a34a,#22c55e)">CM</div><div><div class="t-name">Carmen Molina</div><div class="t-clinic">Centro Dental Molina, Madrid</div></div></div></div>
       <div class="t-card"><div class="t-stars">★★★★★</div><p class="t-q">"Reactivamos más de 80 pacientes inactivos en el primer mes. El ROI fue inmediato. No podría imaginar la clínica sin esta herramienta."</p><div class="t-auth"><div class="t-av" style="background:linear-gradient(135deg,#0ea5e9,#0284c7)">RG</div><div><div class="t-name">Roberto García</div><div class="t-clinic">Clínica Estética RG, Barcelona</div></div></div></div>
       <div class="t-card"><div class="t-stars">★★★★★</div><p class="t-q">"Mis recepcionistas ahora se centran en los pacientes presentes. El sistema gestiona WhatsApp perfectamente solo."</p><div class="t-auth"><div class="t-av" style="background:linear-gradient(135deg,#f43f5e,#e11d48)">LP</div><div><div class="t-name">Laura Pérez</div><div class="t-clinic">Fisio &amp; Salud, Valencia</div></div></div></div>
       <div class="t-card"><div class="t-stars">★★★★★</div><p class="t-q">"La implementación fue increíblemente rápida. En menos de 48 horas teníamos el sistema captando citas fuera de horario."</p><div class="t-auth"><div class="t-av" style="background:linear-gradient(135deg,#f97316,#ea580c)">MA</div><div><div class="t-name">Miguel Ángel Torres</div><div class="t-clinic">Derma Clinic, Sevilla</div></div></div></div>
