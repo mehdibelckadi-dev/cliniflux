@@ -33,14 +33,7 @@
       --sy:112px;--cmax:1160px;--px:48px;
     }
     html{scroll-behavior:smooth}
-    body{
-      font-family:'Inter','Plus Jakarta Sans',system-ui,sans-serif;
-      background:
-        radial-gradient(ellipse 90% 55% at 50% -5%,rgba(22,163,74,0.055) 0%,transparent 65%),
-        radial-gradient(ellipse 60% 45% at 92% 55%,rgba(59,130,246,0.04) 0%,transparent 65%),
-        #ffffff;
-      color:var(--text);line-height:1.6;overflow-x:hidden;-webkit-font-smoothing:antialiased;
-    }
+    body{font-family:'Inter','Plus Jakarta Sans',system-ui,sans-serif;background:#ffffff;color:var(--text);line-height:1.6;overflow-x:hidden;-webkit-font-smoothing:antialiased}
     .c{width:100%;max-width:var(--cmax);margin:0 auto;padding:0 var(--px)}
 
     /* REVEAL */
@@ -67,7 +60,8 @@
 
     /* HERO */
     .hero{position:relative;min-height:100vh;display:flex;align-items:center;padding-top:66px;overflow:hidden}
-    .hero-inner{position:relative;z-index:2;width:100%;max-width:var(--cmax);margin:0 auto;padding:80px var(--px);display:grid;grid-template-columns:1fr 1.1fr;align-items:center;gap:72px;min-height:calc(100vh - 66px)}
+    .hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 75% 55% at 50% 0%,rgba(22,163,74,0.09) 0%,transparent 65%);pointer-events:none;z-index:0}
+    .hero-inner{position:relative;z-index:2;width:100%;max-width:var(--cmax);margin:0 auto;padding:80px var(--px);display:grid;grid-template-columns:1fr 1.22fr;align-items:center;gap:64px;min-height:calc(100vh - 66px)}
     .hero-badge{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:600;color:var(--green);letter-spacing:.4px;background:var(--green-dim);border:1px solid rgba(22,163,74,0.18);padding:5px 13px;border-radius:100px;margin-bottom:26px}
     .badge-dot{width:6px;height:6px;background:var(--green);border-radius:50%;animation:pulse 2s ease infinite}
     @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(1.5)}}
@@ -77,7 +71,7 @@
     .hero-ctas{display:flex;align-items:center;gap:10px;margin-bottom:40px}
     .hero-proof{display:flex;align-items:center;gap:11px}
     .avatars{display:flex}
-    .av{width:26px;height:26px;border-radius:50%;border:2px solid #fff;margin-left:-7px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff}
+    .av{width:28px;height:28px;border-radius:50%;border:2px solid #fff;margin-left:-8px;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:#fff}
     .av:first-child{margin-left:0}
     .proof-text{font-size:13px;color:var(--text3)}
     .proof-text strong{color:var(--text2)}
@@ -103,19 +97,64 @@
     .dash-chrome-title{margin-left:10px;font-size:11px;font-weight:600;color:rgba(0,0,0,0.4);letter-spacing:.2px}
     .dash-chrome-live{margin-left:auto;display:flex;align-items:center;gap:5px;font-size:11px;color:var(--green);font-weight:600}
     .live-dot{width:6px;height:6px;background:var(--green);border-radius:50%;animation:pulse 2s ease infinite}
-    /* 4-panel body */
-    .dash-body{display:grid;grid-template-columns:40px 190px 1fr 155px;height:360px}
-    /* Panel 1: icon nav */
-    .dash-icons{
-      background:#e8e4df;
-      border-right:1px solid rgba(0,0,0,0.07);
-      display:flex;flex-direction:column;align-items:center;
-      padding:10px 0;gap:4px;
-    }
-    .di{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px;cursor:pointer;transition:background .15s;color:rgba(0,0,0,0.4)}
-    .di:hover,.di.active{background:rgba(0,0,0,0.1);color:rgba(0,0,0,0.7)}
-    .di.active{background:rgba(0,0,0,0.12)}
-    /* Panel 2: conversation list */
+    /* Dashboard tabs */
+    .dash-tabs{display:flex;gap:2px;padding:7px 10px;background:#f0ede8;border-bottom:1px solid rgba(0,0,0,0.07)}
+    .dash-tab{font-family:inherit;font-size:11px;font-weight:600;color:rgba(0,0,0,0.4);background:none;border:none;padding:5px 12px;border-radius:6px;cursor:pointer;transition:background .15s,color .15s}
+    .dash-tab:hover{background:rgba(0,0,0,0.06);color:rgba(0,0,0,0.65)}
+    .dash-tab.active{background:#fff;color:#0f172a;box-shadow:0 1px 3px rgba(0,0,0,0.12)}
+    /* Dashboard panels container */
+    .dash-panels{position:relative;height:450px;overflow:hidden}
+    .dash-panel{position:absolute;inset:0;opacity:0;transition:opacity .45s ease;pointer-events:none;display:flex;flex-direction:column}
+    .dash-panel.active{opacity:1;pointer-events:all}
+    /* Panel 0: Conversations (row layout) */
+    .dp-conv{flex-direction:row !important}
+    .dp-conv-list{width:192px;border-right:1px solid rgba(0,0,0,0.07);display:flex;flex-direction:column;background:#fff;overflow:hidden;flex-shrink:0}
+    .dp-conv-chat{flex:1;display:flex;flex-direction:column;background:#fff;overflow:hidden}
+    .dp-msgs{flex:1;padding:10px 12px;display:flex;flex-direction:column;gap:7px;overflow:hidden}
+    .c-ai-badge{font-size:9px;font-weight:700;background:#dcfce7;color:#15803d;padding:1px 7px;border-radius:100px}
+    /* Panel 1: Agenda */
+    .dp-agenda{background:#fff;overflow:hidden}
+    .dp-ag-header{padding:13px 16px 10px;border-bottom:1px solid rgba(0,0,0,0.07);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+    .dp-ag-day{font-size:10px;font-weight:700;color:var(--green);letter-spacing:.8px;text-transform:uppercase}
+    .dp-ag-full{font-size:11px;color:rgba(0,0,0,0.4);margin-top:2px}
+    .dp-ag-count{text-align:right}
+    .dp-ag-count .dp-ag-n{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-1px;display:block;line-height:1}
+    .dp-ag-count .dp-ag-lbl{font-size:10px;color:rgba(0,0,0,0.4)}
+    .dp-ag-list{flex:1;overflow:hidden;display:flex;flex-direction:column}
+    .dp-ag-slot{display:flex;align-items:center;gap:12px;padding:9px 16px;border-bottom:1px solid rgba(0,0,0,0.04);flex-shrink:0}
+    .dp-ag-time{font-size:11px;font-weight:700;color:var(--text);width:36px;flex-shrink:0}
+    .dp-ag-info{flex:1;min-width:0}
+    .dp-ag-name{font-size:12px;font-weight:600;color:var(--text)}
+    .dp-ag-svc{font-size:10px;color:rgba(0,0,0,0.4)}
+    .dp-ag-badge{font-size:9px;font-weight:700;padding:2px 9px;border-radius:100px;flex-shrink:0;white-space:nowrap}
+    .dp-ag-badge.conf{background:#dcfce7;color:#15803d}
+    .dp-ag-badge.pend{background:#fef3c7;color:#92400e}
+    .dp-ag-footer{padding:10px 16px;border-top:1px solid rgba(0,0,0,0.07);display:flex;gap:24px;background:#fafafa;flex-shrink:0}
+    .dp-ag-stat{font-size:11px;color:rgba(0,0,0,0.4)}
+    .dp-ag-stat-n{font-size:17px;font-weight:800;letter-spacing:-1px;margin-right:4px;vertical-align:middle}
+    /* Panel 2: Metrics */
+    .dp-metrics{padding:14px 16px;gap:12px}
+    .dp-met-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;flex-shrink:0}
+    .dp-kpi{background:#f4f5f7;border-radius:8px;padding:10px 10px}
+    .dp-kpi-n{font-size:19px;font-weight:800;letter-spacing:-1px;color:var(--text);line-height:1}
+    .dp-kpi-l{font-size:10px;color:rgba(0,0,0,0.4);margin-top:3px;line-height:1.3}
+    .dp-kpi-trend{font-size:10px;font-weight:700;margin-top:5px}
+    .dp-kpi-trend.up{color:#16a34a}.dp-kpi-trend.down{color:#3b82f6}
+    .dp-met-chart-area{flex:1;min-height:0;display:flex;flex-direction:column}
+    .dp-met-chart-title{font-size:10px;font-weight:600;color:rgba(0,0,0,0.35);margin-bottom:8px;letter-spacing:.5px;text-transform:uppercase;flex-shrink:0}
+    .dp-chart{display:flex;align-items:flex-end;gap:5px;flex:1}
+    .dp-bar-wrap{display:flex;flex-direction:column;align-items:center;gap:4px;flex:1}
+    .dp-bar{width:100%;background:var(--green-dim2);border-radius:4px 4px 0 0;height:var(--h)}
+    .dp-bar.hi{background:var(--green)}
+    .dp-bar-lbl{font-size:10px;color:rgba(0,0,0,0.35);font-weight:500;flex-shrink:0}
+    .dp-met-sources{border-top:1px solid rgba(0,0,0,0.06);padding-top:10px;display:flex;flex-direction:column;gap:6px;flex-shrink:0}
+    .dp-src{display:flex;align-items:center;gap:8px}
+    .dp-src-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+    .dp-src-name{font-size:11px;color:rgba(0,0,0,0.45);width:52px;flex-shrink:0}
+    .dp-src-bar{flex:1;height:5px;background:rgba(0,0,0,0.06);border-radius:3px;overflow:hidden}
+    .dp-src-fill{height:100%;border-radius:3px}
+    .dp-src-pct{font-size:10px;font-weight:700;color:var(--text);width:28px;text-align:right;flex-shrink:0}
+    /* Panel 2: conversation list (reused) */
     .dash-convs{
       background:#fff;
       border-right:1px solid rgba(0,0,0,0.07);
@@ -211,8 +250,7 @@
     .logos-mq{overflow:hidden;mask-image:linear-gradient(to right,transparent,black 10%,black 90%,transparent)}
     .logos-track{display:flex;width:max-content;animation:lscroll 22s linear infinite}
     @keyframes lscroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-    .logo-chip{display:flex;align-items:center;gap:8px;padding:0 32px;font-size:13px;font-weight:600;color:var(--text3);white-space:nowrap;border-right:1px solid var(--border)}
-    .lc-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+    .logo-chip{padding:0 30px;font-size:13px;font-weight:700;color:rgba(15,23,42,0.42);white-space:nowrap;border-right:1px solid var(--border);letter-spacing:-.2px;display:flex;align-items:center}
 
     /* PROBLEM */
     .problem-section{padding:var(--sy) 0}
@@ -432,12 +470,7 @@
 <!-- NAV -->
 <nav id="nav">
   <div class="nav-inner">
-    <a href="/" class="nav-logo">
-      <div class="logo-mark">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M13 2L3 14h8l-1 8 10-12h-8z"/></svg>
-      </div>
-      cliniflux
-    </a>
+    <a href="/" class="nav-logo">cliniflux</a>
     <ul class="nav-links">
       <li><a href="#producto">Producto</a></li>
       <li><a href="#flujo">Cómo funciona</a></li>
@@ -460,113 +493,179 @@
       <p class="hero-desc">Cliniflux automatiza WhatsApp para que cada paciente reciba respuesta instantánea, agende su cita y tu equipo se centre en lo que importa.</p>
       <div class="hero-ctas">
         <a href="#precios" class="btn-primary" style="font-size:15px;padding:12px 28px;border-radius:40px">Solicitar demo gratuita <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg></a>
-        <a href="#flujo" class="btn-secondary" style="font-size:15px;padding:12px 28px;border-radius:40px">Ver cómo funciona</a>
+        <a href="#flujo" class="btn-secondary" style="font-size:15px;padding:12px 36px;border-radius:40px;min-width:220px;justify-content:center">Ver cómo funciona</a>
       </div>
       <div class="hero-proof">
         <div class="avatars">
-          <div class="av" style="background:linear-gradient(135deg,#22c55e,#16a34a)">A</div>
-          <div class="av" style="background:linear-gradient(135deg,#0ea5e9,#0284c7)">B</div>
-          <div class="av" style="background:linear-gradient(135deg,#f43f5e,#e11d48)">C</div>
-          <div class="av" style="background:linear-gradient(135deg,#f97316,#ea580c)">D</div>
+          <div class="av" style="background:linear-gradient(135deg,#22c55e,#16a34a)">CD</div>
+          <div class="av" style="background:linear-gradient(135deg,#0ea5e9,#0284c7)">CE</div>
+          <div class="av" style="background:linear-gradient(135deg,#f43f5e,#e11d48)">FS</div>
+          <div class="av" style="background:linear-gradient(135deg,#f97316,#ea580c)">CM</div>
         </div>
         <p class="proof-text"><strong>+40 clínicas</strong> ya automatizan con Cliniflux</p>
       </div>
     </div>
 
-    <!-- DASHBOARD 4-PANEL -->
+    <!-- DASHBOARD CYCLING 3-PANEL -->
     <div class="hero-visual">
       <div class="dashboard">
         <!-- Chrome -->
         <div class="dash-chrome">
           <div class="tl tl-r"></div><div class="tl tl-y"></div><div class="tl tl-g"></div>
-          <span class="dash-chrome-title">Cliniflux — Bandeja de entrada</span>
+          <span class="dash-chrome-title">Cliniflux — Panel de control</span>
           <div class="dash-chrome-live"><div class="live-dot"></div>IA activa</div>
         </div>
-        <!-- Body -->
-        <div class="dash-body">
-          <!-- Col 1: icon nav -->
-          <div class="dash-icons">
-            <div class="di active">💬</div>
-            <div class="di">⚡</div>
-            <div class="di">📊</div>
-            <div class="di">👥</div>
-            <div class="di" style="margin-top:auto">⚙️</div>
-          </div>
-          <!-- Col 2: conversations -->
-          <div class="dash-convs">
-            <div class="convs-hd"><span>4 Activas</span><span>Recientes ↓</span></div>
-            <div class="conv-item active">
-              <div class="c-ava" style="background:linear-gradient(135deg,#6366f1,#8b5cf6)">MG</div>
-              <div class="c-info"><div class="c-name">María García</div><div class="c-prev">Quiero pedir una cita...</div></div>
-              <div class="c-meta"><span class="c-time">2m</span><span class="c-ai">IA</span></div>
-            </div>
-            <div class="conv-item">
-              <div class="c-ava" style="background:linear-gradient(135deg,#0ea5e9,#0284c7)">JP</div>
-              <div class="c-info"><div class="c-name">Juan Pérez</div><div class="c-prev">¿Tenéis ortodoncia?</div></div>
-              <div class="c-meta"><span class="c-time">8m</span><span class="c-badge">3min</span></div>
-            </div>
-            <div class="conv-item">
-              <div class="c-ava" style="background:linear-gradient(135deg,#f43f5e,#e11d48)">AL</div>
-              <div class="c-info"><div class="c-name">Ana López</div><div class="c-prev">Confirmada para mañana</div></div>
-              <div class="c-meta"><span class="c-time">17m</span><span class="c-ai">IA</span></div>
-            </div>
-            <div class="conv-item">
-              <div class="c-ava" style="background:linear-gradient(135deg,#f97316,#ea580c)">PS</div>
-              <div class="c-info"><div class="c-name">Pedro Sánchez</div><div class="c-prev">#2302 — Gracias!</div></div>
-              <div class="c-meta"><span class="c-time">23m</span><span class="c-ai">IA</span></div>
-            </div>
-            <div class="convs-stats">
-              <div class="cs"><div class="cs-n" style="color:var(--green)">94%</div><div class="cs-l">Resueltos</div></div>
-              <div class="cs"><div class="cs-n">1.2s</div><div class="cs-l">Resp. media</div></div>
-            </div>
-          </div>
-          <!-- Col 3: main chat -->
-          <div class="dash-chat">
-            <div class="chat-hd">
-              <div class="chat-hd-title">Solicitud de cita dental...</div>
-              <div class="chat-status">En progreso</div>
-            </div>
-            <div class="chat-ticket">
-              <span class="ticket-id">#8521</span>
-              <div class="ticket-who">
-                <div class="ticket-dot" style="background:linear-gradient(135deg,#6366f1,#8b5cf6)">MG</div>
-                María García
+        <!-- Tabs -->
+        <div class="dash-tabs">
+          <button class="dash-tab active" data-panel="0">💬 Conversaciones</button>
+          <button class="dash-tab" data-panel="1">📅 Agenda</button>
+          <button class="dash-tab" data-panel="2">📊 Métricas</button>
+        </div>
+        <!-- Panels -->
+        <div class="dash-panels">
+
+          <!-- Panel 0: Conversations -->
+          <div class="dash-panel dp-conv active" id="dp0">
+            <div class="dp-conv-list">
+              <div class="convs-hd"><span>4 Activas</span><span class="c-ai-badge">IA ON</span></div>
+              <div class="conv-item active">
+                <div class="c-ava" style="background:linear-gradient(135deg,#6366f1,#8b5cf6)">MG</div>
+                <div class="c-info"><div class="c-name">María García</div><div class="c-prev">Quiero pedir cita...</div></div>
+                <div class="c-meta"><span class="c-time">2m</span><span class="c-ai">IA</span></div>
               </div>
-              <span style="font-size:10px;color:rgba(0,0,0,0.35);margin-left:4px">· Compartido</span>
+              <div class="conv-item">
+                <div class="c-ava" style="background:linear-gradient(135deg,#0ea5e9,#0284c7)">JP</div>
+                <div class="c-info"><div class="c-name">Juan Pérez</div><div class="c-prev">¿Tenéis ortodoncia?</div></div>
+                <div class="c-meta"><span class="c-time">8m</span><span class="c-badge">3min</span></div>
+              </div>
+              <div class="conv-item">
+                <div class="c-ava" style="background:linear-gradient(135deg,#f43f5e,#e11d48)">AL</div>
+                <div class="c-info"><div class="c-name">Ana López</div><div class="c-prev">Confirmada para mañana</div></div>
+                <div class="c-meta"><span class="c-time">17m</span><span class="c-ai">IA</span></div>
+              </div>
+              <div class="conv-item">
+                <div class="c-ava" style="background:linear-gradient(135deg,#f97316,#ea580c)">PS</div>
+                <div class="c-info"><div class="c-name">Pedro Sánchez</div><div class="c-prev">#2302 — Gracias!</div></div>
+                <div class="c-meta"><span class="c-time">23m</span><span class="c-ai">IA</span></div>
+              </div>
+              <div class="convs-stats">
+                <div class="cs"><div class="cs-n" style="color:var(--green)">94%</div><div class="cs-l">Resueltos</div></div>
+                <div class="cs"><div class="cs-n">1.2s</div><div class="cs-l">Resp. media</div></div>
+              </div>
             </div>
-            <div class="chat-subject">Paciente solicita cita para limpieza dental</div>
-            <div class="msgs">
-              <div class="msg mi">Hola, quería pedir una cita con el dentista 🦷</div>
-              <div class="msg mo">¡Hola María! 👋 Claro, te ayudo con tu cita. ¿Para qué servicio la necesitas?<div class="msg-ts">Visto · 9min · IA</div></div>
-              <div class="msg mi">Para una limpieza, ¿tenéis mañana por la mañana?</div>
-              <div class="msg mo-green">¡Perfecto! ✅ He encontrado disponibilidad mañana a las 10:00h. ¿Te confirmo la cita?<div class="msg-ts">Visto · 4min · IA</div></div>
-              <div class="msg mi"><div class="typing"><div class="td"></div><div class="td"></div><div class="td"></div></div></div>
-            </div>
-            <div class="dash-input-row">
-              <div class="dash-input">Escribir respuesta manual...</div>
-              <div class="send-btn"><svg width="12" height="12" viewBox="0 0 24 24" fill="white"><path d="m22 2-7 20-4-9-9-4 20-7z"/></svg></div>
+            <div class="dp-conv-chat">
+              <div class="chat-hd">
+                <div class="chat-hd-title">Solicitud de cita dental...</div>
+                <div class="chat-status">En progreso</div>
+              </div>
+              <div class="dp-msgs">
+                <div class="msg mi">Hola, quería pedir una cita 🦷</div>
+                <div class="msg mo">¡Hola María! 👋 Claro. ¿Para qué servicio?<div class="msg-ts">Visto · 9min · IA</div></div>
+                <div class="msg mi">Para una limpieza, ¿tenéis mañana?</div>
+                <div class="msg mo-green">✅ Disponibilidad mañana a las 10:00h. ¿Confirmo?<div class="msg-ts">Visto · 4min · IA</div></div>
+                <div class="msg mi"><div class="typing"><div class="td"></div><div class="td"></div><div class="td"></div></div></div>
+              </div>
+              <div class="dash-input-row">
+                <div class="dash-input">Escribir respuesta...</div>
+                <div class="send-btn"><svg width="12" height="12" viewBox="0 0 24 24" fill="white"><path d="m22 2-7 20-4-9-9-4 20-7z"/></svg></div>
+              </div>
             </div>
           </div>
-          <!-- Col 4: details -->
-          <div class="dash-details">
-            <div class="det-hd">Detalles <span style="font-size:11px;color:var(--text3);font-weight:400">✕</span></div>
-            <div class="det-section">
-              <div class="det-section-t">Paciente</div>
-              <div class="det-row"><span class="det-key">Nombre</span><span class="det-val">María García</span></div>
-              <div class="det-row"><span class="det-key">Clínica</span><span class="det-val">Dental Norte</span></div>
-              <div class="det-row"><span class="det-key">Estado</span><span class="det-tag tag-yellow">En progreso</span></div>
+
+          <!-- Panel 1: Agenda -->
+          <div class="dash-panel dp-agenda" id="dp1">
+            <div class="dp-ag-header">
+              <div>
+                <div class="dp-ag-day">Hoy · Martes</div>
+                <div class="dp-ag-full">25 de Marzo, 2026</div>
+              </div>
+              <div class="dp-ag-count">
+                <span class="dp-ag-n">8</span>
+                <span class="dp-ag-lbl">citas hoy</span>
+              </div>
             </div>
-            <div class="det-section">
-              <div class="det-section-t">Cita</div>
-              <div class="det-row"><span class="det-key">Servicio</span><span class="det-val">Limpieza</span></div>
-              <div class="det-row"><span class="det-key">Fecha</span><span class="det-val">Mañana 10h</span></div>
-              <div class="det-row"><span class="det-key">Canal</span><span class="det-tag tag-green">WhatsApp</span></div>
+            <div class="dp-ag-list">
+              <div class="dp-ag-slot">
+                <div class="dp-ag-time">09:00</div>
+                <div class="dp-ag-info"><div class="dp-ag-name">Laura Martínez</div><div class="dp-ag-svc">Revisión dental · Dr. Ruiz</div></div>
+                <div class="dp-ag-badge conf">✓ Confirmada</div>
+              </div>
+              <div class="dp-ag-slot">
+                <div class="dp-ag-time">10:00</div>
+                <div class="dp-ag-info"><div class="dp-ag-name">María García</div><div class="dp-ag-svc">Limpieza dental · Dra. Vega</div></div>
+                <div class="dp-ag-badge conf">✓ Confirmada</div>
+              </div>
+              <div class="dp-ag-slot">
+                <div class="dp-ag-time">11:30</div>
+                <div class="dp-ag-info"><div class="dp-ag-name">Carlos Ruiz</div><div class="dp-ag-svc">Ortodoncia · Dr. López</div></div>
+                <div class="dp-ag-badge pend">● Pendiente</div>
+              </div>
+              <div class="dp-ag-slot">
+                <div class="dp-ag-time">12:00</div>
+                <div class="dp-ag-info"><div class="dp-ag-name">Ana Sánchez</div><div class="dp-ag-svc">Blanqueamiento · Dra. Vega</div></div>
+                <div class="dp-ag-badge conf">✓ Confirmada</div>
+              </div>
+              <div class="dp-ag-slot">
+                <div class="dp-ag-time">16:00</div>
+                <div class="dp-ag-info"><div class="dp-ag-name">Pedro Alonso</div><div class="dp-ag-svc">Extracción · Dr. Ruiz</div></div>
+                <div class="dp-ag-badge conf">✓ Confirmada</div>
+              </div>
+              <div class="dp-ag-slot">
+                <div class="dp-ag-time">17:30</div>
+                <div class="dp-ag-info"><div class="dp-ag-name">Isabel Torres</div><div class="dp-ag-svc">Primera visita · Dr. López</div></div>
+                <div class="dp-ag-badge pend">● Pendiente</div>
+              </div>
             </div>
-            <div class="det-ai-note">
-              <div class="det-ai-note-t">✦ Resumen IA</div>
-              <div class="det-ai-note-b">Paciente confirmará cita en los próximos 2 minutos según patrón de respuesta.</div>
+            <div class="dp-ag-footer">
+              <div class="dp-ag-stat"><span class="dp-ag-stat-n" style="color:var(--green)">6</span>confirmadas</div>
+              <div class="dp-ag-stat"><span class="dp-ag-stat-n" style="color:#f59e0b">2</span>pendientes</div>
+              <div class="dp-ag-stat"><span class="dp-ag-stat-n" style="color:rgba(0,0,0,0.35)">0</span>canceladas</div>
             </div>
           </div>
+
+          <!-- Panel 2: Métricas -->
+          <div class="dash-panel dp-metrics" id="dp2">
+            <div class="dp-met-kpis">
+              <div class="dp-kpi">
+                <div class="dp-kpi-n">342</div>
+                <div class="dp-kpi-l">Mensajes / semana</div>
+                <div class="dp-kpi-trend up">↑ 18%</div>
+              </div>
+              <div class="dp-kpi">
+                <div class="dp-kpi-n" style="color:var(--green)">94%</div>
+                <div class="dp-kpi-l">Resolución IA</div>
+                <div class="dp-kpi-trend up">↑ 3pts</div>
+              </div>
+              <div class="dp-kpi">
+                <div class="dp-kpi-n">1.2s</div>
+                <div class="dp-kpi-l">Tiempo respuesta</div>
+                <div class="dp-kpi-trend down">↓ 0.3s</div>
+              </div>
+              <div class="dp-kpi">
+                <div class="dp-kpi-n">47</div>
+                <div class="dp-kpi-l">Citas confirmadas</div>
+                <div class="dp-kpi-trend up">↑ 12</div>
+              </div>
+            </div>
+            <div class="dp-met-chart-area">
+              <div class="dp-met-chart-title">Actividad — últimos 7 días</div>
+              <div class="dp-chart">
+                <div class="dp-bar-wrap"><div class="dp-bar" style="--h:55%"></div><div class="dp-bar-lbl">L</div></div>
+                <div class="dp-bar-wrap"><div class="dp-bar" style="--h:70%"></div><div class="dp-bar-lbl">M</div></div>
+                <div class="dp-bar-wrap"><div class="dp-bar" style="--h:48%"></div><div class="dp-bar-lbl">X</div></div>
+                <div class="dp-bar-wrap"><div class="dp-bar" style="--h:88%"></div><div class="dp-bar-lbl">J</div></div>
+                <div class="dp-bar-wrap"><div class="dp-bar hi" style="--h:100%"></div><div class="dp-bar-lbl">V</div></div>
+                <div class="dp-bar-wrap"><div class="dp-bar" style="--h:32%"></div><div class="dp-bar-lbl">S</div></div>
+                <div class="dp-bar-wrap"><div class="dp-bar" style="--h:18%"></div><div class="dp-bar-lbl">D</div></div>
+              </div>
+            </div>
+            <div class="dp-met-sources">
+              <div class="dp-src"><div class="dp-src-dot" style="background:#25d366"></div><span class="dp-src-name">WhatsApp</span><div class="dp-src-bar"><div class="dp-src-fill" style="width:82%;background:#25d366"></div></div><span class="dp-src-pct">82%</span></div>
+              <div class="dp-src"><div class="dp-src-dot" style="background:#3b82f6"></div><span class="dp-src-name">Web</span><div class="dp-src-bar"><div class="dp-src-fill" style="width:12%;background:#3b82f6"></div></div><span class="dp-src-pct">12%</span></div>
+              <div class="dp-src"><div class="dp-src-dot" style="background:#8b5cf6"></div><span class="dp-src-name">Otros</span><div class="dp-src-bar"><div class="dp-src-fill" style="width:6%;background:#8b5cf6"></div></div><span class="dp-src-pct">6%</span></div>
+            </div>
+          </div>
+
         </div>
       </div>
     </div>
@@ -575,25 +674,33 @@
 
 <!-- LOGOS -->
 <section class="logos-section">
-  <div class="logos-lbl">Especialidades que confían en Cliniflux</div>
+  <div class="logos-lbl">Especialistas que confían en cliniflux</div>
   <div class="logos-mq">
     <div class="logos-track">
-      <div class="logo-chip"><div class="lc-dot" style="background:#22c55e"></div>Clínicas Dentales</div>
-      <div class="logo-chip"><div class="lc-dot" style="background:#3b82f6"></div>Centros de Estética</div>
-      <div class="logo-chip"><div class="lc-dot" style="background:#f97316"></div>Fisioterapia</div>
-      <div class="logo-chip"><div class="lc-dot" style="background:#8b5cf6"></div>Dermatología</div>
-      <div class="logo-chip"><div class="lc-dot" style="background:#f43f5e"></div>Medicina General</div>
-      <div class="logo-chip"><div class="lc-dot" style="background:#0ea5e9"></div>Psicología</div>
-      <div class="logo-chip"><div class="lc-dot" style="background:#22c55e"></div>Nutrición</div>
-      <div class="logo-chip"><div class="lc-dot" style="background:#eab308"></div>Podología</div>
-      <div class="logo-chip"><div class="lc-dot" style="background:#22c55e"></div>Clínicas Dentales</div>
-      <div class="logo-chip"><div class="lc-dot" style="background:#3b82f6"></div>Centros de Estética</div>
-      <div class="logo-chip"><div class="lc-dot" style="background:#f97316"></div>Fisioterapia</div>
-      <div class="logo-chip"><div class="lc-dot" style="background:#8b5cf6"></div>Dermatología</div>
-      <div class="logo-chip"><div class="lc-dot" style="background:#f43f5e"></div>Medicina General</div>
-      <div class="logo-chip"><div class="lc-dot" style="background:#0ea5e9"></div>Psicología</div>
-      <div class="logo-chip"><div class="lc-dot" style="background:#22c55e"></div>Nutrición</div>
-      <div class="logo-chip"><div class="lc-dot" style="background:#eab308"></div>Podología</div>
+      <div class="logo-chip" style="color:#16a34a;font-size:15px">Dental Norte</div>
+      <div class="logo-chip">PieloSkin</div>
+      <div class="logo-chip">Clínica Fortes</div>
+      <div class="logo-chip" style="color:#6366f1">NovaDent</div>
+      <div class="logo-chip">FisioPro</div>
+      <div class="logo-chip">Centro Médico Alonso</div>
+      <div class="logo-chip" style="color:#0ea5e9">DermLab</div>
+      <div class="logo-chip">Clínica Vidal</div>
+      <div class="logo-chip" style="color:#8b5cf6">Healths</div>
+      <div class="logo-chip">Ortholife</div>
+      <div class="logo-chip">Salud &amp; Vida</div>
+      <div class="logo-chip" style="color:#f97316">NutriMed</div>
+      <div class="logo-chip" style="color:#16a34a;font-size:15px">Dental Norte</div>
+      <div class="logo-chip">PieloSkin</div>
+      <div class="logo-chip">Clínica Fortes</div>
+      <div class="logo-chip" style="color:#6366f1">NovaDent</div>
+      <div class="logo-chip">FisioPro</div>
+      <div class="logo-chip">Centro Médico Alonso</div>
+      <div class="logo-chip" style="color:#0ea5e9">DermLab</div>
+      <div class="logo-chip">Clínica Vidal</div>
+      <div class="logo-chip" style="color:#8b5cf6">Healths</div>
+      <div class="logo-chip">Ortholife</div>
+      <div class="logo-chip">Salud &amp; Vida</div>
+      <div class="logo-chip" style="color:#f97316">NutriMed</div>
     </div>
   </div>
 </section>
@@ -961,10 +1068,7 @@
   <div class="c">
     <div class="ft-inner">
       <div class="ft-brand">
-        <a href="/" class="ft-logo">
-          <div class="logo-mark" style="width:24px;height:24px;border-radius:6px"><svg width="12" height="12" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.557 4.116 1.534 5.845L.073 23.927l6.263-1.637C8.038 23.402 9.976 24 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818c-1.898 0-3.668-.517-5.187-1.416l-.371-.22-3.851 1.006 1.026-3.75-.242-.385A9.801 9.801 0 0 1 2.182 12C2.182 6.57 6.57 2.182 12 2.182S21.818 6.57 21.818 12 17.43 21.818 12 21.818z"/></svg></div>
-          cliniflux
-        </a>
+        <a href="/" class="ft-logo">cliniflux</a>
         <p class="ft-desc">Automatización inteligente de WhatsApp para clínicas que quieren crecer sin aumentar el equipo.</p>
       </div>
       <div class="ft-links">
@@ -993,6 +1097,32 @@
       if(!isOpen) item.classList.add('open');
     });
   });
+  // Dashboard panel cycling
+  (function() {
+    var panels = document.querySelectorAll('.dash-panel');
+    var tabs = document.querySelectorAll('.dash-tab');
+    if (!panels.length) return;
+    var current = 0;
+    var timer;
+    function switchPanel(n) {
+      panels[current].classList.remove('active');
+      tabs[current].classList.remove('active');
+      current = ((n % panels.length) + panels.length) % panels.length;
+      panels[current].classList.add('active');
+      tabs[current].classList.add('active');
+    }
+    function startCycle() {
+      clearInterval(timer);
+      timer = setInterval(function() { switchPanel(current + 1); }, 4000);
+    }
+    tabs.forEach(function(tab, i) {
+      tab.addEventListener('click', function() {
+        switchPanel(i);
+        startCycle();
+      });
+    });
+    startCycle();
+  })();
 </script>
 </body>
 </html>
