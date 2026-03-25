@@ -59,7 +59,8 @@
     .btn-secondary:hover{background:var(--bg2);box-shadow:var(--shadow-sm);transform:translateY(-1px)}
 
     /* HERO */
-    .hero{position:relative;padding:calc(66px + 80px) 0 72px;overflow:hidden;background:linear-gradient(135deg,#bfdbfe 0%,#c4b5fd 35%,#a5f3fc 65%,#bbf7d0 100%)}
+    .hero{position:relative;padding:calc(66px + 80px) 0 72px;overflow:hidden}
+    .hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 100% 80% at 50% -10%,rgba(22,163,74,0.50) 0%,rgba(22,163,74,0.18) 45%,transparent 70%),radial-gradient(ellipse 55% 45% at 50% 5%,rgba(34,197,94,0.25) 0%,transparent 60%);pointer-events:none;z-index:0}
 
     .hero-inner{position:relative;z-index:2;width:100%;max-width:var(--cmax);margin:0 auto;padding:0 var(--px);display:flex;flex-direction:column;align-items:center;gap:56px}
     .hero-body{text-align:center;display:flex;flex-direction:column;align-items:center;max-width:780px}
@@ -260,7 +261,7 @@
     .logos-mq{overflow:hidden;mask-image:linear-gradient(to right,transparent,black 10%,black 90%,transparent)}
     .logos-track{display:flex;width:max-content;animation:lscroll 22s linear infinite}
     @keyframes lscroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-    .logo-chip{padding:0 30px;font-size:13px;font-weight:700;color:rgba(15,23,42,0.42);white-space:nowrap;border-right:1px solid var(--border);letter-spacing:-.2px;display:flex;align-items:center}
+    .logo-chip{padding:0 36px;font-size:16px;font-weight:700;color:rgba(15,23,42,0.35);white-space:nowrap;border-right:1px solid var(--border);letter-spacing:-.3px;display:flex;align-items:center}
 
     /* PROBLEM */
     .problem-section{padding:var(--sy) 0}
@@ -685,33 +686,32 @@
 
 <!-- LOGOS -->
 <section class="logos-section">
-  <div class="logos-lbl">Especialistas que confían en cliniflux</div>
   <div class="logos-mq">
     <div class="logos-track">
-      <div class="logo-chip" style="color:#16a34a;font-size:15px">Dental Norte</div>
+      <div class="logo-chip">Dental Norte</div>
       <div class="logo-chip">PieloSkin</div>
       <div class="logo-chip">Clínica Fortes</div>
-      <div class="logo-chip" style="color:#16a34a">NovaDent</div>
+      <div class="logo-chip">NovaDent</div>
       <div class="logo-chip">FisioPro</div>
       <div class="logo-chip">Centro Médico Alonso</div>
-      <div class="logo-chip" style="color:#0ea5e9">DermLab</div>
+      <div class="logo-chip">DermLab</div>
       <div class="logo-chip">Clínica Vidal</div>
-      <div class="logo-chip" style="color:#22c55e">Healths</div>
+      <div class="logo-chip">Healths</div>
       <div class="logo-chip">Ortholife</div>
       <div class="logo-chip">Salud &amp; Vida</div>
-      <div class="logo-chip" style="color:#f97316">NutriMed</div>
-      <div class="logo-chip" style="color:#16a34a;font-size:15px">Dental Norte</div>
+      <div class="logo-chip">NutriMed</div>
+      <div class="logo-chip">Dental Norte</div>
       <div class="logo-chip">PieloSkin</div>
       <div class="logo-chip">Clínica Fortes</div>
-      <div class="logo-chip" style="color:#16a34a">NovaDent</div>
+      <div class="logo-chip">NovaDent</div>
       <div class="logo-chip">FisioPro</div>
       <div class="logo-chip">Centro Médico Alonso</div>
-      <div class="logo-chip" style="color:#0ea5e9">DermLab</div>
+      <div class="logo-chip">DermLab</div>
       <div class="logo-chip">Clínica Vidal</div>
-      <div class="logo-chip" style="color:#22c55e">Healths</div>
+      <div class="logo-chip">Healths</div>
       <div class="logo-chip">Ortholife</div>
       <div class="logo-chip">Salud &amp; Vida</div>
-      <div class="logo-chip" style="color:#f97316">NutriMed</div>
+      <div class="logo-chip">NutriMed</div>
     </div>
   </div>
 </section>
