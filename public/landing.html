@@ -154,7 +154,7 @@
     .hero-body { max-width: 520px; }
 
     .hero h1 {
-      font-size: clamp(34px, 4.2vw, 60px);
+      font-size: clamp(24px, 2.6vw, 38px);
       font-weight: 800;
       line-height: 1.05;
       letter-spacing: -2px;
@@ -302,23 +302,30 @@
     /* ── TESTIMONIALS ── */
     .testimonials-section {
       padding-bottom: var(--section-y);
+      overflow: hidden;
+    }
+
+    .testimonials-marquee {
+      overflow: hidden;
+      mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+      -webkit-mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
     }
 
     .testimonials-track {
       display: flex;
-      gap: 12px;
-      overflow-x: auto;
-      scrollbar-width: none;
-      scroll-snap-type: x mandatory;
-      padding: 0 var(--container-px);
-      max-width: calc(var(--container-max) + var(--container-px) * 2);
-      margin: 0 auto;
+      gap: 16px;
+      width: max-content;
+      animation: marquee-scroll 32s linear infinite;
     }
-    .testimonials-track::-webkit-scrollbar { display: none; }
+    .testimonials-track:hover { animation-play-state: paused; }
+
+    @keyframes marquee-scroll {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
 
     .t-card {
-      flex: 0 0 290px;
-      scroll-snap-align: start;
+      flex: 0 0 300px;
       background: rgba(8,12,35,0.75);
       border: 1px solid var(--border);
       border-radius: var(--radius-lg);
@@ -787,7 +794,7 @@
       .orbit-icon svg { width: 18px; height: 18px; }
       .orbit-label { font-size: 9px; }
 
-      .hero h1 { font-size: 36px; letter-spacing: -1.5px; }
+      .hero h1 { font-size: 26px; letter-spacing: -1px; }
 
       .testimonials-track { padding: 0 20px; }
 
@@ -873,8 +880,8 @@
 
         <!-- Node 1: Meta Ads — top (220, 52) -->
         <div class="orbit-node" style="left:220px;top:52px;">
-          <div class="orbit-icon" style="--ic-bg:#1877F2;">
-            <svg viewBox="0 0 24 24" fill="white"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.879V14.89h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.989C18.343 21.129 22 16.99 22 12c0-5.523-4.477-10-10-10z"/></svg>
+          <div class="orbit-icon" style="background:linear-gradient(135deg,#0082fb,#0062cc);">
+            <svg viewBox="0 0 24 24" fill="white" width="22" height="22"><path d="M21.3 7.56c-.94-1.55-2.3-2.47-3.82-2.47-1.72 0-3.24 1.08-4.36 2.86a9.93 9.93 0 0 0-.62-.82C11.5 5.9 10.26 5.09 8.82 5.09c-1.52 0-2.88.92-3.82 2.47C4.07 8.93 3.5 10.72 3.5 12.62c0 1.29.2 2.48.61 3.52.73 1.89 2.06 2.96 3.62 2.96 1.13 0 2.12-.47 3.11-1.48.42-.43.83-.93 1.16-1.41l.5-.7.5.7c.33.48.74.98 1.16 1.41.99 1.01 1.98 1.48 3.11 1.48 1.56 0 2.89-1.07 3.62-2.96.41-1.04.61-2.23.61-3.52 0-1.9-.57-3.69-1.5-5.06zm-9.8 4.87c-.87-1.47-1.95-2.42-3-2.42-1.54 0-2.5 1.48-2.5 4.05 0 2.39.87 3.94 2.5 3.94 1.13 0 2.1-1 3-2.67l-1.36-2.36.36-.54zM17.48 18c1.63 0 2.5-1.55 2.5-3.94 0-2.57-.96-4.05-2.5-4.05-1.05 0-2.13.95-3 2.42l.36.54-1.37 2.36c.91 1.67 1.88 2.67 3.01 2.67z"/></svg>
           </div>
           <span class="orbit-label">Meta Ads</span>
         </div>
@@ -902,7 +909,7 @@
 
         <!-- Node 4: Instagram — bottom-right (294, 373) -->
         <div class="orbit-node" style="left:294px;top:373px;">
-          <div class="orbit-icon" style="background:linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);--ic-bg:none;">
+          <div class="orbit-icon" style="background:linear-gradient(45deg,#f09433 0%,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888 100%);">
             <svg viewBox="0 0 24 24" fill="white"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
           </div>
           <span class="orbit-label">Instagram</span>
@@ -926,8 +933,8 @@
 
         <!-- Node 7: Facebook — top-left (88, 115) -->
         <div class="orbit-node" style="left:88px;top:115px;">
-          <div class="orbit-icon" style="--ic-bg:#1877F2;">
-            <svg viewBox="0 0 24 24" fill="white"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+          <div class="orbit-icon" style="background:#1877F2;">
+            <svg viewBox="0 0 24 24" fill="white" width="22" height="22"><path d="M17 2h-3a5 5 0 0 0-5 5v3H6v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
           </div>
           <span class="orbit-label">Facebook</span>
         </div>
@@ -938,12 +945,13 @@
 
   <!-- TESTIMONIALS -->
   <div class="testimonials-section">
+    <div class="testimonials-marquee">
     <div class="testimonials-track">
+      <!-- Set 1 -->
       <div class="t-card">
         <p class="t-quote">"El sistema redujo significativamente el tiempo que el equipo dedicaba a responder consultas repetitivas."</p>
         <div class="t-footer">
           <div class="t-clinic">
-            <div class="t-icon">🏥</div>
             <span class="t-name">Centro Médico Privado</span>
           </div>
           <div>
@@ -956,7 +964,6 @@
         <p class="t-quote">"La agenda se volvió más predecible y organizada gracias a la automatización."</p>
         <div class="t-footer">
           <div class="t-clinic">
-            <div class="t-icon">⚕️</div>
             <span class="t-name">Consulta Especializada</span>
           </div>
           <div>
@@ -969,7 +976,6 @@
         <p class="t-quote">"La reactivación automática permitió contactar pacientes antiguos que no volvían desde hacía meses."</p>
         <div class="t-footer">
           <div class="t-clinic">
-            <div class="t-icon">✨</div>
             <span class="t-name">Clínica Estética</span>
           </div>
           <div>
@@ -982,7 +988,6 @@
         <p class="t-quote">"Tras automatizar WhatsApp, logramos responder el 100% de los mensajes fuera de horario."</p>
         <div class="t-footer">
           <div class="t-clinic">
-            <div class="t-icon">🦷</div>
             <span class="t-name">Clínica Dental</span>
           </div>
           <div>
@@ -991,6 +996,56 @@
           </div>
         </div>
       </div>
+      <!-- Set 2 (duplicate for seamless loop) -->
+      <div class="t-card">
+        <p class="t-quote">"El sistema redujo significativamente el tiempo que el equipo dedicaba a responder consultas repetitivas."</p>
+        <div class="t-footer">
+          <div class="t-clinic">
+            <span class="t-name">Centro Médico Privado</span>
+          </div>
+          <div>
+            <div class="t-score-num">8/10</div>
+            <div class="t-score-label">Satisfacción</div>
+          </div>
+        </div>
+      </div>
+      <div class="t-card">
+        <p class="t-quote">"La agenda se volvió más predecible y organizada gracias a la automatización."</p>
+        <div class="t-footer">
+          <div class="t-clinic">
+            <span class="t-name">Consulta Especializada</span>
+          </div>
+          <div>
+            <div class="t-score-num">10/10</div>
+            <div class="t-score-label">Satisfacción</div>
+          </div>
+        </div>
+      </div>
+      <div class="t-card">
+        <p class="t-quote">"La reactivación automática permitió contactar pacientes antiguos que no volvían desde hacía meses."</p>
+        <div class="t-footer">
+          <div class="t-clinic">
+            <span class="t-name">Clínica Estética</span>
+          </div>
+          <div>
+            <div class="t-score-num">9/10</div>
+            <div class="t-score-label">Satisfacción</div>
+          </div>
+        </div>
+      </div>
+      <div class="t-card">
+        <p class="t-quote">"Tras automatizar WhatsApp, logramos responder el 100% de los mensajes fuera de horario."</p>
+        <div class="t-footer">
+          <div class="t-clinic">
+            <span class="t-name">Clínica Dental</span>
+          </div>
+          <div>
+            <div class="t-score-num">9/10</div>
+            <div class="t-score-label">Satisfacción</div>
+          </div>
+        </div>
+      </div>
+    </div>
     </div>
   </div>
 
