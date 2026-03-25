@@ -6,7 +6,7 @@
   <title>Cliniflux — WhatsApp IA para clínicas</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     :root{
@@ -34,7 +34,7 @@
     }
     html{scroll-behavior:smooth}
     body{
-      font-family:'Plus Jakarta Sans',system-ui,sans-serif;
+      font-family:'Inter','Plus Jakarta Sans',system-ui,sans-serif;
       background:
         radial-gradient(ellipse 90% 55% at 50% -5%,rgba(22,163,74,0.055) 0%,transparent 65%),
         radial-gradient(ellipse 60% 45% at 92% 55%,rgba(59,130,246,0.04) 0%,transparent 65%),
@@ -60,9 +60,9 @@
     .nav-actions{display:flex;align-items:center;gap:8px;flex-shrink:0}
     .btn-ghost{font-family:inherit;font-size:14px;font-weight:500;color:var(--text2);background:none;border:none;padding:7px 13px;border-radius:var(--r-sm);cursor:pointer;text-decoration:none;transition:color .2s,background .2s}
     .btn-ghost:hover{color:var(--text);background:rgba(0,0,0,0.04)}
-    .btn-primary{font-family:inherit;font-size:14px;font-weight:600;color:#fff;background:var(--green);border:none;padding:10px 20px;border-radius:var(--r-md);cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px;transition:background .2s,transform .15s,box-shadow .2s;white-space:nowrap}
+    .btn-primary{font-family:inherit;font-size:14px;font-weight:600;color:#fff;background:var(--green);border:none;padding:10px 22px;border-radius:40px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px;transition:background .2s,transform .15s,box-shadow .2s;white-space:nowrap}
     .btn-primary:hover{background:#15803d;box-shadow:0 4px 20px rgba(22,163,74,0.35);transform:translateY(-1px)}
-    .btn-secondary{font-family:inherit;font-size:14px;font-weight:500;color:var(--text);background:var(--surface);border:1px solid var(--border2);padding:10px 20px;border-radius:var(--r-md);cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px;transition:background .2s,box-shadow .2s,transform .15s}
+    .btn-secondary{font-family:inherit;font-size:14px;font-weight:500;color:var(--text);background:var(--surface);border:1px solid var(--border2);padding:10px 22px;border-radius:40px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px;transition:background .2s,box-shadow .2s,transform .15s}
     .btn-secondary:hover{background:var(--bg2);box-shadow:var(--shadow-sm);transform:translateY(-1px)}
 
     /* HERO */
@@ -71,7 +71,7 @@
     .hero-badge{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:600;color:var(--green);letter-spacing:.4px;background:var(--green-dim);border:1px solid rgba(22,163,74,0.18);padding:5px 13px;border-radius:100px;margin-bottom:26px}
     .badge-dot{width:6px;height:6px;background:var(--green);border-radius:50%;animation:pulse 2s ease infinite}
     @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(1.5)}}
-    .hero h1{font-size:clamp(36px,4.2vw,62px);font-weight:800;line-height:1.0;letter-spacing:-2.5px;margin-bottom:20px;color:var(--text)}
+    .hero h1{font-size:clamp(38px,4.6vw,68px);font-weight:700;line-height:1.0;letter-spacing:-3px;margin-bottom:20px;color:var(--text)}
     .hero h1 .g{color:var(--green)}
     .hero-desc{font-size:16px;color:var(--text2);line-height:1.75;max-width:420px;margin-bottom:32px}
     .hero-ctas{display:flex;align-items:center;gap:10px;margin-bottom:40px}
@@ -313,7 +313,7 @@
     .pr-feats{list-style:none;margin-bottom:26px;display:flex;flex-direction:column;gap:10px}
     .pr-feats li{display:flex;align-items:flex-start;gap:9px;font-size:13px;color:var(--text2);line-height:1.4}
     .pfc{width:17px;height:17px;border-radius:50%;background:var(--green-dim2);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;font-size:9px;color:var(--green)}
-    .btn-pl{display:block;width:100%;font-family:inherit;font-size:14px;font-weight:600;text-align:center;padding:12px;border-radius:var(--r-md);cursor:pointer;text-decoration:none;transition:all .2s}
+    .btn-pl{display:block;width:100%;font-family:inherit;font-size:14px;font-weight:600;text-align:center;padding:12px;border-radius:40px;cursor:pointer;text-decoration:none;transition:all .2s}
     .btn-pl-out{background:transparent;border:1px solid var(--border2);color:var(--text)}
     .btn-pl-out:hover{background:var(--bg2);box-shadow:var(--shadow-sm)}
     .btn-pl-sol{background:var(--green);border:none;color:#fff}
@@ -367,6 +367,60 @@
       .dash-body{grid-template-columns:1fr 1fr}
       .dash-details{display:none}
     }
+
+    /* SHOWCASE ALTERNATING */
+    .showcase-section{padding:var(--sy) 0;border-top:1px solid var(--border)}
+    .showcase-grid{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center}
+    .showcase-grid.rev{direction:rtl}
+    .showcase-grid.rev>*{direction:ltr}
+    .showcase-text .label{margin-bottom:12px}
+    .showcase-text .sec-h{margin-bottom:14px}
+    .showcase-text .sec-p{margin-bottom:24px;max-width:460px}
+    .sc-checklist{list-style:none;display:flex;flex-direction:column;gap:10px;margin-bottom:28px}
+    .sc-checklist li{display:flex;align-items:flex-start;gap:10px;font-size:14px;color:var(--text2);line-height:1.5}
+    .sc-check{width:20px;height:20px;border-radius:50%;background:var(--green-dim2);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--green);flex-shrink:0;margin-top:1px}
+    .sc-card{border-radius:var(--r-xl);overflow:hidden;box-shadow:var(--shadow-lg)}
+    .sc-card-teal{background:linear-gradient(135deg,#0f766e 0%,#0e7490 40%,#1d4ed8 100%)}
+    .sc-card-purple{background:linear-gradient(135deg,#6d28d9 0%,#7c3aed 40%,#4f46e5 100%)}
+    .sc-inner{padding:32px}
+    .sc-top-bar{display:flex;align-items:center;gap:6px;margin-bottom:20px}
+    .sc-top-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,0.4)}
+    .sc-top-title{font-size:11px;font-weight:600;color:rgba(255,255,255,0.7);letter-spacing:.5px;margin-left:4px}
+    .sc-stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px}
+    .sc-stat-box{background:rgba(255,255,255,0.12);border-radius:10px;padding:12px}
+    .sc-stat-n{font-size:22px;font-weight:800;color:#fff;letter-spacing:-1px;line-height:1}
+    .sc-stat-l{font-size:10px;color:rgba(255,255,255,0.65);margin-top:3px}
+    .sc-chart{display:flex;align-items:flex-end;gap:4px;height:60px;padding:0 4px}
+    .sc-bar{flex:1;border-radius:4px 4px 0 0;background:rgba(255,255,255,0.25);transition:height .3s}
+    .sc-bar.hi{background:rgba(255,255,255,0.6)}
+    .sc-flow-list{display:flex;flex-direction:column;gap:0;margin-bottom:16px}
+    .sc-flow-item{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,0.1);border-radius:10px;padding:10px 14px;font-size:12px;font-weight:600;color:rgba(255,255,255,0.85);border:1px solid rgba(255,255,255,0.15);margin-bottom:4px}
+    .sc-flow-item.active{background:rgba(255,255,255,0.2);border-color:rgba(255,255,255,0.35);color:#fff}
+    .sc-flow-item.done{background:rgba(34,197,94,0.25);border-color:rgba(34,197,94,0.4);color:#86efac}
+    .sc-flow-arr{text-align:center;font-size:12px;color:rgba(255,255,255,0.3);margin:0 0 4px 24px}
+    .sc-metrics-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    .sc-metric{background:rgba(255,255,255,0.1);border-radius:10px;padding:12px 14px;border:1px solid rgba(255,255,255,0.15)}
+    .sc-metric-n{font-size:24px;font-weight:800;color:#fff;letter-spacing:-1px;line-height:1}
+    .sc-metric-l{font-size:10px;color:rgba(255,255,255,0.6);margin-top:3px}
+
+    /* FAQ */
+    .faq-section{padding:var(--sy) 0;border-top:1px solid var(--border)}
+    .faq-hd{text-align:center;margin-bottom:52px}
+    .faq-hd .sec-p{margin:0 auto}
+    .faq-list{max-width:720px;margin:0 auto;display:flex;flex-direction:column;gap:0}
+    .faq-item{border-bottom:1px solid var(--border)}
+    .faq-item:first-child{border-top:1px solid var(--border)}
+    .faq-q{width:100%;background:none;border:none;font-family:inherit;font-size:15px;font-weight:600;color:var(--text);text-align:left;padding:20px 0;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:16px;transition:color .2s}
+    .faq-q:hover{color:var(--green)}
+    .faq-icon{width:22px;height:22px;border-radius:50%;background:var(--bg2);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:400;color:var(--text3);flex-shrink:0;transition:transform .3s,background .2s}
+    .faq-item.open .faq-icon{transform:rotate(45deg);background:var(--green-dim2);color:var(--green);border-color:rgba(22,163,74,.2)}
+    .faq-a{max-height:0;overflow:hidden;transition:max-height .35s cubic-bezier(.22,1,.36,1)}
+    .faq-item.open .faq-a{max-height:300px}
+    .faq-a p{font-size:14px;color:var(--text2);line-height:1.75;padding-bottom:20px}
+
+    /* RESPONSIVE SHOWCASE */
+    @media(max-width:1024px){.showcase-grid{grid-template-columns:1fr;gap:36px}.showcase-grid.rev{direction:ltr}}
+
   </style>
 </head>
 <body>
@@ -401,8 +455,8 @@
       <h1>Tu clínica<br>responde <span class="g">24/7.</span><br>Sin equipo<br>extra.</h1>
       <p class="hero-desc">Cliniflux automatiza WhatsApp para que cada paciente reciba respuesta instantánea, agende su cita y tu equipo se centre en lo que importa.</p>
       <div class="hero-ctas">
-        <a href="#precios" class="btn-primary" style="font-size:15px;padding:12px 24px">Solicitar demo gratuita <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg></a>
-        <a href="#flujo" class="btn-secondary" style="font-size:15px;padding:12px 24px">Ver cómo funciona</a>
+        <a href="#precios" class="btn-primary" style="font-size:15px;padding:12px 28px;border-radius:40px">Solicitar demo gratuita <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg></a>
+        <a href="#flujo" class="btn-secondary" style="font-size:15px;padding:12px 28px;border-radius:40px">Ver cómo funciona</a>
       </div>
       <div class="hero-proof">
         <div class="avatars">
@@ -644,6 +698,130 @@
   </div>
 </section>
 
+
+<!-- SHOWCASE 1: Analytics -->
+<section class="showcase-section" id="analiticas">
+  <div class="c">
+    <div class="showcase-grid">
+      <div class="showcase-text reveal">
+        <div class="label">Analíticas en tiempo real</div>
+        <h2 class="sec-h">Cada conversación,<br>una oportunidad.</h2>
+        <p class="sec-p">Visualiza el rendimiento de tu asistente IA con métricas en tiempo real. Sabe exactamente qué pacientes atendió, qué consultas resolvió y qué citas agendó.</p>
+        <ul class="sc-checklist">
+          <li><div class="sc-check">✓</div>Tasa de resolución y satisfacción del paciente</li>
+          <li><div class="sc-check">✓</div>Tiempo medio de respuesta y conversaciones activas</li>
+          <li><div class="sc-check">✓</div>Reportes semanales automáticos por email</li>
+        </ul>
+        <a href="#precios" class="btn-primary">Ver planes →</a>
+      </div>
+      <div class="reveal d1">
+        <div class="sc-card sc-card-teal">
+          <div class="sc-inner">
+            <div class="sc-top-bar">
+              <div class="sc-top-dot"></div><div class="sc-top-dot"></div><div class="sc-top-dot"></div>
+              <span class="sc-top-title">CLINIFLUX ANALYTICS</span>
+            </div>
+            <div class="sc-stats-row">
+              <div class="sc-stat-box"><div class="sc-stat-n">94%</div><div class="sc-stat-l">Tasa resolución IA</div></div>
+              <div class="sc-stat-box"><div class="sc-stat-n">1.2s</div><div class="sc-stat-l">Resp. media</div></div>
+              <div class="sc-stat-box"><div class="sc-stat-n">247</div><div class="sc-stat-l">Chats hoy</div></div>
+            </div>
+            <div class="sc-chart">
+              <div class="sc-bar" style="height:45%"></div>
+              <div class="sc-bar" style="height:65%"></div>
+              <div class="sc-bar" style="height:52%"></div>
+              <div class="sc-bar hi" style="height:82%"></div>
+              <div class="sc-bar" style="height:70%"></div>
+              <div class="sc-bar hi" style="height:95%"></div>
+              <div class="sc-bar" style="height:78%"></div>
+              <div class="sc-bar" style="height:88%"></div>
+              <div class="sc-bar hi" style="height:100%"></div>
+              <div class="sc-bar" style="height:72%"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SHOWCASE 2: Automation -->
+<section class="showcase-section">
+  <div class="c">
+    <div class="showcase-grid rev">
+      <div class="showcase-text reveal">
+        <div class="label">Automatización completa</div>
+        <h2 class="sec-h">Agenda citas mientras<br>duermes.</h2>
+        <p class="sec-p">El sistema trabaja por ti las 24 horas. Cada mensaje recibido desencadena un flujo inteligente que resuelve, agenda o escala según lo que necesita el paciente.</p>
+        <ul class="sc-checklist">
+          <li><div class="sc-check">✓</div>Agenda automática en tu calendario en tiempo real</li>
+          <li><div class="sc-check">✓</div>Recordatorios y confirmaciones de cita automáticas</li>
+          <li><div class="sc-check">✓</div>Gestión de cancelaciones y reagendados sin intervención</li>
+        </ul>
+        <a href="#precios" class="btn-primary">Empezar ahora →</a>
+      </div>
+      <div class="reveal d1">
+        <div class="sc-card sc-card-purple">
+          <div class="sc-inner">
+            <div class="sc-top-bar">
+              <div class="sc-top-dot"></div><div class="sc-top-dot"></div><div class="sc-top-dot"></div>
+              <span class="sc-top-title">AUTOMATIZACIÓN ACTIVA</span>
+            </div>
+            <div class="sc-flow-list">
+              <div class="sc-flow-item">💬 Mensaje recibido · hace 3s</div>
+              <div class="sc-flow-arr">↓</div>
+              <div class="sc-flow-item active">🧠 IA analizando intención...</div>
+              <div class="sc-flow-arr">↓</div>
+              <div class="sc-flow-item done">✅ Cita confirmada · 10:00h mañana</div>
+            </div>
+            <div class="sc-metrics-row">
+              <div class="sc-metric"><div class="sc-metric-n">24</div><div class="sc-metric-l">Citas agendadas hoy</div></div>
+              <div class="sc-metric"><div class="sc-metric-n">6h</div><div class="sc-metric-l">Tiempo ahorrado</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq-section" id="faq">
+  <div class="c">
+    <div class="faq-hd reveal">
+      <div class="label">Preguntas frecuentes</div>
+      <h2 class="sec-h">Todo lo que necesitas saber</h2>
+      <p class="sec-p">Si tienes alguna duda que no está aquí, escríbenos y te respondemos en menos de 24h.</p>
+    </div>
+    <div class="faq-list reveal d1">
+      <div class="faq-item">
+        <button class="faq-q">¿Cómo funciona la integración con WhatsApp? <span class="faq-icon">+</span></button>
+        <div class="faq-a"><p>Conectamos directamente con la API oficial de WhatsApp Business. El proceso de integración dura menos de 48 horas y no requiere ningún desarrollo por tu parte. Solo necesitas tu número de WhatsApp Business y nosotros nos encargamos del resto.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">¿La IA responde exactamente lo que yo quiero? <span class="faq-icon">+</span></button>
+        <div class="faq-a"><p>Sí. Antes de activar el sistema, configuramos la IA con el tono, los servicios, los precios y las políticas específicas de tu clínica. Puedes actualizar la información en cualquier momento y los cambios se aplican de inmediato.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">¿Qué pasa si un paciente tiene una consulta compleja? <span class="faq-icon">+</span></button>
+        <div class="faq-a"><p>La IA detecta automáticamente cuándo una conversación requiere atención humana y la escala a tu equipo con toda la información del contexto. Tu equipo solo interviene cuando realmente es necesario, sin perder el hilo de la conversación.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">¿Es compatible con mi software de gestión actual? <span class="faq-icon">+</span></button>
+        <div class="faq-a"><p>Cliniflux se integra con los principales software de gestión clínica del mercado (Gesden, Clinic Cloud, Doctoralia, entre otros). Si usas una solución propia, disponemos de API para integraciones personalizadas.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">¿Cumple con la normativa RGPD y de datos médicos? <span class="faq-icon">+</span></button>
+        <div class="faq-a"><p>Absolutamente. Toda la infraestructura está alojada en Europa (cumplimiento RGPD), los datos de los pacientes se tratan con cifrado de extremo a extremo y aplicamos todas las medidas de seguridad exigidas para datos sanitarios en España.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">¿Puedo cancelar en cualquier momento? <span class="faq-icon">+</span></button>
+        <div class="faq-a"><p>Sí, sin permanencias ni penalizaciones. Si en algún momento decides cancelar, conservas acceso hasta el final del período pagado y te devolvemos todos tus datos en un formato estándar.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- PRICING -->
 <section class="pricing-section" id="precios">
   <div class="c">
@@ -711,8 +889,8 @@
       <h2 class="sec-h" style="text-align:center">¿Tu clínica lista para<br>el siguiente nivel?</h2>
       <p class="sec-p" style="text-align:center;margin:0 auto 28px">Solicita tu demo gratuita y te mostramos cómo funciona Cliniflux en tu clínica en menos de 30 minutos.</p>
       <div class="cta-btns">
-        <a href="#" class="btn-primary" style="font-size:15px;padding:13px 26px">Solicitar demo gratuita →</a>
-        <a href="/demo" class="btn-secondary" style="font-size:15px;padding:13px 26px">Ver demo interactiva</a>
+        <a href="#" class="btn-primary" style="font-size:15px;padding:13px 28px;border-radius:40px">Solicitar demo gratuita →</a>
+        <a href="/demo" class="btn-secondary" style="font-size:15px;padding:13px 28px;border-radius:40px">Ver demo interactiva</a>
       </div>
     </div>
   </div>
@@ -746,6 +924,15 @@
     entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('on') });
   }, {threshold:0.1, rootMargin:'0px 0px -40px 0px'});
   document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+  // FAQ accordion
+  document.querySelectorAll('.faq-q').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const item = btn.closest('.faq-item');
+      const isOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item.open').forEach(i => i.classList.remove('open'));
+      if(!isOpen) item.classList.add('open');
+    });
+  });
 </script>
 </body>
 </html>
