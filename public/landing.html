@@ -3,1342 +3,703 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cliniflux — Automatización inteligente de WhatsApp para clínicas</title>
+  <title>Cliniflux — WhatsApp IA para clínicas</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-      /* Colors */
-      --bg:            #000000;
-      --surface:       #0a0a12;
-      --surface-2:     #0f0f1a;
-      --border:        rgba(255,255,255,0.07);
-      --text:          #ffffff;
-      --text-secondary: rgba(255,255,255,0.55);
-      --text-tertiary:  rgba(255,255,255,0.30);
-      --accent:        #3B5BF6;
-      --accent-hover:  #5470ff;
-      --label-color:   #b8976a;
-
-      /* Spacing */
-      --section-y:     96px;
-      --container-max: 1160px;
-      --container-px:  48px;
-
-      /* Radius */
-      --radius-sm:  8px;
-      --radius-md: 12px;
-      --radius-lg: 18px;
-    }
-
-    html { scroll-behavior: smooth; }
-
-    body {
-      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.6;
-      overflow-x: hidden;
-      -webkit-font-smoothing: antialiased;
-    }
-
-    /* ── CONTAINER ── */
-    .container {
-      width: 100%;
-      max-width: var(--container-max);
-      margin: 0 auto;
-      padding: 0 var(--container-px);
-    }
-
-    /* ── NAVBAR ── */
-    nav {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 100;
-      background: rgba(0,0,0,0.65);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border-bottom: 1px solid var(--border);
-    }
-
-    .nav-inner {
-      max-width: var(--container-max);
-      margin: 0 auto;
-      padding: 0 var(--container-px);
-      height: 64px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .nav-logo {
-      font-size: 17px;
-      font-weight: 700;
-      color: var(--text);
-      text-decoration: none;
-      letter-spacing: -0.3px;
-    }
-
-    .nav-links {
-      display: flex;
-      gap: 32px;
-      list-style: none;
-    }
-
-    .nav-links a {
-      font-size: 14px;
-      font-weight: 500;
-      color: var(--text-secondary);
-      text-decoration: none;
-      transition: color 0.2s;
-    }
-    .nav-links a:hover { color: var(--text); }
-
-    .nav-cta {
-      font-family: inherit;
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--text);
-      background: var(--surface-2);
-      border: 1px solid rgba(255,255,255,0.12);
-      padding: 9px 18px;
-      border-radius: var(--radius-md);
-      cursor: pointer;
-      text-decoration: none;
-      transition: background 0.2s, border-color 0.2s;
-      white-space: nowrap;
-    }
-    .nav-cta:hover {
-      background: rgba(255,255,255,0.1);
-      border-color: rgba(255,255,255,0.2);
-    }
-
-    /* ── HERO ── */
-    .hero {
-      position: relative;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      overflow: hidden;
-      padding-top: 64px; /* nav height */
-    }
-
-    .hero-glow {
-      position: absolute;
-      inset: 0;
-      background:
-        radial-gradient(ellipse 70% 80% at 80% 40%,
-          rgba(40,80,220,0.45) 0%,
-          rgba(30,55,180,0.2)  40%,
-          transparent          70%);
-      pointer-events: none;
-    }
-
-    .hero-inner {
-      position: relative;
-      z-index: 1;
-      width: 100%;
-      max-width: var(--container-max);
-      margin: 0 auto;
-      padding: 80px var(--container-px);
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      align-items: center;
-      gap: 64px;
-      min-height: calc(100vh - 64px);
-    }
-
-    .hero-body { max-width: 520px; }
-
-    .hero h1 {
-      font-size: clamp(24px, 2.6vw, 38px);
-      font-weight: 800;
-      line-height: 1.05;
-      letter-spacing: -2px;
-      margin-bottom: 24px;
-      animation: fadeUp 0.7s cubic-bezier(0.22,1,0.36,1) both;
-    }
-
-    .hero-desc {
-      font-size: 15px;
-      color: var(--text-secondary);
-      line-height: 1.75;
-      max-width: 400px;
-      margin-bottom: 16px;
-      animation: fadeUp 0.7s 0.1s cubic-bezier(0.22,1,0.36,1) both;
-    }
-
-    .hero-micro {
-      font-size: 13px;
-      color: var(--text-tertiary);
-      margin-bottom: 6px;
-      animation: fadeUp 0.7s 0.2s cubic-bezier(0.22,1,0.36,1) both;
-    }
-
-    .hero-tags {
-      font-size: 13px;
-      color: var(--text-tertiary);
-      margin-bottom: 32px;
-      animation: fadeUp 0.7s 0.25s cubic-bezier(0.22,1,0.36,1) both;
-    }
-
-    .hero-cta-wrap {
-      animation: fadeUp 0.7s 0.35s cubic-bezier(0.22,1,0.36,1) both;
-    }
-
-    /* ── ORBIT VISUAL ── */
-    .hero-visual {
-      position: relative;
-      width: 440px;
-      height: 440px;
-      flex-shrink: 0;
-      animation: fadeUp 0.9s 0.3s cubic-bezier(0.22,1,0.36,1) both;
-      justify-self: center;
-    }
-
-    .orbit-svg {
-      position: absolute;
-      inset: 0;
-      width: 100%; height: 100%;
-    }
-
-    /* Center WhatsApp node */
-    .orbit-center {
-      position: absolute;
-      left: 50%; top: 50%;
-      transform: translate(-50%, -50%);
-      width: 80px; height: 80px;
-      background: radial-gradient(circle at 40% 35%, #25d366, #128c5e);
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 0 40px rgba(37,211,102,0.35), 0 0 80px rgba(37,211,102,0.15);
-      z-index: 2;
-    }
-
-    .orbit-center svg { width: 38px; height: 38px; }
-
-    /* Icon nodes on orbit */
-    .orbit-node {
-      position: absolute;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 6px;
-      transform: translate(-50%, -50%);
-      z-index: 2;
-    }
-
-    .orbit-icon {
-      width: 46px; height: 46px;
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      background: var(--ic-bg, #1a1a2e);
-      border: 1px solid rgba(255,255,255,0.1);
-      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
-      font-size: 0;
-    }
-
-    .orbit-icon svg { width: 22px; height: 22px; }
-    .orbit-icon span { font-size: 11px; font-weight: 800; color: white; letter-spacing: -0.3px; }
-
-    .orbit-label {
-      font-size: 10px;
-      font-weight: 600;
-      color: var(--text-tertiary);
-      white-space: nowrap;
-      letter-spacing: 0.2px;
-    }
-
-    /* Connector lines from center to nodes */
-    .orbit-line {
-      position: absolute;
-      left: 50%; top: 50%;
-      height: 1px;
-      background: linear-gradient(90deg, rgba(255,255,255,0.08), transparent);
-      transform-origin: left center;
-      z-index: 1;
-    }
-
-    .btn-primary {
-      display: inline-flex;
-      align-items: center;
-      font-family: inherit;
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--text);
-      background: var(--accent);
-      border: none;
-      padding: 14px 26px;
-      border-radius: var(--radius-md);
-      cursor: pointer;
-      text-decoration: none;
-      transition: background 0.2s, transform 0.15s;
-      white-space: nowrap;
-    }
-    .btn-primary:hover {
-      background: var(--accent-hover);
-      transform: translateY(-1px);
-    }
-
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(24px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-
-    /* ── SECTION LABEL ── */
-    .label {
-      display: inline-block;
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: var(--label-color);
-      margin-bottom: 16px;
-    }
-
-    /* ── TESTIMONIALS ── */
-    .testimonials-section {
-      padding-bottom: var(--section-y);
-      overflow: hidden;
-    }
-
-    .testimonials-marquee {
-      overflow: hidden;
-      mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
-      -webkit-mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
-    }
-
-    .testimonials-track {
-      display: flex;
-      gap: 16px;
-      width: max-content;
-      animation: marquee-scroll 32s linear infinite;
-    }
-    .testimonials-track:hover { animation-play-state: paused; }
-
-    @keyframes marquee-scroll {
-      from { transform: translateX(0); }
-      to   { transform: translateX(-50%); }
-    }
-
-    .t-card {
-      flex: 0 0 300px;
-      background: rgba(8,12,35,0.75);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      padding: 24px;
-      backdrop-filter: blur(16px);
-    }
-
-    .t-quote {
-      font-size: 13px;
-      color: rgba(255,255,255,0.78);
-      line-height: 1.7;
-      margin-bottom: 24px;
-    }
-
-    .t-footer {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .t-clinic { display: flex; align-items: center; gap: 8px; }
-
-    .t-icon {
-      width: 28px; height: 28px;
-      background: rgba(59,91,246,0.18);
-      border: 1px solid rgba(59,91,246,0.28);
-      border-radius: 6px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 12px;
-    }
-
-    .t-name { font-size: 11px; font-weight: 600; color: var(--text-secondary); }
-
-    .t-score-num {
-      font-size: 26px; font-weight: 800;
-      color: #7b9aff; line-height: 1;
-    }
-
-    .t-score-label {
-      font-size: 9px; color: var(--text-tertiary);
-      text-transform: uppercase; letter-spacing: 1px;
-      text-align: right;
-    }
-
-    /* ── STATS ROW ── */
-    .stats-section {
-      padding: 72px 0;
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-    }
-
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-    }
-
-    .stat-item {
-      padding: 8px 40px;
-      border-right: 1px solid var(--border);
-    }
-
-    .stat-item:first-child { padding-left: 0; }
-    .stat-item:last-child  { border-right: none; }
-
-    .stat-number {
-      font-size: clamp(40px, 4vw, 56px);
-      font-weight: 800;
-      letter-spacing: -2px;
-      line-height: 1;
-      margin-bottom: 8px;
-      color: var(--text);
-    }
-
-    .stat-number em {
-      font-style: normal;
-      color: #7b9aff;
-    }
-
-    .stat-label {
-      font-size: 13px;
-      color: var(--text-secondary);
-      line-height: 1.55;
-      max-width: 200px;
-    }
-
-    /* ── DIVIDERS ── */
-    .section-divider {
-      width: 100%; height: 1px;
-      background: var(--border);
-      margin: 0;
-    }
-
-    /* ── TWO-COLUMN CONTENT ── */
-    .two-col-section {
-      padding: var(--section-y) 0;
-      border-top: 1px solid var(--border);
-    }
-
-    .two-col-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0;
-    }
-
-    .col-left  { padding-right: 64px; }
-    .col-right { padding-left: 64px; border-left: 1px solid var(--border); }
-
-    .sec-title {
-      font-size: clamp(24px, 2.8vw, 38px);
-      font-weight: 800;
-      line-height: 1.1;
-      letter-spacing: -1.2px;
-      margin-bottom: 18px;
-      color: var(--text);
-    }
-
-    .sec-body {
-      font-size: 14px;
-      color: var(--text-secondary);
-      line-height: 1.8;
-      margin-bottom: 12px;
-    }
-
-    .dot-list { list-style: none; margin-bottom: 14px; }
-    .dot-list li {
-      font-size: 14px;
-      color: var(--text-secondary);
-      line-height: 1.75;
-      padding: 2px 0 2px 14px;
-      position: relative;
-    }
-    .dot-list li::before {
-      content: "·";
-      position: absolute; left: 0;
-      color: var(--text-tertiary);
-      font-size: 18px; line-height: 1.4;
-    }
-
-    .check-list { list-style: none; margin-bottom: 16px; }
-    .check-list li {
-      font-size: 14px;
-      color: var(--text-secondary);
-      line-height: 1.6;
-      padding: 4px 0 4px 20px;
-      position: relative;
-    }
-    .check-list li::before {
-      content: "✔";
-      position: absolute; left: 0;
-      color: #7b9aff;
-      font-size: 11px;
-      top: 6px;
-    }
-
-    /* ── PROCESS ── */
-    .process-section {
-      padding: var(--section-y) 0;
-      border-top: 1px solid var(--border);
-    }
-
-    .process-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 40px;
-    }
-
-    .process-cards {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-bottom: 24px;
-    }
-
-    .step-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      padding: 32px;
-    }
-
-    .step-label {
-      font-size: 9px;
-      font-weight: 700;
-      letter-spacing: 2.5px;
-      text-transform: uppercase;
-      color: var(--label-color);
-      margin-bottom: 14px;
-    }
-
-    .step-card h3 {
-      font-size: 22px;
-      font-weight: 800;
-      letter-spacing: -0.5px;
-      margin-bottom: 10px;
-      color: var(--text);
-    }
-
-    .step-card p { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
-
-    .arrows { display: flex; gap: 8px; justify-content: flex-end; }
-
-    .arrow {
-      width: 38px; height: 38px;
-      border-radius: 50%;
-      background: var(--accent);
-      border: none; color: var(--text);
-      font-size: 18px; cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      transition: background 0.2s;
-    }
-    .arrow:hover { background: var(--accent-hover); }
-
-    /* ── TECH ── */
-    .tech-section {
-      padding: var(--section-y) 0;
-      border-top: 1px solid var(--border);
-    }
-
-    .tech-subtitle {
-      font-size: 14px;
-      color: var(--text-secondary);
-      line-height: 1.7;
-      margin-bottom: 36px;
-    }
-
-    .pills {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      max-width: 680px;
-    }
-
-    .pill {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-md);
-      padding: 16px 20px;
-      font-size: 13px;
-      font-weight: 500;
-      color: rgba(255,255,255,0.7);
-      text-align: center;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .pill::after {
-      content: '';
-      position: absolute; inset: 0;
-      background: radial-gradient(ellipse at center, rgba(59,91,246,0.08) 0%, transparent 70%);
-      pointer-events: none;
-    }
-
-    /* ── CONTACT ── */
-    .contact-section {
-      padding: var(--section-y) 0;
-      border-top: 1px solid var(--border);
-    }
-
-    .contact-grid {
-      display: grid;
-      grid-template-columns: 1fr 1.4fr;
-      gap: 80px;
-      align-items: start;
-    }
-
-    .contact-left .sec-title { margin-bottom: 12px; }
-
-    .form { display: flex; flex-direction: column; gap: 12px; }
-
-    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-
-    .field { display: flex; flex-direction: column; gap: 6px; }
-
-    .field label {
-      font-size: 12px;
-      font-weight: 500;
-      color: var(--text-tertiary);
-      letter-spacing: 0.3px;
-    }
-
-    .field input,
-    .field select {
-      font-family: inherit;
-      font-size: 13px;
-      color: rgba(255,255,255,0.75);
-      background: var(--surface);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: var(--radius-sm);
-      padding: 11px 14px;
-      outline: none;
-      transition: border-color 0.2s;
-      -webkit-appearance: none;
-    }
-
-    .field input::placeholder { color: rgba(255,255,255,0.18); }
-    .field input:focus,
-    .field select:focus { border-color: rgba(59,91,246,0.6); }
-    .field select option { background: #0a0a14; }
-
-    .form-note {
-      font-size: 11px;
-      color: var(--text-tertiary);
-    }
-
-    .btn-submit {
-      font-family: inherit;
-      font-size: 12px;
-      font-weight: 700;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      color: var(--text);
-      background: var(--accent);
-      border: none;
-      border-radius: var(--radius-sm);
-      padding: 14px;
-      cursor: pointer;
-      width: 100%;
-      transition: background 0.2s;
-    }
-    .btn-submit:hover { background: var(--accent-hover); }
-
-    /* ── FAQ ── */
-    .faq-section {
-      padding-bottom: var(--section-y);
-    }
-
-    .faq-inner {
-      max-width: 720px;
-    }
-
-    .faq-item {
-      border: 1px solid var(--border);
-      border-radius: var(--radius-md);
-      margin-bottom: 6px;
-      overflow: hidden;
-    }
-
-    .faq-q {
-      width: 100%;
-      background: var(--surface);
-      border: none;
-      color: rgba(255,255,255,0.82);
-      font-family: inherit;
-      font-size: 13px;
-      font-weight: 500;
-      padding: 16px 20px;
-      text-align: left;
-      cursor: pointer;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 16px;
-      transition: background 0.2s;
-    }
-    .faq-q:hover { background: var(--surface-2); }
-
-    .faq-icon {
-      font-size: 20px;
-      color: var(--text-tertiary);
-      transition: transform 0.25s;
-      flex-shrink: 0;
-      line-height: 1;
-    }
-
-    .faq-body {
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height 0.3s ease;
-      background: var(--surface);
-    }
-
-    .faq-body-inner {
-      padding: 0 20px 16px;
-      font-size: 13px;
-      color: var(--text-secondary);
-      line-height: 1.75;
-    }
-
-    .faq-item.open .faq-body { max-height: 200px; }
-    .faq-item.open .faq-icon { transform: rotate(45deg); }
-
-    /* ── FOOTER ── */
-    footer {
-      border-top: 1px solid var(--border);
-      padding: 64px 0 36px;
-    }
-
-    .footer-grid {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 48px;
-      gap: 40px;
-    }
-
-    .footer-info p {
-      font-size: 13px;
-      color: var(--text-tertiary);
-      margin-bottom: 4px;
-    }
-
-    .footer-wordmark {
-      font-size: 64px;
-      font-weight: 800;
-      letter-spacing: -3.5px;
-      color: var(--text);
-      line-height: 1;
-      margin-top: 20px;
-    }
-
-    .footer-links {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px 40px;
-      padding-top: 2px;
-    }
-
-    .footer-links a {
-      font-size: 13px;
-      color: var(--text-tertiary);
-      text-decoration: none;
-      transition: color 0.2s;
-      white-space: nowrap;
-    }
-    .footer-links a:hover { color: var(--text); }
-
-    .footer-bottom {
-      font-size: 12px;
-      color: rgba(255,255,255,0.15);
-      text-align: center;
-      padding-top: 24px;
-      border-top: 1px solid var(--border);
-    }
-
-    /* ── RESPONSIVE ── */
-    @media (max-width: 1024px) {
-      :root {
-        --container-px: 32px;
-        --section-y: 72px;
-      }
-    }
-
-    @media (max-width: 768px) {
-      :root {
-        --container-px: 20px;
-        --section-y: 56px;
-      }
-
-      .nav-links { display: none; }
-
-      .nav-inner { padding: 0 20px; }
-
-      .hero-inner {
-        grid-template-columns: 1fr;
-        padding: 48px 20px 64px;
-        min-height: auto;
-        gap: 40px;
-      }
-
-      .hero-visual { width: 300px; height: 300px; }
-
-      .orbit-center { width: 56px; height: 56px; }
-      .orbit-center svg { width: 26px; height: 26px; }
-      .orbit-icon { width: 36px; height: 36px; }
-      .orbit-icon svg { width: 18px; height: 18px; }
-      .orbit-label { font-size: 9px; }
-
-      .hero h1 { font-size: 26px; letter-spacing: -1px; }
-
-      .testimonials-track { padding: 0 20px; }
-
-      .stats-grid { grid-template-columns: 1fr 1fr; gap: 32px 0; }
-      .stat-item { padding: 0 20px; border-right: none; border-bottom: 1px solid var(--border); padding-bottom: 28px; }
-      .stat-item:nth-child(odd) { padding-left: 0; }
-      .stat-item:nth-child(3), .stat-item:nth-child(4) { border-bottom: none; }
-
-      .two-col-grid { grid-template-columns: 1fr; }
-      .col-left  { padding-right: 0; padding-bottom: 48px; }
-      .col-right { padding-left: 0; border-left: none; padding-top: 48px; border-top: 1px solid var(--border); }
-
-      .process-cards { grid-template-columns: 1fr; }
-      .process-header { flex-direction: column; gap: 16px; }
-
-      .pills { grid-template-columns: 1fr; max-width: 100%; }
-
-      .contact-grid { grid-template-columns: 1fr; gap: 40px; }
-      .form-row { grid-template-columns: 1fr; }
-
-      .footer-grid { flex-direction: column; gap: 28px; }
-      .footer-wordmark { font-size: 48px; }
-      .footer-links { grid-template-columns: repeat(2, 1fr); gap: 10px 24px; }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --bg:#030712;--bg2:#060d1c;--surface:#0d1117;--surface2:#161b22;
+      --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);
+      --text:#f0f6fc;--text2:rgba(240,246,252,0.58);--text3:rgba(240,246,252,0.30);
+      --green:#25d366;--green2:#22c55e;
+      --green-glow:rgba(37,211,102,0.18);--green-dim:rgba(37,211,102,0.09);
+      --blue:#3b82f6;--blue-dim:rgba(59,130,246,0.1);
+      --orange:#f97316;--orange-dim:rgba(249,115,22,0.1);
+      --purple:#8b5cf6;--purple-dim:rgba(139,92,246,0.1);
+      --r-sm:8px;--r-md:14px;--r-lg:20px;--r-xl:26px;
+      --sy:120px;--cmax:1160px;--px:48px;
+    }
+    html{scroll-behavior:smooth}
+    body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+
+    .c{width:100%;max-width:var(--cmax);margin:0 auto;padding:0 var(--px)}
+
+    /* REVEAL */
+    .reveal{opacity:0;transform:translateY(28px);transition:opacity .7s cubic-bezier(.22,1,.36,1),transform .7s cubic-bezier(.22,1,.36,1)}
+    .reveal.on{opacity:1;transform:none}
+    .d1{transition-delay:.1s}.d2{transition-delay:.2s}.d3{transition-delay:.3s}.d4{transition-delay:.4s}
+
+    /* NAV */
+    nav{position:fixed;top:0;left:0;right:0;z-index:200;transition:background .3s,border-color .3s}
+    nav.scrolled{background:rgba(3,7,18,.9);backdrop-filter:blur(24px);border-bottom:1px solid var(--border)}
+    .nav-inner{max-width:var(--cmax);margin:0 auto;padding:0 var(--px);height:68px;display:flex;align-items:center;gap:32px}
+    .nav-logo{display:flex;align-items:center;gap:9px;font-size:17px;font-weight:700;color:var(--text);text-decoration:none;letter-spacing:-.4px;flex-shrink:0}
+    .logo-mark{width:32px;height:32px;background:linear-gradient(135deg,#25d366,#16a34a);border-radius:9px;display:flex;align-items:center;justify-content:center}
+    .nav-links{display:flex;gap:2px;list-style:none;margin:0 auto}
+    .nav-links a{font-size:14px;font-weight:500;color:var(--text2);text-decoration:none;padding:8px 14px;border-radius:var(--r-sm);transition:color .2s,background .2s}
+    .nav-links a:hover{color:var(--text);background:rgba(255,255,255,0.06)}
+    .nav-actions{display:flex;align-items:center;gap:8px;flex-shrink:0}
+    .btn-ghost{font-family:inherit;font-size:14px;font-weight:500;color:var(--text2);background:none;border:none;padding:8px 14px;border-radius:var(--r-sm);cursor:pointer;text-decoration:none;transition:color .2s,background .2s}
+    .btn-ghost:hover{color:var(--text);background:rgba(255,255,255,0.06)}
+    .btn-primary{font-family:inherit;font-size:14px;font-weight:600;color:#000;background:var(--green);border:none;padding:10px 20px;border-radius:var(--r-md);cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px;transition:background .2s,transform .15s,box-shadow .2s;white-space:nowrap}
+    .btn-primary:hover{background:#20c75a;box-shadow:0 0 28px rgba(37,211,102,.35);transform:translateY(-1px)}
+    .btn-secondary{font-family:inherit;font-size:14px;font-weight:500;color:var(--text);background:rgba(255,255,255,0.06);border:1px solid var(--border2);padding:10px 20px;border-radius:var(--r-md);cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px;transition:background .2s,transform .15s}
+    .btn-secondary:hover{background:rgba(255,255,255,0.1);transform:translateY(-1px)}
+
+    /* HERO */
+    .hero{position:relative;min-height:100vh;display:flex;align-items:center;padding-top:68px;overflow:hidden}
+    .hero-bg{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse 55% 70% at 72% 50%,rgba(37,211,102,.08) 0%,transparent 70%),radial-gradient(ellipse 40% 60% at 20% 60%,rgba(59,130,246,.06) 0%,transparent 70%)}
+    .hero-grid{position:absolute;inset:0;pointer-events:none;background-image:linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.018) 1px,transparent 1px);background-size:64px 64px;mask-image:radial-gradient(ellipse 80% 80% at 50% 40%,black 20%,transparent 80%)}
+    .hero-inner{position:relative;z-index:2;width:100%;max-width:var(--cmax);margin:0 auto;padding:80px var(--px);display:grid;grid-template-columns:1fr 1fr;align-items:center;gap:80px;min-height:calc(100vh - 68px)}
+    .hero-badge{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:600;color:var(--green);letter-spacing:.5px;background:var(--green-dim);border:1px solid rgba(37,211,102,.2);padding:6px 14px;border-radius:100px;margin-bottom:28px}
+    .badge-dot{width:6px;height:6px;background:var(--green);border-radius:50%;animation:pulse 2s ease infinite}
+    @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.5)}}
+    .hero h1{font-size:clamp(38px,4.4vw,66px);font-weight:800;line-height:1.0;letter-spacing:-3px;margin-bottom:22px}
+    .hero h1 .g{color:var(--green)}
+    .hero-desc{font-size:16px;color:var(--text2);line-height:1.75;max-width:420px;margin-bottom:34px}
+    .hero-ctas{display:flex;align-items:center;gap:12px;margin-bottom:44px}
+    .hero-proof{display:flex;align-items:center;gap:12px}
+    .avatars{display:flex}
+    .av{width:28px;height:28px;border-radius:50%;border:2px solid var(--bg);margin-left:-8px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff}
+    .av:first-child{margin-left:0}
+    .proof-text{font-size:13px;color:var(--text3)}
+    .proof-text strong{color:var(--text2)}
+
+    /* DASHBOARD */
+    .hero-visual{animation:float 6s ease-in-out infinite}
+    @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+    .dashboard{background:var(--surface);border:1px solid var(--border2);border-radius:var(--r-xl);overflow:hidden;box-shadow:0 40px 100px rgba(0,0,0,.7),0 0 0 1px rgba(255,255,255,.04),inset 0 1px 0 rgba(255,255,255,.07)}
+    .dash-bar{background:var(--surface2);border-bottom:1px solid var(--border);padding:13px 18px;display:flex;align-items:center;gap:7px}
+    .tl{width:11px;height:11px;border-radius:50%}
+    .tl-r{background:#ff5f57}.tl-y{background:#febc2e}.tl-g{background:#28c840}
+    .dash-bar-title{margin-left:8px;font-size:12px;font-weight:600;color:var(--text3)}
+    .dash-bar-live{margin-left:auto;display:flex;align-items:center;gap:5px;font-size:11px;color:var(--green);font-weight:600}
+    .live-dot{width:6px;height:6px;background:var(--green);border-radius:50%;animation:pulse 2s ease infinite}
+    .dash-body{display:grid;grid-template-columns:190px 1fr;height:370px}
+    .dash-side{border-right:1px solid var(--border);display:flex;flex-direction:column;background:rgba(13,17,23,.6)}
+    .dash-side-hd{padding:12px 14px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--text3)}
+    .chat-row{padding:9px 12px;display:flex;align-items:center;gap:9px;border-left:2px solid transparent;transition:background .15s}
+    .chat-row.active{background:rgba(37,211,102,.07);border-left-color:var(--green)}
+    .chat-row:hover:not(.active){background:rgba(255,255,255,.03)}
+    .ava{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0}
+    .ag{background:linear-gradient(135deg,#6366f1,#8b5cf6)}
+    .ab{background:linear-gradient(135deg,#0ea5e9,#0284c7)}
+    .ar{background:linear-gradient(135deg,#f43f5e,#e11d48)}
+    .ao{background:linear-gradient(135deg,#f97316,#ea580c)}
+    .ci{flex:1;min-width:0}
+    .cn{font-size:12px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .cp{font-size:11px;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .cm{display:flex;flex-direction:column;align-items:flex-end;gap:3px}
+    .ct{font-size:10px;color:var(--text3)}
+    .ai-tag{font-size:9px;font-weight:700;background:var(--green-dim);color:var(--green);padding:2px 5px;border-radius:4px;border:1px solid rgba(37,211,102,.15)}
+    .mini-stats{margin-top:auto;padding:12px;border-top:1px solid var(--border);display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    .ms{background:var(--surface2);border-radius:var(--r-sm);padding:8px}
+    .ms-n{font-size:16px;font-weight:800;line-height:1;margin-bottom:2px;letter-spacing:-.5px}
+    .ms-l{font-size:9px;color:var(--text3)}
+    .dash-main{display:flex;flex-direction:column}
+    .dash-main-hd{padding:11px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:9px}
+    .dm-name{font-size:13px;font-weight:700}
+    .dm-sub{font-size:11px;color:var(--text3)}
+    .ai-live{margin-left:auto;font-size:10px;font-weight:600;color:var(--green);background:var(--green-dim);border:1px solid rgba(37,211,102,.2);padding:4px 10px;border-radius:100px;display:flex;align-items:center;gap:4px}
+    .msgs{flex:1;padding:14px;display:flex;flex-direction:column;gap:8px;overflow:hidden}
+    .msg{max-width:80%;padding:9px 13px;border-radius:var(--r-md);font-size:12px;line-height:1.5}
+    .mi{background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text2);align-self:flex-start;border-bottom-left-radius:4px}
+    .mo{background:linear-gradient(135deg,#1a3d2b,#1e4d34);border:1px solid rgba(37,211,102,.15);color:var(--text);align-self:flex-end;border-bottom-right-radius:4px}
+    .msg-meta{font-size:10px;color:rgba(37,211,102,.7);margin-top:3px;text-align:right}
+    .typing{display:flex;gap:5px;align-items:center;padding:4px 0}
+    .td{width:6px;height:6px;border-radius:50%;background:var(--green);animation:tb 1.2s ease infinite}
+    .td:nth-child(2){animation-delay:.2s}.td:nth-child(3){animation-delay:.4s}
+    @keyframes tb{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-5px);opacity:1}}
+    .dash-input-row{padding:10px 12px;border-top:1px solid var(--border);display:flex;align-items:center;gap:8px}
+    .dash-input{flex:1;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:var(--r-sm);padding:7px 11px;font-size:12px;color:var(--text3);font-family:inherit}
+    .send-btn{width:30px;height:30px;background:var(--green);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+
+    /* LABEL + SECTION TITLES */
+    .label{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--green);margin-bottom:14px}
+    .sec-h{font-size:clamp(30px,3.4vw,50px);font-weight:800;line-height:1.05;letter-spacing:-2px;margin-bottom:16px}
+    .sec-p{font-size:16px;color:var(--text2);line-height:1.75;max-width:560px}
+
+    /* LOGOS */
+    .logos-section{padding:56px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+    .logos-lbl{text-align:center;font-size:11px;font-weight:600;color:var(--text3);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:28px}
+    .logos-mq{overflow:hidden;mask-image:linear-gradient(to right,transparent,black 10%,black 90%,transparent)}
+    .logos-track{display:flex;width:max-content;animation:lscroll 22s linear infinite}
+    @keyframes lscroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+    .logo-chip{display:flex;align-items:center;gap:9px;padding:0 36px;font-size:14px;font-weight:600;color:var(--text3);white-space:nowrap;border-right:1px solid var(--border)}
+    .lc-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+
+    /* PROBLEM */
+    .problem-section{padding:var(--sy) 0}
+    .prob-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:56px}
+    .prob-col{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);padding:36px}
+    .prob-col.bad{border-color:rgba(239,68,68,.18)}
+    .prob-col.good{border-color:rgba(37,211,102,.18);background:rgba(37,211,102,.02)}
+    .col-tag{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;padding:5px 12px;border-radius:100px;margin-bottom:24px}
+    .col-tag.bad{background:rgba(239,68,68,.1);color:#f87171;border:1px solid rgba(239,68,68,.2)}
+    .col-tag.good{background:var(--green-dim);color:var(--green);border:1px solid rgba(37,211,102,.2)}
+    .col-h{font-size:20px;font-weight:800;letter-spacing:-.6px;line-height:1.2;margin-bottom:22px}
+    .pi{display:flex;align-items:flex-start;gap:11px;padding:11px 0;border-bottom:1px solid var(--border);font-size:14px;color:var(--text2);line-height:1.5}
+    .pi:last-child{border-bottom:none}
+    .pi-ic{flex-shrink:0;font-size:15px;margin-top:2px}
+
+    /* FLOW */
+    .flow-section{padding:var(--sy) 0;border-top:1px solid var(--border)}
+    .flow-hd{text-align:center;margin-bottom:72px}
+    .flow-hd .sec-p{margin:0 auto;text-align:center}
+    .flow-wrap{max-width:860px;margin:0 auto}
+    .flow-row{display:flex;align-items:center;justify-content:center}
+    .fn{background:var(--surface);border:1px solid var(--border2);border-radius:var(--r-lg);padding:22px 26px;min-width:164px;text-align:center;transition:border-color .3s,box-shadow .3s}
+    .fn:hover{box-shadow:0 0 24px rgba(37,211,102,.07)}
+    .fn.trigger{border-color:rgba(59,130,246,.3)}
+    .fn.ai{border-color:rgba(139,92,246,.3)}
+    .fn.act{border-color:rgba(37,211,102,.3)}
+    .fn.oa{border-color:rgba(37,211,102,.4);background:rgba(37,211,102,.03)}
+    .fn.ob{border-color:rgba(59,130,246,.4);background:rgba(59,130,246,.03)}
+    .fn.oc{border-color:rgba(249,115,22,.4);background:rgba(249,115,22,.03)}
+    .fn-ic{font-size:26px;margin-bottom:8px;display:block}
+    .fn-t{font-size:13px;font-weight:700;color:var(--text);line-height:1.3;margin-bottom:3px}
+    .fn-s{font-size:11px;color:var(--text3);line-height:1.4}
+    .fc{padding:0 10px;display:flex;align-items:center}
+    .fc-line{height:1px;width:44px;background:linear-gradient(90deg,var(--border2),var(--green));position:relative}
+    .fc-line::after{content:'';position:absolute;right:-5px;top:-4px;width:0;height:0;border-left:8px solid var(--green);border-top:4px solid transparent;border-bottom:4px solid transparent}
+    .flow-branches{display:flex;justify-content:center;gap:16px;margin-top:0;position:relative}
+    .flow-vert{display:flex;flex-direction:column;align-items:center}
+    .flow-vert-line{width:1px;height:40px;background:linear-gradient(180deg,var(--green),var(--border2))}
+    .flow-hline-wrap{display:flex;align-items:center;justify-content:center;width:100%;height:1px;margin-bottom:0}
+    .flow-hline{height:1px;background:var(--border2)}
+    .flow-branch-item{display:flex;flex-direction:column;align-items:center}
+    .flow-branch-vl{width:1px;height:24px;background:var(--border2)}
+
+    /* FEATURES */
+    .features-section{padding:var(--sy) 0;border-top:1px solid var(--border)}
+    .feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:56px}
+    .fc-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);padding:30px;transition:border-color .3s,transform .3s,box-shadow .3s}
+    .fc-card:hover{border-color:var(--border2);transform:translateY(-4px);box-shadow:0 24px 60px rgba(0,0,0,.4)}
+    .fc-ic{width:46px;height:46px;border-radius:var(--r-md);display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:18px}
+    .ic-g{background:var(--green-dim);border:1px solid rgba(37,211,102,.15)}
+    .ic-b{background:var(--blue-dim);border:1px solid rgba(59,130,246,.15)}
+    .ic-o{background:var(--orange-dim);border:1px solid rgba(249,115,22,.15)}
+    .ic-p{background:var(--purple-dim);border:1px solid rgba(139,92,246,.15)}
+    .fc-t{font-size:17px;font-weight:800;letter-spacing:-.4px;margin-bottom:10px;line-height:1.2}
+    .fc-b{font-size:14px;color:var(--text2);line-height:1.7;margin-bottom:18px}
+    .fc-pill{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:4px 11px;border-radius:100px}
+    .pg{background:var(--green-dim);color:var(--green)}
+    .pb{background:var(--blue-dim);color:var(--blue)}
+    .po{background:var(--orange-dim);color:var(--orange)}
+    .pp{background:var(--purple-dim);color:var(--purple)}
+
+    /* STATS */
+    .stats-section{padding:var(--sy) 0;border-top:1px solid var(--border);background:var(--surface)}
+    .stats-grid{display:grid;grid-template-columns:repeat(4,1fr)}
+    .si{padding:0 40px;border-right:1px solid var(--border)}
+    .si:first-child{padding-left:0}.si:last-child{border-right:none}
+    .sn{font-size:clamp(42px,4.5vw,62px);font-weight:800;letter-spacing:-3px;line-height:1;margin-bottom:10px}
+    .sn em{font-style:normal;color:var(--green)}
+    .sl{font-size:14px;color:var(--text2);line-height:1.5}
+
+    /* TESTIMONIALS */
+    .t-section{padding:var(--sy) 0;border-top:1px solid var(--border);overflow:hidden}
+    .t-hd{text-align:center;margin-bottom:56px}
+    .t-hd .sec-p{margin:0 auto}
+    .t-mq{overflow:hidden;mask-image:linear-gradient(to right,transparent,black 8%,black 92%,transparent)}
+    .t-track{display:flex;gap:16px;width:max-content;animation:tscroll 38s linear infinite}
+    .t-track:hover{animation-play-state:paused}
+    @keyframes tscroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+    .t-card{flex:0 0 310px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);padding:26px}
+    .t-stars{font-size:13px;margin-bottom:14px;letter-spacing:2px}
+    .t-q{font-size:14px;color:var(--text2);line-height:1.7;margin-bottom:18px}
+    .t-auth{display:flex;align-items:center;gap:10px}
+    .t-av{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0}
+    .t-name{font-size:13px;font-weight:700}
+    .t-clinic{font-size:11px;color:var(--text3)}
+
+    /* PRICING */
+    .pricing-section{padding:var(--sy) 0;border-top:1px solid var(--border)}
+    .pr-hd{text-align:center;margin-bottom:56px}
+    .pr-hd .sec-p{margin:0 auto}
+    .pr-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+    .pr-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);padding:34px;position:relative}
+    .pr-card.hot{border-color:var(--green);box-shadow:0 0 0 1px rgba(37,211,102,.2),0 24px 60px rgba(37,211,102,.06)}
+    .hot-badge{position:absolute;top:-13px;left:50%;transform:translateX(-50%);font-size:11px;font-weight:700;background:var(--green);color:#000;padding:4px 16px;border-radius:100px;white-space:nowrap}
+    .pr-plan{font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+    .pr-amt{font-size:50px;font-weight:800;letter-spacing:-3px;line-height:1;margin-bottom:4px}
+    .pr-amt sup{font-size:20px;font-weight:700;vertical-align:super}
+    .pr-per{font-size:13px;color:var(--text3);margin-bottom:22px}
+    .pr-div{height:1px;background:var(--border);margin-bottom:22px}
+    .pr-feats{list-style:none;margin-bottom:28px;display:flex;flex-direction:column;gap:11px}
+    .pr-feats li{display:flex;align-items:flex-start;gap:10px;font-size:14px;color:var(--text2);line-height:1.4}
+    .pfc{width:18px;height:18px;border-radius:50%;background:var(--green-dim);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;font-size:10px;color:var(--green)}
+    .btn-pl{display:block;width:100%;font-family:inherit;font-size:14px;font-weight:600;text-align:center;padding:13px;border-radius:var(--r-md);cursor:pointer;text-decoration:none;transition:all .2s}
+    .btn-pl-out{background:transparent;border:1px solid var(--border2);color:var(--text)}
+    .btn-pl-out:hover{background:rgba(255,255,255,.06)}
+    .btn-pl-sol{background:var(--green);border:none;color:#000}
+    .btn-pl-sol:hover{background:#20c75a;box-shadow:0 0 24px rgba(37,211,102,.3)}
+
+    /* CTA */
+    .cta-section{padding:var(--sy) 0;border-top:1px solid var(--border);position:relative;overflow:hidden}
+    .cta-bg{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse 60% 100% at 50% 100%,rgba(37,211,102,.07),transparent)}
+    .cta-in{position:relative;z-index:1;text-align:center;max-width:600px;margin:0 auto}
+    .cta-in .sec-p{margin:0 auto 32px;text-align:center}
+    .cta-btns{display:flex;justify-content:center;gap:12px}
+
+    /* FOOTER */
+    footer{border-top:1px solid var(--border);padding:48px 0}
+    .ft-inner{display:flex;justify-content:space-between;align-items:flex-start;gap:40px}
+    .ft-brand{max-width:240px}
+    .ft-logo{display:flex;align-items:center;gap:8px;font-size:16px;font-weight:700;color:var(--text);text-decoration:none;margin-bottom:10px}
+    .ft-desc{font-size:13px;color:var(--text3);line-height:1.6}
+    .ft-links{display:flex;gap:56px}
+    .ft-col-t{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--text3);margin-bottom:14px}
+    .ft-col ul{list-style:none;display:flex;flex-direction:column;gap:9px}
+    .ft-col a{font-size:13px;color:var(--text3);text-decoration:none;transition:color .2s}
+    .ft-col a:hover{color:var(--text2)}
+    .ft-bot{margin-top:36px;padding-top:22px;border-top:1px solid var(--border);display:flex;justify-content:space-between}
+    .ft-bot p{font-size:12px;color:var(--text3)}
+
+    /* RESPONSIVE */
+    @media(max-width:1024px){
+      :root{--sy:80px;--px:32px}
+      .hero-inner{grid-template-columns:1fr;gap:48px;min-height:auto;padding-top:100px;padding-bottom:60px}
+      .feat-grid{grid-template-columns:1fr 1fr}
+      .stats-grid{grid-template-columns:1fr 1fr;gap:32px 0}
+      .si{border-right:none;border-bottom:1px solid var(--border);padding:0 0 32px}
+      .si:last-child{border-bottom:none}
+      .pr-grid{grid-template-columns:1fr;max-width:420px;margin:0 auto}
+      .prob-grid{grid-template-columns:1fr}
+    }
+    @media(max-width:640px){
+      :root{--px:20px;--sy:64px}
+      .nav-links{display:none}
+      .hero h1{font-size:36px;letter-spacing:-1.5px}
+      .feat-grid{grid-template-columns:1fr}
+      .hero-ctas{flex-direction:column;align-items:flex-start}
+      .ft-inner{flex-direction:column}
+      .ft-links{flex-direction:column;gap:28px}
+      .flow-row{flex-direction:column;gap:0}
+      .fc{transform:rotate(90deg)}
     }
   </style>
 </head>
 <body>
 
-  <!-- NAV -->
-  <nav>
-    <div class="nav-inner">
-      <a href="/" class="nav-logo">cliniflux</a>
-      <ul class="nav-links">
-        <li><a href="/about">About</a></li>
-        <li><a href="#blog">Blog</a></li>
-        <li><a href="#contacto">Contacto</a></li>
-      </ul>
-      <a href="#contacto" class="nav-cta">Solicitar llamada</a>
-    </div>
-  </nav>
-
-  <!-- HERO -->
-  <section class="hero">
-    <div class="hero-glow"></div>
-    <div class="hero-inner">
-      <div class="hero-body">
-        <h1>Automatización inteligente de WhatsApp para clínicas que quieren más citas y menos carga administrativa</h1>
-        <p class="hero-desc">Implementamos un sistema avanzado que responde automáticamente a pacientes, reactiva bases de datos inactivas y agenda citas directamente en tu calendario.</p>
-        <p class="hero-micro">Operativo 24/7. Configuración en 48 horas.</p>
-        <p class="hero-tags">Implementación profesional · Sin permanencia · Soporte incluido</p>
-        <div class="hero-cta-wrap">
-          <a href="#contacto" class="btn-primary">Solicitar demostración privada</a>
-        </div>
+<!-- NAV -->
+<nav id="nav">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">
+      <div class="logo-mark">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.557 4.116 1.534 5.845L.073 23.927l6.263-1.637C8.038 23.402 9.976 24 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818c-1.898 0-3.668-.517-5.187-1.416l-.371-.22-3.851 1.006 1.026-3.75-.242-.385A9.801 9.801 0 0 1 2.182 12C2.182 6.57 6.57 2.182 12 2.182S21.818 6.57 21.818 12 17.43 21.818 12 21.818z"/></svg>
       </div>
-
-      <!-- ORBIT VISUAL -->
-      <div class="hero-visual" aria-hidden="true">
-
-        <!-- SVG rings + connector lines -->
-        <svg class="orbit-svg" viewBox="0 0 440 440" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <!-- Outer orbit ring -->
-          <circle cx="220" cy="220" r="170" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
-          <!-- Inner ring -->
-          <circle cx="220" cy="220" r="105" stroke="rgba(59,91,246,0.12)" stroke-width="1"/>
-          <!-- Center glow area -->
-          <circle cx="220" cy="220" r="55" fill="rgba(37,211,102,0.06)"/>
-          <!-- Connector lines to each node -->
-          <line x1="220" y1="220" x2="220" y2="52"   stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
-          <line x1="220" y1="220" x2="352" y2="115"  stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
-          <line x1="220" y1="220" x2="387" y2="258"  stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
-          <line x1="220" y1="220" x2="294" y2="373"  stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
-          <line x1="220" y1="220" x2="146" y2="373"  stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
-          <line x1="220" y1="220" x2="53"  y2="258"  stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
-          <line x1="220" y1="220" x2="88"  y2="115"  stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
-        </svg>
-
-        <!-- Center: WhatsApp -->
-        <div class="orbit-center">
-          <svg viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
-            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-          </svg>
-        </div>
-
-        <!-- Node 1: Meta Ads — top (220, 52) -->
-        <div class="orbit-node" style="left:220px;top:52px;">
-          <div class="orbit-icon" style="background:linear-gradient(135deg,#0082fb,#0062cc);">
-            <svg viewBox="0 0 24 24" fill="white" width="22" height="22"><path d="M21.3 7.56c-.94-1.55-2.3-2.47-3.82-2.47-1.72 0-3.24 1.08-4.36 2.86a9.93 9.93 0 0 0-.62-.82C11.5 5.9 10.26 5.09 8.82 5.09c-1.52 0-2.88.92-3.82 2.47C4.07 8.93 3.5 10.72 3.5 12.62c0 1.29.2 2.48.61 3.52.73 1.89 2.06 2.96 3.62 2.96 1.13 0 2.12-.47 3.11-1.48.42-.43.83-.93 1.16-1.41l.5-.7.5.7c.33.48.74.98 1.16 1.41.99 1.01 1.98 1.48 3.11 1.48 1.56 0 2.89-1.07 3.62-2.96.41-1.04.61-2.23.61-3.52 0-1.9-.57-3.69-1.5-5.06zm-9.8 4.87c-.87-1.47-1.95-2.42-3-2.42-1.54 0-2.5 1.48-2.5 4.05 0 2.39.87 3.94 2.5 3.94 1.13 0 2.1-1 3-2.67l-1.36-2.36.36-.54zM17.48 18c1.63 0 2.5-1.55 2.5-3.94 0-2.57-.96-4.05-2.5-4.05-1.05 0-2.13.95-3 2.42l.36.54-1.37 2.36c.91 1.67 1.88 2.67 3.01 2.67z"/></svg>
-          </div>
-          <span class="orbit-label">Meta Ads</span>
-        </div>
-
-        <!-- Node 2: Messenger — top-right (352, 115) -->
-        <div class="orbit-node" style="left:352px;top:115px;">
-          <div class="orbit-icon" style="background:linear-gradient(135deg,#0084ff,#a033ff);--ic-bg:none;">
-            <svg viewBox="0 0 24 24" fill="white"><path d="M12 2C6.477 2 2 6.145 2 11.243c0 2.879 1.448 5.44 3.716 7.121V22l3.388-1.86a10.1 10.1 0 002.896.423c5.523 0 10-4.855 10-10.32C22 6.145 17.523 2 12 2zm1.016 13.88l-2.545-2.717-4.97 2.717 5.467-5.803 2.611 2.717 4.904-2.717-5.467 5.803z"/></svg>
-          </div>
-          <span class="orbit-label">Messenger</span>
-        </div>
-
-        <!-- Node 3: Google Ads — right (387, 258) -->
-        <div class="orbit-node" style="left:387px;top:258px;">
-          <div class="orbit-icon" style="--ic-bg:#fff;">
-            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-              <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-              <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
-              <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-            </svg>
-          </div>
-          <span class="orbit-label">Google Ads</span>
-        </div>
-
-        <!-- Node 4: Instagram — bottom-right (294, 373) -->
-        <div class="orbit-node" style="left:294px;top:373px;">
-          <div class="orbit-icon" style="background:linear-gradient(45deg,#f09433 0%,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888 100%);">
-            <svg viewBox="0 0 24 24" fill="white"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
-          </div>
-          <span class="orbit-label">Instagram</span>
-        </div>
-
-        <!-- Node 5: Llamadas — bottom-left (146, 373) -->
-        <div class="orbit-node" style="left:146px;top:373px;">
-          <div class="orbit-icon" style="--ic-bg:#16a34a;">
-            <svg viewBox="0 0 24 24" fill="white"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
-          </div>
-          <span class="orbit-label">Llamadas</span>
-        </div>
-
-        <!-- Node 6: RCS — left (53, 258) -->
-        <div class="orbit-node" style="left:53px;top:258px;">
-          <div class="orbit-icon" style="--ic-bg:#4f46e5;">
-            <span style="font-size:10px;font-weight:800;color:white;letter-spacing:-0.5px;">RCS</span>
-          </div>
-          <span class="orbit-label">RCS</span>
-        </div>
-
-        <!-- Node 7: Facebook — top-left (88, 115) -->
-        <div class="orbit-node" style="left:88px;top:115px;">
-          <div class="orbit-icon" style="background:#1877F2;">
-            <svg viewBox="0 0 24 24" fill="white" width="22" height="22"><path d="M17 2h-3a5 5 0 0 0-5 5v3H6v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
-          </div>
-          <span class="orbit-label">Facebook</span>
-        </div>
-
-      </div><!-- end hero-visual -->
-    </div>
-  </section>
-
-  <!-- TESTIMONIALS -->
-  <div class="testimonials-section">
-    <div class="testimonials-marquee">
-    <div class="testimonials-track">
-      <!-- Set 1 -->
-      <div class="t-card">
-        <p class="t-quote">"El sistema redujo significativamente el tiempo que el equipo dedicaba a responder consultas repetitivas."</p>
-        <div class="t-footer">
-          <div class="t-clinic">
-            <span class="t-name">Centro Médico Privado</span>
-          </div>
-          <div>
-            <div class="t-score-num">8/10</div>
-            <div class="t-score-label">Satisfacción</div>
-          </div>
-        </div>
-      </div>
-      <div class="t-card">
-        <p class="t-quote">"La agenda se volvió más predecible y organizada gracias a la automatización."</p>
-        <div class="t-footer">
-          <div class="t-clinic">
-            <span class="t-name">Consulta Especializada</span>
-          </div>
-          <div>
-            <div class="t-score-num">10/10</div>
-            <div class="t-score-label">Satisfacción</div>
-          </div>
-        </div>
-      </div>
-      <div class="t-card">
-        <p class="t-quote">"La reactivación automática permitió contactar pacientes antiguos que no volvían desde hacía meses."</p>
-        <div class="t-footer">
-          <div class="t-clinic">
-            <span class="t-name">Clínica Estética</span>
-          </div>
-          <div>
-            <div class="t-score-num">9/10</div>
-            <div class="t-score-label">Satisfacción</div>
-          </div>
-        </div>
-      </div>
-      <div class="t-card">
-        <p class="t-quote">"Tras automatizar WhatsApp, logramos responder el 100% de los mensajes fuera de horario."</p>
-        <div class="t-footer">
-          <div class="t-clinic">
-            <span class="t-name">Clínica Dental</span>
-          </div>
-          <div>
-            <div class="t-score-num">9/10</div>
-            <div class="t-score-label">Satisfacción</div>
-          </div>
-        </div>
-      </div>
-      <!-- Set 2 (duplicate for seamless loop) -->
-      <div class="t-card">
-        <p class="t-quote">"El sistema redujo significativamente el tiempo que el equipo dedicaba a responder consultas repetitivas."</p>
-        <div class="t-footer">
-          <div class="t-clinic">
-            <span class="t-name">Centro Médico Privado</span>
-          </div>
-          <div>
-            <div class="t-score-num">8/10</div>
-            <div class="t-score-label">Satisfacción</div>
-          </div>
-        </div>
-      </div>
-      <div class="t-card">
-        <p class="t-quote">"La agenda se volvió más predecible y organizada gracias a la automatización."</p>
-        <div class="t-footer">
-          <div class="t-clinic">
-            <span class="t-name">Consulta Especializada</span>
-          </div>
-          <div>
-            <div class="t-score-num">10/10</div>
-            <div class="t-score-label">Satisfacción</div>
-          </div>
-        </div>
-      </div>
-      <div class="t-card">
-        <p class="t-quote">"La reactivación automática permitió contactar pacientes antiguos que no volvían desde hacía meses."</p>
-        <div class="t-footer">
-          <div class="t-clinic">
-            <span class="t-name">Clínica Estética</span>
-          </div>
-          <div>
-            <div class="t-score-num">9/10</div>
-            <div class="t-score-label">Satisfacción</div>
-          </div>
-        </div>
-      </div>
-      <div class="t-card">
-        <p class="t-quote">"Tras automatizar WhatsApp, logramos responder el 100% de los mensajes fuera de horario."</p>
-        <div class="t-footer">
-          <div class="t-clinic">
-            <span class="t-name">Clínica Dental</span>
-          </div>
-          <div>
-            <div class="t-score-num">9/10</div>
-            <div class="t-score-label">Satisfacción</div>
-          </div>
-        </div>
-      </div>
-    </div>
+      Cliniflux
+    </a>
+    <ul class="nav-links">
+      <li><a href="#producto">Producto</a></li>
+      <li><a href="#flujo">Cómo funciona</a></li>
+      <li><a href="#precios">Precios</a></li>
+      <li><a href="/about">Nosotros</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a href="/demo" class="btn-ghost">Ver demo</a>
+      <a href="#precios" class="btn-primary">Solicitar acceso <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg></a>
     </div>
   </div>
+</nav>
 
-  <!-- STATS -->
-  <section class="stats-section">
-    <div class="container">
-      <div class="stats-grid">
-        <div class="stat-item">
-          <div class="stat-number">24<em>/7</em></div>
-          <div class="stat-label">Respuesta automática a pacientes, sin importar la hora</div>
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-inner">
+    <div class="hero-body">
+      <div class="hero-badge"><span class="badge-dot"></span> Automatización IA para clínicas</div>
+      <h1>Tu clínica<br>responde <span class="g">24/7.</span><br>Sin equipo<br>extra.</h1>
+      <p class="hero-desc">Cliniflux automatiza WhatsApp para que cada paciente reciba respuesta instantánea, agende su cita y tu equipo se centre en lo que importa.</p>
+      <div class="hero-ctas">
+        <a href="#precios" class="btn-primary" style="font-size:15px;padding:13px 26px">Solicitar demo gratuita <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg></a>
+        <a href="#flujo" class="btn-secondary" style="font-size:15px;padding:13px 26px">Ver cómo funciona</a>
+      </div>
+      <div class="hero-proof">
+        <div class="avatars">
+          <div class="av" style="background:linear-gradient(135deg,#25d366,#16a34a)">A</div>
+          <div class="av" style="background:linear-gradient(135deg,#0ea5e9,#0284c7)">B</div>
+          <div class="av" style="background:linear-gradient(135deg,#f43f5e,#e11d48)">C</div>
+          <div class="av" style="background:linear-gradient(135deg,#f97316,#ea580c)">D</div>
         </div>
-        <div class="stat-item">
-          <div class="stat-number">48<em>h</em></div>
-          <div class="stat-label">Tiempo de configuración e implementación completa</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-number"><em>+</em>40<em>%</em></div>
-          <div class="stat-label">Incremento medio en citas confirmadas al mes</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-number">100<em>%</em></div>
-          <div class="stat-label">Cobertura de mensajes fuera de horario de atención</div>
-        </div>
+        <p class="proof-text"><strong>+40 clínicas</strong> ya automatizan con Cliniflux</p>
       </div>
     </div>
-  </section>
 
-  <!-- PROBLEM / SOLUTION -->
-  <div class="two-col-section">
-    <div class="container">
-      <div class="two-col-grid">
-        <div class="col-left">
-          <div class="label">El Problema Real</div>
-          <h2 class="sec-title">Las clínicas no pierden pacientes por falta de demanda</h2>
-          <p class="sec-body">Los pierden por falta de sistema.</p>
-          <ul class="dot-list">
-            <li>Pacientes escriben fuera del horario.</li>
-            <li>Mensajes quedan sin seguimiento.</li>
-            <li>Contactos antiguos nunca se vuelven a activar.</li>
-            <li>Citas potenciales se enfrían en horas.</li>
-          </ul>
-          <p class="sec-body">Cada conversación no gestionada es una oportunidad perdida.</p>
+    <!-- DASHBOARD -->
+    <div class="hero-visual">
+      <div class="dashboard">
+        <div class="dash-bar">
+          <div class="tl tl-r"></div><div class="tl tl-y"></div><div class="tl tl-g"></div>
+          <span class="dash-bar-title">Cliniflux — Panel de control</span>
+          <div class="dash-bar-live"><div class="live-dot"></div> IA activa</div>
         </div>
-        <div class="col-right">
-          <div class="label">Claridad Tecnológica</div>
-          <h2 class="sec-title">Cliniflux convierte tu WhatsApp en un sistema automatizado de captación y gestión de citas</h2>
-          <p class="sec-body">No es un chatbot básico. Es una estructura de automatización diseñada específicamente para clínicas.</p>
-          <p class="sec-body">Integra:</p>
-          <ul class="dot-list">
-            <li>Respuesta automática inteligente</li>
-            <li>Reactivación segmentada de pacientes antiguos</li>
-            <li>Agendamiento sincronizado con calendario</li>
-            <li>Recordatorios automáticos para reducir ausencias</li>
-          </ul>
-          <p class="sec-body">Todo funcionando sin intervención manual constante.</p>
+        <div class="dash-body">
+          <div class="dash-side">
+            <div class="dash-side-hd">Conversaciones</div>
+            <div class="chat-row active">
+              <div class="ava ag">MG</div>
+              <div class="ci"><div class="cn">María García</div><div class="cp">Quiero una cita...</div></div>
+              <div class="cm"><span class="ct">2m</span><span class="ai-tag">IA</span></div>
+            </div>
+            <div class="chat-row">
+              <div class="ava ab">JM</div>
+              <div class="ci"><div class="cn">Juan Martínez</div><div class="cp">¿Tenéis ortodoncia?</div></div>
+              <div class="cm"><span class="ct">5m</span><span class="ai-tag">IA</span></div>
+            </div>
+            <div class="chat-row">
+              <div class="ava ar">AL</div>
+              <div class="ci"><div class="cn">Ana López</div><div class="cp">Confirmada para...</div></div>
+              <div class="cm"><span class="ct">12m</span><span class="ai-tag">IA</span></div>
+            </div>
+            <div class="chat-row">
+              <div class="ava ao">PS</div>
+              <div class="ci"><div class="cn">Pedro Sánchez</div><div class="cp">Muchas gracias!</div></div>
+              <div class="cm"><span class="ct">18m</span><span class="ai-tag">IA</span></div>
+            </div>
+            <div class="mini-stats">
+              <div class="ms"><div class="ms-n" style="color:var(--green)">94%</div><div class="ms-l">Resueltos</div></div>
+              <div class="ms"><div class="ms-n">1.2s</div><div class="ms-l">Resp. media</div></div>
+            </div>
+          </div>
+          <div class="dash-main">
+            <div class="dash-main-hd">
+              <div class="ava ag" style="width:34px;height:34px;font-size:11px">MG</div>
+              <div><div class="dm-name">María García</div><div class="dm-sub">Clínica Dental Norte · 2 min</div></div>
+              <div class="ai-live"><div class="live-dot"></div> IA respondiendo</div>
+            </div>
+            <div class="msgs">
+              <div class="msg mi">Hola, quería pedir una cita con el dentista 🦷</div>
+              <div class="msg mo">¡Hola María! 👋 Claro, te ayudo. ¿Para qué servicio necesitas la cita?<div class="msg-meta">✓✓ Enviado · IA</div></div>
+              <div class="msg mi">Para una limpieza, ¿tenéis mañana por la mañana?</div>
+              <div class="msg mo"><div class="typing"><div class="td"></div><div class="td"></div><div class="td"></div></div></div>
+            </div>
+            <div class="dash-input-row">
+              <div class="dash-input">Escribir respuesta manual...</div>
+              <div class="send-btn"><svg width="13" height="13" viewBox="0 0 24 24" fill="white"><path d="m22 2-7 20-4-9-9-4 20-7z"/></svg></div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   </div>
+</section>
 
-  <!-- BENEFITS / DIFFERENTIATION -->
-  <div class="two-col-section" style="border-top: none; padding-top: 0;">
-    <div class="container">
-      <div class="two-col-grid">
-        <div class="col-left">
-          <div class="label">Beneficios Medibles</div>
-          <h2 class="sec-title">Impacto operativo esperado</h2>
-          <ul class="check-list">
-            <li>Respuesta inmediata 24/7</li>
-            <li>Reducción significativa de carga administrativa</li>
-            <li>Recuperación de pacientes inactivos</li>
-            <li>Incremento sostenible de citas mensuales</li>
-            <li>Menor dependencia de llamadas telefónicas</li>
-          </ul>
-          <p class="sec-body">Las clínicas que implementan automatización estructurada observan mejoras en eficiencia operativa y conversión de consultas a cita.</p>
+<!-- LOGOS -->
+<section class="logos-section">
+  <div class="logos-lbl">Especialidades que confían en Cliniflux</div>
+  <div class="logos-mq">
+    <div class="logos-track">
+      <div class="logo-chip"><div class="lc-dot" style="background:#25d366"></div>Clínicas Dentales</div>
+      <div class="logo-chip"><div class="lc-dot" style="background:#3b82f6"></div>Centros de Estética</div>
+      <div class="logo-chip"><div class="lc-dot" style="background:#f97316"></div>Fisioterapia</div>
+      <div class="logo-chip"><div class="lc-dot" style="background:#8b5cf6"></div>Dermatología</div>
+      <div class="logo-chip"><div class="lc-dot" style="background:#f43f5e"></div>Medicina General</div>
+      <div class="logo-chip"><div class="lc-dot" style="background:#0ea5e9"></div>Psicología</div>
+      <div class="logo-chip"><div class="lc-dot" style="background:#22c55e"></div>Nutrición</div>
+      <div class="logo-chip"><div class="lc-dot" style="background:#eab308"></div>Podología</div>
+      <div class="logo-chip"><div class="lc-dot" style="background:#25d366"></div>Clínicas Dentales</div>
+      <div class="logo-chip"><div class="lc-dot" style="background:#3b82f6"></div>Centros de Estética</div>
+      <div class="logo-chip"><div class="lc-dot" style="background:#f97316"></div>Fisioterapia</div>
+      <div class="logo-chip"><div class="lc-dot" style="background:#8b5cf6"></div>Dermatología</div>
+      <div class="logo-chip"><div class="lc-dot" style="background:#f43f5e"></div>Medicina General</div>
+      <div class="logo-chip"><div class="lc-dot" style="background:#0ea5e9"></div>Psicología</div>
+      <div class="logo-chip"><div class="lc-dot" style="background:#22c55e"></div>Nutrición</div>
+      <div class="logo-chip"><div class="lc-dot" style="background:#eab308"></div>Podología</div>
+    </div>
+  </div>
+</section>
+
+<!-- PROBLEM -->
+<section class="problem-section" id="producto">
+  <div class="c">
+    <div class="reveal"><div class="label">El problema</div></div>
+    <h2 class="sec-h reveal d1">Clínicas que pierden citas<br>por no responder a tiempo</h2>
+    <p class="sec-p reveal d2">El 67% de los pacientes eligen la primera clínica que les responde. Cada minuto sin respuesta es una cita que se va a la competencia.</p>
+    <div class="prob-grid">
+      <div class="prob-col bad reveal d1">
+        <div class="col-tag bad">✕ Sin Cliniflux</div>
+        <div class="col-h">Tu equipo saturado.<br>Pacientes sin respuesta.</div>
+        <div class="pi"><span class="pi-ic">⏰</span>Mensajes de WhatsApp sin responder durante horas o días enteros</div>
+        <div class="pi"><span class="pi-ic">💸</span>Pacientes potenciales que se van directamente a la competencia</div>
+        <div class="pi"><span class="pi-ic">🔄</span>Recepcionistas gestionando decenas de preguntas repetitivas al día</div>
+        <div class="pi"><span class="pi-ic">📅</span>Citas perdidas fuera del horario de atención</div>
+        <div class="pi"><span class="pi-ic">😤</span>Equipo frustrado, pacientes insatisfechos</div>
+      </div>
+      <div class="prob-col good reveal d2">
+        <div class="col-tag good">✓ Con Cliniflux</div>
+        <div class="col-h">Respuesta instantánea.<br>Agenda siempre llena.</div>
+        <div class="pi"><span class="pi-ic">⚡</span>Respuesta automática en menos de 2 segundos, disponible 24/7</div>
+        <div class="pi"><span class="pi-ic">📈</span>+40% de citas confirmadas al primer contacto del paciente</div>
+        <div class="pi"><span class="pi-ic">🤖</span>IA que gestiona preguntas frecuentes sin intervención humana</div>
+        <div class="pi"><span class="pi-ic">🌙</span>Captación activa de citas fuera de horario laboral</div>
+        <div class="pi"><span class="pi-ic">😊</span>Equipo enfocado en pacientes, no atendiendo el móvil</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FLOW -->
+<section class="flow-section" id="flujo">
+  <div class="c">
+    <div class="flow-hd">
+      <div class="reveal"><div class="label">Automatización inteligente</div></div>
+      <h2 class="sec-h reveal d1">Del mensaje al paciente<br>atendido. Automático.</h2>
+      <p class="sec-p reveal d2">Nuestro sistema procesa cada mensaje, identifica la intención del paciente y ejecuta la acción correcta en tiempo real, sin intervención humana.</p>
+    </div>
+    <div class="flow-wrap reveal d1">
+      <div class="flow-row">
+        <div class="fn trigger">
+          <span class="fn-ic">💬</span>
+          <div class="fn-t">Paciente escribe</div>
+          <div class="fn-s">WhatsApp, cualquier hora</div>
         </div>
-        <div class="col-right">
-          <div class="label">Diferenciación</div>
-          <h2 class="sec-title">Diseñado exclusivamente para clínicas</h2>
-          <p class="sec-body">Cliniflux no es una solución genérica.</p>
-          <p class="sec-body">Está estructurado para:</p>
-          <ul class="dot-list">
-            <li>Clínicas dentales</li>
-            <li>Clínicas estéticas</li>
-            <li>Centros médicos especializados</li>
-            <li>Consultas privadas</li>
-          </ul>
-          <p class="sec-body">El sistema se adapta a tus horarios, tratamientos y flujo interno.</p>
+        <div class="fc"><div class="fc-line"></div></div>
+        <div class="fn ai">
+          <span class="fn-ic">🧠</span>
+          <div class="fn-t">IA analiza intención</div>
+          <div class="fn-s">NLP + contexto de la clínica</div>
+        </div>
+        <div class="fc"><div class="fc-line"></div></div>
+        <div class="fn act">
+          <span class="fn-ic">⚡</span>
+          <div class="fn-t">Decisión instantánea</div>
+          <div class="fn-s">Menos de 2 segundos</div>
+        </div>
+      </div>
+
+      <div class="flow-vert" style="margin-top:0">
+        <div class="flow-vert-line"></div>
+      </div>
+
+      <div class="flow-branches" style="margin-top:0">
+        <div class="flow-branch-item">
+          <div class="flow-branch-vl"></div>
+          <div class="fn oa">
+            <span class="fn-ic">📅</span>
+            <div class="fn-t">Cita agendada</div>
+            <div class="fn-s">Confirmación automática</div>
+          </div>
+        </div>
+        <div class="flow-branch-item">
+          <div class="flow-branch-vl"></div>
+          <div class="fn ob">
+            <span class="fn-ic">✅</span>
+            <div class="fn-t">Consulta resuelta</div>
+            <div class="fn-s">FAQ respondida al instante</div>
+          </div>
+        </div>
+        <div class="flow-branch-item">
+          <div class="flow-branch-vl"></div>
+          <div class="fn oc">
+            <span class="fn-ic">👤</span>
+            <div class="fn-t">Derivado al equipo</div>
+            <div class="fn-s">Solo cuando es necesario</div>
+          </div>
         </div>
       </div>
     </div>
   </div>
+</section>
 
-  <!-- PROCESS -->
-  <section class="process-section">
-    <div class="container">
-      <div class="process-header">
-        <div>
-          <div class="label">Proceso</div>
-          <h2 class="sec-title">Implementación clara y profesional</h2>
-          <p class="sec-body" style="max-width:320px;">Proceso simple. Sin interrupciones en tu operativa.</p>
-        </div>
+<!-- FEATURES -->
+<section class="features-section">
+  <div class="c">
+    <div class="reveal"><div class="label">Funcionalidades</div></div>
+    <h2 class="sec-h reveal d1">Todo lo que necesita<br>tu clínica para crecer</h2>
+    <div class="feat-grid">
+      <div class="fc-card reveal">
+        <div class="fc-ic ic-g">💬</div>
+        <h3 class="fc-t">Respuesta automática 24/7</h3>
+        <p class="fc-b">Tu clínica nunca duerme. La IA responde a cada paciente en segundos, a cualquier hora del día, incluidos fines de semana y festivos.</p>
+        <span class="fc-pill pg">⚡ Menos de 2s de respuesta</span>
       </div>
-      <div class="process-cards" id="stepsContainer">
-        <div class="step-card" data-pair="0">
-          <div class="step-label">Paso 01</div>
-          <h3>Diagnóstico inicial.</h3>
-          <p>Analizamos tu flujo actual de mensajes y citas.</p>
-        </div>
-        <div class="step-card" data-pair="0">
-          <div class="step-label">Paso 02</div>
-          <h3>Configuración personalizada.</h3>
-          <p>Adaptamos automatizaciones a tu especialidad.</p>
-        </div>
-        <div class="step-card" data-pair="1" style="display:none">
-          <div class="step-label">Paso 03</div>
-          <h3>Activación en 24–48h.</h3>
-          <p>Sistema operativo en tu WhatsApp actual.</p>
-        </div>
-        <div class="step-card" data-pair="1" style="display:none">
-          <div class="step-label">Paso 04</div>
-          <h3>Optimización continua.</h3>
-          <p>Ajustamos mensajes y flujos según resultados.</p>
-        </div>
+      <div class="fc-card reveal d1">
+        <div class="fc-ic ic-b">📅</div>
+        <h3 class="fc-t">Agenda inteligente</h3>
+        <p class="fc-b">Agendamos citas directamente en tu calendario con confirmación automática, recordatorios y gestión de cancelaciones sin intervención.</p>
+        <span class="fc-pill pb">🔗 Integración con tu calendar</span>
       </div>
-      <div class="arrows">
-        <button class="arrow" onclick="changeStep(-1)">‹</button>
-        <button class="arrow" onclick="changeStep(1)">›</button>
+      <div class="fc-card reveal d2">
+        <div class="fc-ic ic-o">📊</div>
+        <h3 class="fc-t">Reactivación de pacientes</h3>
+        <p class="fc-b">Identificamos pacientes inactivos y lanzamos campañas personalizadas por WhatsApp para recuperarlos de forma completamente automática.</p>
+        <span class="fc-pill po">📈 +30% pacientes reactivados</span>
       </div>
-    </div>
-  </section>
-
-  <!-- TECH -->
-  <section class="tech-section">
-    <div class="container">
-      <div class="label">Consultar</div>
-      <h2 class="sec-title">Tecnología con enfoque clínico</h2>
-      <p class="tech-subtitle">Tu equipo solo recibe citas confirmadas.<br>El sistema gestiona el resto.</p>
-      <div class="pills">
-        <div class="pill">Compatible con tu WhatsApp actual</div>
-        <div class="pill">Sin necesidad de cambiar número</div>
-        <div class="pill">Sin curva de aprendizaje compleja</div>
-        <div class="pill">Cumplimiento de estándares de privacidad</div>
+      <div class="fc-card reveal d1">
+        <div class="fc-ic ic-p">🔒</div>
+        <h3 class="fc-t">Cumplimiento RGPD</h3>
+        <p class="fc-b">Toda la automatización cumple con la normativa europea de protección de datos. Tus pacientes y tu clínica siempre protegidos y seguros.</p>
+        <span class="fc-pill pp">🇪🇺 Conforme RGPD</span>
+      </div>
+      <div class="fc-card reveal d2">
+        <div class="fc-ic ic-g">📋</div>
+        <h3 class="fc-t">Panel en tiempo real</h3>
+        <p class="fc-b">Visualiza todas las conversaciones, métricas de respuesta y rendimiento del sistema desde un dashboard centralizado y fácil de usar.</p>
+        <span class="fc-pill pg">📡 Datos en tiempo real</span>
+      </div>
+      <div class="fc-card reveal d3">
+        <div class="fc-ic ic-b">⚙️</div>
+        <h3 class="fc-t">Implementación en 48h</h3>
+        <p class="fc-b">Sin desarrollos complejos ni integraciones costosas. Configuramos y activamos tu sistema en 48 horas. Tú solo ves llegar las citas.</p>
+        <span class="fc-pill pb">🚀 Activo en 2 días</span>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- CONTACT -->
-  <section class="contact-section" id="contacto">
-    <div class="container">
-      <div class="contact-grid">
-        <div class="contact-left">
-          <div class="label">Consultar</div>
-          <h2 class="sec-title">Solicita una demostración privada</h2>
-          <p class="sec-body">Te mostramos exactamente cómo funcionaría el sistema aplicado a tu clínica.</p>
-        </div>
-        <form class="form" id="contactForm" onsubmit="handleSubmit(event)">
-          <div class="field">
-            <label>Nombre</label>
-            <input type="text" placeholder="Carles Esteban" required>
-          </div>
-          <div class="form-row">
-            <div class="field">
-              <label>Teléfono</label>
-              <input type="tel" placeholder="+34 633 824 000" required>
-            </div>
-            <div class="field">
-              <label>Email</label>
-              <input type="email" placeholder="contacto@clinicamolar.com" required>
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="field">
-              <label>Centro Médico</label>
-              <input type="text" placeholder="Clínica Moral">
-            </div>
-            <div class="field">
-              <label>Tipo de clínica</label>
-              <select>
-                <option value="">Seleccionar...</option>
-                <option>Clínica dental</option>
-                <option>Clínica estética</option>
-                <option>Centro médico</option>
-                <option>Consulta privada</option>
-                <option>Otra</option>
-              </select>
-            </div>
-          </div>
-          <p class="form-note">Sin compromiso. Evaluación personalizada.</p>
-          <button type="submit" class="btn-submit">Solicitar</button>
-        </form>
+<!-- STATS -->
+<section class="stats-section">
+  <div class="c">
+    <div class="stats-grid">
+      <div class="si reveal"><div class="sn"><em>24</em>/7</div><div class="sl">Disponibilidad total, sin interrupciones ni festivos</div></div>
+      <div class="si reveal d1"><div class="sn"><em>+</em>40<em>%</em></div><div class="sl">Incremento medio en citas confirmadas al mes</div></div>
+      <div class="si reveal d2"><div class="sn">48<em>h</em></div><div class="sl">Tiempo de implementación completa desde el inicio</div></div>
+      <div class="si reveal d3"><div class="sn">100<em>%</em></div><div class="sl">Mensajes respondidos fuera de horario de atención</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="t-section">
+  <div class="t-hd c">
+    <div class="reveal"><div class="label">Testimonios</div></div>
+    <h2 class="sec-h reveal d1">Lo que dicen nuestros clientes</h2>
+    <p class="sec-p reveal d2">Clínicas reales, resultados reales. Sin letra pequeña.</p>
+  </div>
+  <div class="t-mq">
+    <div class="t-track">
+      <div class="t-card"><div class="t-stars">★★★★★</div><p class="t-q">"Desde que implementamos Cliniflux, nuestra agenda está siempre llena. Los pacientes reciben respuesta inmediata y nosotros nos despreocupamos del WhatsApp por completo."</p><div class="t-auth"><div class="t-av" style="background:linear-gradient(135deg,#6366f1,#8b5cf6)">CM</div><div><div class="t-name">Carmen Molina</div><div class="t-clinic">Centro Dental Molina, Madrid</div></div></div></div>
+      <div class="t-card"><div class="t-stars">★★★★★</div><p class="t-q">"Reactivamos más de 80 pacientes inactivos en el primer mes. El ROI fue inmediato. No podría imaginar la clínica sin esta herramienta ahora mismo."</p><div class="t-auth"><div class="t-av" style="background:linear-gradient(135deg,#0ea5e9,#0284c7)">RG</div><div><div class="t-name">Roberto García</div><div class="t-clinic">Clínica Estética RG, Barcelona</div></div></div></div>
+      <div class="t-card"><div class="t-stars">★★★★★</div><p class="t-q">"Mis recepcionistas ahora se centran en atender a los pacientes presentes. El sistema gestiona WhatsApp perfectamente y sin errores. Una maravilla."</p><div class="t-auth"><div class="t-av" style="background:linear-gradient(135deg,#f43f5e,#e11d48)">LP</div><div><div class="t-name">Laura Pérez</div><div class="t-clinic">Fisio &amp; Salud, Valencia</div></div></div></div>
+      <div class="t-card"><div class="t-stars">★★★★★</div><p class="t-q">"La implementación fue increíblemente rápida. En menos de 48 horas ya teníamos el sistema funcionando y captando citas fuera de horario sin parar."</p><div class="t-auth"><div class="t-av" style="background:linear-gradient(135deg,#f97316,#ea580c)">MA</div><div><div class="t-name">Miguel Ángel Torres</div><div class="t-clinic">Derma Clinic, Sevilla</div></div></div></div>
+      <div class="t-card"><div class="t-stars">★★★★★</div><p class="t-q">"Desde que implementamos Cliniflux, nuestra agenda está siempre llena. Los pacientes reciben respuesta inmediata y nosotros nos despreocupamos del WhatsApp por completo."</p><div class="t-auth"><div class="t-av" style="background:linear-gradient(135deg,#6366f1,#8b5cf6)">CM</div><div><div class="t-name">Carmen Molina</div><div class="t-clinic">Centro Dental Molina, Madrid</div></div></div></div>
+      <div class="t-card"><div class="t-stars">★★★★★</div><p class="t-q">"Reactivamos más de 80 pacientes inactivos en el primer mes. El ROI fue inmediato. No podría imaginar la clínica sin esta herramienta ahora mismo."</p><div class="t-auth"><div class="t-av" style="background:linear-gradient(135deg,#0ea5e9,#0284c7)">RG</div><div><div class="t-name">Roberto García</div><div class="t-clinic">Clínica Estética RG, Barcelona</div></div></div></div>
+      <div class="t-card"><div class="t-stars">★★★★★</div><p class="t-q">"Mis recepcionistas ahora se centran en atender a los pacientes presentes. El sistema gestiona WhatsApp perfectamente y sin errores. Una maravilla."</p><div class="t-auth"><div class="t-av" style="background:linear-gradient(135deg,#f43f5e,#e11d48)">LP</div><div><div class="t-name">Laura Pérez</div><div class="t-clinic">Fisio &amp; Salud, Valencia</div></div></div></div>
+      <div class="t-card"><div class="t-stars">★★★★★</div><p class="t-q">"La implementación fue increíblemente rápida. En menos de 48 horas ya teníamos el sistema funcionando y captando citas fuera de horario sin parar."</p><div class="t-auth"><div class="t-av" style="background:linear-gradient(135deg,#f97316,#ea580c)">MA</div><div><div class="t-name">Miguel Ángel Torres</div><div class="t-clinic">Derma Clinic, Sevilla</div></div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="pricing-section" id="precios">
+  <div class="c">
+    <div class="pr-hd">
+      <div class="reveal"><div class="label">Precios</div></div>
+      <h2 class="sec-h reveal d1">Simple, transparente,<br>sin sorpresas</h2>
+      <p class="sec-p reveal d2">Sin permanencias. Cancela cuando quieras. Resultados desde el primer día.</p>
+    </div>
+    <div class="pr-grid">
+      <div class="pr-card reveal">
+        <div class="pr-plan">Starter</div>
+        <div class="pr-amt"><sup>€</sup>297</div>
+        <div class="pr-per">/ mes · 1 clínica</div>
+        <div class="pr-div"></div>
+        <ul class="pr-feats">
+          <li><div class="pfc">✓</div>Respuesta automática 24/7</li>
+          <li><div class="pfc">✓</div>Gestión de citas automática</li>
+          <li><div class="pfc">✓</div>Hasta 500 conversaciones/mes</li>
+          <li><div class="pfc">✓</div>Panel de control básico</li>
+          <li><div class="pfc">✓</div>Soporte por email</li>
+        </ul>
+        <a href="#" class="btn-pl btn-pl-out">Solicitar demo →</a>
+      </div>
+      <div class="pr-card hot reveal d1">
+        <div class="hot-badge">Más popular</div>
+        <div class="pr-plan">Profesional</div>
+        <div class="pr-amt"><sup>€</sup>497</div>
+        <div class="pr-per">/ mes · hasta 3 clínicas</div>
+        <div class="pr-div"></div>
+        <ul class="pr-feats">
+          <li><div class="pfc">✓</div>Todo lo de Starter</li>
+          <li><div class="pfc">✓</div>Reactivación de pacientes inactivos</li>
+          <li><div class="pfc">✓</div>Conversaciones ilimitadas</li>
+          <li><div class="pfc">✓</div>Integración con software de gestión</li>
+          <li><div class="pfc">✓</div>Campañas WhatsApp personalizadas</li>
+          <li><div class="pfc">✓</div>Soporte prioritario 24/7</li>
+        </ul>
+        <a href="#" class="btn-pl btn-pl-sol">Empezar ahora →</a>
+      </div>
+      <div class="pr-card reveal d2">
+        <div class="pr-plan">Agencia / Red</div>
+        <div class="pr-amt"><sup>€</sup>997</div>
+        <div class="pr-per">/ mes · clínicas ilimitadas</div>
+        <div class="pr-div"></div>
+        <ul class="pr-feats">
+          <li><div class="pfc">✓</div>Todo lo de Profesional</li>
+          <li><div class="pfc">✓</div>Clínicas ilimitadas</li>
+          <li><div class="pfc">✓</div>API + integraciones custom</li>
+          <li><div class="pfc">✓</div>Account manager dedicado</li>
+          <li><div class="pfc">✓</div>Onboarding personalizado</li>
+          <li><div class="pfc">✓</div>SLA garantizado</li>
+        </ul>
+        <a href="#" class="btn-pl btn-pl-out">Contactar →</a>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- FAQ -->
-  <section class="faq-section">
-    <div class="container">
-      <div class="faq-inner">
-        <div class="faq-item">
-          <button class="faq-q" onclick="toggleFaq(this)">
-            ¿Es complejo de gestionar?
-            <span class="faq-icon">+</span>
-          </button>
-          <div class="faq-body">
-            <div class="faq-body-inner">No. Nosotros realizamos la configuración completa. Tu equipo solo valida citas confirmadas.</div>
-          </div>
-        </div>
-        <div class="faq-item">
-          <button class="faq-q" onclick="toggleFaq(this)">
-            ¿Interfiere con nuestro sistema actual?
-            <span class="faq-icon">+</span>
-          </button>
-          <div class="faq-body">
-            <div class="faq-body-inner">No. Se integra sobre tu WhatsApp y calendario existentes sin alterar tus procesos actuales.</div>
-          </div>
-        </div>
-        <div class="faq-item">
-          <button class="faq-q" onclick="toggleFaq(this)">
-            ¿Cuánto tiempo tarda en implementarse?
-            <span class="faq-icon">+</span>
-          </button>
-          <div class="faq-body">
-            <div class="faq-body-inner">Entre 24 y 48 horas desde la aprobación. Incluye diagnóstico, configuración y pruebas de validación.</div>
-          </div>
-        </div>
+<!-- CTA -->
+<section class="cta-section">
+  <div class="cta-bg"></div>
+  <div class="c">
+    <div class="cta-in reveal">
+      <div class="label" style="justify-content:center">Empieza hoy</div>
+      <h2 class="sec-h" style="text-align:center">¿Tu clínica lista para<br>el siguiente nivel?</h2>
+      <p class="sec-p" style="text-align:center;margin:0 auto 32px">Solicita tu demo gratuita y te mostramos cómo funciona Cliniflux en tu clínica en menos de 30 minutos. Sin compromiso.</p>
+      <div class="cta-btns">
+        <a href="#" class="btn-primary" style="font-size:15px;padding:14px 28px">Solicitar demo gratuita →</a>
+        <a href="/demo" class="btn-secondary" style="font-size:15px;padding:14px 28px">Ver demo interactiva</a>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- FOOTER -->
-  <footer>
-    <div class="container">
-      <div class="footer-grid">
-        <div class="footer-info">
-          <p>Automatización avanzada de WhatsApp para clínicas</p>
-          <p>contacto@cliniflux.com</p>
-          <div class="footer-wordmark">cliniflux</div>
-        </div>
-        <div class="footer-links">
-          <a href="/about">About</a>
-          <a href="#contacto">Contact</a>
-          <a href="#">X (Twitter)</a>
-          <a href="#">Roles</a>
-          <a href="#">Blog</a>
-          <a href="#">Instagram</a>
-          <a href="#">Hiring</a>
-          <a href="#">Terms</a>
-          <a href="#">LinkedIn</a>
-        </div>
+<!-- FOOTER -->
+<footer>
+  <div class="c">
+    <div class="ft-inner">
+      <div class="ft-brand">
+        <a href="/" class="ft-logo">
+          <div class="logo-mark" style="width:26px;height:26px;border-radius:7px"><svg width="13" height="13" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.557 4.116 1.534 5.845L.073 23.927l6.263-1.637C8.038 23.402 9.976 24 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818c-1.898 0-3.668-.517-5.187-1.416l-.371-.22-3.851 1.006 1.026-3.75-.242-.385A9.801 9.801 0 0 1 2.182 12C2.182 6.57 6.57 2.182 12 2.182S21.818 6.57 21.818 12 17.43 21.818 12 21.818z"/></svg></div>
+          Cliniflux
+        </a>
+        <p class="ft-desc">Automatización inteligente de WhatsApp para clínicas que quieren crecer sin aumentar el equipo.</p>
       </div>
-      <div class="footer-bottom">© 2026 Cliniflux — Soluciones de automatización clínica</div>
+      <div class="ft-links">
+        <div class="ft-col"><div class="ft-col-t">Producto</div><ul><li><a href="#flujo">Cómo funciona</a></li><li><a href="#producto">Funcionalidades</a></li><li><a href="#precios">Precios</a></li><li><a href="/demo">Demo</a></li></ul></div>
+        <div class="ft-col"><div class="ft-col-t">Empresa</div><ul><li><a href="/about">Nosotros</a></li><li><a href="#">Blog</a></li><li><a href="#">Contacto</a></li><li><a href="#">Casos de uso</a></li></ul></div>
+        <div class="ft-col"><div class="ft-col-t">Legal</div><ul><li><a href="#">Privacidad</a></li><li><a href="#">Términos de uso</a></li><li><a href="#">Cookies</a></li><li><a href="#">RGPD</a></li></ul></div>
+      </div>
     </div>
-  </footer>
+    <div class="ft-bot"><p>© 2025 Cliniflux. Todos los derechos reservados.</p><p>Hecho con ❤️ en España</p></div>
+  </div>
+</footer>
 
-  <script>
-    let step = 0;
-    function changeStep(dir) {
-      step = Math.max(0, Math.min(1, step + dir));
-      document.querySelectorAll('.step-card').forEach(c => {
-        c.style.display = parseInt(c.dataset.pair) === step ? '' : 'none';
-      });
-    }
+<script>
+  // Navbar scroll
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', () => nav.classList.toggle('scrolled', scrollY > 20), {passive:true});
 
-    function toggleFaq(btn) {
-      const item = btn.closest('.faq-item');
-      const isOpen = item.classList.contains('open');
-      document.querySelectorAll('.faq-item').forEach(el => el.classList.remove('open'));
-      if (!isOpen) item.classList.add('open');
-    }
+  // Scroll reveal
+  const els = document.querySelectorAll('.reveal');
+  new IntersectionObserver((entries) => {
+    entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('on') });
+  }, {threshold: 0.1, rootMargin: '0px 0px -40px 0px'}).observe
+  ? new IntersectionObserver((entries) => {
+      entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('on') });
+    }, {threshold: 0.1, rootMargin: '0px 0px -40px 0px'})
+  : null;
 
-    async function handleSubmit(e) {
-      e.preventDefault();
-      const btn = e.target.querySelector('.btn-submit');
-      btn.textContent = 'Enviando...';
-      btn.disabled = true;
-      try {
-        const fd = new FormData(e.target);
-        await fetch('/api/demo-request', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(Object.fromEntries(fd))
-        });
-      } catch(_) {}
-      btn.textContent = 'Enviado ✓';
-      btn.style.background = '#16a34a';
-      setTimeout(() => {
-        btn.textContent = 'Solicitar';
-        btn.style.background = '';
-        btn.disabled = false;
-        e.target.reset();
-      }, 3500);
-    }
-  </script>
+  // Correct observer
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('on') });
+  }, {threshold: 0.1, rootMargin: '0px 0px -40px 0px'});
+  els.forEach(el => io.observe(el));
+</script>
 </body>
 </html>
