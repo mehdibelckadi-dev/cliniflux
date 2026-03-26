@@ -636,6 +636,69 @@
       .dp-det{display:none}
       .dp-conv-list{width:180px}
     }
+
+    /* ── PROBLEMA V2 (ElevenAgents style) ─────────────────── */
+    .pv2-section{padding:var(--sy) 0;border-top:1px solid var(--border)}
+    /* Header 2-col */
+    .pv2-hd{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:end;margin-bottom:32px}
+    .pv2-hd h2{font-size:clamp(28px,3.2vw,44px);font-weight:800;line-height:1.1;letter-spacing:-1.5px;margin:0;color:var(--text)}
+    .pv2-hd-right{display:flex;flex-direction:column;align-items:flex-start;gap:20px}
+    .pv2-hd-right p{font-size:16px;color:var(--text2);line-height:1.75;margin:0}
+    /* Top 2 cards */
+    .pv2-top{display:grid;grid-template-columns:1.15fr 1fr;gap:12px;margin-bottom:12px}
+    .pv2-card{border-radius:20px;overflow:hidden;display:flex;flex-direction:column;min-height:360px}
+    /* Left card — dark gradient with glow */
+    .pv2-left{background:#060f09;position:relative}
+    .pv2-glow1{position:absolute;top:-20%;left:-5%;width:65%;height:65%;background:radial-gradient(circle,rgba(34,197,94,0.38) 0%,transparent 65%);animation:glow-drift 7s ease-in-out infinite;pointer-events:none}
+    .pv2-glow2{position:absolute;bottom:-15%;right:0%;width:55%;height:55%;background:radial-gradient(circle,rgba(16,185,129,0.22) 0%,transparent 65%);animation:glow-drift 9s ease-in-out infinite reverse;pointer-events:none}
+    .pv2-glow3{position:absolute;top:30%;right:10%;width:40%;height:40%;background:radial-gradient(circle,rgba(234,179,8,0.10) 0%,transparent 65%);pointer-events:none}
+    @keyframes glow-drift{0%,100%{transform:translate(0,0)}50%{transform:translate(8%,12%)}}
+    /* Chat bubbles in left card */
+    .pv2-bubbles{position:relative;z-index:2;flex:1;display:flex;flex-direction:column;justify-content:center;padding:36px 32px;gap:10px}
+    .pv2-bub{max-width:72%;padding:10px 14px;border-radius:14px;font-size:13px;font-weight:500;line-height:1.5;animation:bub-in .5s ease both}
+    @keyframes bub-in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+    .pv2-bub.inc{background:rgba(255,255,255,0.12);color:rgba(255,255,255,0.9);border-radius:4px 14px 14px 14px;align-self:flex-start;backdrop-filter:blur(8px)}
+    .pv2-bub.out{background:rgba(34,197,94,0.25);color:#86efac;border:1px solid rgba(34,197,94,0.3);border-radius:14px 4px 14px 14px;align-self:flex-end;backdrop-filter:blur(8px)}
+    .pv2-bub.out.conf{background:rgba(34,197,94,0.35);border-color:rgba(34,197,94,0.5);color:#dcfce7;font-weight:600}
+    .pv2-bub-ts{font-size:9px;opacity:.5;margin-top:2px;text-align:right}
+    /* Left card bottom label */
+    .pv2-card-footer{position:relative;z-index:2;padding:20px 28px 24px;border-top:1px solid rgba(255,255,255,0.07)}
+    .pv2-card-label-dark{font-size:13px;font-weight:700;color:rgba(255,255,255,0.9);margin-bottom:4px}
+    .pv2-card-desc-dark{font-size:12px;color:rgba(255,255,255,0.45);line-height:1.5}
+    /* Right card — chart */
+    .pv2-right{background:#fff;border:1px solid var(--border)}
+    .pv2-chart-area{flex:1;padding:24px 24px 12px;display:flex;flex-direction:column;gap:12px}
+    .pv2-chart-top{display:flex;justify-content:space-between;align-items:flex-start}
+    .pv2-chart-label{font-size:12px;font-weight:600;color:var(--text2)}
+    .pv2-chart-val{font-size:32px;font-weight:800;letter-spacing:-1.5px;color:var(--text);line-height:1}
+    .pv2-chart-sub{font-size:11px;color:var(--green);font-weight:600;margin-top:3px}
+    .pv2-legend{display:flex;gap:14px}
+    .pv2-leg{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--text2)}
+    .pv2-leg-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+    .pv2-svg-wrap{flex:1;min-height:0}
+    .pv2-chart-svg{width:100%;height:100%;overflow:visible}
+    .pv2-x-labels{display:flex;justify-content:space-between;padding:4px 2px 0;font-size:9px;color:rgba(0,0,0,0.3);font-weight:500}
+    .pv2-right .pv2-card-footer{border-top:1px solid var(--border);padding:16px 24px}
+    .pv2-card-label{font-size:13px;font-weight:700;color:var(--text);margin-bottom:3px}
+    .pv2-card-desc{font-size:12px;color:var(--text2);line-height:1.5}
+    /* Bottom 3 feature cards */
+    .pv2-bottom{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+    .pv2-feat{background:#fff;border:1px solid var(--border);border-radius:20px;padding:28px;transition:border-color .2s,box-shadow .2s}
+    .pv2-feat:hover{border-color:rgba(22,163,74,0.25);box-shadow:0 4px 20px rgba(22,163,74,0.06)}
+    .pv2-feat-icon{width:40px;height:40px;background:var(--bg2);border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:20px}
+    .pv2-feat-icon svg{width:18px;height:18px}
+    .pv2-feat-label{font-size:14px;font-weight:700;color:var(--text);margin-bottom:8px}
+    .pv2-feat-desc{font-size:13px;color:var(--text2);line-height:1.65}
+    /* Responsive */
+    @media(max-width:1024px){
+      .pv2-hd{grid-template-columns:1fr}
+      .pv2-top{grid-template-columns:1fr}
+      .pv2-bottom{grid-template-columns:1fr 1fr}
+    }
+    @media(max-width:640px){
+      .pv2-bottom{grid-template-columns:1fr}
+      .pv2-card{min-height:280px}
+    }
   </style>
 </head>
 <body>
@@ -977,32 +1040,123 @@
   </div>
 </section>
 
-<!-- PROBLEM -->
-<section class="problem-section" id="producto">
+<!-- PROBLEM V2 -->
+<section class="pv2-section" id="producto">
   <div class="c">
-    <div class="reveal"><div class="label">El problema</div></div>
-    <h2 class="sec-h reveal d1">Clínicas que pierden citas<br>por no responder a tiempo</h2>
-    <p class="sec-p reveal d2">El 67% de los pacientes eligen la primera clínica que les responde. Cada minuto sin respuesta es una cita que se va a la competencia.</p>
-    <div class="prob-grid">
-      <div class="prob-col bad reveal d1">
-        <div class="col-tag bad">✕ Sin Cliniflux</div>
-        <div class="col-h">Tu equipo saturado.<br>Pacientes sin respuesta.</div>
-        <div class="pi">Mensajes de WhatsApp sin responder durante horas o días</div>
-        <div class="pi">Pacientes que se van directamente a la competencia</div>
-        <div class="pi">Recepcionistas gestionando decenas de preguntas repetitivas</div>
-        <div class="pi">Citas perdidas fuera del horario de atención</div>
-        <div class="pi">Equipo frustrado, pacientes insatisfechos</div>
+
+    <!-- Header 2-col -->
+    <div class="pv2-hd reveal">
+      <div>
+        <div class="label" style="margin-bottom:14px">El problema</div>
+        <h2>Clínicas que pierden pacientes<br>por no responder a tiempo</h2>
       </div>
-      <div class="prob-col good reveal d2">
-        <div class="col-tag good">✓ Con Cliniflux</div>
-        <div class="col-h">Respuesta instantánea.<br>Agenda siempre llena.</div>
-        <div class="pi">Respuesta automática en menos de 2 segundos, 24/7</div>
-        <div class="pi">+40% de citas confirmadas al primer contacto</div>
-        <div class="pi">IA que gestiona preguntas frecuentes sin intervención</div>
-        <div class="pi">Captación activa de citas fuera de horario laboral</div>
-        <div class="pi">Equipo enfocado en pacientes, no en el móvil</div>
+      <div class="pv2-hd-right">
+        <p>El 67% de los pacientes elige la primera clínica que les responde. Cada minuto sin respuesta es una cita que se va a la competencia — para siempre.</p>
+        <a href="#precios" class="btn-primary" style="border-radius:40px">Solicitar demo gratuita →</a>
       </div>
     </div>
+
+    <!-- Top 2 cards -->
+    <div class="pv2-top reveal d1">
+
+      <!-- Left: chat on dark gradient -->
+      <div class="pv2-card pv2-left">
+        <div class="pv2-glow1"></div>
+        <div class="pv2-glow2"></div>
+        <div class="pv2-glow3"></div>
+        <div class="pv2-bubbles">
+          <div class="pv2-bub inc">Hola, ¿tenéis hueco para una limpieza esta semana?</div>
+          <div class="pv2-bub out">¡Hola! 👋 Claro, tenemos disponibilidad el miércoles a las 10h o el jueves a las 17h. ¿Cuál te va mejor?<div class="pv2-bub-ts">IA · 1.3s</div></div>
+          <div class="pv2-bub inc">El miércoles a las 10 perfecto</div>
+          <div class="pv2-bub out conf">✅ ¡Cita confirmada! Miércoles 26 · 10:00h · Limpieza dental · Dra. Vega. Te llegará una confirmación por WhatsApp.<div class="pv2-bub-ts">IA · 0.8s</div></div>
+        </div>
+        <div class="pv2-card-footer">
+          <div class="pv2-card-label-dark">Automatización omnicanal</div>
+          <div class="pv2-card-desc-dark">Responde, agenda y confirma citas sin que tu equipo intervenga. 24 horas, 7 días.</div>
+        </div>
+      </div>
+
+      <!-- Right: SVG analytics chart -->
+      <div class="pv2-card pv2-right">
+        <div class="pv2-chart-area">
+          <div class="pv2-chart-top">
+            <div>
+              <div class="pv2-chart-label">Citas confirmadas</div>
+              <div class="pv2-chart-val">+47%</div>
+              <div class="pv2-chart-sub">↑ vs. antes de Cliniflux</div>
+            </div>
+            <div class="pv2-legend">
+              <div class="pv2-leg"><div class="pv2-leg-dot" style="background:#22c55e"></div>Con IA</div>
+              <div class="pv2-leg"><div class="pv2-leg-dot" style="background:#f97316"></div>Sin IA</div>
+            </div>
+          </div>
+          <div class="pv2-svg-wrap">
+            <svg class="pv2-chart-svg" viewBox="0 0 300 110" preserveAspectRatio="none">
+              <defs>
+                <linearGradient id="gGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#22c55e" stop-opacity=".18"/>
+                  <stop offset="100%" stop-color="#22c55e" stop-opacity="0"/>
+                </linearGradient>
+                <linearGradient id="oGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#f97316" stop-opacity=".1"/>
+                  <stop offset="100%" stop-color="#f97316" stop-opacity="0"/>
+                </linearGradient>
+              </defs>
+              <!-- Grid -->
+              <line x1="0" y1="20" x2="300" y2="20" stroke="#f1f5f9" stroke-width="1"/>
+              <line x1="0" y1="55" x2="300" y2="55" stroke="#f1f5f9" stroke-width="1"/>
+              <line x1="0" y1="90" x2="300" y2="90" stroke="#f1f5f9" stroke-width="1"/>
+              <!-- Area fills -->
+              <polygon points="0,95 42,90 85,80 128,65 171,45 214,30 257,18 300,12 300,110 0,110" fill="url(#gGrad)"/>
+              <polygon points="0,80 42,82 85,85 128,83 171,86 214,82 257,85 300,88 300,110 0,110" fill="url(#oGrad)"/>
+              <!-- Sin IA line (flat/declining) -->
+              <polyline points="0,80 42,82 85,85 128,83 171,86 214,82 257,85 300,88" fill="none" stroke="#f97316" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="4 2"/>
+              <!-- Con IA line (rising) -->
+              <polyline points="0,95 42,90 85,80 128,65 171,45 214,30 257,18 300,12" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <!-- End dots -->
+              <circle cx="300" cy="12" r="4" fill="#22c55e"/>
+              <circle cx="300" cy="88" r="3.5" fill="#f97316"/>
+              <!-- Value labels at end -->
+              <text x="290" y="9" font-size="8" fill="#16a34a" font-weight="700" font-family="Inter,sans-serif" text-anchor="end">87.4%</text>
+              <text x="290" y="96" font-size="8" fill="#ea580c" font-weight="700" font-family="Inter,sans-serif" text-anchor="end">40.1%</text>
+            </svg>
+          </div>
+          <div class="pv2-x-labels">
+            <span>Lun</span><span>Mar</span><span>Mié</span><span>Jue</span><span>Vie</span><span>Sáb</span><span>Dom</span><span>Hoy</span>
+          </div>
+        </div>
+        <div class="pv2-card-footer">
+          <div class="pv2-card-label">Analítica en tiempo real</div>
+          <div class="pv2-card-desc">Monitoriza respuestas, conversiones y citas confirmadas desde tu panel central.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom 3 feature cards -->
+    <div class="pv2-bottom reveal d2">
+      <div class="pv2-feat">
+        <div class="pv2-feat-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+        <div class="pv2-feat-label">Respuesta en &lt; 2 segundos</div>
+        <div class="pv2-feat-desc">Sin importar la hora ni el día. Tu clínica responde antes que cualquier competidor.</div>
+      </div>
+      <div class="pv2-feat">
+        <div class="pv2-feat-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <div class="pv2-feat-label">Cero errores, cero olvidos</div>
+        <div class="pv2-feat-desc">La IA nunca se cansa, nunca olvida un mensaje y nunca comete errores en la gestión de citas.</div>
+      </div>
+      <div class="pv2-feat">
+        <div class="pv2-feat-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="m9 16 2 2 4-4"/></svg>
+        </div>
+        <div class="pv2-feat-label">Agenda que se llena sola</div>
+        <div class="pv2-feat-desc">Gestiona disponibilidad, confirma citas y envía recordatorios automáticos sin intervención humana.</div>
+      </div>
+    </div>
+
   </div>
 </section>
 
