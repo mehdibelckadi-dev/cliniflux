@@ -481,9 +481,9 @@
     .nav-burger.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
     .nav-burger.open span:nth-child(2){opacity:0}
     .nav-burger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
-    .mob-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:90;opacity:0;transition:opacity .3s}
+    .mob-overlay{display:none;position:fixed;top:52px;left:0;right:0;bottom:0;background:rgba(0,0,0,0.35);z-index:90;opacity:0;transition:opacity .3s}
     .mob-overlay.on{opacity:1}
-    .mob-menu{position:fixed;top:0;right:-280px;width:260px;height:100%;background:#fff;z-index:95;padding:80px 24px 32px;display:flex;flex-direction:column;gap:24px;box-shadow:-8px 0 32px rgba(0,0,0,0.12);transition:right .35s cubic-bezier(.22,1,.36,1)}
+    .mob-menu{position:fixed;top:52px;right:-280px;width:240px;height:calc(100% - 52px);background:#fff;z-index:95;padding:20px 20px 32px;display:flex;flex-direction:column;gap:20px;box-shadow:-8px 0 32px rgba(0,0,0,0.10);transition:right .35s cubic-bezier(.22,1,.36,1)}
     .mob-menu.on{right:0}
     .mob-menu ul{list-style:none;display:flex;flex-direction:column;gap:4px}
     .mob-link{display:block;font-size:16px;font-weight:600;color:var(--text);padding:10px 0;border-bottom:1px solid var(--border);text-decoration:none}
@@ -493,6 +493,9 @@
       /* Nav */
       .nav-burger{display:flex}
       .nav-actions{display:none}
+      .nav-inner{height:52px;padding:0 16px;gap:0}
+      .nav-logo{font-size:18px;letter-spacing:-.5px}
+      .nav-burger{margin-left:auto}
 
       /* Hero */
       .hero{padding:calc(66px + 56px) 0 48px}
@@ -570,8 +573,7 @@
     <li><a href="/about" class="mob-link">Nosotros</a></li>
   </ul>
   <div class="mob-menu-actions">
-    <a href="/demo" class="btn-ghost" style="width:100%;justify-content:center">Ver demo</a>
-    <a href="#precios" class="btn-primary" style="width:100%;justify-content:center">Solicitar acceso</a>
+    <a href="#precios" class="btn-primary" style="width:100%;justify-content:center;padding:13px 22px">Solicitar demo gratuita →</a>
   </div>
 </div>
 
