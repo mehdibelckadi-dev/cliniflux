@@ -541,6 +541,43 @@
       /* FAQ */
       .faq-q{font-size:14px}
     }
+
+    /* ── DASHBOARD FIDELITY IMPROVEMENTS ──────────────────── */
+    /* Search bar */
+    .convs-search{padding:7px 10px;border-bottom:1px solid rgba(0,0,0,0.06)}
+    .convs-search input{width:100%;background:#f4f5f7;border:1px solid rgba(0,0,0,0.08);border-radius:7px;padding:5px 10px;font-size:11px;color:var(--text);font-family:inherit;outline:none}
+    .convs-search input::placeholder{color:rgba(0,0,0,0.32)}
+    /* Unread badge */
+    .c-unread{background:#ef4444;color:#fff;font-size:9px;font-weight:700;padding:0 5px;border-radius:100px;min-width:16px;text-align:center;line-height:16px}
+    /* Quick reply chips */
+    .quick-chips{display:flex;gap:5px;padding:6px 10px;border-top:1px solid rgba(0,0,0,0.06);overflow-x:auto;flex-shrink:0}
+    .quick-chips::-webkit-scrollbar{display:none}
+    .qc{font-size:10px;font-weight:600;color:var(--green);background:var(--green-dim);border:1px solid rgba(22,163,74,0.2);border-radius:100px;padding:3px 10px;white-space:nowrap;cursor:pointer;flex-shrink:0}
+    .qc:hover{background:var(--green-dim2)}
+    /* Chat header improved */
+    .chat-hd-sub{font-size:9px;color:rgba(0,0,0,0.38);margin-top:1px;display:flex;align-items:center;gap:4px}
+    .wa-dot{width:6px;height:6px;background:#25d366;border-radius:50%;flex-shrink:0}
+    /* Mini week calendar */
+    .dp-week{display:flex;gap:3px;padding:10px 14px 8px;border-bottom:1px solid rgba(0,0,0,0.07);flex-shrink:0}
+    .dp-wd{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;border-radius:8px;padding:4px 2px;transition:background .15s}
+    .dp-wd:hover{background:#f4f5f7}
+    .dp-wd-lbl{font-size:9px;font-weight:600;color:rgba(0,0,0,0.35);text-transform:uppercase}
+    .dp-wd-num{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--text)}
+    .dp-wd.today .dp-wd-lbl{color:var(--green)}
+    .dp-wd.today .dp-wd-num{background:var(--green);color:#fff}
+    .dp-wd.has-dot{position:relative}
+    .dp-wd.has-dot::after{content:'';position:absolute;bottom:3px;left:50%;transform:translateX(-50%);width:4px;height:4px;border-radius:50%;background:var(--green);opacity:.7}
+    /* Appointment slot — left color bar */
+    .dp-ag-slot{position:relative;padding-left:22px !important}
+    .slot-bar{position:absolute;left:16px;top:8px;bottom:8px;width:3px;border-radius:2px;flex-shrink:0}
+    /* KPI sparkline */
+    .dp-kpi-spark{display:flex;align-items:flex-end;gap:2px;height:22px;margin-top:6px}
+    .dp-spark-b{width:5px;border-radius:2px 2px 0 0;background:var(--green-dim2)}
+    .dp-spark-b.hi{background:var(--green)}
+    /* Chart bar labels */
+    .dp-bar-val{font-size:9px;font-weight:600;color:rgba(0,0,0,0.35);margin-bottom:3px}
+    /* AI typing label */
+    .ai-typing{font-size:10px;color:var(--green);font-weight:600;padding:4px 12px;display:flex;align-items:center;gap:5px;flex-shrink:0}
   </style>
 </head>
 <body>
@@ -620,46 +657,60 @@
           <!-- Panel 0: Conversations -->
           <div class="dash-panel dp-conv active" id="dp0">
             <div class="dp-conv-list">
-              <div class="convs-hd"><span>4 Activas</span><span class="c-ai-badge">IA ON</span></div>
+              <div class="convs-hd">
+                <span>Bandeja <span style="background:#ef4444;color:#fff;font-size:9px;font-weight:700;padding:1px 6px;border-radius:100px;margin-left:4px;vertical-align:middle">4</span></span>
+                <span class="c-ai-badge">● IA ON</span>
+              </div>
+              <div class="convs-search"><input placeholder="🔍  Buscar paciente..." readonly /></div>
               <div class="conv-item active">
                 <div class="c-ava" style="background:linear-gradient(135deg,#16a34a,#22c55e)">MG</div>
-                <div class="c-info"><div class="c-name">María García</div><div class="c-prev">Quiero pedir cita...</div></div>
-                <div class="c-meta"><span class="c-time">2m</span><span class="c-ai">IA</span></div>
+                <div class="c-info"><div class="c-name">María García</div><div class="c-prev">Quiero pedir cita para limp...</div></div>
+                <div class="c-meta"><span class="c-time">2m</span><span class="c-unread">2</span></div>
               </div>
               <div class="conv-item">
                 <div class="c-ava" style="background:linear-gradient(135deg,#0ea5e9,#0284c7)">JP</div>
-                <div class="c-info"><div class="c-name">Juan Pérez</div><div class="c-prev">¿Tenéis ortodoncia?</div></div>
-                <div class="c-meta"><span class="c-time">8m</span><span class="c-badge">3min</span></div>
+                <div class="c-info"><div class="c-name">Juan Pérez</div><div class="c-prev">¿Tenéis ortodoncia invisible?</div></div>
+                <div class="c-meta"><span class="c-time">8m</span><span class="c-ai">IA</span></div>
               </div>
               <div class="conv-item">
                 <div class="c-ava" style="background:linear-gradient(135deg,#f43f5e,#e11d48)">AL</div>
-                <div class="c-info"><div class="c-name">Ana López</div><div class="c-prev">Confirmada para mañana</div></div>
+                <div class="c-info"><div class="c-name">Ana López</div><div class="c-prev">Cita confirmada ✓ mañana 10h</div></div>
                 <div class="c-meta"><span class="c-time">17m</span><span class="c-ai">IA</span></div>
               </div>
               <div class="conv-item">
                 <div class="c-ava" style="background:linear-gradient(135deg,#f97316,#ea580c)">PS</div>
-                <div class="c-info"><div class="c-name">Pedro Sánchez</div><div class="c-prev">#2302 — Gracias!</div></div>
+                <div class="c-info"><div class="c-name">Pedro Sánchez</div><div class="c-prev">Muchas gracias, hasta pronto</div></div>
                 <div class="c-meta"><span class="c-time">23m</span><span class="c-ai">IA</span></div>
               </div>
               <div class="convs-stats">
-                <div class="cs"><div class="cs-n" style="color:var(--green)">94%</div><div class="cs-l">Resueltos</div></div>
+                <div class="cs"><div class="cs-n" style="color:var(--green)">94%</div><div class="cs-l">Resueltos IA</div></div>
                 <div class="cs"><div class="cs-n">1.2s</div><div class="cs-l">Resp. media</div></div>
               </div>
             </div>
             <div class="dp-conv-chat">
               <div class="chat-hd">
-                <div class="chat-hd-title">Solicitud de cita dental...</div>
+                <div class="c-ava" style="background:linear-gradient(135deg,#16a34a,#22c55e);width:28px;height:28px;font-size:10px;flex-shrink:0">MG</div>
+                <div style="flex:1;min-width:0">
+                  <div class="chat-hd-title">María García</div>
+                  <div class="chat-hd-sub"><span class="wa-dot"></span>WhatsApp · IA respondiendo</div>
+                </div>
                 <div class="chat-status">En progreso</div>
               </div>
               <div class="dp-msgs">
                 <div class="msg mi">Hola, quería pedir una cita 🦷</div>
-                <div class="msg mo">¡Hola María! 👋 Claro. ¿Para qué servicio?<div class="msg-ts">Visto · 9min · IA</div></div>
-                <div class="msg mi">Para una limpieza, ¿tenéis mañana?</div>
-                <div class="msg mo-green">✅ Disponibilidad mañana a las 10:00h. ¿Confirmo?<div class="msg-ts">Visto · 4min · IA</div></div>
+                <div class="msg mo">¡Hola María! 👋 Claro, con gusto. ¿Para qué servicio?<div class="msg-ts">Visto · 9min · IA</div></div>
+                <div class="msg mi">Para una limpieza, ¿tenéis hueco mañana?</div>
+                <div class="msg mo-green">✅ Tenemos disponibilidad mañana a las 10:00h con la Dra. Vega. ¿Confirmo la cita?<div class="msg-ts">Visto · 4min · IA</div></div>
                 <div class="msg mi"><div class="typing"><div class="td"></div><div class="td"></div><div class="td"></div></div></div>
               </div>
+              <div class="quick-chips">
+                <div class="qc">✓ Confirmar cita</div>
+                <div class="qc">📅 Ver disponibilidad</div>
+                <div class="qc">📍 Enviar dirección</div>
+                <div class="qc">ℹ️ Info servicio</div>
+              </div>
               <div class="dash-input-row">
-                <div class="dash-input">Escribir respuesta...</div>
+                <div class="dash-input">Escribir respuesta manual...</div>
                 <div class="send-btn"><svg width="12" height="12" viewBox="0 0 24 24" fill="white"><path d="m22 2-7 20-4-9-9-4 20-7z"/></svg></div>
               </div>
             </div>
@@ -677,33 +728,42 @@
                 <span class="dp-ag-lbl">citas hoy</span>
               </div>
             </div>
+            <div class="dp-week">
+              <div class="dp-wd"><div class="dp-wd-lbl">L</div><div class="dp-wd-num">23</div></div>
+              <div class="dp-wd has-dot"><div class="dp-wd-lbl">M</div><div class="dp-wd-num">24</div></div>
+              <div class="dp-wd today"><div class="dp-wd-lbl">X</div><div class="dp-wd-num">25</div></div>
+              <div class="dp-wd has-dot"><div class="dp-wd-lbl">J</div><div class="dp-wd-num">26</div></div>
+              <div class="dp-wd has-dot"><div class="dp-wd-lbl">V</div><div class="dp-wd-num">27</div></div>
+              <div class="dp-wd"><div class="dp-wd-lbl">S</div><div class="dp-wd-num">28</div></div>
+              <div class="dp-wd"><div class="dp-wd-lbl">D</div><div class="dp-wd-num">29</div></div>
+            </div>
             <div class="dp-ag-body"><div class="dp-ag-list" style="flex:1">
-              <div class="dp-ag-slot">
+              <div class="dp-ag-slot"><div class="slot-bar" style="background:#16a34a"></div>
                 <div class="dp-ag-time">09:00</div>
                 <div class="dp-ag-info"><div class="dp-ag-name">Laura Martínez</div><div class="dp-ag-svc">Revisión dental · Dr. Ruiz</div></div>
                 <div class="dp-ag-badge conf">✓ Confirmada</div>
               </div>
-              <div class="dp-ag-slot">
+              <div class="dp-ag-slot"><div class="slot-bar" style="background:#0ea5e9"></div>
                 <div class="dp-ag-time">10:00</div>
                 <div class="dp-ag-info"><div class="dp-ag-name">María García</div><div class="dp-ag-svc">Limpieza dental · Dra. Vega</div></div>
                 <div class="dp-ag-badge conf">✓ Confirmada</div>
               </div>
-              <div class="dp-ag-slot">
+              <div class="dp-ag-slot"><div class="slot-bar" style="background:#f59e0b"></div>
                 <div class="dp-ag-time">11:30</div>
                 <div class="dp-ag-info"><div class="dp-ag-name">Carlos Ruiz</div><div class="dp-ag-svc">Ortodoncia · Dr. López</div></div>
                 <div class="dp-ag-badge pend">● Pendiente</div>
               </div>
-              <div class="dp-ag-slot">
+              <div class="dp-ag-slot"><div class="slot-bar" style="background:#0ea5e9"></div>
                 <div class="dp-ag-time">12:00</div>
                 <div class="dp-ag-info"><div class="dp-ag-name">Ana Sánchez</div><div class="dp-ag-svc">Blanqueamiento · Dra. Vega</div></div>
                 <div class="dp-ag-badge conf">✓ Confirmada</div>
               </div>
-              <div class="dp-ag-slot">
+              <div class="dp-ag-slot"><div class="slot-bar" style="background:#16a34a"></div>
                 <div class="dp-ag-time">16:00</div>
                 <div class="dp-ag-info"><div class="dp-ag-name">Pedro Alonso</div><div class="dp-ag-svc">Extracción · Dr. Ruiz</div></div>
                 <div class="dp-ag-badge conf">✓ Confirmada</div>
               </div>
-              <div class="dp-ag-slot">
+              <div class="dp-ag-slot"><div class="slot-bar" style="background:#f59e0b"></div>
                 <div class="dp-ag-time">17:30</div>
                 <div class="dp-ag-info"><div class="dp-ag-name">Isabel Torres</div><div class="dp-ag-svc">Primera visita · Dr. López</div></div>
                 <div class="dp-ag-badge pend">● Pendiente</div>
@@ -721,36 +781,40 @@
           <div class="dash-panel dp-metrics" id="dp2">
             <div class="dp-met-kpis">
               <div class="dp-kpi">
-                <div class="dp-kpi-n">342</div>
                 <div class="dp-kpi-l">Mensajes / semana</div>
-                <div class="dp-kpi-trend up">↑ 18%</div>
+                <div class="dp-kpi-n">342</div>
+                <div class="dp-kpi-spark"><div class="dp-spark-b" style="height:40%"></div><div class="dp-spark-b" style="height:55%"></div><div class="dp-spark-b" style="height:45%"></div><div class="dp-spark-b" style="height:70%"></div><div class="dp-spark-b" style="height:60%"></div><div class="dp-spark-b hi" style="height:100%"></div></div>
+                <div class="dp-kpi-trend up">↑ 18% vs semana anterior</div>
               </div>
               <div class="dp-kpi">
-                <div class="dp-kpi-n" style="color:var(--green)">94%</div>
                 <div class="dp-kpi-l">Resolución IA</div>
-                <div class="dp-kpi-trend up">↑ 3pts</div>
+                <div class="dp-kpi-n" style="color:var(--green)">94%</div>
+                <div class="dp-kpi-spark"><div class="dp-spark-b" style="height:75%"></div><div class="dp-spark-b" style="height:80%"></div><div class="dp-spark-b" style="height:78%"></div><div class="dp-spark-b" style="height:85%"></div><div class="dp-spark-b" style="height:90%"></div><div class="dp-spark-b hi" style="height:100%"></div></div>
+                <div class="dp-kpi-trend up">↑ 3 puntos</div>
               </div>
               <div class="dp-kpi">
-                <div class="dp-kpi-n">1.2s</div>
                 <div class="dp-kpi-l">Tiempo respuesta</div>
-                <div class="dp-kpi-trend down">↓ 0.3s</div>
+                <div class="dp-kpi-n">1.2s</div>
+                <div class="dp-kpi-spark"><div class="dp-spark-b hi" style="height:100%"></div><div class="dp-spark-b" style="height:85%"></div><div class="dp-spark-b" style="height:70%"></div><div class="dp-spark-b" style="height:55%"></div><div class="dp-spark-b" style="height:45%"></div><div class="dp-spark-b" style="height:35%"></div></div>
+                <div class="dp-kpi-trend down">↓ 0.3s mejor</div>
               </div>
               <div class="dp-kpi">
-                <div class="dp-kpi-n">47</div>
                 <div class="dp-kpi-l">Citas confirmadas</div>
-                <div class="dp-kpi-trend up">↑ 12</div>
+                <div class="dp-kpi-n">47</div>
+                <div class="dp-kpi-spark"><div class="dp-spark-b" style="height:50%"></div><div class="dp-spark-b" style="height:60%"></div><div class="dp-spark-b" style="height:55%"></div><div class="dp-spark-b" style="height:75%"></div><div class="dp-spark-b" style="height:80%"></div><div class="dp-spark-b hi" style="height:100%"></div></div>
+                <div class="dp-kpi-trend up">↑ 12 este mes</div>
               </div>
             </div>
             <div class="dp-met-chart-area">
               <div class="dp-met-chart-title">Actividad — últimos 7 días</div>
               <div class="dp-chart">
-                <div class="dp-bar-wrap"><div class="dp-bar" style="--h:55%"></div><div class="dp-bar-lbl">L</div></div>
-                <div class="dp-bar-wrap"><div class="dp-bar" style="--h:70%"></div><div class="dp-bar-lbl">M</div></div>
-                <div class="dp-bar-wrap"><div class="dp-bar" style="--h:48%"></div><div class="dp-bar-lbl">X</div></div>
-                <div class="dp-bar-wrap"><div class="dp-bar" style="--h:88%"></div><div class="dp-bar-lbl">J</div></div>
-                <div class="dp-bar-wrap"><div class="dp-bar hi" style="--h:100%"></div><div class="dp-bar-lbl">V</div></div>
-                <div class="dp-bar-wrap"><div class="dp-bar" style="--h:32%"></div><div class="dp-bar-lbl">S</div></div>
-                <div class="dp-bar-wrap"><div class="dp-bar" style="--h:18%"></div><div class="dp-bar-lbl">D</div></div>
+                <div class="dp-bar-wrap"><div class="dp-bar-val">41</div><div class="dp-bar" style="--h:55%"></div><div class="dp-bar-lbl">L</div></div>
+                <div class="dp-bar-wrap"><div class="dp-bar-val">52</div><div class="dp-bar" style="--h:70%"></div><div class="dp-bar-lbl">M</div></div>
+                <div class="dp-bar-wrap"><div class="dp-bar-val">36</div><div class="dp-bar" style="--h:48%"></div><div class="dp-bar-lbl">X</div></div>
+                <div class="dp-bar-wrap"><div class="dp-bar-val">66</div><div class="dp-bar" style="--h:88%"></div><div class="dp-bar-lbl">J</div></div>
+                <div class="dp-bar-wrap"><div class="dp-bar-val">75</div><div class="dp-bar hi" style="--h:100%"></div><div class="dp-bar-lbl">V</div></div>
+                <div class="dp-bar-wrap"><div class="dp-bar-val">24</div><div class="dp-bar" style="--h:32%"></div><div class="dp-bar-lbl">S</div></div>
+                <div class="dp-bar-wrap"><div class="dp-bar-val">14</div><div class="dp-bar" style="--h:18%"></div><div class="dp-bar-lbl">D</div></div>
               </div>
             </div>
             <div class="dp-met-sources">
