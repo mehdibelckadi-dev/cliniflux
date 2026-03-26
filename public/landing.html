@@ -474,6 +474,70 @@
     /* RESPONSIVE SHOWCASE */
     @media(max-width:1024px){.showcase-grid{grid-template-columns:1fr;gap:36px}.showcase-grid.rev{direction:ltr}}
 
+
+    /* ── HAMBURGER & MOBILE MENU ───────────────────────────── */
+    .nav-burger{display:none;flex-direction:column;justify-content:center;gap:5px;background:none;border:none;cursor:pointer;padding:4px;margin-left:auto}
+    .nav-burger span{display:block;width:22px;height:2px;background:var(--text);border-radius:2px;transition:all .3s}
+    .nav-burger.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+    .nav-burger.open span:nth-child(2){opacity:0}
+    .nav-burger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+    .mob-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:90;opacity:0;transition:opacity .3s}
+    .mob-overlay.on{opacity:1}
+    .mob-menu{position:fixed;top:0;right:-280px;width:260px;height:100%;background:#fff;z-index:95;padding:80px 24px 32px;display:flex;flex-direction:column;gap:24px;box-shadow:-8px 0 32px rgba(0,0,0,0.12);transition:right .35s cubic-bezier(.22,1,.36,1)}
+    .mob-menu.on{right:0}
+    .mob-menu ul{list-style:none;display:flex;flex-direction:column;gap:4px}
+    .mob-link{display:block;font-size:16px;font-weight:600;color:var(--text);padding:10px 0;border-bottom:1px solid var(--border);text-decoration:none}
+    .mob-menu-actions{display:flex;flex-direction:column;gap:10px;margin-top:auto}
+
+    @media(max-width:640px){
+      /* Nav */
+      .nav-burger{display:flex}
+      .nav-actions{display:none}
+
+      /* Hero */
+      .hero{padding:calc(66px + 56px) 0 48px}
+      .hero-inner{padding:0 var(--px);gap:40px}
+      .hero h1{font-size:38px;letter-spacing:-1.5px;line-height:1.12}
+      .hero-desc{font-size:15px;margin-bottom:28px}
+      .hero-ctas{flex-direction:column;align-items:stretch;width:100%;gap:10px}
+      .hero-ctas a{text-align:center;justify-content:center;min-width:0 !important;width:100% !important}
+      .hero-proof{flex-wrap:wrap;justify-content:center;gap:8px}
+
+      /* Dashboard – simplify for mobile */
+      .dash-tabs{flex-wrap:nowrap;gap:6px}
+      .dash-tab{font-size:11px;padding:6px 12px}
+      .dash-panels{height:420px}
+      .dash-icons{display:none}
+      .dash-body{grid-template-columns:1fr !important}
+      .dash-conv-list{display:none}
+      .dash-details{display:none}
+      .dash-main{border-radius:var(--r-xl);overflow:hidden}
+
+      /* Features */
+      .feat-grid{grid-template-columns:1fr}
+
+      /* Flow */
+      .flow-row{flex-direction:column;align-items:center;gap:8px}
+      .fc{transform:rotate(90deg);margin:0}
+      .fn{min-width:160px;padding:12px 18px}
+
+      /* Pricing */
+      .pr-grid{grid-template-columns:1fr;max-width:340px;margin:0 auto}
+
+      /* Logos */
+      .logo-chip{font-size:14px;padding:0 24px}
+
+      /* Footer */
+      .ft-inner{flex-direction:column;gap:32px}
+      .ft-links{flex-direction:column;gap:20px}
+
+      /* Testimonials */
+      .t-track{gap:16px}
+      .t-card{min-width:280px;padding:20px}
+
+      /* FAQ */
+      .faq-q{font-size:14px}
+    }
   </style>
 </head>
 <body>
@@ -488,12 +552,28 @@
       <li><a href="#precios">Precios</a></li>
       <li><a href="/about">Nosotros</a></li>
     </ul>
+    <button class="nav-burger" id="navBurger" aria-label="Menú"><span></span><span></span><span></span></button>
     <div class="nav-actions">
       <a href="/demo" class="btn-ghost">Ver demo</a>
       <a href="#precios" class="btn-primary">Solicitar acceso <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg></a>
     </div>
   </div>
 </nav>
+
+<!-- MOBILE MENU -->
+<div class="mob-overlay" id="mobOverlay"></div>
+<div class="mob-menu" id="mobMenu">
+  <ul>
+    <li><a href="#producto" class="mob-link">Producto</a></li>
+    <li><a href="#flujo" class="mob-link">Cómo funciona</a></li>
+    <li><a href="#precios" class="mob-link">Precios</a></li>
+    <li><a href="/about" class="mob-link">Nosotros</a></li>
+  </ul>
+  <div class="mob-menu-actions">
+    <a href="/demo" class="btn-ghost" style="width:100%;justify-content:center">Ver demo</a>
+    <a href="#precios" class="btn-primary" style="width:100%;justify-content:center">Solicitar acceso</a>
+  </div>
+</div>
 
 <!-- HERO -->
 <section class="hero">
@@ -1135,5 +1215,18 @@
     startCycle();
   })();
 </script>
+
+  <script>
+    (function(){
+      var burger = document.getElementById('navBurger');
+      var menu = document.getElementById('mobMenu');
+      var overlay = document.getElementById('mobOverlay');
+      function openMenu(){burger.classList.add('open');menu.classList.add('on');overlay.style.display='block';setTimeout(function(){overlay.classList.add('on')},10)}
+      function closeMenu(){burger.classList.remove('open');menu.classList.remove('on');overlay.classList.remove('on');setTimeout(function(){overlay.style.display='none'},300)}
+      if(burger){burger.addEventListener('click',function(){menu.classList.contains('on')?closeMenu():openMenu()})}
+      if(overlay){overlay.addEventListener('click',closeMenu)}
+      document.querySelectorAll('.mob-link').forEach(function(l){l.addEventListener('click',closeMenu)})
+    })();
+  </script>
 </body>
 </html>
