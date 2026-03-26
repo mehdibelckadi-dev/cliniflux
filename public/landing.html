@@ -81,31 +81,21 @@
     /* ── DASHBOARD INTERCOM STYLE ── */
     .hero-visual{width:100%;animation:float 6s ease-in-out infinite}
     @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
-    .dashboard{
-      background:#f0ede8;
-      border-radius:20px;
-      overflow:hidden;
-      box-shadow:0 40px 100px rgba(0,0,0,0.14),0 8px 24px rgba(0,0,0,0.07),0 0 0 1px rgba(0,0,0,0.05);
-    }
+    .dashboard{background:#f8f9fb;border-radius:20px;overflow:hidden;box-shadow:0 50px 120px rgba(0,0,0,0.18),0 12px 32px rgba(0,0,0,0.08),0 0 0 1px rgba(0,0,0,0.05)}
     /* Chrome top bar */
-    .dash-chrome{
-      background:#f0ede8;
-      padding:10px 14px;
-      display:flex;align-items:center;gap:7px;
-      border-bottom:1px solid rgba(0,0,0,0.07);
-    }
+    .dash-chrome{background:#fff;padding:9px 14px;display:flex;align-items:center;gap:8px;border-bottom:1px solid rgba(0,0,0,0.08)}
+    .dash-chrome-url{flex:1;margin:0 12px;background:#f4f5f7;border:1px solid rgba(0,0,0,0.08);border-radius:7px;padding:4px 10px;font-size:10px;color:rgba(0,0,0,0.38);letter-spacing:.1px;display:flex;align-items:center;gap:5px}
+    .chrome-lock{width:9px;height:9px;opacity:.4}
     .tl{width:11px;height:11px;border-radius:50%}
     .tl-r{background:#ff5f57}.tl-y{background:#febc2e}.tl-g{background:#28c840}
     .dash-chrome-title{margin-left:10px;font-size:11px;font-weight:600;color:rgba(0,0,0,0.4);letter-spacing:.2px}
     .dash-chrome-live{margin-left:auto;display:flex;align-items:center;gap:5px;font-size:11px;color:var(--green);font-weight:600}
     .live-dot{width:6px;height:6px;background:var(--green);border-radius:50%;animation:pulse 2s ease infinite}
     /* Dashboard tabs */
-    .dash-tabs{display:flex;gap:2px;padding:7px 10px;background:#f0ede8;border-bottom:1px solid rgba(0,0,0,0.07)}
-    .dash-tab{font-family:inherit;font-size:11px;font-weight:600;color:rgba(0,0,0,0.4);background:none;border:none;padding:5px 12px;border-radius:6px;cursor:pointer;transition:background .15s,color .15s}
-    .dash-tab:hover{background:rgba(0,0,0,0.06);color:rgba(0,0,0,0.65)}
-    .dash-tab.active{background:#fff;color:#0f172a;box-shadow:0 1px 3px rgba(0,0,0,0.12)}
+    .dash-tabs{display:none}
+    .dash-tab{display:none}
     /* Dashboard panels container */
-    .dash-panels{position:relative;height:540px;overflow:hidden}
+    .dash-panels{position:relative;height:560px;overflow:hidden}
     .dash-panel{position:absolute;inset:0;opacity:0;transition:opacity .45s ease;pointer-events:none;display:flex;flex-direction:column}
     .dash-panel.active{opacity:1;pointer-events:all}
     /* Panel 0: Conversations (row layout) */
@@ -578,6 +568,74 @@
     .dp-bar-val{font-size:9px;font-weight:600;color:rgba(0,0,0,0.35);margin-bottom:3px}
     /* AI typing label */
     .ai-typing{font-size:10px;color:var(--green);font-weight:600;padding:4px 12px;display:flex;align-items:center;gap:5px;flex-shrink:0}
+
+    /* ── DASHBOARD NEXT LEVEL ─────────────────────────── */
+    .dash-layout{display:flex;height:560px}
+    /* Dark sidebar */
+    .dash-nav{width:54px;background:#0f172a;display:flex;flex-direction:column;align-items:center;padding:12px 0;gap:4px;flex-shrink:0}
+    .dns-brand{width:32px;height:32px;border-radius:10px;background:var(--green);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;margin-bottom:12px;letter-spacing:-.3px}
+    .dni{width:38px;height:38px;border-radius:10px;border:none;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s;position:relative;flex-shrink:0}
+    .dni:hover{background:rgba(255,255,255,0.08)}
+    .dni.active{background:rgba(34,197,94,0.18)}
+    .dni svg{width:16px;height:16px;opacity:.45;transition:opacity .15s}
+    .dni.active svg{opacity:1}
+    .dni.active svg path,.dni.active svg rect,.dni.active svg circle,.dni.active svg polyline{stroke:#22c55e}
+    .dni-badge{position:absolute;top:6px;right:6px;background:#ef4444;color:#fff;font-size:8px;font-weight:700;min-width:14px;height:14px;border-radius:100px;display:flex;align-items:center;justify-content:center;padding:0 3px;border:1.5px solid #0f172a}
+    .dns-divider{width:24px;height:1px;background:rgba(255,255,255,0.1);margin:8px 0}
+    .dns-bottom{margin-top:auto;display:flex;flex-direction:column;align-items:center;gap:6px}
+    .dns-ava{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#16a34a,#22c55e);font-size:10px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center}
+    .dns-settings svg{opacity:.3}
+    /* Dashboard content */
+    .dash-content{flex:1;display:flex;flex-direction:column;overflow:hidden;background:#fff}
+    /* WhatsApp-style message tails */
+    .msg{position:relative}
+    .mi{border-radius:3px 14px 14px 14px !important}
+    .mo{border-radius:14px 3px 14px 14px !important}
+    .mo-green{border-radius:14px 3px 14px 14px !important}
+    /* Patient details panel */
+    .dp-det{width:168px;border-left:1px solid rgba(0,0,0,0.07);background:#fafbfc;display:flex;flex-direction:column;overflow:hidden;flex-shrink:0}
+    .dp-det-hd{padding:10px 12px 6px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:rgba(0,0,0,0.35);border-bottom:1px solid rgba(0,0,0,0.06)}
+    .dp-det-profile{padding:14px 12px 10px;display:flex;flex-direction:column;align-items:center;text-align:center;border-bottom:1px solid rgba(0,0,0,0.06)}
+    .dp-det-ava{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#16a34a,#22c55e);font-size:13px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center;margin-bottom:7px}
+    .dp-det-name{font-size:12px;font-weight:700;color:var(--text);margin-bottom:2px}
+    .dp-det-phone{font-size:10px;color:rgba(0,0,0,0.4);margin-bottom:6px}
+    .dp-det-wa{display:flex;align-items:center;gap:4px;font-size:9px;font-weight:600;color:#25d366;background:#f0fdf4;padding:3px 8px;border-radius:100px}
+    .dp-det-sect{padding:8px 12px 4px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:rgba(0,0,0,0.3)}
+    .dp-det-apt{margin:0 10px 8px;background:#f0fdf4;border:1px solid rgba(22,163,74,0.15);border-radius:8px;padding:8px 10px}
+    .dp-det-apt-t{font-size:11px;font-weight:700;color:var(--text);margin-bottom:1px}
+    .dp-det-apt-s{font-size:10px;color:rgba(0,0,0,0.4)}
+    .dp-det-hist-item{padding:5px 12px;font-size:10px;color:rgba(0,0,0,0.5);border-bottom:1px solid rgba(0,0,0,0.04);display:flex;justify-content:space-between;align-items:center}
+    .dp-det-hist-item span{font-size:9px;color:var(--green);font-weight:600}
+    .dp-det-ai-box{margin:8px 10px;background:#fff7ed;border:1px solid rgba(251,146,60,0.2);border-radius:8px;padding:8px 10px}
+    .dp-det-ai-lbl{font-size:9px;font-weight:700;color:#ea580c;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px;display:flex;align-items:center;gap:4px}
+    .dp-det-ai-val{font-size:11px;color:#9a3412;font-weight:600;margin-bottom:2px}
+    .dp-det-ai-conf{font-size:10px;color:rgba(0,0,0,0.4)}
+    /* Metrics redesign */
+    .dp-met-area{flex:1;min-height:0;display:flex;flex-direction:column;gap:2px}
+    .dp-area-chart{flex:1;display:flex;align-items:flex-end;gap:6px;padding:0 4px;border-bottom:1px solid rgba(0,0,0,0.06);position:relative}
+    .dp-area-chart::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:linear-gradient(to bottom,rgba(22,163,74,0.05) 0%,transparent 100%);pointer-events:none;border-radius:4px}
+    .dp-bar-wrap{display:flex;flex-direction:column;align-items:center;gap:3px;flex:1}
+    .dp-bar{width:100%;background:var(--green-dim2);border-radius:5px 5px 0 0;height:var(--h);transition:background .2s;min-height:4px}
+    .dp-bar.hi{background:linear-gradient(to top,#16a34a,#22c55e)}
+    .dp-bar-lbl{font-size:9px;color:rgba(0,0,0,0.3);font-weight:500}
+    .dp-bar-val{font-size:9px;font-weight:600;color:rgba(0,0,0,0.3)}
+    .dp-met-bottom{display:flex;gap:6px;flex-shrink:0}
+    .dp-met-src{flex:1;background:#f4f5f7;border-radius:8px;padding:8px 10px}
+    .dp-met-src-name{font-size:9px;font-weight:700;color:rgba(0,0,0,0.4);margin-bottom:5px;display:flex;align-items:center;gap:4px}
+    .dp-met-src-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+    .dp-met-src-bar{height:4px;background:rgba(0,0,0,0.08);border-radius:2px;overflow:hidden;margin-bottom:3px}
+    .dp-met-src-fill{height:100%;border-radius:2px}
+    .dp-met-src-pct{font-size:13px;font-weight:800;letter-spacing:-0.5px;color:var(--text)}
+
+    /* Mobile: hide sidebar, back to simple layout */
+    @media(max-width:640px){
+      .dash-layout{height:420px}
+      .dash-nav{width:40px;padding:8px 0}
+      .dns-brand{width:26px;height:26px;font-size:10px}
+      .dni{width:32px;height:32px}
+      .dp-det{display:none}
+      .dp-conv-list{width:180px}
+    }
   </style>
 </head>
 <body>
@@ -642,15 +700,34 @@
         <!-- Chrome -->
         <div class="dash-chrome">
           <div class="tl tl-r"></div><div class="tl tl-y"></div><div class="tl tl-g"></div>
-          <span class="dash-chrome-title">Cliniflux — Panel de control</span>
+          <div class="dash-chrome-url"><svg class="chrome-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>app.cliniflux.com</div>
           <div class="dash-chrome-live"><div class="live-dot"></div>IA activa</div>
         </div>
-        <!-- Tabs -->
-        <div class="dash-tabs">
-          <button class="dash-tab active" data-panel="0">💬 Conversaciones</button>
-          <button class="dash-tab" data-panel="1">📅 Agenda</button>
-          <button class="dash-tab" data-panel="2">📊 Métricas</button>
-        </div>
+        <!-- Layout: sidebar + content -->
+        <div class="dash-layout">
+          <!-- Dark sidebar nav -->
+          <div class="dash-nav">
+            <div class="dns-brand">CF</div>
+            <button class="dni dash-tab active" data-panel="0" title="Conversaciones">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              <span class="dni-badge">4</span>
+            </button>
+            <button class="dni dash-tab" data-panel="1" title="Agenda">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            </button>
+            <button class="dni dash-tab" data-panel="2" title="Métricas">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            </button>
+            <div class="dns-divider"></div>
+            <div class="dns-bottom">
+              <div class="dni dns-settings">
+                <svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+              </div>
+              <div class="dns-ava">Dr</div>
+            </div>
+          </div>
+          <!-- Content -->
+          <div class="dash-content">
         <!-- Panels -->
         <div class="dash-panels">
 
@@ -712,6 +789,30 @@
               <div class="dash-input-row">
                 <div class="dash-input">Escribir respuesta manual...</div>
                 <div class="send-btn"><svg width="12" height="12" viewBox="0 0 24 24" fill="white"><path d="m22 2-7 20-4-9-9-4 20-7z"/></svg></div>
+              </div>
+            </div>
+            <div class="dp-det">
+              <div class="dp-det-hd">Paciente</div>
+              <div class="dp-det-profile">
+                <div class="dp-det-ava">MG</div>
+                <div class="dp-det-name">María García</div>
+                <div class="dp-det-phone">+34 612 345 678</div>
+                <div class="dp-det-wa"><svg width="9" height="9" viewBox="0 0 24 24" fill="#25d366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M11.9 0C5.336 0 0 5.291 0 11.8c0 2.085.548 4.04 1.503 5.73L0 24l6.639-1.737A11.91 11.91 0 0 0 11.9 23.6C18.464 23.6 24 18.309 24 11.8 24 5.291 18.464 0 11.9 0zm0 21.6a9.9 9.9 0 0 1-5.035-1.374l-.361-.214-3.742.978.999-3.629-.235-.374A9.737 9.737 0 0 1 2 11.8C2 6.395 6.44 2 11.9 2 17.36 2 21.8 6.395 21.8 11.8c0 5.405-4.44 9.8-9.9 9.8z"/></svg>WhatsApp</div>
+              </div>
+              <div class="dp-det-sect">Próxima cita</div>
+              <div class="dp-det-apt">
+                <div class="dp-det-apt-t">Mañana · 10:00h</div>
+                <div class="dp-det-apt-s">Limpieza · Dra. Vega</div>
+              </div>
+              <div class="dp-det-sect">Historial</div>
+              <div class="dp-det-hist-item">Mar 26 · Revisión<span>✓</span></div>
+              <div class="dp-det-hist-item">Ene 26 · Limpieza<span>✓</span></div>
+              <div class="dp-det-hist-item">Nov 25 · Ortodoncia<span>✓</span></div>
+              <div class="dp-det-sect">IA Análisis</div>
+              <div class="dp-det-ai-box">
+                <div class="dp-det-ai-lbl">⚡ Intención</div>
+                <div class="dp-det-ai-val">Reservar cita</div>
+                <div class="dp-det-ai-conf">Confianza: 97%</div>
               </div>
             </div>
           </div>
@@ -805,9 +906,9 @@
                 <div class="dp-kpi-trend up">↑ 12 este mes</div>
               </div>
             </div>
-            <div class="dp-met-chart-area">
+            <div class="dp-met-area">
               <div class="dp-met-chart-title">Actividad — últimos 7 días</div>
-              <div class="dp-chart">
+              <div class="dp-area-chart">
                 <div class="dp-bar-wrap"><div class="dp-bar-val">41</div><div class="dp-bar" style="--h:55%"></div><div class="dp-bar-lbl">L</div></div>
                 <div class="dp-bar-wrap"><div class="dp-bar-val">52</div><div class="dp-bar" style="--h:70%"></div><div class="dp-bar-lbl">M</div></div>
                 <div class="dp-bar-wrap"><div class="dp-bar-val">36</div><div class="dp-bar" style="--h:48%"></div><div class="dp-bar-lbl">X</div></div>
@@ -817,13 +918,27 @@
                 <div class="dp-bar-wrap"><div class="dp-bar-val">14</div><div class="dp-bar" style="--h:18%"></div><div class="dp-bar-lbl">D</div></div>
               </div>
             </div>
-            <div class="dp-met-sources">
-              <div class="dp-src"><div class="dp-src-dot" style="background:#25d366"></div><span class="dp-src-name">WhatsApp</span><div class="dp-src-bar"><div class="dp-src-fill" style="width:82%;background:#25d366"></div></div><span class="dp-src-pct">82%</span></div>
-              <div class="dp-src"><div class="dp-src-dot" style="background:#3b82f6"></div><span class="dp-src-name">Web</span><div class="dp-src-bar"><div class="dp-src-fill" style="width:12%;background:#3b82f6"></div></div><span class="dp-src-pct">12%</span></div>
-              <div class="dp-src"><div class="dp-src-dot" style="background:#4ade80"></div><span class="dp-src-name">Otros</span><div class="dp-src-bar"><div class="dp-src-fill" style="width:6%;background:#4ade80"></div></div><span class="dp-src-pct">6%</span></div>
+            <div class="dp-met-bottom">
+              <div class="dp-met-src">
+                <div class="dp-met-src-name"><div class="dp-met-src-dot" style="background:#25d366"></div>WhatsApp</div>
+                <div class="dp-met-src-bar"><div class="dp-met-src-fill" style="width:82%;background:#25d366"></div></div>
+                <div class="dp-met-src-pct">82%</div>
+              </div>
+              <div class="dp-met-src">
+                <div class="dp-met-src-name"><div class="dp-met-src-dot" style="background:#3b82f6"></div>Web chat</div>
+                <div class="dp-met-src-bar"><div class="dp-met-src-fill" style="width:12%;background:#3b82f6"></div></div>
+                <div class="dp-met-src-pct">12%</div>
+              </div>
+              <div class="dp-met-src">
+                <div class="dp-met-src-name"><div class="dp-met-src-dot" style="background:#4ade80"></div>Teléfono</div>
+                <div class="dp-met-src-bar"><div class="dp-met-src-fill" style="width:6%;background:#4ade80"></div></div>
+                <div class="dp-met-src-pct">6%</div>
+              </div>
             </div>
           </div>
 
+        </div>
+          </div>
         </div>
       </div>
     </div>
