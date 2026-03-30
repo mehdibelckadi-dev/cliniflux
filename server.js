@@ -45,6 +45,13 @@ Normas:
 
 app.get('/', (req, res) => res.sendFile('landing.html', { root: 'public' }));
 app.get('/demo', (req, res) => res.sendFile('demo.html', { root: 'public' }));
+app.get('/about', (req, res) => res.sendFile('about.html', { root: 'public' }));
+
+// Feature pages
+const FEATURES = ['respuesta-automatica','agenda-inteligente','reactivacion-pacientes','panel-control','implementacion','rgpd'];
+FEATURES.forEach(slug => {
+  app.get(`/features/${slug}`, (req, res) => res.sendFile(`features/${slug}.html`, { root: 'public' }));
+});
 
 // ── POST /chat ──────────────────────────────────────────────────────────────
 

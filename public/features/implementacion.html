@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Implementación en 48 horas — Cliniflux</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    :root{
+      --bg:#ffffff;--bg2:#f8f9fb;--surface:#ffffff;--surface2:#f4f5f7;
+      --border:rgba(0,0,0,0.07);--border2:rgba(0,0,0,0.12);
+      --text:#0f172a;--text2:rgba(15,23,42,0.60);--text3:rgba(15,23,42,0.36);
+      --green:#16a34a;--green-btn:#22c55e;
+      --green-dim:rgba(22,163,74,0.08);--green-dim2:rgba(22,163,74,0.14);
+      --shadow-sm:0 1px 3px rgba(0,0,0,0.07);
+      --shadow-md:0 4px 16px rgba(0,0,0,0.08);
+      --shadow-lg:0 16px 48px rgba(0,0,0,0.12);
+      --r-sm:8px;--r-md:12px;--r-xl:24px;
+      --sy:96px;--cmax:1160px;--px:48px;
+    }
+    html{scroll-behavior:smooth}
+    body{font-family:'Inter',sans-serif;color:var(--text);background:#fff;-webkit-font-smoothing:antialiased}
+    .c{max-width:var(--cmax);margin:0 auto;padding:0 var(--px)}
+    a{color:inherit;text-decoration:none}
+    /* NAV */
+    nav{position:fixed;top:0;left:0;right:0;z-index:200;transition:background .3s,box-shadow .3s}
+    nav.scrolled{background:rgba(255,255,255,0.95);backdrop-filter:blur(16px);box-shadow:0 1px 0 var(--border)}
+    .nav-inner{max-width:var(--cmax);margin:0 auto;padding:0 var(--px);height:66px;display:flex;align-items:center;gap:32px}
+    .nav-logo{font-size:24px;font-weight:700;color:var(--text);letter-spacing:-.8px;flex-shrink:0}
+    .nav-links{display:flex;gap:2px;list-style:none;margin:0 auto}
+    .nav-links a{font-size:14px;font-weight:500;color:var(--text2);padding:7px 13px;border-radius:var(--r-sm);transition:color .2s,background .2s}
+    .nav-links a:hover{color:var(--text);background:rgba(0,0,0,0.04)}
+    .nav-actions{display:flex;align-items:center;gap:8px;flex-shrink:0}
+    .btn-ghost{font-family:inherit;font-size:14px;font-weight:500;color:var(--text2);background:none;border:none;padding:7px 13px;border-radius:var(--r-sm);cursor:pointer;text-decoration:none;transition:color .2s,background .2s}
+    .btn-ghost:hover{color:var(--text);background:rgba(0,0,0,0.04)}
+    .btn-primary{font-family:inherit;font-size:14px;font-weight:600;color:#fff;background:var(--green);border:none;padding:10px 22px;border-radius:40px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px;transition:background .2s,transform .15s,box-shadow .2s;white-space:nowrap}
+    .btn-primary:hover{background:#15803d;box-shadow:0 4px 20px rgba(22,163,74,0.35);transform:translateY(-1px)}
+    .btn-primary-lg{font-size:16px;padding:14px 32px}
+    .btn-outline{font-family:inherit;font-size:14px;font-weight:600;color:var(--green);background:transparent;border:1.5px solid var(--green);padding:10px 22px;border-radius:40px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px;transition:all .2s}
+    .btn-outline:hover{background:var(--green-dim)}
+    .nav-burger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:8px;flex-shrink:0}
+    .nav-burger span{display:block;width:22px;height:2px;background:var(--text);border-radius:2px;transition:.3s}
+    .mob-menu{position:fixed;top:52px;right:-280px;width:240px;height:calc(100% - 52px);background:#fff;z-index:95;padding:20px 20px 32px;display:flex;flex-direction:column;gap:20px;box-shadow:-8px 0 32px rgba(0,0,0,0.10);transition:right .35s cubic-bezier(.22,1,.36,1)}
+    .mob-menu.on{right:0}
+    .mob-menu ul{list-style:none}
+    .mob-link{display:block;font-size:15px;font-weight:600;color:var(--text);padding:11px 0;border-bottom:1px solid var(--border)}
+    .mob-overlay{display:none;position:fixed;top:52px;left:0;right:0;bottom:0;background:rgba(0,0,0,0.35);z-index:90;opacity:0;transition:opacity .3s}
+    .mob-menu-actions{margin-top:auto}
+    /* HERO */
+    .fp-hero{position:relative;min-height:70vh;display:flex;align-items:center;padding-top:66px;background:#0a0f0a;overflow:hidden}
+    .fp-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% -10%,rgba(34,197,94,0.18) 0%,transparent 65%);pointer-events:none}
+    .fp-hero-inner{position:relative;z-index:2;width:100%;max-width:var(--cmax);margin:0 auto;padding:80px var(--px);display:flex;flex-direction:column;align-items:center;text-align:center;gap:0}
+    .fp-badge{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:700;color:#4ade80;letter-spacing:.5px;background:rgba(34,197,94,0.12);border:1px solid rgba(34,197,94,0.2);padding:5px 14px;border-radius:100px;margin-bottom:28px;text-transform:uppercase}
+    .fp-badge-dot{width:6px;height:6px;border-radius:50%;background:#22c55e;animation:pulse 1.5s infinite}
+    @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.3)}}
+    .fp-h1{font-size:clamp(36px,5vw,68px);font-weight:900;line-height:1.05;letter-spacing:-3px;color:#fff;margin-bottom:22px}
+    .fp-h1 span{color:#4ade80}
+    .fp-sub{font-size:18px;color:rgba(255,255,255,0.55);line-height:1.75;max-width:600px;margin-bottom:40px}
+    .fp-ctas{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+    /* STATS BAR */
+    .fp-stats{background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:0}
+    .fp-stats-inner{max-width:var(--cmax);margin:0 auto;padding:0 var(--px);display:grid;grid-template-columns:repeat(3,1fr)}
+    .fp-stat{padding:32px 24px;text-align:center;border-right:1px solid var(--border)}
+    .fp-stat:last-child{border-right:none}
+    .fp-stat-v{font-size:36px;font-weight:900;letter-spacing:-1.5px;color:var(--green);line-height:1}
+    .fp-stat-l{font-size:13px;color:var(--text2);margin-top:6px;font-weight:500}
+    /* SECTIONS */
+    .fp-section{padding:var(--sy) 0;border-top:1px solid var(--border)}
+    .fp-grid{display:grid;grid-template-columns:1fr 1fr;gap:72px;align-items:center}
+    .fp-grid.rev{direction:rtl}.fp-grid.rev>*{direction:ltr}
+    .fp-label{font-size:11px;font-weight:700;color:var(--green);letter-spacing:.6px;text-transform:uppercase;margin-bottom:14px}
+    .fp-h2{font-size:clamp(26px,3vw,40px);font-weight:800;line-height:1.15;letter-spacing:-1.5px;color:var(--text);margin-bottom:16px}
+    .fp-p{font-size:16px;color:var(--text2);line-height:1.75;margin-bottom:28px}
+    .fp-checks{list-style:none;display:flex;flex-direction:column;gap:10px;margin-bottom:32px}
+    .fp-checks li{display:flex;align-items:flex-start;gap:10px;font-size:14px;color:var(--text2);line-height:1.5}
+    .fp-ck{width:18px;height:18px;border-radius:50%;background:var(--green-dim);border:1px solid rgba(22,163,74,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+    .fp-ck svg{width:9px;height:9px;color:var(--green)}
+    /* VISUAL CARD */
+    .fp-visual{background:#0a1220;border-radius:20px;overflow:hidden;box-shadow:var(--shadow-lg);border:1px solid rgba(255,255,255,0.06);padding:28px;position:relative}
+    .fp-visual-glow{position:absolute;top:-30%;left:-10%;width:70%;height:70%;background:radial-gradient(circle,rgba(34,197,94,0.15) 0%,transparent 65%);pointer-events:none}
+    .fp-visual-title{font-size:10px;font-weight:700;color:rgba(255,255,255,0.3);letter-spacing:.5px;text-transform:uppercase;margin-bottom:20px;position:relative;z-index:2}
+    .fp-vis-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px;position:relative;z-index:2}
+    .fp-vis-kpi{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:14px}
+    .fp-vis-kpi-v{font-size:20px;font-weight:800;color:#4ade80;letter-spacing:-.5px;line-height:1}
+    .fp-vis-kpi-l{font-size:10px;color:rgba(255,255,255,0.35);margin-top:4px}
+    /* FLOW */
+    .fp-flow-section{padding:var(--sy) 0;border-top:1px solid var(--border);background:var(--bg2)}
+    .fp-flow-hd{text-align:center;margin-bottom:52px}
+    .fp-flow-wrap{background:linear-gradient(135deg,#f0fdf4 0%,#dcfce7 40%,#bbf7d0 70%,#d1fae5 100%);border-radius:var(--r-xl);padding:52px 48px;overflow-x:auto}
+    .fp-flow-row{display:flex;align-items:flex-start;gap:0;min-width:600px}
+    .fp-fn{display:flex;flex-direction:column;align-items:center;flex:1;gap:12px}
+    .fp-fn-pill{background:#fff;border:1.5px solid rgba(22,163,74,0.2);border-radius:100px;padding:10px 18px;font-size:13px;font-weight:700;color:var(--text);white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,0.06);text-align:center}
+    .fp-fn-desc{font-size:11px;color:rgba(15,23,42,0.55);text-align:center;line-height:1.5;max-width:110px}
+    .fp-fn-conn{flex:1;height:2px;background:linear-gradient(90deg,rgba(22,163,74,0.3),rgba(22,163,74,0.15));margin-top:21px;min-width:20px}
+    /* STEPS */
+    .fp-steps-section{padding:var(--sy) 0;border-top:1px solid var(--border)}
+    .fp-steps-hd{text-align:center;margin-bottom:52px}
+    .fp-steps-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+    .fp-step{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);padding:28px;position:relative;transition:border-color .2s,box-shadow .2s}
+    .fp-step:hover{border-color:rgba(22,163,74,0.2);box-shadow:0 4px 20px rgba(22,163,74,0.06)}
+    .fp-step-num{font-size:11px;font-weight:800;color:var(--green);letter-spacing:.5px;margin-bottom:16px;background:var(--green-dim);border:1px solid rgba(22,163,74,.15);display:inline-flex;padding:4px 10px;border-radius:100px}
+    .fp-step-t{font-size:15px;font-weight:700;color:var(--text);margin-bottom:8px;line-height:1.3}
+    .fp-step-d{font-size:13px;color:var(--text2);line-height:1.65}
+    /* CTA */
+    .fp-cta-section{padding:var(--sy) 0;border-top:1px solid var(--border)}
+    .fp-cta-box{background:#0a0f0a;border-radius:var(--r-xl);padding:72px;text-align:center;position:relative;overflow:hidden}
+    .fp-cta-box::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 60% at 50% 50%,rgba(34,197,94,0.12) 0%,transparent 65%);pointer-events:none}
+    .fp-cta-box h2{font-size:clamp(28px,3.5vw,48px);font-weight:900;letter-spacing:-2px;color:#fff;margin-bottom:16px;position:relative;z-index:2}
+    .fp-cta-box p{font-size:17px;color:rgba(255,255,255,0.5);margin-bottom:36px;position:relative;z-index:2}
+    .fp-cta-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;position:relative;z-index:2}
+    .btn-white{font-family:inherit;font-size:14px;font-weight:600;color:var(--text);background:#fff;border:none;padding:12px 24px;border-radius:40px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px;transition:all .2s}
+    .btn-white:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(255,255,255,0.15)}
+    /* FOOTER */
+    footer{border-top:1px solid var(--border);padding:44px 0;background:var(--bg2)}
+    .ft-inner{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:48px;margin-bottom:36px}
+    .ft-logo{font-size:20px;font-weight:700;color:var(--text);letter-spacing:-.5px;display:block;margin-bottom:10px}
+    .ft-desc{font-size:13px;color:var(--text2);line-height:1.65;max-width:240px}
+    .ft-col-t{font-size:12px;font-weight:700;color:var(--text);letter-spacing:.3px;text-transform:uppercase;margin-bottom:14px}
+    .ft-col ul{list-style:none;display:flex;flex-direction:column;gap:8px}
+    .ft-col a{font-size:13px;color:var(--text2);transition:color .2s}.ft-col a:hover{color:var(--text)}
+    .ft-bot{display:flex;justify-content:space-between;align-items:center;padding-top:24px;border-top:1px solid var(--border);font-size:12px;color:var(--text3)}
+    /* REVEAL */
+    .reveal{opacity:0;transform:translateY(20px);transition:opacity .6s ease,transform .6s ease}
+    .reveal.on{opacity:1;transform:none}
+    .d1{transition-delay:.1s}.d2{transition-delay:.2s}.d3{transition-delay:.3s}
+    /* RESPONSIVE */
+    @media(max-width:1024px){.fp-steps-grid{grid-template-columns:1fr 1fr}.fp-grid{grid-template-columns:1fr;gap:40px}.fp-grid.rev{direction:ltr}.ft-inner{grid-template-columns:1fr 1fr}}
+    @media(max-width:640px){.nav-links,.nav-actions{display:none}.nav-inner{height:52px;padding:0 16px}.nav-logo{font-size:18px}.nav-burger{display:flex;margin-left:auto}.fp-stats-inner{grid-template-columns:1fr}.fp-stat{border-right:none;border-bottom:1px solid var(--border)}.fp-steps-grid{grid-template-columns:1fr}.fp-cta-box{padding:40px 24px}.fp-h1{letter-spacing:-2px}.fp-flow-wrap{padding:32px 20px}.ft-inner{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<nav id="nav">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">cliniflux</a>
+    <ul class="nav-links">
+      <li><a href="/#producto">Producto</a></li>
+      <li><a href="/#flujo">Cómo funciona</a></li>
+      <li><a href="/#precios">Precios</a></li>
+      <li><a href="/about">Nosotros</a></li>
+    </ul>
+    <button class="nav-burger" id="navBurger" aria-label="Menú"><span></span><span></span><span></span></button>
+    <div class="nav-actions">
+      <a href="/demo" class="btn-ghost">Ver demo</a>
+      <a href="/#precios" class="btn-primary">Solicitar acceso →</a>
+    </div>
+  </div>
+</nav>
+<div class="mob-overlay" id="mobOverlay"></div>
+<div class="mob-menu" id="mobMenu">
+  <ul>
+    <li><a href="/#producto" class="mob-link">Producto</a></li>
+    <li><a href="/#flujo" class="mob-link">Cómo funciona</a></li>
+    <li><a href="/#precios" class="mob-link">Precios</a></li>
+    <li><a href="/about" class="mob-link">Nosotros</a></li>
+  </ul>
+  <div class="mob-menu-actions">
+    <a href="/#precios" class="btn-primary" style="width:100%;justify-content:center;padding:13px 22px">Solicitar demo gratuita →</a>
+  </div>
+</div>
+
+<!-- HERO -->
+<section class="fp-hero">
+  <div class="fp-hero-inner">
+    <div class="fp-badge"><span class="fp-badge-dot"></span>Onboarding Rápido</div>
+    <h1 class="fp-h1">Funcionando en 48 horas.<br>Sin técnicos ni complicaciones.</h1>
+    <p class="fp-sub">Nuestro equipo configura Cliniflux para tu clínica en dos días. Solo necesitas tu número de WhatsApp Business y 30 minutos de tu tiempo.</p>
+    <div class="fp-ctas">
+      <a href="/demo" class="btn-primary btn-primary-lg">Solicitar demo gratuita →</a>
+      <a href="/#precios" class="btn-white">Ver planes</a>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="fp-stats">
+  <div class="fp-stats-inner">
+    <div class="fp-stat"><div class="fp-stat-v">48h</div><div class="fp-stat-l">Tiempo de implementación</div></div>
+    <div class="fp-stat"><div class="fp-stat-v">30min</div><div class="fp-stat-l">De tu tiempo necesario</div></div>
+    <div class="fp-stat"><div class="fp-stat-v">30 días</div><div class="fp-stat-l">Soporte dedicado incluido</div></div>
+  </div>
+</div>
+
+<!-- FEATURE 1 -->
+<section class="fp-section">
+  <div class="c">
+    <div class="fp-grid reveal">
+      <div>
+        <div class="fp-label">Proceso sencillo</div>
+        <h2 class="fp-h2">Configuración guiada paso a paso</h2>
+        <p class="fp-p">No necesitas saber de tecnología. Nuestro equipo de onboarding te acompaña en cada paso: desde conectar tu WhatsApp hasta configurar los flujos de respuesta adaptados a tu clínica.</p>
+        <ul class="fp-checks"><li><div class="fp-ck"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="2,6 5,9 10,3"/></svg></div>Llamada de onboarding de 30 minutos con nuestro equipo</li><li><div class="fp-ck"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="2,6 5,9 10,3"/></svg></div>Configuración personalizada para tu tipo de clínica</li><li><div class="fp-ck"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="2,6 5,9 10,3"/></svg></div>Plantillas de respuesta listas para usar</li><li><div class="fp-ck"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="2,6 5,9 10,3"/></svg></div>Sin instalaciones ni conocimientos técnicos necesarios</li></ul>
+        <a href="/demo" class="btn-primary">Ver cómo funciona →</a>
+      </div>
+      <div>
+        <div class="fp-visual">
+          <div class="fp-visual-glow"></div>
+          <div class="fp-visual-title">Cliniflux · CONFIGURACIÓN GUIADA PASO A PASO</div>
+          <div class="fp-vis-kpis"><div class="fp-vis-kpi"><div class="fp-vis-kpi-v">48h</div><div class="fp-vis-kpi-l">Tiempo de implementación</div></div><div class="fp-vis-kpi"><div class="fp-vis-kpi-v">30min</div><div class="fp-vis-kpi-l">De tu tiempo necesario</div></div><div class="fp-vis-kpi"><div class="fp-vis-kpi-v">30 días</div><div class="fp-vis-kpi-l">Soporte dedicado incluido</div></div></div>
+          <div style="height:2px;background:rgba(255,255,255,0.06);margin:8px 0 16px;position:relative;z-index:2"></div>
+          <div style="position:relative;z-index:2;display:flex;flex-direction:column;gap:8px">
+            <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:10px 14px;font-size:12px;color:rgba(255,255,255,0.6);display:flex;align-items:center;gap:8px"><span style=\"color:#4ade80\">✓</span>Llamada de onboarding de 30 minutos con nuestro equipo</div><div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:10px 14px;font-size:12px;color:rgba(255,255,255,0.6);display:flex;align-items:center;gap:8px"><span style=\"color:#4ade80\">✓</span>Configuración personalizada para tu tipo de clínica</div><div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:10px 14px;font-size:12px;color:rgba(255,255,255,0.6);display:flex;align-items:center;gap:8px"><span style=\"color:#4ade80\">✓</span>Plantillas de respuesta listas para usar</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURE 2 -->
+<section class="fp-section" style="background:var(--bg2)">
+  <div class="c">
+    <div class="fp-grid rev reveal">
+      <div>
+        <div class="fp-label">En detalle</div>
+        <h2 class="fp-h2">Soporte dedicado los primeros 30 días</h2>
+        <p class="fp-p">Durante el primer mes, tienes acceso directo a nuestro equipo por WhatsApp y email. Ajustamos, mejoramos y optimizamos el sistema contigo hasta que todo funcione exactamente como necesitas.</p>
+        <ul class="fp-checks"><li><div class="fp-ck"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="2,6 5,9 10,3"/></svg></div>Canal de soporte directo por WhatsApp los primeros 30 días</li><li><div class="fp-ck"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="2,6 5,9 10,3"/></svg></div>Revisión de conversaciones y ajuste de respuestas incluido</li><li><div class="fp-ck"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="2,6 5,9 10,3"/></svg></div>Formación del equipo en el uso del panel</li><li><div class="fp-ck"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="2,6 5,9 10,3"/></svg></div>SLA de respuesta garantizado en menos de 2 horas</li></ul>
+        <a href="/#precios" class="btn-primary">Ver planes →</a>
+      </div>
+      <div>
+        <div class="fp-visual">
+          <div class="fp-visual-glow"></div>
+          <div class="fp-visual-title">En vivo ahora mismo</div>
+          <div style="position:relative;z-index:2;display:flex;flex-direction:column;gap:10px">
+            <div style="background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.15);border-radius:10px;padding:12px 14px"><div style=\"font-size:11px;color:#4ade80;font-weight:700;margin-bottom:3px\">✓ Activo</div><div style=\"font-size:12px;color:rgba(255,255,255,0.6)\">Canal de soporte directo por WhatsApp los primeros 30 días</div></div><div style="background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.15);border-radius:10px;padding:12px 14px"><div style=\"font-size:11px;color:#4ade80;font-weight:700;margin-bottom:3px\">✓ Activo</div><div style=\"font-size:12px;color:rgba(255,255,255,0.6)\">Revisión de conversaciones y ajuste de respuestas incluido</div></div><div style="background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.15);border-radius:10px;padding:12px 14px"><div style=\"font-size:11px;color:#4ade80;font-weight:700;margin-bottom:3px\">✓ Activo</div><div style=\"font-size:12px;color:rgba(255,255,255,0.6)\">Formación del equipo en el uso del panel</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FLOW -->
+<section class="fp-flow-section">
+  <div class="c">
+    <div class="fp-flow-hd reveal">
+      <div class="fp-label" style="text-align:center;margin-bottom:10px">Flujo automatizado</div>
+      <h2 class="fp-h2" style="text-align:center">Cómo funciona paso a paso</h2>
+    </div>
+    <div class="fp-flow-wrap reveal d1">
+      <div class="fp-flow-row"><div class="fp-fn"><div class="fp-fn-pill">Día 1 · Mañana</div><div class="fp-fn-desc">Llamada onboarding 30min con nuestro equipo</div></div><div class="fp-fn-conn"></div><div class="fp-fn"><div class="fp-fn-pill">Día 1 · Tarde</div><div class="fp-fn-desc">Configuración WhatsApp Business + respuestas base</div></div><div class="fp-fn-conn"></div><div class="fp-fn"><div class="fp-fn-pill">Día 2 · Mañana</div><div class="fp-fn-desc">Pruebas internas con casos reales de tu clínica</div></div><div class="fp-fn-conn"></div><div class="fp-fn"><div class="fp-fn-pill">Día 2 · Tarde</div><div class="fp-fn-desc">Ajustes finales y formación del equipo</div></div><div class="fp-fn-conn"></div><div class="fp-fn"><div class="fp-fn-pill">Activo</div><div class="fp-fn-desc">Cliniflux en producción en tu clínica</div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- STEPS -->
+<section class="fp-steps-section">
+  <div class="c">
+    <div class="fp-steps-hd reveal">
+      <div class="fp-label" style="text-align:center;margin-bottom:10px">Implementación</div>
+      <h2 class="fp-h2" style="text-align:center">De cero a funcionando en 48h</h2>
+      <p style="font-size:16px;color:var(--text2);text-align:center;margin-top:12px;max-width:500px;margin-left:auto;margin-right:auto">Sin necesidad de técnicos. Nuestro equipo te acompaña en cada paso.</p>
+    </div>
+    <div class="fp-steps-grid">
+      <div class="fp-step reveal">
+        <div class="fp-step-num">01</div>
+        <div class="fp-step-t">Llamada inicial — 30 min</div>
+        <div class="fp-step-d">Conocemos tu clínica, tus necesidades y configuramos tu cuenta.</div>
+      </div>
+      <div class="fp-step reveal">
+        <div class="fp-step-num">02</div>
+        <div class="fp-step-t">Conexión WhatsApp Business</div>
+        <div class="fp-step-d">Vinculamos tu número oficial. El proceso tarda menos de 10 minutos.</div>
+      </div>
+      <div class="fp-step reveal">
+        <div class="fp-step-num">03</div>
+        <div class="fp-step-t">Configuración y pruebas</div>
+        <div class="fp-step-d">Personalizamos respuestas y hacemos pruebas reales con tu equipo.</div>
+      </div>
+      <div class="fp-step reveal">
+        <div class="fp-step-num">04</div>
+        <div class="fp-step-t">Go live en 48h</div>
+        <div class="fp-step-d">Tu clínica empieza a responder sola. Nosotros monitorizamos los primeros días.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="fp-cta-section">
+  <div class="c">
+    <div class="fp-cta-box">
+      <h2>Empieza hoy.<br>Resultados en 48h.</h2>
+      <p>Únete a las clínicas que ya automatizan con Cliniflux y recuperan horas cada semana.</p>
+      <div class="fp-cta-btns">
+        <a href="/demo" class="btn-primary btn-primary-lg">Solicitar demo gratuita →</a>
+        <a href="/#precios" class="btn-white">Ver planes y precios</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="c">
+    <div class="ft-inner">
+      <div><a href="/" class="ft-logo">cliniflux</a><p class="ft-desc">Automatización inteligente de WhatsApp para clínicas que quieren crecer sin aumentar el equipo.</p></div>
+      <div class="ft-col"><div class="ft-col-t">Producto</div><ul><li><a href="/#flujo">Cómo funciona</a></li><li><a href="/#producto">Funcionalidades</a></li><li><a href="/#precios">Precios</a></li><li><a href="/demo">Demo</a></li></ul></div>
+      <div class="ft-col"><div class="ft-col-t">Empresa</div><ul><li><a href="/about">Nosotros</a></li><li><a href="#">Blog</a></li><li><a href="#">Contacto</a></li></ul></div>
+      <div class="ft-col"><div class="ft-col-t">Legal</div><ul><li><a href="#">Privacidad</a></li><li><a href="#">Términos</a></li><li><a href="/features/rgpd">RGPD</a></li></ul></div>
+    </div>
+    <div class="ft-bot"><p>© 2025 Cliniflux. Todos los derechos reservados.</p><p>Hecho con ❤️ en España</p></div>
+  </div>
+</footer>
+
+<script>
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', () => nav.classList.toggle('scrolled', scrollY > 20), {passive:true});
+  const burger = document.getElementById('navBurger');
+  const menu = document.getElementById('mobMenu');
+  const overlay = document.getElementById('mobOverlay');
+  function toggleMenu(on) {
+    menu.classList.toggle('on', on);
+    overlay.style.display = on ? 'block' : 'none';
+    setTimeout(() => overlay.style.opacity = on ? '1' : '0', on ? 10 : 0);
+  }
+  burger.addEventListener('click', () => toggleMenu(!menu.classList.contains('on')));
+  overlay.addEventListener('click', () => toggleMenu(false));
+  document.querySelectorAll('.mob-link').forEach(l => l.addEventListener('click', () => toggleMenu(false)));
+  const io = new IntersectionObserver(entries => entries.forEach(e => { if(e.isIntersecting) { e.target.classList.add('on'); io.unobserve(e.target); } }), {threshold:.12});
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+</script>
+</body>
+</html>
