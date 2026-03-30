@@ -753,6 +753,83 @@
       .flow2-arr{transform:rotate(90deg)}
       .flow2-col-hd{display:none}
     }
+
+    /* ── SHOWCASE V2 ──────────────────────────────────────────── */
+    .sc2-section{padding:var(--sy) 0;border-top:1px solid var(--border)}
+    .sc2-grid{display:grid;grid-template-columns:1fr 1fr;gap:72px;align-items:center}
+    .sc2-grid.rev{direction:rtl}.sc2-grid.rev>*{direction:ltr}
+    .sc2-text .label{margin-bottom:12px}
+    .sc2-text h2{font-size:clamp(28px,3vw,42px);font-weight:800;line-height:1.1;letter-spacing:-1.5px;margin-bottom:16px;color:var(--text)}
+    .sc2-text p{font-size:16px;color:var(--text2);line-height:1.75;margin-bottom:24px;max-width:440px}
+    .sc2-list{list-style:none;margin:0 0 32px;padding:0;display:flex;flex-direction:column;gap:10px}
+    .sc2-list li{display:flex;align-items:flex-start;gap:10px;font-size:14px;color:var(--text2);line-height:1.5}
+    .sc2-check{width:18px;height:18px;border-radius:50%;background:var(--green-dim);border:1px solid rgba(22,163,74,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+    .sc2-check svg{width:9px;height:9px;color:var(--green)}
+
+    /* ── Analytics card ── */
+    .sc2-card-a{background:#0a1220;border-radius:20px;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,0.25),0 1px 0 rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06)}
+    .sc2-a-chrome{height:36px;background:#111827;display:flex;align-items:center;padding:0 14px;gap:6px;border-bottom:1px solid rgba(255,255,255,0.06)}
+    .sc2-a-dot{width:10px;height:10px;border-radius:50%}
+    .sc2-a-title{font-size:11px;font-weight:600;color:rgba(255,255,255,0.3);letter-spacing:.3px;margin-left:8px}
+    .sc2-a-live{margin-left:auto;display:flex;align-items:center;gap:5px;font-size:10px;color:#22c55e;font-weight:700}
+    .sc2-a-live-dot{width:6px;height:6px;border-radius:50%;background:#22c55e;animation:pulse 1.5s infinite}
+    .sc2-a-body{padding:22px 22px 18px}
+    .sc2-a-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px}
+    .sc2-a-kpi{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:12px 14px}
+    .sc2-a-kpi-v{font-size:20px;font-weight:800;color:#fff;letter-spacing:-.8px;line-height:1}
+    .sc2-a-kpi-l{font-size:10px;color:rgba(255,255,255,0.38);font-weight:500;margin-top:4px}
+    .sc2-a-kpi.up .sc2-a-kpi-v{color:#4ade80}
+    /* Chart area */
+    .sc2-a-chart-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+    .sc2-a-chart-title{font-size:11px;font-weight:600;color:rgba(255,255,255,0.4);letter-spacing:.3px}
+    .sc2-a-legend{display:flex;gap:12px}
+    .sc2-a-leg{display:flex;align-items:center;gap:5px;font-size:10px;color:rgba(255,255,255,0.35);font-weight:500}
+    .sc2-a-leg-dot{width:7px;height:7px;border-radius:50%}
+    .sc2-a-chart-wrap{height:90px}
+    .sc2-a-chart-svg{width:100%;height:100%;overflow:visible}
+    .sc2-a-days{display:flex;justify-content:space-between;padding:6px 2px 0;font-size:9px;color:rgba(255,255,255,0.2);font-weight:500}
+    /* Bottom row */
+    .sc2-a-bottom{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.06)}
+    .sc2-a-row-item{display:flex;align-items:center;gap:8px}
+    .sc2-a-row-ic{width:28px;height:28px;border-radius:8px;background:rgba(34,197,94,0.12);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .sc2-a-row-ic svg{width:13px;height:13px;color:#4ade80}
+    .sc2-a-row-v{font-size:14px;font-weight:700;color:#fff}
+    .sc2-a-row-l{font-size:10px;color:rgba(255,255,255,0.35)}
+
+    /* ── Automation card ── */
+    .sc2-card-b{background:#060f09;border-radius:20px;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,0.28),0 1px 0 rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);position:relative}
+    .sc2-b-glow{position:absolute;top:-30%;left:-10%;width:70%;height:70%;background:radial-gradient(circle,rgba(34,197,94,0.22) 0%,transparent 65%);pointer-events:none}
+    .sc2-b-chrome{height:36px;background:rgba(0,0,0,0.3);display:flex;align-items:center;padding:0 14px;gap:6px;border-bottom:1px solid rgba(255,255,255,0.05)}
+    .sc2-b-body{padding:22px 22px 20px;position:relative;z-index:2}
+    /* WA conversation */
+    .sc2-b-wa-hd{display:flex;align-items:center;gap:10px;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,0.07)}
+    .sc2-b-wa-av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#16a34a,#22c55e);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff;flex-shrink:0}
+    .sc2-b-wa-name{font-size:13px;font-weight:700;color:rgba(255,255,255,0.9)}
+    .sc2-b-wa-status{font-size:10px;color:#4ade80;font-weight:500}
+    .sc2-b-wa-badge{margin-left:auto;font-size:9px;font-weight:700;padding:3px 8px;border-radius:100px;background:rgba(34,197,94,0.15);color:#4ade80;border:1px solid rgba(34,197,94,0.2)}
+    .sc2-b-msgs{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}
+    .sc2-b-msg{max-width:78%;padding:8px 12px;border-radius:12px;font-size:12px;font-weight:500;line-height:1.5}
+    .sc2-b-msg.inc{background:rgba(255,255,255,0.09);color:rgba(255,255,255,0.8);border-radius:4px 12px 12px 12px;align-self:flex-start}
+    .sc2-b-msg.out{background:rgba(34,197,94,0.2);color:#86efac;border:1px solid rgba(34,197,94,0.25);border-radius:12px 4px 12px 12px;align-self:flex-end}
+    .sc2-b-msg.out.done{background:rgba(34,197,94,0.3);border-color:rgba(34,197,94,0.45);color:#dcfce7;font-weight:600}
+    .sc2-b-ts{font-size:9px;opacity:.45;margin-top:2px;text-align:right}
+    /* Automation steps */
+    .sc2-b-steps{display:flex;flex-direction:column;gap:6px;padding-top:14px;border-top:1px solid rgba(255,255,255,0.07)}
+    .sc2-b-step{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:10px;background:rgba(255,255,255,0.04)}
+    .sc2-b-step.active{background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.2)}
+    .sc2-b-step.done{background:rgba(34,197,94,0.06)}
+    .sc2-b-step-ic{width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:11px}
+    .sc2-b-step-text{font-size:11px;font-weight:600;color:rgba(255,255,255,0.65);flex:1}
+    .sc2-b-step.active .sc2-b-step-text{color:#86efac}
+    .sc2-b-step-t{font-size:9px;color:rgba(255,255,255,0.25);font-weight:500;white-space:nowrap}
+    /* Bottom metrics */
+    .sc2-b-bottom{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,0.07)}
+    .sc2-b-metric{text-align:center}
+    .sc2-b-metric-v{font-size:18px;font-weight:800;color:#4ade80;letter-spacing:-.5px}
+    .sc2-b-metric-l{font-size:9px;color:rgba(255,255,255,0.35);font-weight:500;line-height:1.3}
+
+    @media(max-width:1024px){.sc2-grid{grid-template-columns:1fr;gap:40px}.sc2-grid.rev{direction:ltr}}
+    @media(max-width:640px){.sc2-a-kpis{grid-template-columns:repeat(3,1fr)}.sc2-b-bottom{grid-template-columns:repeat(3,1fr)}}
   </style>
 </head>
 <body>
@@ -1447,44 +1524,87 @@
 </section>
 
 
-<!-- SHOWCASE 1: Analytics -->
-<section class="showcase-section" id="analiticas">
+<!-- SHOWCASE 1: Analytics V2 -->
+<section class="sc2-section" id="analiticas">
   <div class="c">
-    <div class="showcase-grid">
-      <div class="showcase-text reveal">
+    <div class="sc2-grid">
+      <div class="sc2-text reveal">
         <div class="label">Analíticas en tiempo real</div>
-        <h2 class="sec-h">Cada conversación,<br>una oportunidad.</h2>
-        <p class="sec-p">Visualiza el rendimiento de tu asistente IA con métricas en tiempo real. Sabe exactamente qué pacientes atendió, qué consultas resolvió y qué citas agendó.</p>
-        <ul class="sc-checklist">
-          <li><div class="sc-check">✓</div>Tasa de resolución y satisfacción del paciente</li>
-          <li><div class="sc-check">✓</div>Tiempo medio de respuesta y conversaciones activas</li>
-          <li><div class="sc-check">✓</div>Reportes semanales automáticos por email</li>
+        <h2>Cada conversación,<br>una oportunidad.</h2>
+        <p>Visualiza el rendimiento de tu asistente IA en tiempo real. Sabe exactamente qué pacientes atendió, qué consultas resolvió y cuántas citas agendó cada día.</p>
+        <ul class="sc2-list">
+          <li><div class="sc2-check"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="2,6 5,9 10,3"/></svg></div>Tasa de resolución y satisfacción del paciente</li>
+          <li><div class="sc2-check"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="2,6 5,9 10,3"/></svg></div>Tiempo medio de respuesta y volumen de conversaciones</li>
+          <li><div class="sc2-check"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="2,6 5,9 10,3"/></svg></div>Reportes semanales automáticos por email</li>
         </ul>
         <a href="#precios" class="btn-primary">Ver planes →</a>
       </div>
       <div class="reveal d1">
-        <div class="sc-card sc-card-teal">
-          <div class="sc-inner">
-            <div class="sc-top-bar">
-              <div class="sc-top-dot"></div><div class="sc-top-dot"></div><div class="sc-top-dot"></div>
-              <span class="sc-top-title">CLINIFLUX ANALYTICS</span>
+        <div class="sc2-card-a">
+          <div class="sc2-a-chrome">
+            <div class="sc2-a-dot" style="background:#ff5f57"></div>
+            <div class="sc2-a-dot" style="background:#febc2e"></div>
+            <div class="sc2-a-dot" style="background:#28c840"></div>
+            <span class="sc2-a-title">CLINIFLUX · ANALYTICS</span>
+            <div class="sc2-a-live"><div class="sc2-a-live-dot"></div>En vivo</div>
+          </div>
+          <div class="sc2-a-body">
+            <div class="sc2-a-kpis">
+              <div class="sc2-a-kpi up">
+                <div class="sc2-a-kpi-v">94%</div>
+                <div class="sc2-a-kpi-l">Tasa resolución IA</div>
+              </div>
+              <div class="sc2-a-kpi">
+                <div class="sc2-a-kpi-v">1.2s</div>
+                <div class="sc2-a-kpi-l">Resp. media</div>
+              </div>
+              <div class="sc2-a-kpi">
+                <div class="sc2-a-kpi-v">247</div>
+                <div class="sc2-a-kpi-l">Chats hoy</div>
+              </div>
             </div>
-            <div class="sc-stats-row">
-              <div class="sc-stat-box"><div class="sc-stat-n">94%</div><div class="sc-stat-l">Tasa resolución IA</div></div>
-              <div class="sc-stat-box"><div class="sc-stat-n">1.2s</div><div class="sc-stat-l">Resp. media</div></div>
-              <div class="sc-stat-box"><div class="sc-stat-n">247</div><div class="sc-stat-l">Chats hoy</div></div>
+            <div class="sc2-a-chart-hd">
+              <span class="sc2-a-chart-title">CITAS CONFIRMADAS — ÚLTIMOS 7 DÍAS</span>
+              <div class="sc2-a-legend">
+                <div class="sc2-a-leg"><div class="sc2-a-leg-dot" style="background:#22c55e"></div>Con IA</div>
+                <div class="sc2-a-leg"><div class="sc2-a-leg-dot" style="background:#374151"></div>Sin IA</div>
+              </div>
             </div>
-            <div class="sc-chart">
-              <div class="sc-bar" style="height:45%"></div>
-              <div class="sc-bar" style="height:65%"></div>
-              <div class="sc-bar" style="height:52%"></div>
-              <div class="sc-bar hi" style="height:82%"></div>
-              <div class="sc-bar" style="height:70%"></div>
-              <div class="sc-bar hi" style="height:95%"></div>
-              <div class="sc-bar" style="height:78%"></div>
-              <div class="sc-bar" style="height:88%"></div>
-              <div class="sc-bar hi" style="height:100%"></div>
-              <div class="sc-bar" style="height:72%"></div>
+            <div class="sc2-a-chart-wrap">
+              <svg class="sc2-a-chart-svg" viewBox="0 0 340 90" preserveAspectRatio="none">
+                <defs>
+                  <linearGradient id="aGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#22c55e" stop-opacity=".25"/>
+                    <stop offset="100%" stop-color="#22c55e" stop-opacity="0"/>
+                  </linearGradient>
+                  <linearGradient id="bGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#4b5563" stop-opacity=".2"/>
+                    <stop offset="100%" stop-color="#4b5563" stop-opacity="0"/>
+                  </linearGradient>
+                </defs>
+                <line x1="0" y1="22" x2="340" y2="22" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+                <line x1="0" y1="55" x2="340" y2="55" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+                <line x1="0" y1="88" x2="340" y2="88" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+                <polygon points="0,88 56,80 113,70 170,52 227,35 284,20 340,10 340,90 0,90" fill="url(#aGrad)"/>
+                <polygon points="0,72 56,74 113,76 170,73 227,75 284,72 340,74 340,90 0,90" fill="url(#bGrad)"/>
+                <polyline points="0,72 56,74 113,76 170,73 227,75 284,72 340,74" fill="none" stroke="#374151" stroke-width="1.5" stroke-dasharray="4 2" stroke-linecap="round" stroke-linejoin="round"/>
+                <polyline points="0,88 56,80 113,70 170,52 227,35 284,20 340,10" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <circle cx="340" cy="10" r="4" fill="#22c55e"/>
+                <circle cx="340" cy="74" r="3" fill="#4b5563"/>
+              </svg>
+            </div>
+            <div class="sc2-a-days">
+              <span>Lun</span><span>Mar</span><span>Mié</span><span>Jue</span><span>Vie</span><span>Sáb</span><span>Hoy</span>
+            </div>
+            <div class="sc2-a-bottom">
+              <div class="sc2-a-row-item">
+                <div class="sc2-a-row-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>
+                <div><div class="sc2-a-row-v">+38%</div><div class="sc2-a-row-l">Conv. este mes</div></div>
+              </div>
+              <div class="sc2-a-row-item">
+                <div class="sc2-a-row-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+                <div><div class="sc2-a-row-v">11h ahorradas</div><div class="sc2-a-row-l">Esta semana</div></div>
+              </div>
             </div>
           </div>
         </div>
@@ -1493,38 +1613,76 @@
   </div>
 </section>
 
-<!-- SHOWCASE 2: Automation -->
-<section class="showcase-section">
+<!-- SHOWCASE 2: Automation V2 -->
+<section class="sc2-section">
   <div class="c">
-    <div class="showcase-grid rev">
-      <div class="showcase-text reveal">
+    <div class="sc2-grid rev">
+      <div class="sc2-text reveal">
         <div class="label">Automatización completa</div>
-        <h2 class="sec-h">Agenda citas mientras<br>duermes.</h2>
-        <p class="sec-p">El sistema trabaja por ti las 24 horas. Cada mensaje recibido desencadena un flujo inteligente que resuelve, agenda o escala según lo que necesita el paciente.</p>
-        <ul class="sc-checklist">
-          <li><div class="sc-check">✓</div>Agenda automática en tu calendario en tiempo real</li>
-          <li><div class="sc-check">✓</div>Recordatorios y confirmaciones de cita automáticas</li>
-          <li><div class="sc-check">✓</div>Gestión de cancelaciones y reagendados sin intervención</li>
+        <h2>Agenda citas mientras<br>duermes.</h2>
+        <p>El sistema trabaja por ti las 24 horas. Cada mensaje desencadena un flujo inteligente que resuelve, agenda o escala según lo que necesita el paciente.</p>
+        <ul class="sc2-list">
+          <li><div class="sc2-check"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="2,6 5,9 10,3"/></svg></div>Agenda automática en tu calendario en tiempo real</li>
+          <li><div class="sc2-check"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="2,6 5,9 10,3"/></svg></div>Recordatorios y confirmaciones de cita automáticas</li>
+          <li><div class="sc2-check"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="2,6 5,9 10,3"/></svg></div>Gestión de cancelaciones y reagendados sin intervención</li>
         </ul>
         <a href="#precios" class="btn-primary">Empezar ahora →</a>
       </div>
       <div class="reveal d1">
-        <div class="sc-card sc-card-purple">
-          <div class="sc-inner">
-            <div class="sc-top-bar">
-              <div class="sc-top-dot"></div><div class="sc-top-dot"></div><div class="sc-top-dot"></div>
-              <span class="sc-top-title">AUTOMATIZACIÓN ACTIVA</span>
+        <div class="sc2-card-b">
+          <div class="sc2-b-glow"></div>
+          <div class="sc2-b-chrome">
+            <div class="sc2-a-dot" style="background:#ff5f57"></div>
+            <div class="sc2-a-dot" style="background:#febc2e"></div>
+            <div class="sc2-a-dot" style="background:#28c840"></div>
+            <span class="sc2-a-title" style="margin-left:8px">AUTOMATIZACIÓN ACTIVA</span>
+            <div class="sc2-a-live" style="margin-left:auto"><div class="sc2-a-live-dot"></div>Procesando</div>
+          </div>
+          <div class="sc2-b-body">
+            <div class="sc2-b-wa-hd">
+              <div class="sc2-b-wa-av">MP</div>
+              <div>
+                <div class="sc2-b-wa-name">María Pérez</div>
+                <div class="sc2-b-wa-status">En línea</div>
+              </div>
+              <div class="sc2-b-wa-badge">WhatsApp</div>
             </div>
-            <div class="sc-flow-list">
-              <div class="sc-flow-item">💬 Mensaje recibido · hace 3s</div>
-              <div class="sc-flow-arr">↓</div>
-              <div class="sc-flow-item active">🧠 IA analizando intención...</div>
-              <div class="sc-flow-arr">↓</div>
-              <div class="sc-flow-item done">✅ Cita confirmada · 10:00h mañana</div>
+            <div class="sc2-b-msgs">
+              <div class="sc2-b-msg inc">Hola, quería pedir cita para una revisión esta semana si es posible</div>
+              <div class="sc2-b-msg out">¡Hola María! 👋 Por supuesto. Tenemos hueco el miércoles a las 11h o el viernes a las 16h. ¿Cuál prefieres?<div class="sc2-b-ts">IA Cliniflux · 1.1s</div></div>
+              <div class="sc2-b-msg inc">El miércoles perfecto</div>
+              <div class="sc2-b-msg out done">✅ Cita confirmada · Miércoles 26 · 11:00h · Revisión general · Dra. López. Recibirás un recordatorio 24h antes.<div class="sc2-b-ts">IA Cliniflux · 0.7s</div></div>
             </div>
-            <div class="sc-metrics-row">
-              <div class="sc-metric"><div class="sc-metric-n">24</div><div class="sc-metric-l">Citas agendadas hoy</div></div>
-              <div class="sc-metric"><div class="sc-metric-n">6h</div><div class="sc-metric-l">Tiempo ahorrado</div></div>
+            <div class="sc2-b-steps">
+              <div class="sc2-b-step done">
+                <div class="sc2-b-step-ic" style="background:rgba(34,197,94,0.15)">✓</div>
+                <div class="sc2-b-step-text">Intención detectada — Reserva de cita</div>
+                <div class="sc2-b-step-t">0.3s</div>
+              </div>
+              <div class="sc2-b-step done">
+                <div class="sc2-b-step-ic" style="background:rgba(34,197,94,0.15)">✓</div>
+                <div class="sc2-b-step-text">Disponibilidad consultada en agenda</div>
+                <div class="sc2-b-step-t">0.5s</div>
+              </div>
+              <div class="sc2-b-step active">
+                <div class="sc2-b-step-ic" style="background:rgba(34,197,94,0.2)">⟳</div>
+                <div class="sc2-b-step-text">Confirmación enviada + calendario actualizado</div>
+                <div class="sc2-b-step-t">En curso</div>
+              </div>
+            </div>
+            <div class="sc2-b-bottom">
+              <div class="sc2-b-metric">
+                <div class="sc2-b-metric-v">24</div>
+                <div class="sc2-b-metric-l">Citas hoy</div>
+              </div>
+              <div class="sc2-b-metric">
+                <div class="sc2-b-metric-v">11h</div>
+                <div class="sc2-b-metric-l">Ahorradas</div>
+              </div>
+              <div class="sc2-b-metric">
+                <div class="sc2-b-metric-v">100%</div>
+                <div class="sc2-b-metric-l">Sin errores</div>
+              </div>
             </div>
           </div>
         </div>
