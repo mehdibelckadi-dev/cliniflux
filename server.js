@@ -46,6 +46,10 @@ Normas:
 app.get('/', (req, res) => res.sendFile('landing.html', { root: 'public' }));
 app.get('/demo', (req, res) => res.sendFile('demo.html', { root: 'public' }));
 app.get('/about', (req, res) => res.sendFile('about.html', { root: 'public' }));
+app.get('/contacto', (req, res) => res.sendFile('contacto.html', { root: 'public' }));
+app.get('/legal/privacidad', (req, res) => res.sendFile('legal/privacidad.html', { root: 'public' }));
+app.get('/legal/terminos', (req, res) => res.sendFile('legal/terminos.html', { root: 'public' }));
+app.get('/legal/cookies', (req, res) => res.sendFile('legal/cookies.html', { root: 'public' }));
 
 // Feature pages
 const FEATURES = ['respuesta-automatica','agenda-inteligente','reactivacion-pacientes','panel-control','implementacion','rgpd'];
@@ -103,6 +107,33 @@ app.post('/chat', async (req, res) => {
     console.error('Chat error:', err.message);
     res.status(500).json({ error: 'Error interno' });
   }
+});
+
+
+// ── POST /api/contact ───────────────────────────────────────────────────────
+app.post('/api/contact', async (req, res) => {
+  const { nombre, clinica, email, telefono, tipo, mensaje } = req.body;
+  if (!nombre || !email || !tipo) return res.status(400).json({ error: 'Campos requeridos' });
+  try { await saveLead({ nombre, clinica, email, telefono, tipo, mensaje, source: 'contacto' }); } catch(e) { console.error('Lead save:', e.message); }
+  if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
+    try {
+      const nodemailer = require('nodemailer');
+      const t = nodemailer.createTransport({
+        host: process.env.SMTP_HOST,
+        port: parseInt(process.env.SMTP_PORT || '587'),
+        secure: false,
+        auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS }
+      });
+      await t.sendMail({
+        from: '"Cliniflux Web" <' + process.env.SMTP_USER + '>',
+        to: 'contacto@cliniflux.com',
+        replyTo: email,
+        subject: '[Contacto Web] ' + tipo + ' - ' + nombre + ' (' + (clinica||'-') + ')',
+        html: '<h2>Nuevo mensaje desde cliniflux.com</h2><p><b>Nombre:</b> ' + nombre + '</p><p><b>Clinica:</b> ' + (clinica||'-') + '</p><p><b>Email:</b> ' + email + '</p><p><b>Telefono:</b> ' + (telefono||'-') + '</p><p><b>Tipo:</b> ' + tipo + '</p><p><b>Mensaje:</b> ' + (mensaje||'-') + '</p>'
+      });
+    } catch(e) { console.error('Email error:', e.message); }
+  }
+  res.json({ ok: true });
 });
 
 // ── POST /api/demo-request ──────────────────────────────────────────────────

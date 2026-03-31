@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
-  <title>Nosotros — Cliniflux</title>
+  <title>Contacto — Cliniflux</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>*{margin:0;padding:0;box-sizing:border-box}
@@ -44,33 +44,41 @@
     .label{font-size:11px;font-weight:700;color:var(--green);letter-spacing:.6px;text-transform:uppercase;margin-bottom:14px;display:block}
     @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.4)}}
     @media(max-width:640px){.nav-links,.nav-actions{display:none}.nav-inner{height:52px;padding:0 16px}.nav-logo{font-size:18px}.nav-burger{display:flex;margin-left:auto}.ft-inner{grid-template-columns:1fr 1fr}}
-    .about-hero{background:#0a0f0a;position:relative;overflow:hidden;padding:calc(66px + 72px) 0 80px;text-align:center}
-    .about-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% -5%,rgba(34,197,94,0.14) 0%,transparent 65%);pointer-events:none}
-    .about-hero-inner{position:relative;z-index:2;max-width:720px;margin:0 auto;padding:0 var(--px)}
-    .about-h1{font-size:clamp(36px,5vw,60px);font-weight:900;line-height:1.08;letter-spacing:-2.5px;color:#fff;margin-bottom:18px}
-    .about-h1 em{color:#4ade80;font-style:normal}
-    .about-sub{font-size:18px;color:rgba(255,255,255,0.5);line-height:1.75;max-width:540px;margin:0 auto}
-    .about-section{padding:var(--sy) 0;border-top:1px solid var(--border)}
-    .about-grid{display:grid;grid-template-columns:1fr 1fr;gap:72px;align-items:center}
-    .about-h2{font-size:clamp(26px,3vw,40px);font-weight:800;letter-spacing:-1.5px;line-height:1.15;margin-bottom:16px}
-    .about-p{font-size:16px;color:var(--text2);line-height:1.8;margin-bottom:20px}
-    .about-stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:32px}
-    .about-stat{text-align:center;padding:24px;background:var(--bg2);border-radius:16px;border:1px solid var(--border)}
-    .about-stat-v{font-size:32px;font-weight:900;letter-spacing:-1.5px;color:var(--green)}
-    .about-stat-l{font-size:12px;color:var(--text2);margin-top:4px}
-    .values-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:48px}
-    .val-card{background:#fff;border:1px solid var(--border);border-radius:20px;padding:28px;transition:border-color .2s,box-shadow .2s}
-    .val-card:hover{border-color:rgba(22,163,74,0.2);box-shadow:0 4px 20px rgba(22,163,74,0.06)}
-    .val-ic{width:44px;height:44px;border-radius:14px;background:var(--green-dim);display:flex;align-items:center;justify-content:center;margin-bottom:18px}
-    .val-ic svg{width:20px;height:20px;color:var(--green)}
-    .val-t{font-size:16px;font-weight:700;margin-bottom:8px}
-    .val-d{font-size:13px;color:var(--text2);line-height:1.65}
-    .about-cta{background:#0a0f0a;padding:80px 0;text-align:center;position:relative;overflow:hidden}
-    .about-cta::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 70% at 50% 50%,rgba(34,197,94,0.1) 0%,transparent 65%);pointer-events:none}
-    .about-cta h2{font-size:clamp(28px,3.5vw,46px);font-weight:900;letter-spacing:-2px;color:#fff;margin-bottom:14px;position:relative;z-index:2}
-    .about-cta p{font-size:16px;color:rgba(255,255,255,0.45);margin-bottom:32px;position:relative;z-index:2}
-    @media(max-width:1024px){.about-grid{grid-template-columns:1fr;gap:40px}.values-grid{grid-template-columns:1fr 1fr}.about-stat-row{grid-template-columns:1fr 1fr}}
-    @media(max-width:640px){.values-grid{grid-template-columns:1fr}.about-stat-row{grid-template-columns:1fr}}</style>
+    .contact-hero{background:#0a0f0a;padding:calc(66px + 72px) 0 80px;text-align:center;position:relative;overflow:hidden}
+    .contact-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 60% at 50% 0%,rgba(34,197,94,0.13) 0%,transparent 65%);pointer-events:none}
+    .contact-hero-inner{position:relative;z-index:2;max-width:620px;margin:0 auto;padding:0 var(--px)}
+    .contact-h1{font-size:clamp(34px,4.5vw,56px);font-weight:900;letter-spacing:-2.5px;line-height:1.08;color:#fff;margin-bottom:16px}
+    .contact-h1 em{color:#4ade80;font-style:normal}
+    .contact-sub{font-size:17px;color:rgba(255,255,255,0.5);line-height:1.75}
+    .contact-body{padding:72px 0;background:var(--bg2)}
+    .contact-layout{display:grid;grid-template-columns:1.4fr 1fr;gap:56px;align-items:start}
+    /* Form */
+    .cf{background:#fff;border:1px solid var(--border);border-radius:24px;padding:40px;box-shadow:var(--shadow-md)}
+    .cf-title{font-size:18px;font-weight:800;margin-bottom:6px}
+    .cf-sub{font-size:13px;color:var(--text2);margin-bottom:28px}
+    .cf-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    .cf-group{margin-bottom:18px;display:flex;flex-direction:column;gap:6px}
+    .cf-label{font-size:12px;font-weight:700;color:var(--text);letter-spacing:.2px}
+    .cf-input,.cf-select,.cf-textarea{font-family:inherit;font-size:14px;color:var(--text);background:#fff;border:1.5px solid var(--border2);border-radius:12px;padding:11px 14px;width:100%;outline:none;transition:border-color .2s}
+    .cf-input:focus,.cf-select:focus,.cf-textarea:focus{border-color:var(--green);box-shadow:0 0 0 3px var(--green-dim)}
+    .cf-textarea{resize:vertical;min-height:100px;line-height:1.6}
+    .cf-select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%230f172a' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center}
+    .cf-submit{width:100%;font-family:inherit;font-size:15px;font-weight:700;color:#fff;background:var(--green);border:none;padding:14px;border-radius:40px;cursor:pointer;transition:background .2s,transform .15s;margin-top:4px}
+    .cf-submit:hover{background:#15803d;transform:translateY(-1px)}
+    .cf-success{display:none;text-align:center;padding:40px 20px}
+    .cf-success-ic{width:56px;height:56px;border-radius:50%;background:var(--green-dim);border:2px solid rgba(22,163,74,.2);display:flex;align-items:center;justify-content:center;margin:0 auto 16px}
+    .cf-success-ic svg{width:24px;height:24px;color:var(--green)}
+    .cf-success h3{font-size:20px;font-weight:800;margin-bottom:8px}
+    .cf-success p{font-size:14px;color:var(--text2)}
+    /* Info */
+    .contact-info{display:flex;flex-direction:column;gap:20px;position:sticky;top:90px}
+    .ci-card{background:#fff;border:1px solid var(--border);border-radius:20px;padding:24px;display:flex;gap:16px;align-items:flex-start}
+    .ci-ic{width:40px;height:40px;border-radius:12px;background:var(--green-dim);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .ci-ic svg{width:18px;height:18px;color:var(--green)}
+    .ci-t{font-size:14px;font-weight:700;margin-bottom:4px}
+    .ci-v{font-size:13px;color:var(--text2);line-height:1.6}
+    .ci-v a{color:var(--green);font-weight:600}
+    @media(max-width:1024px){.contact-layout{grid-template-columns:1fr}.contact-info{position:static}.cf-row{grid-template-columns:1fr}}</style>
 </head>
 <body>
 <nav id="nav">
@@ -102,77 +110,84 @@
   </div>
 </div>
 
-<!-- HERO -->
-<section class="about-hero">
-  <div class="about-hero-inner">
-    <span class="label" style="color:#4ade80;margin-bottom:16px;display:block">Nosotros</span>
-    <h1 class="about-h1">Nacimos de un<br><em>problema real.</em></h1>
-    <p class="about-sub">Vimos cómo las clínicas perdían pacientes por no poder responder a tiempo. Decidimos solucionarlo.</p>
+<section class="contact-hero">
+  <div class="contact-hero-inner">
+    <span class="label" style="color:#4ade80;margin-bottom:14px;display:block">Contacto</span>
+    <h1 class="contact-h1">Hablemos sobre<br><em>tu clínica.</em></h1>
+    <p class="contact-sub">Cuéntanos tu situación y te preparamos una demo personalizada. Sin compromiso.</p>
   </div>
 </section>
 
-<!-- MISSION -->
-<section class="about-section">
+<section class="contact-body">
   <div class="c">
-    <div class="about-grid reveal">
-      <div>
-        <span class="label">Nuestra misión</span>
-        <h2 class="about-h2">Que ninguna clínica pierda un paciente por no responder a tiempo.</h2>
-        <p class="about-p">En España, miles de clínicas pequeñas y medianas atienden a sus pacientes con equipos reducidos que hacen malabares entre consultas, llamadas y mensajes de WhatsApp. El resultado: pacientes sin respuesta, citas perdidas y equipos agotados.</p>
-        <p class="about-p">Cliniflux nació para cambiar eso. Creamos un sistema de automatización inteligente que permite a cualquier clínica responder como si tuviera una recepcionista dedicada 24/7 — sin necesidad de contratar a nadie.</p>
+    <div class="contact-layout">
+      <!-- Form -->
+      <div class="cf reveal" id="cfWrap">
+        <div id="cfForm">
+          <div class="cf-title">Solicitar información</div>
+          <div class="cf-sub">Respondemos en menos de 24 horas laborables.</div>
+          <div class="cf-row">
+            <div class="cf-group"><label class="cf-label">Nombre *</label><input class="cf-input" id="cf-nombre" type="text" placeholder="Tu nombre" required></div>
+            <div class="cf-group"><label class="cf-label">Clínica *</label><input class="cf-input" id="cf-clinica" type="text" placeholder="Nombre de tu clínica" required></div>
+          </div>
+          <div class="cf-row">
+            <div class="cf-group"><label class="cf-label">Email *</label><input class="cf-input" id="cf-email" type="email" placeholder="tu@email.com" required></div>
+            <div class="cf-group"><label class="cf-label">Teléfono</label><input class="cf-input" id="cf-telefono" type="tel" placeholder="+34 600 000 000"></div>
+          </div>
+          <div class="cf-group"><label class="cf-label">Tipo de consulta *</label>
+            <select class="cf-select" id="cf-tipo">
+              <option value="">Selecciona una opción</option>
+              <option>Quiero una demo personalizada</option>
+              <option>Información sobre precios y planes</option>
+              <option>Duda técnica sobre el sistema</option>
+              <option>Soy partner / integrador</option>
+              <option>Otro</option>
+            </select>
+          </div>
+          <div class="cf-group"><label class="cf-label">Mensaje</label><textarea class="cf-textarea" id="cf-mensaje" placeholder="Cuéntanos más sobre tu clínica y qué necesitas..."></textarea></div>
+          <button class="cf-submit" onclick="submitForm()">Enviar mensaje →</button>
+        </div>
+        <div class="cf-success" id="cfSuccess">
+          <div class="cf-success-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <h3>¡Mensaje enviado!</h3>
+          <p>Gracias por contactarnos. Te responderemos en menos de 24 horas laborables a tu email.</p>
+        </div>
       </div>
-      <div>
-        <div class="about-stat-row">
-          <div class="about-stat"><div class="about-stat-v">67%</div><div class="about-stat-l">Pacientes eligen la primera clínica que responde</div></div>
-          <div class="about-stat"><div class="about-stat-v">+40%</div><div class="about-stat-l">Aumento en citas confirmadas con IA</div></div>
-          <div class="about-stat"><div class="about-stat-v">48h</div><div class="about-stat-l">Tiempo máximo de implementación</div></div>
-          <div class="about-stat"><div class="about-stat-v">11h</div><div class="about-stat-l">Ahorradas por clínica cada semana</div></div>
-          <div class="about-stat"><div class="about-stat-v">94%</div><div class="about-stat-l">Tasa de resolución automática IA</div></div>
-          <div class="about-stat"><div class="about-stat-v">24/7</div><div class="about-stat-l">Disponibilidad sin interrupciones</div></div>
+      <!-- Info -->
+      <div class="contact-info reveal d1">
+        <div class="ci-card">
+          <div class="ci-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
+          <div><div class="ci-t">Email</div><div class="ci-v"><a href="mailto:contacto@cliniflux.com">contacto@cliniflux.com</a><br>Respondemos en &lt; 24h laborables</div></div>
+        </div>
+        <div class="ci-card">
+          <div class="ci-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+          <div><div class="ci-t">Horario de atención</div><div class="ci-v">Lunes a Viernes<br>9:00 – 18:00 (CET)</div></div>
+        </div>
+        <div class="ci-card">
+          <div class="ci-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
+          <div><div class="ci-t">Ubicación</div><div class="ci-v">España · Servicio 100% remoto<br>Clientes en toda España y LATAM</div></div>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- VALUES -->
-<section class="about-section" style="background:var(--bg2)">
-  <div class="c">
-    <div class="reveal" style="text-align:center;margin-bottom:0">
-      <span class="label" style="display:block;text-align:center">Lo que nos define</span>
-      <h2 class="about-h2" style="text-align:center;max-width:500px;margin:0 auto 0">Nuestros valores</h2>
-    </div>
-    <div class="values-grid reveal d1">
-      <div class="val-card">
-        <div class="val-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M13 2L3 14h8l-1 8 10-12h-8z"/></svg></div>
-        <div class="val-t">Rapidez ante todo</div>
-        <div class="val-d">En sanidad, cada segundo cuenta. Diseñamos todo para que la respuesta llegue antes de que el paciente piense en buscar alternativas.</div>
-      </div>
-      <div class="val-card">
-        <div class="val-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
-        <div class="val-t">Privacidad primero</div>
-        <div class="val-d">Los datos de salud son los más sensibles. Cumplimos RGPD y construimos Cliniflux con seguridad desde la primera línea de código.</div>
-      </div>
-      <div class="val-card">
-        <div class="val-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg></div>
-        <div class="val-t">El equipo, liberado</div>
-        <div class="val-d">No reemplazamos a las personas. Les liberamos de tareas repetitivas para que puedan dedicarse a lo que realmente importa: cuidar al paciente.</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- CTA -->
-<section class="about-cta">
-  <div class="c" style="position:relative;z-index:2">
-    <h2>¿Quieres saber más?</h2>
-    <p>Escríbenos o prueba la demo. Sin compromiso.</p>
-    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
-      <a href="/demo" class="btn-primary" style="font-size:16px;padding:14px 32px">Probar demo gratuita →</a>
-      <a href="/contacto" class="btn-white" style="font-family:inherit;font-size:14px;font-weight:600;color:var(--text);background:#fff;border:none;padding:12px 24px;border-radius:40px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;transition:all .2s">Contactar</a>
-    </div>
-  </div>
-</section>
+<script>
+async function submitForm(){
+  const nombre=document.getElementById('cf-nombre').value.trim();
+  const clinica=document.getElementById('cf-clinica').value.trim();
+  const email=document.getElementById('cf-email').value.trim();
+  const tipo=document.getElementById('cf-tipo').value;
+  if(!nombre||!clinica||!email||!tipo){alert('Por favor completa los campos obligatorios.');return;}
+  const btn=document.querySelector('.cf-submit');
+  btn.textContent='Enviando...';btn.disabled=true;
+  try{
+    const r=await fetch('/api/contact',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nombre,clinica,email,telefono:document.getElementById('cf-telefono').value,tipo,mensaje:document.getElementById('cf-mensaje').value})});
+    if(r.ok){document.getElementById('cfForm').style.display='none';document.getElementById('cfSuccess').style.display='block';}
+    else throw new Error();
+  }catch(e){btn.textContent='Enviar mensaje →';btn.disabled=false;alert('Error al enviar. Por favor escríbenos a contacto@cliniflux.com');}
+}
+</script>
 <!-- COOKIE BANNER -->
 <div id="cookieBanner" style="display:none;position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:9999;background:#fff;border:1px solid rgba(0,0,0,0.1);border-radius:16px;box-shadow:0 8px 40px rgba(0,0,0,0.15);padding:20px 24px;max-width:520px;width:calc(100% - 40px);display:flex;align-items:center;gap:16px;flex-wrap:wrap">
   <p style="flex:1;font-size:13px;color:#374151;line-height:1.5;min-width:220px">🍪 Usamos cookies técnicas necesarias y, con tu consentimiento, analíticas para mejorar tu experiencia. <a href="/legal/cookies" style="color:#16a34a;font-weight:600">Más info</a></p>
