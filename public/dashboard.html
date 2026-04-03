@@ -208,10 +208,9 @@
     <span class="tb-clinic-tag">Vista previa</span>
   </div>
   <div class="tb-right">
-    <span class="tb-demo-badge">🔍 Demo interactiva</span>
     <div class="tb-ia"><div class="tb-ia-dot"></div>IA activa</div>
-    <a href="/contacto" class="tb-btn primary">Solicitar acceso →</a>
-    <a href="/" class="tb-btn">← Volver</a>
+    <span id="tb-clinic-name" style="font-size:13px;font-weight:500;color:var(--text2)"></span>
+    <button class="tb-btn" onclick="logout()">Cerrar sesión</button>
   </div>
 </header>
 
@@ -448,6 +447,128 @@
 </div>
 
 <script>
+  // ── Auth check ────────────────────────────────────────────────────────────
+  (async function(){
+    try {
+      const r = await fetch('/api/me');
+      if (!r.ok) { window.location.href = '/login'; return; }
+      const me = await r.json();
+      document.getElementById('tb-clinic-name').textContent = me.name;
+      document.querySelector('.tb-clinic-name').textContent = me.name;
+      loadData();
+    } catch { window.location.href = '/login'; }
+  })();
+
+  async function logout() {
+    await fetch('/auth/logout', { method: 'POST' });
+    window.location.href = '/login';
+  }
+
+  // ── Cargar datos reales ───────────────────────────────────────────────────
+  async function loadData() {
+    try {
+      const [leadsRes, apptRes] = await Promise.all([
+        fetch('/api/dashboard/leads'),
+        fetch('/api/dashboard/appointments')
+      ]);
+      const leads = await leadsRes.json();
+      const appts = await apptRes.json();
+
+      // Actualizar KPI de leads en métricas
+      const kpiLeads = document.querySelector('.kpi-n[data-key="leads"]');
+      if (kpiLeads) kpiLeads.textContent = leads.length;
+
+      // Actualizar lista de conversaciones/leads con datos reales
+      if (leads.length > 0) renderLeads(leads);
+
+      // Actualizar agenda con citas reales
+      if (appts.length > 0) renderAppointments(appts);
+
+      // Actualizar contador badge
+      const badge = document.querySelector('.si-badge');
+      if (badge) badge.textContent = leads.filter(l => {
+        const d = new Date(l.created_at); return (Date.now() - d) < 86400000;
+      }).length || leads.length;
+
+    } catch(e) { console.error('loadData:', e); }
+  }
+
+  function renderLeads(leads) {
+    const list = document.querySelector('.conv-list');
+    const statsEl = list.querySelector('.conv-stats');
+    const colors = ['#16a34a,#22c55e','#0ea5e9,#0284c7','#f43f5e,#e11d48','#f97316,#ea580c','#8b5cf6,#7c3aed'];
+    // Limpiar items existentes (mantener hd, search, stats)
+    list.querySelectorAll('.conv-item').forEach(el => el.remove());
+    leads.slice(0, 8).forEach((lead, i) => {
+      const initials = (lead.nombre || 'U').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+      const color = colors[i % colors.length];
+      const ago = timeAgo(lead.created_at);
+      const div = document.createElement('div');
+      div.className = 'conv-item' + (i===0?' active':'');
+      div.onclick = function(){ selectConv(this); showLeadDetail(lead); };
+      div.innerHTML = `<div class="c-ava" style="background:linear-gradient(135deg,${color})">${initials}</div>
+        <div class="c-info"><div class="c-name">${esc(lead.nombre||'Sin nombre')}</div><div class="c-prev">${esc(lead.tipo||lead.mensaje||'Sin mensaje')}</div></div>
+        <div class="c-meta"><span class="c-time">${ago}</span><span class="c-ai">Web</span></div>`;
+      list.insertBefore(div, statsEl);
+    });
+    // Actualizar stats
+    const today = leads.filter(l => new Date(l.created_at).toDateString() === new Date().toDateString()).length;
+    list.querySelectorAll('.cs').forEach((el, i) => {
+      const n = el.querySelector('.cs-n'), lbl = el.querySelector('.cs-l');
+      if (i===0){ n.textContent = leads.length; lbl.textContent = 'Total leads'; }
+      if (i===1){ n.textContent = today; n.style.color='var(--green)'; lbl.textContent = 'Hoy'; }
+    });
+    if (leads[0]) showLeadDetail(leads[0]);
+  }
+
+  function showLeadDetail(lead) {
+    const pp = document.querySelector('.patient-panel');
+    const initials = (lead.nombre||'U').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    pp.querySelector('.pp-ava').textContent = initials;
+    pp.querySelector('.pp-name').textContent = lead.nombre || '—';
+    pp.querySelector('.pp-phone').textContent = lead.email || '—';
+    pp.querySelector('.pp-wa').innerHTML = `<svg width="10" height="10" viewBox="0 0 24 24" fill="#16a34a"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4" stroke="#fff" stroke-width="2" fill="none"/></svg>${lead.tipo||'Lead web'}`;
+    const apt = pp.querySelector('.pp-apt');
+    apt.querySelector('.pp-apt-t').textContent = lead.clinica || '—';
+    apt.querySelector('.pp-apt-s').textContent = new Date(lead.created_at).toLocaleString('es-ES');
+    const chat = document.querySelector('.chat-msgs');
+    chat.innerHTML = `
+      <div class="msg mi">${esc(lead.mensaje || lead.tipo || 'Contacto desde el formulario web.')}</div>
+      <div class="msg mo">Hemos recibido tu mensaje, ${esc(lead.nombre?.split(' ')[0]||'')}.
+        Nos pondremos en contacto contigo a la mayor brevedad posible.<div class="msg-ts">Auto-reply · ${new Date(lead.created_at).toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'})}</div>
+      </div>`;
+    document.querySelector('.chat-hd-title').textContent = lead.nombre || '—';
+    document.querySelector('.chat-hd-av').textContent = initials;
+  }
+
+  function renderAppointments(appts) {
+    const list = document.querySelector('.ag-list');
+    if (!list || !appts.length) return;
+    list.innerHTML = '';
+    const colors = ['#16a34a','#0ea5e9','#f59e0b','#f43f5e','#8b5cf6'];
+    appts.forEach((a, i) => {
+      const div = document.createElement('div');
+      div.className = 'ag-slot';
+      const time = a.scheduled_at?.slice(0,5) || '--:--';
+      div.innerHTML = `<div class="slot-bar" style="background:${colors[i%colors.length]}"></div>
+        <div class="ag-time">${esc(time)}</div>
+        <div class="ag-info"><div class="ag-name">${esc(a.patient_name||'Paciente')}</div><div class="ag-svc">${esc(a.service||'Servicio')}</div></div>
+        <div class="ag-badge conf">✓ Confirmada</div>`;
+      list.appendChild(div);
+    });
+    document.querySelector('.ag-count-n').textContent = appts.length;
+  }
+
+  function timeAgo(dateStr) {
+    const diff = (Date.now() - new Date(dateStr)) / 60000;
+    if (diff < 60) return Math.round(diff) + 'm';
+    if (diff < 1440) return Math.round(diff/60) + 'h';
+    return Math.round(diff/1440) + 'd';
+  }
+
+  function esc(s){ return String(s).replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  // ── Panel switching ───────────────────────────────────────────────────────
   function switchPanel(n){
     document.querySelectorAll('.panel').forEach((p,i) => p.classList.toggle('active', i===n));
     document.querySelectorAll('.si[data-panel]').forEach(s => s.classList.toggle('active', parseInt(s.dataset.panel)===n));
