@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Blog — Cliniflux</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>*{margin:0;padding:0;box-sizing:border-box}
+    :root{--bg:#fff;--bg2:#f8f9fb;--border:rgba(0,0,0,0.07);--text:#0f172a;--text2:rgba(15,23,42,0.60);--text3:rgba(15,23,42,0.36);--green:#16a34a;--green-dim:rgba(22,163,74,0.08);--green-dim2:rgba(22,163,74,0.14);--shadow-sm:0 1px 3px rgba(0,0,0,0.07);--r-xl:24px;--r-sm:8px;--cmax:1160px;--px:48px}
+    html{scroll-behavior:smooth}body{font-family:'Inter',sans-serif;color:var(--text);background:#fff;-webkit-font-smoothing:antialiased}
+    .c{max-width:var(--cmax);margin:0 auto;padding:0 var(--px)}a{color:inherit;text-decoration:none}
+    nav{position:fixed;top:0;left:0;right:0;z-index:200;transition:background .3s,box-shadow .3s}
+    nav.scrolled{background:rgba(255,255,255,0.95);backdrop-filter:blur(16px);box-shadow:0 1px 0 var(--border)}
+    .nav-inner{max-width:var(--cmax);margin:0 auto;padding:0 var(--px);height:66px;display:flex;align-items:center;gap:32px}
+    .nav-logo{font-size:24px;font-weight:700;letter-spacing:-.8px;flex-shrink:0}
+    .nav-links{display:flex;gap:2px;list-style:none;margin:0 auto}
+    .nav-links a{font-size:14px;font-weight:500;color:var(--text2);padding:7px 13px;border-radius:var(--r-sm);transition:color .2s,background .2s}
+    .nav-links a:hover{color:var(--text);background:rgba(0,0,0,0.04)}
+    .btn-primary{font-family:inherit;font-size:14px;font-weight:600;color:#fff;background:var(--green);border:none;padding:10px 22px;border-radius:40px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px;transition:background .2s}
+    .btn-primary:hover{background:#15803d}
+    .btn-ghost{font-family:inherit;font-size:14px;font-weight:500;color:var(--text2);background:none;border:none;padding:7px 13px;border-radius:var(--r-sm);cursor:pointer;text-decoration:none;transition:color .2s}
+    .btn-ghost:hover{color:var(--text);background:rgba(0,0,0,0.04)}
+    .nav-burger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:8px}
+    .nav-burger span{display:block;width:22px;height:2px;background:var(--text);border-radius:2px}
+    @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.4)}}
+    .badge-dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 2s ease-in-out infinite}
+    footer{border-top:1px solid var(--border);padding:44px 0;background:var(--bg2)}
+    .ft-inner{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:48px;margin-bottom:36px}
+    .ft-logo{font-size:20px;font-weight:700;letter-spacing:-.5px;display:block;margin-bottom:10px}
+    .ft-desc{font-size:13px;color:var(--text2);line-height:1.65;max-width:240px}
+    .ft-col-t{font-size:12px;font-weight:700;color:var(--text);letter-spacing:.3px;text-transform:uppercase;margin-bottom:14px}
+    .ft-col ul{list-style:none;display:flex;flex-direction:column;gap:8px}
+    .ft-col a{font-size:13px;color:var(--text2);transition:color .2s}.ft-col a:hover{color:var(--text)}
+    .ft-bot{display:flex;justify-content:space-between;padding-top:24px;border-top:1px solid var(--border);font-size:12px;color:var(--text3)}
+    @media(max-width:640px){.nav-links,.nav-actions{display:none}.nav-inner{height:52px;padding:0 16px}.nav-logo{font-size:18px}.nav-burger{display:flex;margin-left:auto}.ft-inner{grid-template-columns:1fr 1fr}}
+
+    .blog-hero{padding:calc(66px + 72px) 0 64px;text-align:center;border-bottom:1px solid var(--border)}
+    .blog-hero .label{font-size:11px;font-weight:700;color:var(--green);letter-spacing:.6px;text-transform:uppercase;margin-bottom:16px;display:flex;align-items:center;justify-content:center;gap:6px}
+    .blog-hero h1{font-size:clamp(36px,5vw,56px);font-weight:800;letter-spacing:-2.5px;line-height:1.1;margin-bottom:16px}
+    .blog-hero p{font-size:17px;color:var(--text2);max-width:520px;margin:0 auto 32px;line-height:1.7}
+    .subscribe-form{display:flex;gap:8px;justify-content:center;max-width:420px;margin:0 auto}
+    .subscribe-input{flex:1;font-family:inherit;font-size:14px;color:var(--text);background:#fff;border:1.5px solid rgba(0,0,0,0.12);border-radius:40px;padding:11px 18px;outline:none;transition:border-color .2s}
+    .subscribe-input:focus{border-color:var(--green)}
+    .subscribe-btn{font-family:inherit;font-size:14px;font-weight:600;color:#fff;background:var(--green);border:none;padding:11px 22px;border-radius:40px;cursor:pointer;white-space:nowrap;transition:background .2s}
+    .subscribe-btn:hover{background:#15803d}
+
+    .blog-section{padding:72px 0}
+    .blog-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:48px}
+    .blog-card{background:#fff;border:1px solid var(--border);border-radius:var(--r-xl);overflow:hidden;transition:box-shadow .2s,transform .2s;cursor:default}
+    .blog-card:hover{box-shadow:0 12px 40px rgba(0,0,0,0.08);transform:translateY(-2px)}
+    .blog-img{height:160px;display:flex;align-items:center;justify-content:center;font-size:48px;position:relative;overflow:hidden}
+    .blog-body{padding:24px}
+    .blog-tag{font-size:11px;font-weight:700;color:var(--green);letter-spacing:.5px;text-transform:uppercase;margin-bottom:10px}
+    .blog-title{font-size:18px;font-weight:700;letter-spacing:-.4px;line-height:1.3;margin-bottom:10px}
+    .blog-excerpt{font-size:13px;color:var(--text2);line-height:1.65}
+    .blog-meta{display:flex;align-items:center;gap:10px;margin-top:16px;padding-top:14px;border-top:1px solid var(--border);font-size:12px;color:var(--text3)}
+    .blog-av{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff}
+    .coming-badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;background:var(--green-dim);color:var(--green);padding:4px 12px;border-radius:100px;border:1px solid rgba(22,163,74,0.2);margin-top:12px}
+    @media(max-width:900px){.blog-grid{grid-template-columns:1fr 1fr}}
+    @media(max-width:580px){.blog-grid{grid-template-columns:1fr}.subscribe-form{flex-direction:column}}
+  </style>
+</head>
+<body>
+<nav id="nav">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">cliniflux</a>
+    <ul class="nav-links">
+      <li><a href="/#flujo">Cómo funciona</a></li>
+      <li><a href="/#producto">Funcionalidades</a></li>
+      <li><a href="/#precios">Precios</a></li>
+      <li><a href="/blog">Blog</a></li>
+    </ul>
+    <div class="nav-actions" style="display:flex;align-items:center;gap:8px">
+      <a href="/demo" class="btn-ghost">Ver demo</a>
+      <a href="/contacto" class="btn-primary">Solicitar acceso →</a>
+    </div>
+    <button class="nav-burger" id="navBurger"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<section class="blog-hero">
+  <div class="c">
+    <div class="label"><span class="badge-dot"></span>Blog Cliniflux</div>
+    <h1>Recursos para clínicas<br>que quieren crecer</h1>
+    <p>Artículos sobre automatización, WhatsApp Business, inteligencia artificial y gestión de clínicas.</p>
+    <div class="subscribe-form">
+      <input class="subscribe-input" type="email" placeholder="tu@email.com" id="sub-email">
+      <button class="subscribe-btn" onclick="subscribe()">Suscribirme</button>
+    </div>
+    <div class="coming-badge" style="margin:16px auto 0;display:block;width:fit-content">📝 Próximos artículos en camino</div>
+  </div>
+</section>
+
+<section class="blog-section">
+  <div class="c">
+    <div style="text-align:center">
+      <div style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px">Próximamente</div>
+      <h2 style="font-size:clamp(24px,3vw,36px);font-weight:800;letter-spacing:-1.5px;margin-bottom:8px">Artículos que estamos preparando</h2>
+      <p style="font-size:15px;color:var(--text2)">Suscríbete arriba para recibir los primeros artículos.</p>
+    </div>
+    <div class="blog-grid">
+      <div class="blog-card">
+        <div class="blog-img" style="background:linear-gradient(135deg,#f0fdf4,#dcfce7)">📱</div>
+        <div class="blog-body">
+          <div class="blog-tag">WhatsApp Business</div>
+          <div class="blog-title">Cómo configurar WhatsApp Business API para tu clínica en 2025</div>
+          <div class="blog-excerpt">Guía paso a paso para conectar la API oficial de Meta y empezar a automatizar las respuestas de tu clínica.</div>
+          <div class="blog-meta"><div class="blog-av" style="background:var(--green)">CF</div><span>Equipo Cliniflux</span><span>·</span><span>Próximamente</span></div>
+        </div>
+      </div>
+      <div class="blog-card">
+        <div class="blog-img" style="background:linear-gradient(135deg,#eff6ff,#dbeafe)">🤖</div>
+        <div class="blog-body">
+          <div class="blog-tag">Inteligencia Artificial</div>
+          <div class="blog-title">IA en clínicas: qué puede y qué no puede hacer por ti</div>
+          <div class="blog-excerpt">Desmontamos los mitos sobre la IA en salud y explicamos qué tareas puede automatizar realmente hoy en día.</div>
+          <div class="blog-meta"><div class="blog-av" style="background:#0ea5e9">CF</div><span>Equipo Cliniflux</span><span>·</span><span>Próximamente</span></div>
+        </div>
+      </div>
+      <div class="blog-card">
+        <div class="blog-img" style="background:linear-gradient(135deg,#fef9f0,#fef3c7)">📊</div>
+        <div class="blog-body">
+          <div class="blog-tag">Gestión de clínicas</div>
+          <div class="blog-title">5 métricas que toda clínica debería medir en su agenda</div>
+          <div class="blog-excerpt">Tasa de confirmación, no-shows, tiempo de respuesta... Los KPIs que marcan la diferencia entre crecer y estancarse.</div>
+          <div class="blog-meta"><div class="blog-av" style="background:#f59e0b">CF</div><span>Equipo Cliniflux</span><span>·</span><span>Próximamente</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="c">
+    <div class="ft-inner">
+      <div><a href="/" class="ft-logo">cliniflux</a><p class="ft-desc">Automatización inteligente de WhatsApp para clínicas que quieren crecer sin aumentar el equipo.</p></div>
+      <div class="ft-col"><div class="ft-col-t">Producto</div><ul><li><a href="/#flujo">Cómo funciona</a></li><li><a href="/#producto">Funcionalidades</a></li><li><a href="/#precios">Precios</a></li><li><a href="/demo">Demo</a></li><li><a href="/blog">Blog</a></li></ul></div>
+      <div class="ft-col"><div class="ft-col-t">Empresa</div><ul><li><a href="/about">Nosotros</a></li><li><a href="/contacto">Contacto</a></li></ul></div>
+      <div class="ft-col"><div class="ft-col-t">Legal</div><ul><li><a href="/legal/privacidad">Privacidad</a></li><li><a href="/legal/terminos">Términos</a></li><li><a href="/legal/cookies">Cookies</a></li><li><a href="/features/rgpd">RGPD</a></li></ul></div>
+    </div>
+    <div class="ft-bot"><p>© 2025 Cliniflux. Todos los derechos reservados.</p><p>Hecho con ❤️ en España</p></div>
+  </div>
+</footer>
+
+<script>
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', () => nav.classList.toggle('scrolled', scrollY > 20), {passive:true});
+  function subscribe(){
+    const e = document.getElementById('sub-email').value.trim();
+    if(!e || !e.includes('@')){alert('Introduce un email válido');return;}
+    document.querySelector('.subscribe-form').innerHTML = '<p style="color:var(--green);font-weight:600;font-size:14px">✓ Te avisaremos cuando publiquemos el primer artículo.</p>';
+  }
+</script>
+</body>
+</html>

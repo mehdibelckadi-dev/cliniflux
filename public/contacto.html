@@ -173,6 +173,19 @@
 </section>
 
 <script>
+// Pre-rellenar tipo de consulta según plan seleccionado en precios
+(function(){
+  const params = new URLSearchParams(window.location.search);
+  const plan = params.get('plan');
+  if(plan){
+    const sel = document.getElementById('cf-tipo');
+    sel.value = 'Información sobre precios y planes';
+    const msg = document.getElementById('cf-mensaje');
+    const nombres = {starter:'Starter (297€/mes)', profesional:'Profesional (497€/mes)', agencia:'Agencia / Red (997€/mes)'};
+    if(nombres[plan]) msg.value = 'Estoy interesado en el plan ' + nombres[plan] + '. Me gustaría más información y una demo personalizada.';
+  }
+})();
+
 async function submitForm(){
   const nombre=document.getElementById('cf-nombre').value.trim();
   const clinica=document.getElementById('cf-clinica').value.trim();

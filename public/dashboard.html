@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Dashboard — Cliniflux</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    :root{--bg:#fff;--bg2:#f8f9fb;--border:rgba(0,0,0,0.07);--text:#0f172a;--text2:rgba(15,23,42,0.60);--text3:rgba(15,23,42,0.36);--green:#16a34a;--green-dim:rgba(22,163,74,0.08);--green-dim2:rgba(22,163,74,0.14);--shadow-sm:0 1px 3px rgba(0,0,0,0.07)}
+    html,body{height:100%;font-family:'Inter',sans-serif;color:var(--text);background:#f4f5f7;-webkit-font-smoothing:antialiased}
+    a{color:inherit;text-decoration:none}
+
+    /* TOP BAR */
+    .topbar{position:fixed;top:0;left:0;right:0;height:48px;background:#fff;border-bottom:1px solid rgba(0,0,0,0.08);display:flex;align-items:center;z-index:100;padding:0 16px 0 0}
+    .tb-logo-zone{width:56px;height:48px;display:flex;align-items:center;justify-content:center;border-right:1px solid rgba(0,0,0,0.08);flex-shrink:0}
+    .tb-logo{font-size:14px;font-weight:800;color:#fff;background:var(--green);width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;letter-spacing:-.3px}
+    .tb-clinic{flex:1;padding:0 16px;display:flex;align-items:center;gap:8px}
+    .tb-clinic-name{font-size:13px;font-weight:600;color:var(--text)}
+    .tb-clinic-tag{font-size:10px;color:var(--text3);background:var(--bg2);border:1px solid var(--border);padding:2px 8px;border-radius:100px}
+    .tb-right{display:flex;align-items:center;gap:12px}
+    .tb-ia{display:flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:var(--green);background:var(--green-dim);border:1px solid rgba(22,163,74,0.2);padding:4px 12px;border-radius:100px}
+    .tb-ia-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s ease-in-out infinite}
+    @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.4)}}
+    .tb-btn{font-family:inherit;font-size:12px;font-weight:600;color:var(--text2);background:none;border:1px solid var(--border);padding:5px 12px;border-radius:6px;cursor:pointer;text-decoration:none;transition:all .15s}
+    .tb-btn:hover{color:var(--text);background:var(--bg2)}
+    .tb-btn.primary{color:#fff;background:var(--green);border-color:var(--green)}
+    .tb-btn.primary:hover{background:#15803d}
+    .tb-demo-badge{font-size:11px;font-weight:700;color:#92400e;background:#fef3c7;border:1px solid rgba(245,158,11,0.3);padding:3px 10px;border-radius:100px}
+
+    /* LAYOUT */
+    .app-layout{display:flex;height:calc(100vh - 48px);margin-top:48px}
+
+    /* SIDEBAR */
+    .sidebar{width:56px;background:#0f172a;display:flex;flex-direction:column;align-items:center;padding:12px 0;flex-shrink:0;gap:4px}
+    .si{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .15s;position:relative;flex-shrink:0}
+    .si:hover{background:rgba(255,255,255,0.08)}
+    .si.active{background:rgba(255,255,255,0.12)}
+    .si svg{width:17px;height:17px;stroke:rgba(255,255,255,0.45)}
+    .si.active svg{stroke:rgba(255,255,255,0.9)}
+    .si-badge{position:absolute;top:4px;right:4px;width:14px;height:14px;border-radius:50%;background:#ef4444;font-size:8px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center}
+    .si-divider{width:24px;height:1px;background:rgba(255,255,255,0.1);margin:6px 0}
+    .si-bottom{margin-top:auto;display:flex;flex-direction:column;align-items:center;gap:6px}
+    .si-ava{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#16a34a,#22c55e);font-size:9px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center}
+    .si-tooltip{position:absolute;left:calc(100% + 10px);top:50%;transform:translateY(-50%);background:#0f172a;color:#fff;font-size:11px;font-weight:600;padding:4px 10px;border-radius:6px;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .15s;z-index:200}
+    .si:hover .si-tooltip{opacity:1}
+
+    /* MAIN CONTENT */
+    .main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+
+    /* PANELS */
+    .panel{display:none;flex:1;overflow:hidden}
+    .panel.active{display:flex}
+
+    /* ─── PANEL 0: CONVERSACIONES ─── */
+    .p-conv{flex-direction:row}
+    .conv-list{width:260px;border-right:1px solid rgba(0,0,0,0.07);display:flex;flex-direction:column;background:#fff;flex-shrink:0}
+    .conv-list-hd{padding:12px 14px 8px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(0,0,0,0.06)}
+    .conv-list-title{font-size:13px;font-weight:700;color:var(--text)}
+    .conv-cnt{font-size:10px;font-weight:700;background:#ef4444;color:#fff;padding:1px 6px;border-radius:100px}
+    .conv-ia-badge{font-size:9px;font-weight:700;background:#dcfce7;color:#15803d;padding:2px 7px;border-radius:100px}
+    .conv-search{padding:8px 12px;border-bottom:1px solid rgba(0,0,0,0.06)}
+    .conv-search input{width:100%;background:#f4f5f7;border:1px solid rgba(0,0,0,0.08);border-radius:7px;padding:6px 10px;font-size:12px;color:var(--text);font-family:inherit;outline:none}
+    .conv-item{padding:10px 12px;display:flex;align-items:flex-start;gap:9px;border-left:2px solid transparent;cursor:pointer;transition:background .12s;border-bottom:1px solid rgba(0,0,0,0.04)}
+    .conv-item.active{background:#eff6ff;border-left-color:#3b82f6}
+    .conv-item:hover:not(.active){background:#fafafa}
+    .c-ava{width:32px;height:32px;border-radius:50%;font-size:11px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+    .c-info{flex:1;min-width:0}
+    .c-name{font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .c-prev{font-size:11px;color:rgba(0,0,0,0.4);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+    .c-meta{display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex-shrink:0}
+    .c-time{font-size:10px;color:rgba(0,0,0,0.35)}
+    .c-unread{font-size:9px;font-weight:700;background:#3b82f6;color:#fff;padding:1px 5px;border-radius:100px;min-width:16px;text-align:center}
+    .c-ai{font-size:9px;font-weight:700;background:#dcfce7;color:#15803d;padding:1px 5px;border-radius:4px}
+    .conv-stats{margin-top:auto;padding:10px 12px;border-top:1px solid rgba(0,0,0,0.06);display:grid;grid-template-columns:1fr 1fr;gap:6px}
+    .cs{background:#f4f5f7;border-radius:7px;padding:7px 9px}
+    .cs-n{font-size:16px;font-weight:800;color:var(--text);letter-spacing:-.5px;line-height:1}
+    .cs-l{font-size:9px;color:rgba(0,0,0,0.4);margin-top:1px}
+    .chat-area{flex:1;display:flex;flex-direction:column;background:#fff;min-width:0}
+    .chat-hd{padding:10px 14px;border-bottom:1px solid rgba(0,0,0,0.07);display:flex;align-items:center;gap:8px;flex-shrink:0}
+    .chat-hd-av{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0}
+    .chat-hd-title{font-size:13px;font-weight:700;color:var(--text);flex:1}
+    .chat-hd-sub{font-size:11px;color:rgba(0,0,0,0.4);display:flex;align-items:center;gap:4px}
+    .wa-dot{width:6px;height:6px;background:#25d366;border-radius:50%}
+    .chat-status{font-size:10px;font-weight:600;background:#fef3c7;color:#92400e;padding:3px 9px;border-radius:5px}
+    .chat-msgs{flex:1;padding:14px 16px;display:flex;flex-direction:column;gap:8px;overflow-y:auto;background:#f8f9fb}
+    .msg{max-width:72%;padding:9px 12px;border-radius:12px;font-size:13px;line-height:1.5}
+    .mi{background:#fff;color:#334155;align-self:flex-start;border-bottom-left-radius:3px;box-shadow:0 1px 2px rgba(0,0,0,0.06)}
+    .mo{background:#dbeafe;color:#1e3a5f;align-self:flex-end;border-bottom-right-radius:3px}
+    .mo-green{background:#dcfce7;color:#14532d;align-self:flex-end;border-bottom-right-radius:3px}
+    .msg-ts{font-size:10px;margin-top:3px;text-align:right;opacity:.5}
+    .typing{display:flex;gap:4px;align-items:center;padding:4px 0}
+    .td{width:6px;height:6px;border-radius:50%;background:var(--green);animation:tb 1.2s ease infinite}
+    .td:nth-child(2){animation-delay:.2s}.td:nth-child(3){animation-delay:.4s}
+    @keyframes tb{0%,60%,100%{transform:translateY(0);opacity:.35}30%{transform:translateY(-5px);opacity:1}}
+    .quick-chips{display:flex;gap:6px;padding:8px 12px;border-top:1px solid rgba(0,0,0,0.06);overflow-x:auto;flex-shrink:0;background:#fff}
+    .quick-chips::-webkit-scrollbar{display:none}
+    .qc{font-size:11px;font-weight:600;color:var(--text2);background:var(--bg2);border:1px solid var(--border);padding:4px 10px;border-radius:100px;white-space:nowrap;cursor:pointer;transition:all .15s;flex-shrink:0}
+    .qc:hover{background:var(--green-dim);color:var(--green);border-color:rgba(22,163,74,0.3)}
+    .chat-input-row{padding:10px 12px;border-top:1px solid rgba(0,0,0,0.07);display:flex;align-items:center;gap:8px;flex-shrink:0;background:#fff}
+    .chat-input{flex:1;background:#f4f5f7;border:1px solid rgba(0,0,0,0.08);border-radius:8px;padding:8px 12px;font-size:12px;color:var(--text);font-family:inherit;outline:none}
+    .send-btn{width:32px;height:32px;background:var(--green);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;cursor:pointer;border:none;transition:background .15s}
+    .send-btn:hover{background:#15803d}
+    .patient-panel{width:220px;border-left:1px solid rgba(0,0,0,0.07);background:#fafbfc;display:flex;flex-direction:column;overflow-y:auto;flex-shrink:0}
+    .pp-hd{padding:10px 14px 6px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:rgba(0,0,0,0.35);border-bottom:1px solid rgba(0,0,0,0.06)}
+    .pp-profile{padding:16px 14px 12px;display:flex;flex-direction:column;align-items:center;text-align:center;border-bottom:1px solid rgba(0,0,0,0.06)}
+    .pp-ava{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#16a34a,#22c55e);font-size:15px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center;margin-bottom:8px}
+    .pp-name{font-size:13px;font-weight:700;color:var(--text);margin-bottom:2px}
+    .pp-phone{font-size:11px;color:rgba(0,0,0,0.4);margin-bottom:7px}
+    .pp-wa{display:flex;align-items:center;gap:4px;font-size:10px;font-weight:600;color:#25d366;background:#f0fdf4;padding:3px 9px;border-radius:100px}
+    .pp-sect{padding:8px 14px 4px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:rgba(0,0,0,0.3)}
+    .pp-apt{margin:0 12px 8px;background:#f0fdf4;border:1px solid rgba(22,163,74,0.15);border-radius:8px;padding:9px 11px}
+    .pp-apt-t{font-size:12px;font-weight:700;color:var(--text);margin-bottom:2px}
+    .pp-apt-s{font-size:10px;color:rgba(0,0,0,0.4)}
+    .pp-hist-item{padding:6px 14px;font-size:11px;color:rgba(0,0,0,0.5);border-bottom:1px solid rgba(0,0,0,0.04);display:flex;justify-content:space-between}
+    .pp-hist-item span{font-size:10px;color:var(--green);font-weight:600}
+    .pp-ai{margin:8px 12px;background:#fff7ed;border:1px solid rgba(251,146,60,0.2);border-radius:8px;padding:9px 11px}
+    .pp-ai-lbl{font-size:9px;font-weight:700;color:#ea580c;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px;display:flex;align-items:center;gap:4px}
+    .pp-ai-val{font-size:12px;color:#9a3412;font-weight:600;margin-bottom:2px}
+    .pp-ai-conf{font-size:10px;color:rgba(0,0,0,0.4)}
+
+    /* ─── PANEL 1: AGENDA ─── */
+    .p-agenda{flex-direction:column;background:#fff;overflow:hidden}
+    .ag-hd{padding:14px 20px 10px;border-bottom:1px solid rgba(0,0,0,0.07);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+    .ag-title-day{font-size:11px;font-weight:700;color:var(--green);letter-spacing:.8px;text-transform:uppercase}
+    .ag-title-full{font-size:13px;font-weight:600;color:var(--text);margin-top:2px}
+    .ag-count{text-align:right}
+    .ag-count-n{font-size:28px;font-weight:800;color:var(--text);letter-spacing:-1.5px;line-height:1}
+    .ag-count-l{font-size:11px;color:rgba(0,0,0,0.4)}
+    .ag-week{display:flex;gap:4px;padding:10px 20px 8px;border-bottom:1px solid rgba(0,0,0,0.07);flex-shrink:0}
+    .ag-wd{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;border-radius:8px;padding:5px 2px;transition:background .15s;position:relative}
+    .ag-wd:hover{background:#f4f5f7}
+    .ag-wd-lbl{font-size:9px;font-weight:600;color:rgba(0,0,0,0.35);text-transform:uppercase}
+    .ag-wd-num{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--text)}
+    .ag-wd.today .ag-wd-lbl{color:var(--green)}
+    .ag-wd.today .ag-wd-num{background:var(--green);color:#fff}
+    .ag-wd.has-dot::after{content:'';position:absolute;bottom:3px;left:50%;transform:translateX(-50%);width:4px;height:4px;border-radius:50%;background:var(--green);opacity:.7}
+    .ag-body{display:flex;flex:1;overflow:hidden}
+    .ag-list{flex:1;overflow-y:auto;display:flex;flex-direction:column}
+    .ag-slot{display:flex;align-items:center;gap:14px;padding:12px 20px;border-bottom:1px solid rgba(0,0,0,0.04);position:relative;transition:background .12s;cursor:pointer}
+    .ag-slot:hover{background:#fafafa}
+    .slot-bar{position:absolute;left:20px;top:10px;bottom:10px;width:3px;border-radius:2px}
+    .ag-time{font-size:12px;font-weight:700;color:var(--text);width:42px;flex-shrink:0;padding-left:14px}
+    .ag-info{flex:1;min-width:0}
+    .ag-name{font-size:13px;font-weight:600;color:var(--text)}
+    .ag-svc{font-size:11px;color:rgba(0,0,0,0.4);margin-top:1px}
+    .ag-badge{font-size:10px;font-weight:700;padding:3px 10px;border-radius:100px;flex-shrink:0}
+    .ag-badge.conf{background:#dcfce7;color:#15803d}
+    .ag-badge.pend{background:#fef3c7;color:#92400e}
+    .ag-side{width:240px;border-left:1px solid rgba(0,0,0,0.07);background:#fafafa;padding:16px;display:flex;flex-direction:column;gap:14px;flex-shrink:0;overflow-y:auto}
+    .ag-side-title{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:rgba(0,0,0,0.35);margin-bottom:8px}
+    .ag-side-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+    .ag-stat-card{background:#fff;border-radius:10px;padding:10px;text-align:center;border:1px solid var(--border)}
+    .ag-stat-n{font-size:22px;font-weight:800;letter-spacing:-1px;line-height:1}
+    .ag-stat-l{font-size:9px;color:rgba(0,0,0,0.4);margin-top:2px}
+    .ag-doc{margin-bottom:10px}
+    .ag-doc-name{font-size:12px;font-weight:600;color:var(--text);margin-bottom:4px}
+    .ag-doc-bar{height:5px;background:rgba(0,0,0,0.06);border-radius:3px;overflow:hidden;margin-bottom:2px}
+    .ag-doc-fill{height:100%;border-radius:3px}
+    .ag-doc-lbl{font-size:10px;color:rgba(0,0,0,0.4)}
+    .ag-footer{padding:10px 20px;border-top:1px solid rgba(0,0,0,0.07);display:flex;gap:24px;background:#fafafa;flex-shrink:0}
+    .ag-foot-stat{font-size:12px;color:rgba(0,0,0,0.4);display:flex;align-items:center;gap:4px}
+    .ag-foot-n{font-size:18px;font-weight:800;letter-spacing:-1px;margin-right:4px;vertical-align:middle}
+
+    /* ─── PANEL 2: MÉTRICAS ─── */
+    .p-metrics{flex-direction:column;background:#f4f5f7;overflow-y:auto;padding:20px}
+    .met-title{font-size:18px;font-weight:800;letter-spacing:-1px;color:var(--text);margin-bottom:4px}
+    .met-sub{font-size:13px;color:var(--text2);margin-bottom:20px}
+    .met-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+    .kpi{background:#fff;border-radius:14px;padding:16px 18px;border:1px solid var(--border)}
+    .kpi-l{font-size:11px;color:rgba(0,0,0,0.4);margin-bottom:6px}
+    .kpi-n{font-size:28px;font-weight:800;letter-spacing:-1.5px;color:var(--text);line-height:1}
+    .kpi-spark{display:flex;align-items:flex-end;gap:3px;height:28px;margin-top:8px}
+    .sp-b{width:6px;border-radius:2px 2px 0 0;background:var(--green-dim2)}
+    .sp-b.hi{background:var(--green)}
+    .kpi-trend{font-size:11px;font-weight:700;margin-top:6px}
+    .kpi-trend.up{color:#16a34a}.kpi-trend.down{color:#3b82f6}
+    .met-row{display:grid;grid-template-columns:2fr 1fr;gap:12px;margin-bottom:12px}
+    .met-card{background:#fff;border-radius:14px;padding:18px;border:1px solid var(--border)}
+    .met-card-title{font-size:11px;font-weight:700;color:rgba(0,0,0,0.4);text-transform:uppercase;letter-spacing:.8px;margin-bottom:14px}
+    .met-chart{display:flex;align-items:flex-end;gap:8px;height:140px}
+    .met-bar-wrap{display:flex;flex-direction:column;align-items:center;gap:5px;flex:1}
+    .met-bar-val{font-size:10px;font-weight:700;color:var(--text2)}
+    .met-bar{width:100%;border-radius:5px 5px 0 0;background:var(--green-dim2)}
+    .met-bar.hi{background:var(--green)}
+    .met-bar-lbl{font-size:10px;color:rgba(0,0,0,0.35);font-weight:600}
+    .met-sources{display:flex;flex-direction:column;gap:10px}
+    .met-src{display:flex;align-items:center;gap:10px}
+    .met-src-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+    .met-src-name{font-size:12px;color:rgba(0,0,0,0.5);width:70px;flex-shrink:0;font-weight:500}
+    .met-src-bar{flex:1;height:6px;background:rgba(0,0,0,0.06);border-radius:3px;overflow:hidden}
+    .met-src-fill{height:100%;border-radius:3px}
+    .met-src-pct{font-size:12px;font-weight:700;color:var(--text);width:34px;text-align:right}
+    @media(max-width:1100px){.met-kpis{grid-template-columns:repeat(2,1fr)}.patient-panel{display:none}.met-row{grid-template-columns:1fr}}
+    @media(max-width:700px){.conv-list{width:100%}.chat-area{display:none}.p-conv.chat-open .conv-list{display:none}.p-conv.chat-open .chat-area{display:flex}}
+  </style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<header class="topbar">
+  <div class="tb-logo-zone">
+    <div class="tb-logo">CF</div>
+  </div>
+  <div class="tb-clinic">
+    <span class="tb-clinic-name">Clínica Demo</span>
+    <span class="tb-clinic-tag">Vista previa</span>
+  </div>
+  <div class="tb-right">
+    <span class="tb-demo-badge">🔍 Demo interactiva</span>
+    <div class="tb-ia"><div class="tb-ia-dot"></div>IA activa</div>
+    <a href="/contacto" class="tb-btn primary">Solicitar acceso →</a>
+    <a href="/" class="tb-btn">← Volver</a>
+  </div>
+</header>
+
+<div class="app-layout">
+  <!-- SIDEBAR -->
+  <nav class="sidebar">
+    <div class="si active" data-panel="0" onclick="switchPanel(0)" title="">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      <span class="si-badge">4</span>
+      <div class="si-tooltip">Conversaciones</div>
+    </div>
+    <div class="si" data-panel="1" onclick="switchPanel(1)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      <div class="si-tooltip">Agenda</div>
+    </div>
+    <div class="si" data-panel="2" onclick="switchPanel(2)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      <div class="si-tooltip">Métricas</div>
+    </div>
+    <div class="si-divider"></div>
+    <div class="si">
+      <svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      <div class="si-tooltip">Configuración</div>
+    </div>
+    <div class="si-bottom">
+      <div class="si-ava">Dr</div>
+    </div>
+  </nav>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- PANEL 0: CONVERSACIONES -->
+    <div class="panel p-conv active" id="panel-0">
+      <div class="conv-list">
+        <div class="conv-list-hd">
+          <span class="conv-list-title">Bandeja <span class="conv-cnt">4</span></span>
+          <span class="conv-ia-badge">● IA ON</span>
+        </div>
+        <div class="conv-search"><input placeholder="🔍  Buscar paciente..." readonly></div>
+        <div class="conv-item active" onclick="selectConv(this)">
+          <div class="c-ava" style="background:linear-gradient(135deg,#16a34a,#22c55e)">MG</div>
+          <div class="c-info"><div class="c-name">María García</div><div class="c-prev">Quiero pedir cita para limp...</div></div>
+          <div class="c-meta"><span class="c-time">2m</span><span class="c-unread">2</span></div>
+        </div>
+        <div class="conv-item" onclick="selectConv(this)">
+          <div class="c-ava" style="background:linear-gradient(135deg,#0ea5e9,#0284c7)">JP</div>
+          <div class="c-info"><div class="c-name">Juan Pérez</div><div class="c-prev">¿Tenéis ortodoncia invisible?</div></div>
+          <div class="c-meta"><span class="c-time">8m</span><span class="c-ai">IA</span></div>
+        </div>
+        <div class="conv-item" onclick="selectConv(this)">
+          <div class="c-ava" style="background:linear-gradient(135deg,#f43f5e,#e11d48)">AL</div>
+          <div class="c-info"><div class="c-name">Ana López</div><div class="c-prev">Cita confirmada ✓ mañana 10h</div></div>
+          <div class="c-meta"><span class="c-time">17m</span><span class="c-ai">IA</span></div>
+        </div>
+        <div class="conv-item" onclick="selectConv(this)">
+          <div class="c-ava" style="background:linear-gradient(135deg,#f97316,#ea580c)">PS</div>
+          <div class="c-info"><div class="c-name">Pedro Sánchez</div><div class="c-prev">Muchas gracias, hasta pronto</div></div>
+          <div class="c-meta"><span class="c-time">23m</span><span class="c-ai">IA</span></div>
+        </div>
+        <div class="conv-stats">
+          <div class="cs"><div class="cs-n" style="color:var(--green)">94%</div><div class="cs-l">Resueltos IA</div></div>
+          <div class="cs"><div class="cs-n">1.2s</div><div class="cs-l">Resp. media</div></div>
+          <div class="cs"><div class="cs-n">342</div><div class="cs-l">Esta semana</div></div>
+          <div class="cs"><div class="cs-n">47</div><div class="cs-l">Citas mes</div></div>
+        </div>
+      </div>
+      <div class="chat-area">
+        <div class="chat-hd">
+          <div class="chat-hd-av" style="background:linear-gradient(135deg,#16a34a,#22c55e)">MG</div>
+          <div style="flex:1;min-width:0">
+            <div class="chat-hd-title">María García</div>
+            <div class="chat-hd-sub"><span class="wa-dot"></span>WhatsApp · IA respondiendo</div>
+          </div>
+          <div class="chat-status">En progreso</div>
+        </div>
+        <div class="chat-msgs">
+          <div class="msg mi">Hola, quería pedir una cita 🦷</div>
+          <div class="msg mo">¡Hola María! 👋 Claro, con gusto te ayudo. ¿Para qué servicio deseas la cita?<div class="msg-ts">Visto · 9min · IA</div></div>
+          <div class="msg mi">Para una limpieza, ¿tenéis hueco mañana?</div>
+          <div class="msg mo-green">✅ Tenemos disponibilidad mañana a las 10:00h con la Dra. Vega. ¿Confirmo la cita a su nombre?<div class="msg-ts">Visto · 4min · IA</div></div>
+          <div class="msg mi"><div class="typing"><div class="td"></div><div class="td"></div><div class="td"></div></div></div>
+        </div>
+        <div class="quick-chips">
+          <div class="qc">✓ Confirmar cita</div>
+          <div class="qc">📅 Ver disponibilidad</div>
+          <div class="qc">📍 Enviar dirección</div>
+          <div class="qc">ℹ️ Info servicio</div>
+          <div class="qc">💰 Ver precios</div>
+        </div>
+        <div class="chat-input-row">
+          <input class="chat-input" placeholder="Escribir respuesta manual..." readonly>
+          <button class="send-btn"><svg width="13" height="13" viewBox="0 0 24 24" fill="white"><path d="m22 2-7 20-4-9-9-4 20-7z"/></svg></button>
+        </div>
+      </div>
+      <div class="patient-panel">
+        <div class="pp-hd">Paciente</div>
+        <div class="pp-profile">
+          <div class="pp-ava">MG</div>
+          <div class="pp-name">María García</div>
+          <div class="pp-phone">+34 612 345 678</div>
+          <div class="pp-wa"><svg width="10" height="10" viewBox="0 0 24 24" fill="#25d366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M11.9 0C5.336 0 0 5.291 0 11.8c0 2.085.548 4.04 1.503 5.73L0 24l6.639-1.737A11.91 11.91 0 0 0 11.9 23.6C18.464 23.6 24 18.309 24 11.8 24 5.291 18.464 0 11.9 0zm0 21.6a9.9 9.9 0 0 1-5.035-1.374l-.361-.214-3.742.978.999-3.629-.235-.374A9.737 9.737 0 0 1 2 11.8C2 6.395 6.44 2 11.9 2 17.36 2 21.8 6.395 21.8 11.8c0 5.405-4.44 9.8-9.9 9.8z"/></svg>WhatsApp</div>
+        </div>
+        <div class="pp-sect">Próxima cita</div>
+        <div class="pp-apt">
+          <div class="pp-apt-t">Mañana · 10:00h</div>
+          <div class="pp-apt-s">Limpieza · Dra. Vega</div>
+        </div>
+        <div class="pp-sect">Historial</div>
+        <div class="pp-hist-item">Mar 26 · Revisión<span>✓</span></div>
+        <div class="pp-hist-item">Ene 26 · Limpieza<span>✓</span></div>
+        <div class="pp-hist-item">Nov 25 · Ortodoncia<span>✓</span></div>
+        <div class="pp-sect">IA Análisis</div>
+        <div class="pp-ai">
+          <div class="pp-ai-lbl">⚡ Intención detectada</div>
+          <div class="pp-ai-val">Reservar cita</div>
+          <div class="pp-ai-conf">Confianza: 97%</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PANEL 1: AGENDA -->
+    <div class="panel p-agenda" id="panel-1">
+      <div class="ag-hd">
+        <div>
+          <div class="ag-title-day">Hoy · Miércoles</div>
+          <div class="ag-title-full">2 de Abril, 2026</div>
+        </div>
+        <div class="ag-count">
+          <div class="ag-count-n">8</div>
+          <div class="ag-count-l">citas hoy</div>
+        </div>
+      </div>
+      <div class="ag-week">
+        <div class="ag-wd"><div class="ag-wd-lbl">L</div><div class="ag-wd-num">30</div></div>
+        <div class="ag-wd has-dot"><div class="ag-wd-lbl">M</div><div class="ag-wd-num">1</div></div>
+        <div class="ag-wd today"><div class="ag-wd-lbl">X</div><div class="ag-wd-num">2</div></div>
+        <div class="ag-wd has-dot"><div class="ag-wd-lbl">J</div><div class="ag-wd-num">3</div></div>
+        <div class="ag-wd has-dot"><div class="ag-wd-lbl">V</div><div class="ag-wd-num">4</div></div>
+        <div class="ag-wd"><div class="ag-wd-lbl">S</div><div class="ag-wd-num">5</div></div>
+        <div class="ag-wd"><div class="ag-wd-lbl">D</div><div class="ag-wd-num">6</div></div>
+      </div>
+      <div class="ag-body">
+        <div class="ag-list">
+          <div class="ag-slot"><div class="slot-bar" style="background:#16a34a"></div><div class="ag-time">09:00</div><div class="ag-info"><div class="ag-name">Laura Martínez</div><div class="ag-svc">Revisión dental · Dr. Ruiz</div></div><div class="ag-badge conf">✓ Confirmada</div></div>
+          <div class="ag-slot"><div class="slot-bar" style="background:#0ea5e9"></div><div class="ag-time">10:00</div><div class="ag-info"><div class="ag-name">María García</div><div class="ag-svc">Limpieza dental · Dra. Vega</div></div><div class="ag-badge conf">✓ Confirmada</div></div>
+          <div class="ag-slot"><div class="slot-bar" style="background:#f59e0b"></div><div class="ag-time">11:30</div><div class="ag-info"><div class="ag-name">Carlos Ruiz</div><div class="ag-svc">Ortodoncia · Dr. López</div></div><div class="ag-badge pend">● Pendiente</div></div>
+          <div class="ag-slot"><div class="slot-bar" style="background:#0ea5e9"></div><div class="ag-time">12:00</div><div class="ag-info"><div class="ag-name">Ana Sánchez</div><div class="ag-svc">Blanqueamiento · Dra. Vega</div></div><div class="ag-badge conf">✓ Confirmada</div></div>
+          <div class="ag-slot"><div class="slot-bar" style="background:#16a34a"></div><div class="ag-time">16:00</div><div class="ag-info"><div class="ag-name">Pedro Alonso</div><div class="ag-svc">Extracción · Dr. Ruiz</div></div><div class="ag-badge conf">✓ Confirmada</div></div>
+          <div class="ag-slot"><div class="slot-bar" style="background:#f59e0b"></div><div class="ag-time">17:30</div><div class="ag-info"><div class="ag-name">Isabel Torres</div><div class="ag-svc">Primera visita · Dr. López</div></div><div class="ag-badge pend">● Pendiente</div></div>
+          <div class="ag-slot"><div class="slot-bar" style="background:#16a34a"></div><div class="ag-time">18:00</div><div class="ag-info"><div class="ag-name">Marcos Vidal</div><div class="ag-svc">Revisión · Dr. Ruiz</div></div><div class="ag-badge conf">✓ Confirmada</div></div>
+          <div class="ag-slot"><div class="slot-bar" style="background:#8b5cf6"></div><div class="ag-time">19:00</div><div class="ag-info"><div class="ag-name">Carmen Díaz</div><div class="ag-svc">Implante · Dr. López</div></div><div class="ag-badge conf">✓ Confirmada</div></div>
+        </div>
+        <div class="ag-side">
+          <div>
+            <div class="ag-side-title">Resumen del día</div>
+            <div class="ag-side-stats">
+              <div class="ag-stat-card"><div class="ag-stat-n" style="color:var(--green)">6</div><div class="ag-stat-l">Confirmadas</div></div>
+              <div class="ag-stat-card"><div class="ag-stat-n" style="color:#f59e0b">2</div><div class="ag-stat-l">Pendientes</div></div>
+              <div class="ag-stat-card"><div class="ag-stat-n" style="color:rgba(0,0,0,.35)">0</div><div class="ag-stat-l">Canceladas</div></div>
+            </div>
+          </div>
+          <div>
+            <div class="ag-side-title">Por doctor</div>
+            <div class="ag-doc"><div class="ag-doc-name">Dr. Ruiz</div><div class="ag-doc-bar"><div class="ag-doc-fill" style="width:62%;background:var(--green)"></div></div><div class="ag-doc-lbl">3 citas</div></div>
+            <div class="ag-doc"><div class="ag-doc-name">Dra. Vega</div><div class="ag-doc-bar"><div class="ag-doc-fill" style="width:48%;background:#22c55e"></div></div><div class="ag-doc-lbl">2 citas</div></div>
+            <div class="ag-doc"><div class="ag-doc-name">Dr. López</div><div class="ag-doc-bar"><div class="ag-doc-fill" style="width:48%;background:#0ea5e9"></div></div><div class="ag-doc-lbl">2 citas</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="ag-footer">
+        <div class="ag-foot-stat"><span class="ag-foot-n" style="color:var(--green)">6</span>confirmadas</div>
+        <div class="ag-foot-stat"><span class="ag-foot-n" style="color:#f59e0b">2</span>pendientes</div>
+        <div class="ag-foot-stat"><span class="ag-foot-n" style="color:rgba(0,0,0,.35)">0</span>canceladas</div>
+        <div class="ag-foot-stat" style="margin-left:auto;font-size:11px;color:var(--green);font-weight:600">● Agenda sincronizada con IA</div>
+      </div>
+    </div>
+
+    <!-- PANEL 2: MÉTRICAS -->
+    <div class="panel p-metrics" id="panel-2">
+      <div class="met-title">Métricas de rendimiento</div>
+      <div class="met-sub">Resumen semanal — 27 Mar al 2 Abr, 2026</div>
+      <div class="met-kpis">
+        <div class="kpi">
+          <div class="kpi-l">Mensajes / semana</div>
+          <div class="kpi-n">342</div>
+          <div class="kpi-spark"><div class="sp-b" style="height:40%"></div><div class="sp-b" style="height:55%"></div><div class="sp-b" style="height:45%"></div><div class="sp-b" style="height:70%"></div><div class="sp-b" style="height:60%"></div><div class="sp-b hi" style="height:100%"></div></div>
+          <div class="kpi-trend up">↑ 18% vs semana anterior</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-l">Resolución IA</div>
+          <div class="kpi-n" style="color:var(--green)">94%</div>
+          <div class="kpi-spark"><div class="sp-b" style="height:75%"></div><div class="sp-b" style="height:80%"></div><div class="sp-b" style="height:78%"></div><div class="sp-b" style="height:85%"></div><div class="sp-b" style="height:90%"></div><div class="sp-b hi" style="height:100%"></div></div>
+          <div class="kpi-trend up">↑ 3 puntos</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-l">Tiempo respuesta</div>
+          <div class="kpi-n">1.2s</div>
+          <div class="kpi-spark"><div class="sp-b hi" style="height:100%"></div><div class="sp-b" style="height:85%"></div><div class="sp-b" style="height:70%"></div><div class="sp-b" style="height:55%"></div><div class="sp-b" style="height:45%"></div><div class="sp-b" style="height:35%"></div></div>
+          <div class="kpi-trend down">↓ 0.3s mejor</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-l">Citas confirmadas</div>
+          <div class="kpi-n">47</div>
+          <div class="kpi-spark"><div class="sp-b" style="height:50%"></div><div class="sp-b" style="height:60%"></div><div class="sp-b" style="height:55%"></div><div class="sp-b" style="height:75%"></div><div class="sp-b" style="height:80%"></div><div class="sp-b hi" style="height:100%"></div></div>
+          <div class="kpi-trend up">↑ 12 este mes</div>
+        </div>
+      </div>
+      <div class="met-row">
+        <div class="met-card">
+          <div class="met-card-title">Actividad — últimos 7 días</div>
+          <div class="met-chart">
+            <div class="met-bar-wrap"><div class="met-bar-val">41</div><div class="met-bar" style="height:55%"></div><div class="met-bar-lbl">L</div></div>
+            <div class="met-bar-wrap"><div class="met-bar-val">52</div><div class="met-bar" style="height:70%"></div><div class="met-bar-lbl">M</div></div>
+            <div class="met-bar-wrap"><div class="met-bar-val">36</div><div class="met-bar" style="height:48%"></div><div class="met-bar-lbl">X</div></div>
+            <div class="met-bar-wrap"><div class="met-bar-val">66</div><div class="met-bar" style="height:88%"></div><div class="met-bar-lbl">J</div></div>
+            <div class="met-bar-wrap"><div class="met-bar-val">75</div><div class="met-bar hi" style="height:100%"></div><div class="met-bar-lbl">V</div></div>
+            <div class="met-bar-wrap"><div class="met-bar-val">24</div><div class="met-bar" style="height:32%"></div><div class="met-bar-lbl">S</div></div>
+            <div class="met-bar-wrap"><div class="met-bar-val">14</div><div class="met-bar" style="height:18%"></div><div class="met-bar-lbl">D</div></div>
+          </div>
+        </div>
+        <div class="met-card">
+          <div class="met-card-title">Canal de origen</div>
+          <div class="met-sources">
+            <div class="met-src"><div class="met-src-dot" style="background:#25d366"></div><div class="met-src-name">WhatsApp</div><div class="met-src-bar"><div class="met-src-fill" style="width:82%;background:#25d366"></div></div><div class="met-src-pct">82%</div></div>
+            <div class="met-src"><div class="met-src-dot" style="background:#3b82f6"></div><div class="met-src-name">Web chat</div><div class="met-src-bar"><div class="met-src-fill" style="width:12%;background:#3b82f6"></div></div><div class="met-src-pct">12%</div></div>
+            <div class="met-src"><div class="met-src-dot" style="background:#4ade80"></div><div class="met-src-name">Teléfono</div><div class="met-src-bar"><div class="met-src-fill" style="width:6%;background:#4ade80"></div></div><div class="met-src-pct">6%</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+  function switchPanel(n){
+    document.querySelectorAll('.panel').forEach((p,i) => p.classList.toggle('active', i===n));
+    document.querySelectorAll('.si[data-panel]').forEach(s => s.classList.toggle('active', parseInt(s.dataset.panel)===n));
+  }
+  function selectConv(el){
+    document.querySelectorAll('.conv-item').forEach(i => i.classList.remove('active'));
+    el.classList.add('active');
+  }
+</script>
+</body>
+</html>

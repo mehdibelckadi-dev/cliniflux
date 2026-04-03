@@ -361,6 +361,16 @@
     .btn-pl-out:hover{background:var(--bg2);box-shadow:var(--shadow-sm)}
     .btn-pl-sol{background:var(--green);border:none;color:#fff}
     .btn-pl-sol:hover{background:#15803d;box-shadow:0 4px 16px rgba(22,163,74,.3)}
+    .pr-setup-note{text-align:center;font-size:13px;color:var(--text2);background:var(--green-dim);border:1px solid rgba(22,163,74,0.2);border-radius:100px;padding:8px 20px;width:fit-content;margin:0 auto 28px}
+    .pr-wa-note{font-size:11px;color:var(--text3);text-align:center;margin-bottom:10px}
+    .pfc-wa{background:rgba(37,211,102,0.15)!important;color:#25d366!important}
+    .pr-footer-note{text-align:center;font-size:12px;color:var(--text3);margin-top:20px}
+    .btn-wa-hero{font-family:inherit;font-size:15px;font-weight:600;color:#fff;background:#25d366;border:none;padding:12px 24px;border-radius:40px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:7px;transition:all .2s}
+    .btn-wa-hero:hover{background:#128c7e;transform:translateY(-1px);box-shadow:0 4px 20px rgba(37,211,102,0.4)}
+    .pr-toggle{display:flex;align-items:center;justify-content:center;gap:4px;margin-top:24px;background:var(--bg2);border:1px solid var(--border);border-radius:100px;padding:4px;width:fit-content;margin-left:auto;margin-right:auto}
+    .pr-tog-btn{font-family:inherit;font-size:13px;font-weight:600;color:var(--text2);background:none;border:none;padding:7px 18px;border-radius:100px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:6px}
+    .pr-tog-btn.active{background:#fff;color:var(--text);box-shadow:var(--shadow-sm)}
+    .pr-tog-save{font-size:11px;font-weight:700;color:#fff;background:var(--green);padding:2px 8px;border-radius:100px}
 
     /* CTA */
     .cta-section{padding:var(--sy) 0;border-top:1px solid var(--border);position:relative;overflow:hidden;background:var(--bg2)}
@@ -875,7 +885,10 @@
       <p class="hero-desc">Cliniflux automatiza WhatsApp para que cada paciente reciba respuesta instantánea, agende su cita y tu equipo se centre en lo que importa.</p>
       <div class="hero-ctas">
         <a href="#precios" class="btn-primary" style="font-size:15px;padding:12px 28px;border-radius:40px">Solicitar demo gratuita <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg></a>
-        <a href="#flujo" class="btn-secondary" style="font-size:15px;padding:12px 36px;border-radius:40px;min-width:220px;justify-content:center">Ver cómo funciona</a>
+        <a href="/demo" class="btn-wa-hero">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M11.9 0C5.336 0 0 5.291 0 11.8c0 2.085.548 4.04 1.503 5.73L0 24l6.639-1.737A11.91 11.91 0 0 0 11.9 23.6C18.464 23.6 24 18.309 24 11.8 24 5.291 18.464 0 11.9 0zm0 21.6a9.9 9.9 0 0 1-5.035-1.374l-.361-.214-3.742.978.999-3.629-.235-.374A9.737 9.737 0 0 1 2 11.8C2 6.395 6.44 2 11.9 2 17.36 2 21.8 6.395 21.8 11.8c0 5.405-4.44 9.8-9.9 9.8z"/></svg>
+          Probar demo web
+        </a>
       </div>
       <div class="hero-proof">
         <div class="avatars">
@@ -1484,7 +1497,7 @@
       <div class="fc-card reveal d1"><div class="fc-card-top"><h3 class="fc-t">Agenda inteligente</h3><span class="fc-pill pb">Integración calendar</span></div><p class="fc-b">Agendamos citas en tu calendario con confirmación automática, recordatorios y gestión de cancelaciones.</p><a href="#" class="fc-link">Ver cómo funciona →</a></div>
       <div class="fc-card reveal d2"><div class="fc-card-top"><h3 class="fc-t">Reactivación de pacientes</h3><span class="fc-pill po">+30% pacientes reactivados</span></div><p class="fc-b">Identificamos pacientes inactivos y lanzamos campañas personalizadas por WhatsApp para recuperarlos.</p><a href="#" class="fc-link">Ver cómo funciona →</a></div>
       <div class="fc-card reveal d1"><div class="fc-card-top"><h3 class="fc-t">Cumplimiento RGPD</h3><span class="fc-pill pp">Conforme RGPD</span></div><p class="fc-b">Toda la automatización cumple con la normativa europea de protección de datos. Siempre protegidos.</p><a href="#" class="fc-link">Ver más →</a></div>
-      <div class="fc-card reveal d2"><div class="fc-card-top"><h3 class="fc-t">Panel en tiempo real</h3><span class="fc-pill pg">Datos en tiempo real</span></div><p class="fc-b">Visualiza conversaciones, métricas de respuesta y rendimiento desde un dashboard centralizado.</p><a href="#" class="fc-link">Ver cómo funciona →</a></div>
+      <div class="fc-card reveal d2"><div class="fc-card-top"><h3 class="fc-t">Panel en tiempo real</h3><span class="fc-pill pg">Datos en tiempo real</span></div><p class="fc-b">Visualiza conversaciones, métricas de respuesta y rendimiento desde un dashboard centralizado.</p><a href="/dashboard" class="fc-link">Ver el dashboard →</a></div>
       <div class="fc-card reveal d3"><div class="fc-card-top"><h3 class="fc-t">Implementación en 48h</h3><span class="fc-pill pb">Activo en 48h</span></div><p class="fc-b">Sin desarrollos complejos. Configuramos y activamos tu sistema en 48 horas. Tú solo ves las citas llegar.</p><a href="#" class="fc-link">Ver proceso →</a></div>
     </div>
   </div>
@@ -1511,14 +1524,14 @@
   </div>
   <div class="t-mq">
     <div class="t-track">
-      <div class="t-card"><div class="t-stars">★★★★★</div><p class="t-q">"Desde que implementamos Cliniflux, nuestra agenda está siempre llena. Los pacientes reciben respuesta inmediata y nosotros nos despreocupamos del WhatsApp."</p><div class="t-auth"><div class="t-av" style="background:linear-gradient(135deg,#16a34a,#22c55e)">CM</div><div><div class="t-name">Carmen Molina</div><div class="t-clinic">Centro Dental Molina, Madrid</div></div></div></div>
-      <div class="t-card"><div class="t-stars">★★★★★</div><p class="t-q">"Reactivamos más de 80 pacientes inactivos en el primer mes. El ROI fue inmediato. No podría imaginar la clínica sin esta herramienta."</p><div class="t-auth"><div class="t-av" style="background:linear-gradient(135deg,#0ea5e9,#0284c7)">RG</div><div><div class="t-name">Roberto García</div><div class="t-clinic">Clínica Estética RG, Barcelona</div></div></div></div>
-      <div class="t-card"><div class="t-stars">★★★★★</div><p class="t-q">"Mis recepcionistas ahora se centran en los pacientes presentes. El sistema gestiona WhatsApp perfectamente solo."</p><div class="t-auth"><div class="t-av" style="background:linear-gradient(135deg,#f43f5e,#e11d48)">LP</div><div><div class="t-name">Laura Pérez</div><div class="t-clinic">Fisio &amp; Salud, Valencia</div></div></div></div>
-      <div class="t-card"><div class="t-stars">★★★★★</div><p class="t-q">"La implementación fue increíblemente rápida. En menos de 48 horas teníamos el sistema captando citas fuera de horario."</p><div class="t-auth"><div class="t-av" style="background:linear-gradient(135deg,#f97316,#ea580c)">MA</div><div><div class="t-name">Miguel Ángel Torres</div><div class="t-clinic">Derma Clinic, Sevilla</div></div></div></div>
-      <div class="t-card"><div class="t-stars">★★★★★</div><p class="t-q">"Desde que implementamos Cliniflux, nuestra agenda está siempre llena. Los pacientes reciben respuesta inmediata y nosotros nos despreocupamos del WhatsApp."</p><div class="t-auth"><div class="t-av" style="background:linear-gradient(135deg,#16a34a,#22c55e)">CM</div><div><div class="t-name">Carmen Molina</div><div class="t-clinic">Centro Dental Molina, Madrid</div></div></div></div>
-      <div class="t-card"><div class="t-stars">★★★★★</div><p class="t-q">"Reactivamos más de 80 pacientes inactivos en el primer mes. El ROI fue inmediato. No podría imaginar la clínica sin esta herramienta."</p><div class="t-auth"><div class="t-av" style="background:linear-gradient(135deg,#0ea5e9,#0284c7)">RG</div><div><div class="t-name">Roberto García</div><div class="t-clinic">Clínica Estética RG, Barcelona</div></div></div></div>
-      <div class="t-card"><div class="t-stars">★★★★★</div><p class="t-q">"Mis recepcionistas ahora se centran en los pacientes presentes. El sistema gestiona WhatsApp perfectamente solo."</p><div class="t-auth"><div class="t-av" style="background:linear-gradient(135deg,#f43f5e,#e11d48)">LP</div><div><div class="t-name">Laura Pérez</div><div class="t-clinic">Fisio &amp; Salud, Valencia</div></div></div></div>
-      <div class="t-card"><div class="t-stars">★★★★★</div><p class="t-q">"La implementación fue increíblemente rápida. En menos de 48 horas teníamos el sistema captando citas fuera de horario."</p><div class="t-auth"><div class="t-av" style="background:linear-gradient(135deg,#f97316,#ea580c)">MA</div><div><div class="t-name">Miguel Ángel Torres</div><div class="t-clinic">Derma Clinic, Sevilla</div></div></div></div>
+      <div class="t-card"><div class="t-stars">★★★★★</div><p class="t-q">"Desde que implementamos Cliniflux, nuestra agenda está siempre llena. Los pacientes reciben respuesta inmediata y nosotros nos despreocupamos del WhatsApp."</p><div class="t-auth"><div class="t-av" style="background:linear-gradient(135deg,#16a34a,#22c55e)">CM</div><div><div class="t-name">Carmen M.</div><div class="t-clinic">Directora · Clínica dental, Madrid</div></div></div></div>
+      <div class="t-card"><div class="t-stars">★★★★★</div><p class="t-q">"Reactivamos más de 80 pacientes inactivos en el primer mes. El ROI fue inmediato. No podría imaginar la clínica sin esta herramienta."</p><div class="t-auth"><div class="t-av" style="background:linear-gradient(135deg,#0ea5e9,#0284c7)">RG</div><div><div class="t-name">Roberto G.</div><div class="t-clinic">Director médico · Clínica estética, Barcelona</div></div></div></div>
+      <div class="t-card"><div class="t-stars">★★★★★</div><p class="t-q">"Mis recepcionistas ahora se centran en los pacientes presentes. El sistema gestiona WhatsApp perfectamente solo."</p><div class="t-auth"><div class="t-av" style="background:linear-gradient(135deg,#f43f5e,#e11d48)">LP</div><div><div class="t-name">Laura P.</div><div class="t-clinic">Fisioterapeuta · Centro de salud, Valencia</div></div></div></div>
+      <div class="t-card"><div class="t-stars">★★★★★</div><p class="t-q">"La implementación fue increíblemente rápida. En menos de 48 horas teníamos el sistema captando citas fuera de horario."</p><div class="t-auth"><div class="t-av" style="background:linear-gradient(135deg,#f97316,#ea580c)">MA</div><div><div class="t-name">Miguel A. T.</div><div class="t-clinic">Dermatólogo · Clínica privada, Sevilla</div></div></div></div>
+      <div class="t-card"><div class="t-stars">★★★★★</div><p class="t-q">"Desde que implementamos Cliniflux, nuestra agenda está siempre llena. Los pacientes reciben respuesta inmediata y nosotros nos despreocupamos del WhatsApp."</p><div class="t-auth"><div class="t-av" style="background:linear-gradient(135deg,#16a34a,#22c55e)">CM</div><div><div class="t-name">Carmen M.</div><div class="t-clinic">Directora · Clínica dental, Madrid</div></div></div></div>
+      <div class="t-card"><div class="t-stars">★★★★★</div><p class="t-q">"Reactivamos más de 80 pacientes inactivos en el primer mes. El ROI fue inmediato. No podría imaginar la clínica sin esta herramienta."</p><div class="t-auth"><div class="t-av" style="background:linear-gradient(135deg,#0ea5e9,#0284c7)">RG</div><div><div class="t-name">Roberto G.</div><div class="t-clinic">Director médico · Clínica estética, Barcelona</div></div></div></div>
+      <div class="t-card"><div class="t-stars">★★★★★</div><p class="t-q">"Mis recepcionistas ahora se centran en los pacientes presentes. El sistema gestiona WhatsApp perfectamente solo."</p><div class="t-auth"><div class="t-av" style="background:linear-gradient(135deg,#f43f5e,#e11d48)">LP</div><div><div class="t-name">Laura P.</div><div class="t-clinic">Fisioterapeuta · Centro de salud, Valencia</div></div></div></div>
+      <div class="t-card"><div class="t-stars">★★★★★</div><p class="t-q">"La implementación fue increíblemente rápida. En menos de 48 horas teníamos el sistema captando citas fuera de horario."</p><div class="t-auth"><div class="t-av" style="background:linear-gradient(135deg,#f97316,#ea580c)">MA</div><div><div class="t-name">Miguel A. T.</div><div class="t-clinic">Dermatólogo · Clínica privada, Sevilla</div></div></div></div>
     </div>
   </div>
 </section>
@@ -1735,54 +1748,64 @@
       <div class="reveal"><div class="label">Precios</div></div>
       <h2 class="sec-h reveal d1">Simple, transparente,<br>sin sorpresas</h2>
       <p class="sec-p reveal d2">Sin permanencias. Cancela cuando quieras. Resultados desde el primer día.</p>
+      <div class="pr-toggle reveal d3">
+        <button class="pr-tog-btn active" id="togMes" onclick="setPricing('mes')">Mensual</button>
+        <button class="pr-tog-btn" id="togAno" onclick="setPricing('ano')">Anual <span class="pr-tog-save">Ahorra 20%</span></button>
+      </div>
     </div>
+    <div class="pr-setup-note reveal d3">🎁 <strong>Setup gratuito</strong> en todos los planes — sin coste de activación, sin permanencia</div>
     <div class="pr-grid">
       <div class="pr-card reveal">
         <div class="pr-plan">Starter</div>
-        <div class="pr-amt"><sup>€</sup>297</div>
+        <div class="pr-amt"><sup>€</sup><span class="pr-price-val">99</span></div>
         <div class="pr-per">/ mes · 1 clínica</div>
         <div class="pr-div"></div>
         <ul class="pr-feats">
-          <li><div class="pfc">✓</div>Respuesta automática WhatsApp 24/7</li>
+          <li><div class="pfc">✓</div>Asistente web 24/7</li>
           <li><div class="pfc">✓</div>Gestión de citas automática</li>
           <li><div class="pfc">✓</div>Hasta 500 conversaciones/mes</li>
           <li><div class="pfc">✓</div>Panel de control básico</li>
+          <li><div class="pfc">✓</div>Setup gratuito incluido</li>
           <li><div class="pfc">✓</div>Soporte por email</li>
         </ul>
-        <a href="#" class="btn-pl btn-pl-out">Solicitar demo →</a>
+        <div class="pr-wa-note">💬 WhatsApp disponible en Pro</div>
+        <a href="/contacto?plan=starter" class="btn-pl btn-pl-out">Solicitar demo →</a>
       </div>
       <div class="pr-card hot reveal d1">
         <div class="hot-badge">Más popular</div>
-        <div class="pr-plan">Profesional</div>
-        <div class="pr-amt"><sup>€</sup>497</div>
-        <div class="pr-per">/ mes · hasta 3 clínicas</div>
+        <div class="pr-plan">Pro</div>
+        <div class="pr-amt"><sup>€</sup><span class="pr-price-val">199</span></div>
+        <div class="pr-per">/ mes · 1 clínica</div>
         <div class="pr-div"></div>
         <ul class="pr-feats">
           <li><div class="pfc">✓</div>Todo lo de Starter</li>
-          <li><div class="pfc">✓</div>Reactivación de pacientes inactivos</li>
-          <li><div class="pfc">✓</div>Conversaciones ilimitadas</li>
-          <li><div class="pfc">✓</div>Integración software de gestión</li>
-          <li><div class="pfc">✓</div>Campañas WhatsApp personalizadas</li>
-          <li><div class="pfc">✓</div>Soporte prioritario 24/7</li>
+          <li><div class="pfc pfc-wa">✓</div><strong>WhatsApp Business 24/7</strong></li>
+          <li><div class="pfc">✓</div>2.000 conversaciones/mes</li>
+          <li><div class="pfc">✓</div>Integración Google Calendar</li>
+          <li><div class="pfc">✓</div>Panel de control avanzado</li>
+          <li><div class="pfc">✓</div>Soporte prioritario</li>
+          <li><div class="pfc">✓</div>Setup gratuito incluido</li>
         </ul>
-        <a href="#" class="btn-pl btn-pl-sol">Empezar ahora →</a>
+        <a href="/contacto?plan=pro" class="btn-pl btn-pl-sol">Empezar ahora →</a>
       </div>
       <div class="pr-card reveal d2">
-        <div class="pr-plan">Agencia / Red</div>
-        <div class="pr-amt"><sup>€</sup>997</div>
-        <div class="pr-per">/ mes · clínicas ilimitadas</div>
+        <div class="pr-plan">Clínica</div>
+        <div class="pr-amt"><sup>€</sup><span class="pr-price-val">349</span></div>
+        <div class="pr-per">/ mes · 1 clínica</div>
         <div class="pr-div"></div>
         <ul class="pr-feats">
-          <li><div class="pfc">✓</div>Todo lo de Profesional</li>
-          <li><div class="pfc">✓</div>Clínicas ilimitadas</li>
-          <li><div class="pfc">✓</div>API + integraciones custom</li>
+          <li><div class="pfc">✓</div>Todo lo de Pro</li>
+          <li><div class="pfc">✓</div>Dashboard en tiempo real</li>
+          <li><div class="pfc">✓</div>Conversaciones ilimitadas</li>
+          <li><div class="pfc">✓</div>Reactivación de pacientes</li>
           <li><div class="pfc">✓</div>Account manager dedicado</li>
-          <li><div class="pfc">✓</div>Onboarding personalizado</li>
-          <li><div class="pfc">✓</div>SLA garantizado</li>
+          <li><div class="pfc">✓</div>Soporte 24/7 + SLA garantizado</li>
+          <li><div class="pfc">✓</div>Setup gratuito incluido</li>
         </ul>
-        <a href="#" class="btn-pl btn-pl-out">Contactar →</a>
+        <a href="/contacto?plan=clinica" class="btn-pl btn-pl-out">Contactar →</a>
       </div>
     </div>
+    <p class="pr-footer-note reveal">Todos los precios incluyen IVA. Gastos de API, WhatsApp Business y modelos de IA incluidos en el plan.</p>
   </div>
 </section>
 
@@ -1795,7 +1818,7 @@
       <h2 class="sec-h" style="text-align:center">¿Tu clínica lista para<br>el siguiente nivel?</h2>
       <p class="sec-p" style="text-align:center;margin:0 auto 28px">Solicita tu demo gratuita y te mostramos cómo funciona Cliniflux en tu clínica en menos de 30 minutos.</p>
       <div class="cta-btns">
-        <a href="#" class="btn-primary" style="font-size:15px;padding:13px 28px;border-radius:40px">Solicitar demo gratuita →</a>
+        <a href="/contacto" class="btn-primary" style="font-size:15px;padding:13px 28px;border-radius:40px">Solicitar demo gratuita →</a>
         <a href="/demo" class="btn-secondary" style="font-size:15px;padding:13px 28px;border-radius:40px">Ver demo interactiva</a>
       </div>
     </div>
@@ -1811,9 +1834,9 @@
         <p class="ft-desc">Automatización inteligente de WhatsApp para clínicas que quieren crecer sin aumentar el equipo.</p>
       </div>
       <div class="ft-links">
-        <div class="ft-col"><div class="ft-col-t">Producto</div><ul><li><a href="#flujo">Cómo funciona</a></li><li><a href="#producto">Funcionalidades</a></li><li><a href="#precios">Precios</a></li><li><a href="/demo">Demo</a></li></ul></div>
-        <div class="ft-col"><div class="ft-col-t">Empresa</div><ul><li><a href="/about">Nosotros</a></li><li><a href="#">Blog</a></li><li><a href="#">Contacto</a></li><li><a href="#">Casos de uso</a></li></ul></div>
-        <div class="ft-col"><div class="ft-col-t">Legal</div><ul><li><a href="#">Privacidad</a></li><li><a href="#">Términos de uso</a></li><li><a href="#">Cookies</a></li><li><a href="#">RGPD</a></li></ul></div>
+        <div class="ft-col"><div class="ft-col-t">Producto</div><ul><li><a href="#flujo">Cómo funciona</a></li><li><a href="#producto">Funcionalidades</a></li><li><a href="#precios">Precios</a></li><li><a href="/demo">Demo</a></li><li><a href="/blog">Blog</a></li></ul></div>
+        <div class="ft-col"><div class="ft-col-t">Empresa</div><ul><li><a href="/about">Nosotros</a></li><li><a href="/contacto">Contacto</a></li></ul></div>
+        <div class="ft-col"><div class="ft-col-t">Legal</div><ul><li><a href="/legal/privacidad">Privacidad</a></li><li><a href="/legal/terminos">Términos de uso</a></li><li><a href="/legal/cookies">Cookies</a></li><li><a href="/features/rgpd">RGPD</a></li></ul></div>
       </div>
     </div>
     <div class="ft-bot"><p>© 2025 Cliniflux. Todos los derechos reservados.</p><p>Hecho con ❤️ en España</p></div>
@@ -1827,6 +1850,20 @@
     entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('on') });
   }, {threshold:0.1, rootMargin:'0px 0px -40px 0px'});
   document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+  // Pricing toggle mensual/anual
+  const PRICES = {mes:[99,199,349], ano:[79,159,279]};
+  const PERIODS = {mes:'/ mes · ', ano:'/ mes · (facturado anual) · '};
+  const PERIFS = {mes:['1 clínica','hasta 3 clínicas','clínicas ilimitadas'], ano:['1 clínica','hasta 3 clínicas','clínicas ilimitadas']};
+  function setPricing(mode){
+    document.getElementById('togMes').classList.toggle('active', mode==='mes');
+    document.getElementById('togAno').classList.toggle('active', mode==='ano');
+    document.querySelectorAll('.pr-price-val').forEach((el,i)=>{
+      el.textContent = PRICES[mode][i];
+    });
+    document.querySelectorAll('.pr-per').forEach((el,i)=>{
+      el.textContent = PERIODS[mode] + PERIFS.mes[i];
+    });
+  }
   // FAQ accordion
   document.querySelectorAll('.faq-q').forEach(btn => {
     btn.addEventListener('click', () => {
