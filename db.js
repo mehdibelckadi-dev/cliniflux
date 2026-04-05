@@ -45,6 +45,19 @@ async function initDb() {
       created_at TIMESTAMP DEFAULT NOW()
     );
 
+    CREATE TABLE IF NOT EXISTS imported_leads (
+      id SERIAL PRIMARY KEY,
+      clinic_id INTEGER REFERENCES clinics(id),
+      nombre TEXT,
+      telefono TEXT,
+      email TEXT,
+      ultima_visita TEXT,
+      servicio TEXT,
+      notas TEXT,
+      estado TEXT DEFAULT 'pendiente',
+      created_at TIMESTAMP DEFAULT NOW()
+    );
+
     CREATE TABLE IF NOT EXISTS appointments (
       id SERIAL PRIMARY KEY,
       clinic_id INTEGER REFERENCES clinics(id),
@@ -122,4 +135,27 @@ async function getAppointments(clinic_id, limit = 20) {
   return rows;
 }
 
-module.exports = { pool, initDb, getSession, saveSession, saveLead, getClinicByEmail, getLeads, saveAppointment, getAppointments, verifyPassword };
+async function importLeads(clinic_id, rows) {
+  if (!rows.length) return 0;
+  const flat = rows.flatMap(r => [clinic_id, r.nombre||null, r.telefono||null, r.email||null, r.ultima_visita||null, r.servicio||null, r.notas||null]);
+  const v2 = rows.map((_, i) => {
+    const o = i * 7;
+    return `($${o+1},$${o+2},$${o+3},$${o+4},$${o+5},$${o+6},$${o+7})`;
+  }).join(',');
+  await pool.query(`INSERT INTO imported_leads (clinic_id,nombre,telefono,email,ultima_visita,servicio,notas) VALUES ${v2}`, flat);
+  return rows.length;
+}
+
+async function getImportedLeads(clinic_id) {
+  const { rows } = await pool.query(
+    'SELECT * FROM imported_leads WHERE clinic_id=$1 ORDER BY created_at DESC LIMIT 500',
+    [clinic_id]
+  );
+  return rows;
+}
+
+async function updateLeadEstado(id, estado) {
+  await pool.query('UPDATE imported_leads SET estado=$1 WHERE id=$2', [estado, id]);
+}
+
+module.exports = { pool, initDb, getSession, saveSession, saveLead, getClinicByEmail, getLeads, saveAppointment, getAppointments, verifyPassword, importLeads, getImportedLeads, updateLeadEstado };

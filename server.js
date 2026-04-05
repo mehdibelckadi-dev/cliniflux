@@ -3,7 +3,7 @@ const express = require('express');
 const session = require('express-session');
 const PgSession = require('connect-pg-simple')(session);
 const OpenAI = require('openai');
-const { pool, initDb, getSession, saveSession, saveLead, getClinicByEmail, getLeads, getAppointments, saveAppointment, verifyPassword } = require('./db');
+const { pool, initDb, getSession, saveSession, saveLead, getClinicByEmail, getLeads, getAppointments, saveAppointment, verifyPassword, importLeads, getImportedLeads, updateLeadEstado } = require('./db');
 
 const app = express();
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
@@ -141,6 +141,64 @@ app.get('/api/dashboard/leads', requireAuth, async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: 'Error' });
   }
+});
+
+// ── Importar leads (CSV raw text) ───────────────────────────────────────────
+app.post('/api/leads/import', requireAuth, async (req, res) => {
+  try {
+    const { csv } = req.body; // cliente envía el texto del CSV
+    if (!csv) return res.status(400).json({ error: 'CSV vacío' });
+    const lines = csv.trim().split('\n').filter(l => l.trim());
+    if (lines.length < 2) return res.status(400).json({ error: 'CSV sin datos' });
+    const headers = lines[0].split(',').map(h => h.trim().toLowerCase()
+      .replace('úl','ul').replace('ú','u').replace('é','e').replace('ó','o'));
+    const rows = lines.slice(1).map(line => {
+      const cols = line.split(',').map(c => c.trim().replace(/^"|"$/g,''));
+      const obj = {};
+      headers.forEach((h, i) => { obj[h] = cols[i] || null; });
+      return {
+        nombre: obj.nombre || obj.name || null,
+        telefono: obj.telefono || obj.phone || obj.tel || null,
+        email: obj.email || null,
+        ultima_visita: obj['ultima visita'] || obj.ultima_visita || obj.fecha || null,
+        servicio: obj.servicio || obj.tratamiento || obj.service || null,
+        notas: obj.notas || obj.notes || null
+      };
+    }).filter(r => r.nombre || r.telefono || r.email);
+    const count = await importLeads(req.session.clinic.id, rows);
+    res.json({ ok: true, imported: count });
+  } catch (err) {
+    console.error('Import error:', err.message);
+    res.status(500).json({ error: 'Error importando' });
+  }
+});
+
+app.get('/api/leads/imported', requireAuth, async (req, res) => {
+  try { res.json(await getImportedLeads(req.session.clinic.id)); }
+  catch (err) { res.status(500).json({ error: 'Error' }); }
+});
+
+app.patch('/api/leads/imported/:id', requireAuth, async (req, res) => {
+  try {
+    await updateLeadEstado(req.params.id, req.body.estado);
+    res.json({ ok: true });
+  } catch (err) { res.status(500).json({ error: 'Error' }); }
+});
+
+// Exportar a CSV (compatible Google Sheets)
+app.get('/api/leads/export', requireAuth, async (req, res) => {
+  try {
+    const leads = await getImportedLeads(req.session.clinic.id);
+    const header = 'nombre,telefono,email,ultima_visita,servicio,notas,estado,creado';
+    const rows = leads.map(l =>
+      [l.nombre,l.telefono,l.email,l.ultima_visita,l.servicio,l.notas,l.estado,
+        new Date(l.created_at).toLocaleDateString('es-ES')]
+      .map(v => `"${(v||'').replace(/"/g,'""')}"`).join(',')
+    );
+    res.setHeader('Content-Type','text/csv; charset=utf-8');
+    res.setHeader('Content-Disposition','attachment; filename="leads-reactivacion.csv"');
+    res.send('\uFEFF' + [header,...rows].join('\n')); // BOM para Excel/Sheets
+  } catch (err) { res.status(500).json({ error: 'Error' }); }
 });
 
 app.get('/api/dashboard/appointments', requireAuth, async (req, res) => {

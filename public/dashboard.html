@@ -194,6 +194,40 @@
     .met-src-pct{font-size:12px;font-weight:700;color:var(--text);width:34px;text-align:right}
     @media(max-width:1100px){.met-kpis{grid-template-columns:repeat(2,1fr)}.patient-panel{display:none}.met-row{grid-template-columns:1fr}}
     @media(max-width:700px){.conv-list{width:100%}.chat-area{display:none}.p-conv.chat-open .conv-list{display:none}.p-conv.chat-open .chat-area{display:flex}}
+    /* ─── PANEL 3: REACTIVACIÓN ─── */
+    .p-leads{flex-direction:column;background:#f4f5f7;overflow:hidden}
+    .leads-topbar{padding:14px 20px;background:#fff;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-shrink:0;flex-wrap:wrap}
+    .leads-title{font-size:16px;font-weight:800;letter-spacing:-.5px;color:var(--text);margin-right:auto}
+    .leads-btn{font-family:inherit;font-size:12px;font-weight:600;border:none;padding:7px 14px;border-radius:8px;cursor:pointer;transition:all .15s}
+    .leads-btn.upload{background:var(--green);color:#fff}.leads-btn.upload:hover{background:#15803d}
+    .leads-btn.export{background:#fff;color:var(--text);border:1px solid var(--border)}.leads-btn.export:hover{background:var(--bg2)}
+    .leads-stats{display:flex;gap:8px;padding:12px 20px;flex-shrink:0}
+    .lstat{background:#fff;border:1px solid var(--border);border-radius:10px;padding:10px 16px;font-size:12px;color:var(--text2)}
+    .lstat strong{display:block;font-size:20px;font-weight:800;color:var(--text);letter-spacing:-1px;line-height:1.2}
+    .leads-table-wrap{flex:1;overflow-y:auto;padding:0 20px 20px}
+    .leads-table{width:100%;border-collapse:collapse;background:#fff;border-radius:12px;overflow:hidden;border:1px solid var(--border)}
+    .leads-table th{background:#f8f9fb;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;padding:10px 14px;text-align:left;border-bottom:1px solid var(--border)}
+    .leads-table td{padding:10px 14px;font-size:13px;color:var(--text);border-bottom:1px solid rgba(0,0,0,0.04)}
+    .leads-table tr:last-child td{border-bottom:none}
+    .leads-table tr:hover td{background:#fafafa}
+    .lead-estado{font-size:10px;font-weight:700;padding:3px 9px;border-radius:100px;cursor:pointer;border:none;font-family:inherit}
+    .estado-pendiente{background:#fef3c7;color:#92400e}
+    .estado-contactado{background:#dbeafe;color:#1d4ed8}
+    .estado-reactivado{background:#dcfce7;color:#15803d}
+    .estado-descartado{background:#f1f5f9;color:var(--text3)}
+    .leads-empty{text-align:center;padding:60px 20px;color:var(--text2)}
+    .leads-empty h3{font-size:16px;font-weight:700;margin-bottom:8px;color:var(--text)}
+    .leads-empty p{font-size:13px;line-height:1.6;max-width:360px;margin:0 auto 20px}
+    .upload-area{border:2px dashed rgba(22,163,74,0.3);border-radius:12px;padding:32px;text-align:center;background:var(--green-dim);cursor:pointer;transition:all .2s;max-width:500px;margin:0 auto}
+    .upload-area:hover{border-color:var(--green);background:rgba(22,163,74,0.12)}
+    .import-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:500;align-items:center;justify-content:center}
+    .import-modal.open{display:flex}
+    .import-box{background:#fff;border-radius:16px;padding:28px;width:500px;max-width:90vw;max-height:80vh;overflow-y:auto}
+    .import-box h3{font-size:16px;font-weight:800;margin-bottom:6px}
+    .import-box p{font-size:13px;color:var(--text2);margin-bottom:14px;line-height:1.5}
+    .import-textarea{width:100%;font-family:'Courier New',monospace;font-size:11px;border:1.5px solid var(--border);border-radius:8px;padding:10px;outline:none;resize:vertical;min-height:140px;color:var(--text)}
+    .import-textarea:focus{border-color:var(--green)}
+    .import-actions{display:flex;gap:8px;margin-top:12px;justify-content:flex-end}
   </style>
 </head>
 <body>
@@ -229,6 +263,10 @@
     <div class="si" data-panel="2" onclick="switchPanel(2)">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
       <div class="si-tooltip">Métricas</div>
+    </div>
+    <div class="si" data-panel="3" onclick="switchPanel(3)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      <div class="si-tooltip">Reactivación</div>
     </div>
     <div class="si-divider"></div>
     <div class="si">
@@ -443,7 +481,77 @@
       </div>
     </div>
 
+    <!-- PANEL 3: REACTIVACIÓN DE LEADS -->
+    <div class="panel p-leads" id="panel-3">
+      <div class="leads-topbar">
+        <span class="leads-title">Reactivación de pacientes</span>
+        <button class="leads-btn export" onclick="exportLeads()">⬇ Exportar CSV</button>
+        <button class="leads-btn" style="background:#fff;color:var(--text);border:1px solid var(--border)" onclick="openSheetsHelp()">📊 Google Sheets</button>
+        <button class="leads-btn upload" onclick="openImport()">⬆ Importar lista</button>
+      </div>
+      <div class="leads-stats">
+        <div class="lstat"><strong id="ls-total">0</strong>Total importados</div>
+        <div class="lstat"><strong id="ls-pend" style="color:#92400e">0</strong>Pendientes</div>
+        <div class="lstat"><strong id="ls-cont" style="color:#1d4ed8">0</strong>Contactados</div>
+        <div class="lstat"><strong id="ls-react" style="color:var(--green)">0</strong>Reactivados</div>
+      </div>
+      <div class="leads-table-wrap">
+        <div id="leads-empty" class="leads-empty" style="display:none">
+          <h3>Sin leads importados</h3>
+          <p>Importa la lista de pacientes inactivos de la clínica en formato CSV para comenzar la campaña de reactivación.</p>
+          <div class="upload-area" onclick="openImport()">
+            <div style="font-size:32px;margin-bottom:8px">📋</div>
+            <div style="font-size:14px;font-weight:600;color:var(--green);margin-bottom:4px">Subir lista de pacientes</div>
+            <div style="font-size:12px;color:var(--text2)">Formato CSV — columnas: nombre, telefono, email, ultima_visita, servicio</div>
+          </div>
+        </div>
+        <table class="leads-table" id="leads-table" style="display:none">
+          <thead><tr>
+            <th>Nombre</th><th>Teléfono</th><th>Email</th>
+            <th>Última visita</th><th>Servicio</th><th>Notas</th><th>Estado</th>
+          </tr></thead>
+          <tbody id="leads-tbody"></tbody>
+        </table>
+      </div>
+    </div>
   </main>
+
+  <!-- IMPORT MODAL -->
+  <div class="import-modal" id="importModal">
+    <div class="import-box">
+      <h3>Importar lista de pacientes</h3>
+      <p>Pega el contenido de tu CSV o exporta desde Excel/Sheets y pega aquí.<br>
+        Columnas soportadas: <strong>nombre, telefono, email, ultima_visita, servicio, notas</strong><br>
+        La primera fila debe ser la cabecera.</p>
+      <div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:4px">Ejemplo:</div>
+      <div style="font-size:10px;font-family:monospace;background:#f4f5f7;padding:8px;border-radius:6px;margin-bottom:10px;color:var(--text2)">nombre,telefono,email,ultima_visita,servicio<br>María García,+34612345678,maria@email.com,2024-06-15,Higiene dental</div>
+      <textarea class="import-textarea" id="csvInput" placeholder="Pega aquí el contenido CSV..."></textarea>
+      <div class="import-actions">
+        <button class="leads-btn" style="background:#fff;border:1px solid var(--border);color:var(--text)" onclick="closeImport()">Cancelar</button>
+        <button class="leads-btn upload" id="importBtn" onclick="doImport()">Importar →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SHEETS HELP MODAL -->
+  <div class="import-modal" id="sheetsModal">
+    <div class="import-box">
+      <h3>Conectar con Google Sheets</h3>
+      <p>Dos formas de trabajar con Google Sheets:</p>
+      <div style="background:#f0fdf4;border:1px solid rgba(22,163,74,0.2);border-radius:10px;padding:14px;margin-bottom:12px;font-size:13px">
+        <strong style="color:var(--green)">Opción A — Importar desde Sheets</strong><br>
+        En tu Google Sheet → Archivo → Descargar → CSV. Luego usa el botón "Importar lista" aquí.
+      </div>
+      <div style="background:#eff6ff;border:1px solid rgba(59,130,246,0.2);border-radius:10px;padding:14px;font-size:13px">
+        <strong style="color:#1d4ed8">Opción B — Exportar hacia Sheets</strong><br>
+        Pulsa "Exportar CSV", luego en Google Sheets → Importar → Subir el archivo descargado. Los datos estarán sincronizados.
+      </div>
+      <div class="import-actions">
+        <button class="leads-btn" style="background:#fff;border:1px solid var(--border);color:var(--text)" onclick="document.getElementById('sheetsModal').classList.remove('open')">Cerrar</button>
+        <button class="leads-btn upload" onclick="exportLeads()">Exportar CSV ahora →</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -567,6 +675,76 @@
   }
 
   function esc(s){ return String(s).replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  // ── Leads reactivación ────────────────────────────────────────────────────
+  async function loadImportedLeads() {
+    try {
+      const r = await fetch('/api/leads/imported');
+      if (!r.ok) return;
+      const leads = await r.json();
+      renderImportedLeads(leads);
+    } catch(e) { console.error(e); }
+  }
+
+  function renderImportedLeads(leads) {
+    const empty = document.getElementById('leads-empty');
+    const table = document.getElementById('leads-table');
+    const tbody = document.getElementById('leads-tbody');
+    if (!leads.length) { empty.style.display='block'; table.style.display='none'; return; }
+    empty.style.display='none'; table.style.display='table';
+    const pend = leads.filter(l=>l.estado==='pendiente').length;
+    const cont = leads.filter(l=>l.estado==='contactado').length;
+    const react = leads.filter(l=>l.estado==='reactivado').length;
+    document.getElementById('ls-total').textContent = leads.length;
+    document.getElementById('ls-pend').textContent = pend;
+    document.getElementById('ls-cont').textContent = cont;
+    document.getElementById('ls-react').textContent = react;
+    const estados = ['pendiente','contactado','reactivado','descartado'];
+    tbody.innerHTML = leads.map(l => `
+      <tr>
+        <td><strong>${esc(l.nombre||'—')}</strong></td>
+        <td>${esc(l.telefono||'—')}</td>
+        <td>${esc(l.email||'—')}</td>
+        <td>${esc(l.ultima_visita||'—')}</td>
+        <td>${esc(l.servicio||'—')}</td>
+        <td style="max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(l.notas||'—')}</td>
+        <td><select class="lead-estado estado-${l.estado}" onchange="cambiarEstado(${l.id},this)">
+          ${estados.map(e=>`<option value="${e}"${e===l.estado?' selected':''}>${e.charAt(0).toUpperCase()+e.slice(1)}</option>`).join('')}
+        </select></td>
+      </tr>`).join('');
+  }
+
+  async function cambiarEstado(id, sel) {
+    const estado = sel.value;
+    sel.className = `lead-estado estado-${estado}`;
+    await fetch(`/api/leads/imported/${id}`, { method:'PATCH', headers:{'Content-Type':'application/json'}, body: JSON.stringify({estado}) });
+    loadImportedLeads();
+  }
+
+  function openImport() { document.getElementById('importModal').classList.add('open'); }
+  function closeImport() { document.getElementById('importModal').classList.remove('open'); document.getElementById('csvInput').value=''; }
+  function openSheetsHelp() { document.getElementById('sheetsModal').classList.add('open'); }
+
+  async function doImport() {
+    const csv = document.getElementById('csvInput').value.trim();
+    if (!csv) return;
+    const btn = document.getElementById('importBtn');
+    btn.disabled=true; btn.textContent='Importando...';
+    try {
+      const r = await fetch('/api/leads/import', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({csv}) });
+      const d = await r.json();
+      if (r.ok) { closeImport(); loadImportedLeads(); }
+      else alert(d.error || 'Error al importar');
+    } catch(e) { alert('Error de conexión'); }
+    btn.disabled=false; btn.textContent='Importar →';
+  }
+
+  async function exportLeads() {
+    window.location.href = '/api/leads/export';
+  }
+
+  // Cargar leads al arrancar
+  loadImportedLeads();
 
   // ── Panel switching ───────────────────────────────────────────────────────
   function switchPanel(n){
