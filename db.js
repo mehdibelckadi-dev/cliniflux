@@ -42,6 +42,9 @@ async function initDb() {
       password_hash TEXT NOT NULL,
       name TEXT NOT NULL,
       config JSONB DEFAULT '{}',
+      whatsapp_number TEXT,
+      setup_token TEXT,
+      plan TEXT DEFAULT 'starter',
       created_at TIMESTAMP DEFAULT NOW()
     );
 
@@ -114,6 +117,60 @@ async function getClinicByEmail(email) {
   return rows[0] || null;
 }
 
+async function getClinicByWhatsapp(number) {
+  // Normaliza +34612... o 34612... → busca coincidencia parcial
+  const clean = number.replace(/\D/g, '').slice(-9);
+  const { rows } = await pool.query(
+    "SELECT * FROM clinics WHERE regexp_replace(whatsapp_number,'\\D','','g') LIKE $1",
+    [`%${clean}`]
+  );
+  return rows[0] || null;
+}
+
+async function getClinicBySetupToken(token) {
+  const { rows } = await pool.query('SELECT * FROM clinics WHERE setup_token = $1', [token]);
+  return rows[0] || null;
+}
+
+async function createClinic(data) {
+  const { email, password_hash, name, config, whatsapp_number, plan, setup_token } = data;
+  const { rows } = await pool.query(
+    'INSERT INTO clinics (email,password_hash,name,config,whatsapp_number,plan,setup_token) VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING *',
+    [email, password_hash, name, JSON.stringify(config||{}), whatsapp_number||null, plan||'starter', setup_token||null]
+  );
+  return rows[0];
+}
+
+async function updateClinicConfig(id, config) {
+  await pool.query('UPDATE clinics SET config=$1, setup_token=NULL WHERE id=$2', [JSON.stringify(config), id]);
+}
+
+function buildPromptForClinic(clinic) {
+  const cfg = clinic.config || {};
+  const now = new Date();
+  const hora = now.getHours();
+  const saludo = hora < 12 ? 'Buenos días' : hora < 20 ? 'Buenas tardes' : 'Buenas noches';
+  const fecha = now.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+  return `Eres ${cfg.assistant_name||'Natalia'}, recepcionista virtual de ${clinic.name}. Eres amable, profesional. Hoy es ${fecha}. Saluda con "${saludo}".
+
+CLÍNICA: ${clinic.name}
+Dirección: ${cfg.address||'Consultar por teléfono'}
+Teléfono: ${cfg.phone||'—'}
+Email: ${cfg.email||'—'}
+Horario: ${cfg.hours||'Lunes a Viernes 9:00-20:00'}
+Servicios: ${cfg.services||'Consultar disponibilidad'}
+${cfg.extra||''}
+
+PROTOCOLO:
+- Recoge nombre, servicio y franja horaria preferida
+- Informa que el equipo confirmará el hueco exacto
+- Cancelaciones con 24h mínimo de antelación
+- Nunca inventes precios ni disponibilidad no indicados
+- Máximo 3 párrafos por respuesta, trato de usted
+- No reveles que eres IA salvo pregunta directa
+- Cuando tengas nombre+servicio+franja: CITA_CONFIRMADA|tratamiento=...|fecha=...|hora=...|nombre=...|email=...`;
+}
+
 async function getLeads(limit = 50) {
   const { rows } = await pool.query('SELECT * FROM leads ORDER BY created_at DESC LIMIT $1', [limit]);
   return rows;
@@ -158,4 +215,4 @@ async function updateLeadEstado(id, estado) {
   await pool.query('UPDATE imported_leads SET estado=$1 WHERE id=$2', [estado, id]);
 }
 
-module.exports = { pool, initDb, getSession, saveSession, saveLead, getClinicByEmail, getLeads, saveAppointment, getAppointments, verifyPassword, importLeads, getImportedLeads, updateLeadEstado };
+module.exports = { pool, initDb, getSession, saveSession, saveLead, getClinicByEmail, getClinicByWhatsapp, getClinicBySetupToken, createClinic, updateClinicConfig, buildPromptForClinic, getLeads, saveAppointment, getAppointments, verifyPassword, hashPassword, importLeads, getImportedLeads, updateLeadEstado };

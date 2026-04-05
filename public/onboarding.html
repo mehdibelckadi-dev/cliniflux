@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Configurar tu clínica — Cliniflux</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    :root{--green:#16a34a;--green-dim:rgba(22,163,74,0.08);--text:#0f172a;--text2:rgba(15,23,42,0.6);--border:rgba(0,0,0,0.1)}
+    body{font-family:'Inter',sans-serif;background:#f4f5f7;min-height:100vh;padding:40px 16px;-webkit-font-smoothing:antialiased}
+    .wrap{max-width:560px;margin:0 auto}
+    .logo{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-.8px;margin-bottom:4px}
+    .logo span{color:var(--green)}
+    .subtitle{font-size:13px;color:var(--text2);margin-bottom:32px}
+    .step{background:#fff;border-radius:16px;padding:28px;margin-bottom:16px;border:1px solid rgba(0,0,0,0.07)}
+    .step-n{font-size:11px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+    .step-title{font-size:17px;font-weight:800;letter-spacing:-.5px;margin-bottom:16px}
+    label{display:block;font-size:12px;font-weight:600;color:var(--text);margin-bottom:4px;margin-top:12px}
+    label:first-of-type{margin-top:0}
+    input,textarea,select{width:100%;font-family:inherit;font-size:13px;color:var(--text);background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:9px 12px;outline:none;transition:border-color .2s}
+    input:focus,textarea:focus{border-color:var(--green);box-shadow:0 0 0 3px var(--green-dim)}
+    textarea{resize:vertical;min-height:80px}
+    .hint{font-size:11px;color:var(--text2);margin-top:3px}
+    .btn{width:100%;font-family:inherit;font-size:15px;font-weight:700;color:#fff;background:var(--green);border:none;padding:13px;border-radius:40px;cursor:pointer;transition:background .2s;margin-top:8px}
+    .btn:hover{background:#15803d}
+    .btn:disabled{opacity:.6;cursor:not-allowed}
+    .error{font-size:13px;color:#dc2626;background:#fef2f2;border:1px solid rgba(220,38,38,0.2);border-radius:8px;padding:9px 12px;margin-bottom:12px;display:none}
+    .success{text-align:center;padding:48px 24px;display:none}
+    .success h2{font-size:24px;font-weight:800;margin-bottom:8px}
+    .success p{font-size:14px;color:var(--text2);margin-bottom:20px}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <div class="logo">clini<span>flux</span></div>
+  <div class="subtitle">Configura tu asistente virtual en 2 minutos</div>
+
+  <div id="form-area">
+    <div class="error" id="err"></div>
+
+    <div class="step">
+      <div class="step-n">Paso 1</div>
+      <div class="step-title">Información de la clínica</div>
+      <label>Nombre de la clínica *</label>
+      <input id="clinic-name" type="text" placeholder="Ej: Clínica Dental Martínez" readonly>
+      <label>Teléfono de contacto *</label>
+      <input id="phone" type="tel" placeholder="+34 900 000 000">
+      <label>Email de la clínica</label>
+      <input id="email-clinic" type="email" placeholder="info@tuclinica.com">
+      <label>Dirección</label>
+      <input id="address" type="text" placeholder="Calle, número, ciudad">
+      <label>Horario de atención *</label>
+      <input id="hours" type="text" placeholder="Ej: L-V 9:00-20:00, Sáb 10:00-14:00">
+    </div>
+
+    <div class="step">
+      <div class="step-n">Paso 2</div>
+      <div class="step-title">Servicios y precios</div>
+      <label>Lista de servicios con precios *</label>
+      <textarea id="services" placeholder="Higiene dental: 55€&#10;Blanqueamiento: 280€&#10;Ortodoncia: desde 2.900€&#10;..."></textarea>
+      <div class="hint">Escribe un servicio por línea. Incluye precios si quieres que Natalia los comunique.</div>
+      <label>Información adicional (seguros, parking, FAQ…)</label>
+      <textarea id="extra" placeholder="Ej: Aceptamos Adeslas y Sanitas. Parking gratuito 1h en Calle X."></textarea>
+    </div>
+
+    <div class="step">
+      <div class="step-n">Paso 3</div>
+      <div class="step-title">Tu asistente y acceso</div>
+      <label>Nombre del asistente virtual</label>
+      <input id="assistant-name" type="text" placeholder="Natalia" value="Natalia">
+      <label>Número WhatsApp Business (con prefijo país)</label>
+      <input id="wa-number" type="tel" placeholder="+34 612 345 678">
+      <div class="hint">El número que conectarás con Twilio. Puedes dejarlo vacío y añadirlo después.</div>
+      <label>Nueva contraseña para tu panel *</label>
+      <input id="new-pass" type="password" placeholder="Mínimo 8 caracteres">
+      <label>Repetir contraseña *</label>
+      <input id="new-pass2" type="password" placeholder="Repite la contraseña">
+    </div>
+
+    <button class="btn" id="btn" onclick="saveOnboarding()">Activar mi asistente →</button>
+  </div>
+
+  <div class="success" id="success">
+    <div style="font-size:48px;margin-bottom:12px">🎉</div>
+    <h2>¡Tu asistente está listo!</h2>
+    <p>Natalia ya tiene toda la información de tu clínica.<br>Accede a tu panel para ver conversaciones y citas.</p>
+    <a href="/login" style="display:inline-block;font-size:14px;font-weight:700;color:#fff;background:var(--green);padding:12px 28px;border-radius:40px;text-decoration:none">Ir a mi panel →</a>
+  </div>
+</div>
+
+<script>
+  const token = new URLSearchParams(location.search).get('token');
+  if (!token) location.href = '/login';
+
+  // Pre-rellenar nombre clínica desde URL si viene
+  const nameParam = new URLSearchParams(location.search).get('name');
+  if (nameParam) document.getElementById('clinic-name').value = decodeURIComponent(nameParam);
+
+  async function saveOnboarding() {
+    const err = document.getElementById('err');
+    err.style.display = 'none';
+    const pass = document.getElementById('new-pass').value;
+    const pass2 = document.getElementById('new-pass2').value;
+    if (!document.getElementById('phone').value) { err.textContent='El teléfono es obligatorio.'; err.style.display='block'; return; }
+    if (!document.getElementById('hours').value) { err.textContent='El horario es obligatorio.'; err.style.display='block'; return; }
+    if (!document.getElementById('services').value) { err.textContent='Los servicios son obligatorios.'; err.style.display='block'; return; }
+    if (!pass || pass.length < 8) { err.textContent='La contraseña debe tener al menos 8 caracteres.'; err.style.display='block'; return; }
+    if (pass !== pass2) { err.textContent='Las contraseñas no coinciden.'; err.style.display='block'; return; }
+
+    const btn = document.getElementById('btn');
+    btn.disabled = true; btn.textContent = 'Guardando...';
+
+    try {
+      const r = await fetch('/api/onboarding', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({
+          token,
+          phone: document.getElementById('phone').value,
+          address: document.getElementById('address').value,
+          hours: document.getElementById('hours').value,
+          services: document.getElementById('services').value,
+          extra: document.getElementById('extra').value,
+          assistant_name: document.getElementById('assistant-name').value || 'Natalia',
+          whatsapp_number: document.getElementById('wa-number').value,
+          new_password: pass
+        })
+      });
+      const d = await r.json();
+      if (r.ok) {
+        document.getElementById('form-area').style.display = 'none';
+        document.getElementById('success').style.display = 'block';
+      } else {
+        err.textContent = d.error || 'Error al guardar.';
+        err.style.display = 'block';
+        btn.disabled = false; btn.textContent = 'Activar mi asistente →';
+      }
+    } catch { err.textContent = 'Error de conexión.'; err.style.display = 'block'; btn.disabled = false; btn.textContent = 'Activar mi asistente →'; }
+  }
+</script>
+</body>
+</html>

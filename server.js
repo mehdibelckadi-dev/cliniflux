@@ -3,7 +3,8 @@ const express = require('express');
 const session = require('express-session');
 const PgSession = require('connect-pg-simple')(session);
 const OpenAI = require('openai');
-const { pool, initDb, getSession, saveSession, saveLead, getClinicByEmail, getLeads, getAppointments, saveAppointment, verifyPassword, importLeads, getImportedLeads, updateLeadEstado } = require('./db');
+const crypto = require('crypto');
+const { pool, initDb, getSession, saveSession, saveLead, getClinicByEmail, getClinicByWhatsapp, getClinicBySetupToken, createClinic, updateClinicConfig, buildPromptForClinic, getLeads, getAppointments, saveAppointment, verifyPassword, hashPassword, importLeads, getImportedLeads, updateLeadEstado } = require('./db');
 
 const app = express();
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
@@ -26,59 +27,22 @@ function requireAuth(req, res, next) {
   res.redirect('/login');
 }
 
-// ── Sistema de prompts ──────────────────────────────────────────────────────
-
-function buildSystemPrompt() {
+// ── Demo prompt (BarnaDental) — usado por /demo y /webhook sin clinic_id ───
+function buildDemoPrompt() {
   const now = new Date();
   const hora = now.getHours();
   const saludo = hora < 12 ? 'Buenos días' : hora < 20 ? 'Buenas tardes' : 'Buenas noches';
   const fecha = now.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-
-  return `Eres Natalia, recepcionista virtual de BarnaDental. Eres amable, profesional y hablas con naturalidad. Hoy es ${fecha}. Saluda con "${saludo}".
-
-CLÍNICA:
-- Nombre: BarnaDental
-- Dirección: Carrer de València, 245, 08007 Barcelona (cerca de Paseo de Gracia)
-- Teléfono: +34 932 123 456
-- Email: info@barnadental.cat
-- Metro: Diagonal (L3/L5) o FGC Provença
-- Parking: 1h gratis para pacientes en Parking de Carrer d'Aragó
-
-HORARIOS:
-- Lunes a Viernes: 09:00 – 20:30 (ininterrumpido)
-- Sábados: 10:00 – 14:00 (solo visitas concertadas)
-- Domingos: cerrado
-- Agosto: cerramos la segunda quincena por vacaciones
-
-SERVICIOS Y PRECIOS:
-- Higiene dental: 55€ (incluye revisión y radiografía panorámica si es necesario)
-- Blanqueamiento LED: 280€ (sesión única en clínica)
-- Invisalign / Ortodoncia invisible: desde 2.900€ (valoración gratuita previa)
-- Implante dental: desde 850€ (implante; corona aparte, se presupuesta)
-- Urgencias dentales: 40€ visita diagnóstico (en horario comercial)
-- Primera visita de diagnóstico y presupuesto: GRATUITA
-
-EQUIPO:
-- Dra. Laia Puig: Directora médica, especialista en Implantología
-- Dr. Marc Soler: Especialista en Ortodoncia Invisible y Estética Dental
-
-SEGUROS: Adeslas, Sanitas y Mapfre. Otras aseguradoras consultar.
-
-PROTOCOLO DE CITAS:
-1. Recoge: nombre completo → servicio de interés → franja horaria preferida
-2. Informa que Marta (secretaria) llamará en menos de 30 min para confirmar el hueco exacto
-3. Cancelaciones: avisar con mínimo 24h de antelación
-4. Se envía SMS recordatorio 48h antes de la cita
-
-NORMAS ESTRICTAS:
-- Responde siempre en español, trato de usted
-- Máximo 3 párrafos cortos por respuesta
-- Nunca inventes precios, servicios ni disponibilidades que no estén aquí
-- Nunca confirmes un horario concreto (solo Marta puede hacerlo)
-- Si preguntan por algo no listado, di "le recomiendo llamarnos al +34 932 123 456"
-- Nunca digas que eres una IA salvo que te lo pregunten directamente
-- Cuando el paciente dé su nombre, servicio y franja horaria, termina con esta línea exacta (invisible para el paciente):
-  CITA_CONFIRMADA|tratamiento=...|fecha=...|hora=...|nombre=...|email=...`;
+  return `Eres Natalia, recepcionista virtual de BarnaDental. Amable, profesional. Hoy es ${fecha}. Saluda con "${saludo}".
+CLÍNICA: BarnaDental · Carrer de València 245, 08007 Barcelona · +34 932 123 456 · info@barnadental.cat
+Metro: Diagonal (L3/L5) · Parking 1h gratis en Carrer d'Aragó
+HORARIO: L-V 09:00-20:30 · Sáb 10:00-14:00 · Dom cerrado · Agosto: segunda quincena vacaciones
+SERVICIOS: Higiene dental 55€ · Blanqueamiento LED 280€ · Invisalign desde 2.900€ (valoración gratuita) · Implante desde 850€ · Urgencias 40€ · Primera visita GRATUITA
+EQUIPO: Dra. Laia Puig (Implantología) · Dr. Marc Soler (Ortodoncia/Estética)
+SEGUROS: Adeslas, Sanitas, Mapfre
+PROTOCOLO: Recoge nombre→servicio→franja horaria. Marta confirma hueco en <30min. Cancelar con 24h mínimo.
+NORMAS: Español, usted, máx 3 párrafos, no inventes datos, no confirmes horario exacto, no reveles IA.
+Al tener nombre+servicio+franja: CITA_CONFIRMADA|tratamiento=...|fecha=...|hora=...|nombre=...|email=...`;
 }
 
 // ── Rutas páginas públicas ──────────────────────────────────────────────────
@@ -104,6 +68,52 @@ FEATURES.forEach(slug => {
 // ── Dashboard (protegido) ───────────────────────────────────────────────────
 
 app.get('/dashboard', requireAuth, (req, res) => res.sendFile('dashboard.html', { root: 'public' }));
+
+// ── Onboarding ──────────────────────────────────────────────────────────────
+
+// Tú creas el token: GET /admin/new-clinic?secret=ADMIN_SECRET&email=x&name=y&plan=pro
+app.get('/admin/new-clinic', async (req, res) => {
+  if (req.query.secret !== (process.env.ADMIN_SECRET || 'cliniflux-admin')) {
+    return res.status(403).send('Forbidden');
+  }
+  const { email, name, plan } = req.query;
+  if (!email || !name) return res.status(400).send('email y name requeridos');
+  try {
+    const token = crypto.randomBytes(16).toString('hex');
+    const tempPass = crypto.randomBytes(8).toString('hex');
+    await createClinic({ email, password_hash: hashPassword(tempPass), name, plan: plan||'starter', setup_token: token });
+    res.json({ ok: true, setup_url: `/onboarding?token=${token}`, temp_password: tempPass });
+  } catch(e) {
+    res.status(500).send(e.message);
+  }
+});
+
+app.get('/onboarding', async (req, res) => {
+  const clinic = await getClinicBySetupToken(req.query.token).catch(() => null);
+  if (!clinic) return res.redirect('/login');
+  res.sendFile('onboarding.html', { root: 'public' });
+});
+
+app.post('/api/onboarding', async (req, res) => {
+  const { token, phone, address, hours, services, extra, assistant_name, whatsapp_number, new_password } = req.body;
+  if (!token) return res.status(400).json({ error: 'Token requerido' });
+  try {
+    const clinic = await getClinicBySetupToken(token);
+    if (!clinic) return res.status(404).json({ error: 'Token inválido o ya usado' });
+    const config = { phone, address, hours, services, extra, assistant_name: assistant_name||'Natalia', email: clinic.email };
+    await updateClinicConfig(clinic.id, config);
+    if (whatsapp_number) {
+      await pool.query('UPDATE clinics SET whatsapp_number=$1 WHERE id=$2', [whatsapp_number, clinic.id]);
+    }
+    if (new_password) {
+      await pool.query('UPDATE clinics SET password_hash=$1 WHERE id=$2', [hashPassword(new_password), clinic.id]);
+    }
+    res.json({ ok: true });
+  } catch(e) {
+    console.error('Onboarding:', e.message);
+    res.status(500).json({ error: 'Error guardando configuración' });
+  }
+});
 
 // ── Auth routes ─────────────────────────────────────────────────────────────
 
@@ -213,106 +223,74 @@ app.get('/api/dashboard/appointments', requireAuth, async (req, res) => {
 // ── POST /webhook/whatsapp (Twilio) ────────────────────────────────────────
 
 app.post('/webhook/whatsapp', async (req, res) => {
-  // Twilio envía form-urlencoded: From=whatsapp:+34..., Body=texto
-  const from = req.body.From || '';
-  const msg  = (req.body.Body || '').trim();
-  const phone = from.replace('whatsapp:', '');
+  const from  = (req.body.From || '').replace('whatsapp:', '');
+  const to    = (req.body.To   || '').replace('whatsapp:', '');
+  const msg   = (req.body.Body || '').trim().slice(0, 500);
+  if (!from || !msg) return res.type('text/xml').send('<Response></Response>');
 
-  if (!phone || !msg) {
-    return res.type('text/xml').send('<Response></Response>');
-  }
-
-  // Validación de token opcional (añade TWILIO_TOKEN en Railway para producción)
-  if (process.env.TWILIO_TOKEN && req.headers['x-twilio-signature'] === undefined) {
-    return res.status(403).send('Forbidden');
-  }
-
-  // Limitar longitud de mensaje
-  const safeMsg = msg.slice(0, 500);
-  // Session por número de teléfono
-  const sessionId = 'wa_' + phone.replace(/\D/g, '').slice(-12);
+  // Identificar clínica por número destino (multi-tenant)
+  const clinic = to ? await getClinicByWhatsapp(to).catch(() => null) : null;
+  const prompt = clinic ? buildPromptForClinic(clinic) : buildDemoPrompt();
+  const clinicId = clinic?.id || 1;
+  const sessionId = `wa_${clinicId}_` + from.replace(/\D/g,'').slice(-10);
 
   try {
     const history = await getSession(sessionId);
-    const messages = [
-      { role: 'system', content: buildSystemPrompt() },
-      ...history,
-      { role: 'user', content: safeMsg }
-    ];
-
     const completion = await openai.chat.completions.create({
       model: process.env.AI_MODEL || 'gpt-4o-mini',
-      messages,
-      max_tokens: 350,
-      temperature: 0.4
+      messages: [{ role:'system', content: prompt }, ...history, { role:'user', content: msg }],
+      max_tokens: 350, temperature: 0.4
     });
-
     let reply = completion.choices[0].message.content;
-
-    // Detectar cita confirmada
     const match = reply.match(/CITA_CONFIRMADA\|(.+)/);
     if (match) {
       reply = reply.replace(/\nCITA_CONFIRMADA\|.+/, '').trim();
       const parts = Object.fromEntries(match[1].split('|').map(p => p.split('=')));
-      await saveAppointment({
-        clinic_id: 1,
-        patient_name: parts.nombre || 'Paciente WhatsApp',
-        patient_phone: phone,
-        service: parts.tratamiento || null,
-        scheduled_at: `${parts.fecha || ''} ${parts.hora || ''}`.trim()
-      }).catch(e => console.error('Appt save:', e.message));
-      console.log('[WA] Cita confirmada:', match[1]);
+      await saveAppointment({ clinic_id: clinicId, patient_name: parts.nombre||'Paciente', patient_phone: from, service: parts.tratamiento||null, scheduled_at: `${parts.fecha||''} ${parts.hora||''}`.trim() }).catch(e => console.error('Appt:', e.message));
     }
-
-    history.push({ role: 'user', content: safeMsg });
-    history.push({ role: 'assistant', content: reply });
+    history.push({ role:'user', content: msg });
+    history.push({ role:'assistant', content: reply });
     await saveSession(sessionId, history.slice(-20));
-
-    // TwiML — Twilio envía este reply al paciente
-    const escapedReply = reply.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-    res.type('text/xml').send(`<?xml version="1.0" encoding="UTF-8"?><Response><Message>${escapedReply}</Message></Response>`);
-
-  } catch (err) {
-    console.error('[WA] Error:', err.message);
-    res.type('text/xml').send('<Response><Message>Lo sentimos, ha ocurrido un error. Por favor intente de nuevo en unos minutos.</Message></Response>');
+    const safe = reply.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    res.type('text/xml').send(`<?xml version="1.0" encoding="UTF-8"?><Response><Message>${safe}</Message></Response>`);
+  } catch(err) {
+    console.error('[WA]', err.message);
+    res.type('text/xml').send('<Response><Message>Lo sentimos, ha ocurrido un error. Inténtelo de nuevo en unos minutos.</Message></Response>');
   }
 });
 
 // ── POST /chat ──────────────────────────────────────────────────────────────
 
 app.post('/chat', async (req, res) => {
-  const { session_id, msg } = req.body;
+  const { session_id, msg, clinic_id } = req.body;
   if (!session_id || !msg || msg.length > 500) return res.status(400).json({ error: 'Parámetros inválidos' });
   const safeId = session_id.replace(/[^a-zA-Z0-9\-_]/g, '').slice(0, 64);
+  // Obtener prompt según clínica (demo usa BarnaDental por defecto)
+  let prompt = buildDemoPrompt();
+  let clinicId = 1;
+  if (clinic_id && Number.isInteger(+clinic_id)) {
+    const { rows } = await pool.query('SELECT * FROM clinics WHERE id=$1', [+clinic_id]).catch(() => ({ rows: [] }));
+    if (rows[0]) { prompt = buildPromptForClinic(rows[0]); clinicId = rows[0].id; }
+  }
   try {
     const history = await getSession(safeId);
-    const messages = [{ role: 'system', content: buildSystemPrompt() }, ...history, { role: 'user', content: msg }];
     const completion = await openai.chat.completions.create({
       model: process.env.AI_MODEL || 'gpt-4o-mini',
-      messages,
-      max_tokens: 350,
-      temperature: 0.4
+      messages: [{ role:'system', content: prompt }, ...history, { role:'user', content: msg }],
+      max_tokens: 350, temperature: 0.4
     });
     let reply = completion.choices[0].message.content;
     const match = reply.match(/CITA_CONFIRMADA\|(.+)/);
     if (match) {
       reply = reply.replace(/\nCITA_CONFIRMADA\|.+/, '').trim();
-      // Parsear y guardar cita
       const parts = Object.fromEntries(match[1].split('|').map(p => p.split('=')));
-      await saveAppointment({
-        clinic_id: 1, // demo clinic — multi-tenant en fase 2
-        patient_name: parts.nombre || 'Paciente',
-        patient_phone: null,
-        service: parts.tratamiento || null,
-        scheduled_at: `${parts.fecha || ''} ${parts.hora || ''}`.trim()
-      }).catch(e => console.error('Appt save:', e.message));
-      console.log('Cita confirmada:', match[1]);
+      await saveAppointment({ clinic_id: clinicId, patient_name: parts.nombre||'Paciente', patient_phone: null, service: parts.tratamiento||null, scheduled_at: `${parts.fecha||''} ${parts.hora||''}`.trim() }).catch(e => console.error('Appt:', e.message));
     }
-    history.push({ role: 'user', content: msg });
-    history.push({ role: 'assistant', content: reply });
+    history.push({ role:'user', content: msg });
+    history.push({ role:'assistant', content: reply });
     await saveSession(safeId, history.slice(-20));
     res.json({ reply });
-  } catch (err) {
+  } catch(err) {
     console.error('Chat error:', err.message);
     res.status(500).json({ error: 'Error interno' });
   }
