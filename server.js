@@ -355,6 +355,30 @@ app.post('/api/contact', async (req, res) => {
   res.json({ ok: true });
 });
 
+app.get('/api/settings', requireAuth, async (req, res) => {
+  const { rows } = await pool.query('SELECT name,email,plan,whatsapp_number,config FROM clinics WHERE id=$1', [req.session.clinic.id]);
+  res.json(rows[0] || {});
+});
+
+app.post('/api/settings', requireAuth, async (req, res) => {
+  const { name, phone, email_clinic, address, hours, services, extra, assistant_name, whatsapp_number } = req.body;
+  try {
+    const { rows } = await pool.query('SELECT config FROM clinics WHERE id=$1', [req.session.clinic.id]);
+    const cfg = { ...(rows[0]?.config || {}), phone, email: email_clinic, address, hours, services, extra, assistant_name };
+    await pool.query('UPDATE clinics SET config=$1, name=COALESCE($2,name), whatsapp_number=COALESCE(NULLIF($3,\'\'),whatsapp_number) WHERE id=$4',
+      [JSON.stringify(cfg), name || null, whatsapp_number || '', req.session.clinic.id]);
+    req.session.clinic.name = name || req.session.clinic.name;
+    res.json({ ok: true });
+  } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+app.post('/api/settings/password', requireAuth, async (req, res) => {
+  const { password } = req.body;
+  if (!password || password.length < 8) return res.status(400).json({ error: 'Mínimo 8 caracteres' });
+  await pool.query('UPDATE clinics SET password_hash=$1 WHERE id=$2', [hashPassword(password), req.session.clinic.id]);
+  res.json({ ok: true });
+});
+
 app.post('/api/demo-request', async (req, res) => {
   try { await saveLead(req.body); res.json({ ok: true }); }
   catch (err) { res.status(500).json({ error: 'Error' }); }

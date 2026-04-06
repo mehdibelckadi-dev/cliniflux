@@ -228,6 +228,33 @@
     .import-textarea{width:100%;font-family:'Courier New',monospace;font-size:11px;border:1.5px solid var(--border);border-radius:8px;padding:10px;outline:none;resize:vertical;min-height:140px;color:var(--text)}
     .import-textarea:focus{border-color:var(--green)}
     .import-actions{display:flex;gap:8px;margin-top:12px;justify-content:flex-end}
+    /* ─── PANEL 4: AJUSTES ─── */
+    .p-settings{flex-direction:column;background:#f4f5f7;overflow-y:auto;padding:24px 28px}
+    .set-title{font-size:18px;font-weight:800;letter-spacing:-.5px;margin-bottom:4px}
+    .set-sub{font-size:13px;color:var(--text2);margin-bottom:24px}
+    .set-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    .set-card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:20px}
+    .set-card-full{grid-column:1/-1}
+    .set-card-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:14px;display:flex;align-items:center;gap:7px}
+    .set-label{font-size:11px;font-weight:600;color:var(--text2);margin-bottom:4px;margin-top:10px;display:block}
+    .set-label:first-of-type{margin-top:0}
+    .set-input{width:100%;font-family:inherit;font-size:13px;color:var(--text);background:#fff;border:1.5px solid var(--border);border-radius:8px;padding:8px 11px;outline:none;transition:border-color .2s}
+    .set-input:focus{border-color:var(--green);box-shadow:0 0 0 3px var(--green-dim)}
+    .set-textarea{width:100%;font-family:inherit;font-size:12px;color:var(--text);background:#fff;border:1.5px solid var(--border);border-radius:8px;padding:8px 11px;outline:none;resize:vertical;min-height:90px;transition:border-color .2s}
+    .set-textarea:focus{border-color:var(--green);box-shadow:0 0 0 3px var(--green-dim)}
+    .set-btn{font-family:inherit;font-size:13px;font-weight:700;color:#fff;background:var(--green);border:none;padding:9px 20px;border-radius:8px;cursor:pointer;transition:background .2s;margin-top:12px}
+    .set-btn:hover{background:#15803d}
+    .set-btn:disabled{opacity:.6;cursor:not-allowed}
+    .set-btn-ghost{font-family:inherit;font-size:13px;font-weight:600;color:var(--text2);background:#fff;border:1.5px solid var(--border);padding:9px 20px;border-radius:8px;cursor:pointer;transition:all .15s;margin-top:12px}
+    .set-btn-ghost:hover{border-color:var(--text2);color:var(--text)}
+    .set-saved{font-size:12px;color:var(--green);font-weight:600;display:none;margin-top:8px}
+    .set-plan-badge{font-size:11px;font-weight:700;padding:3px 10px;border-radius:100px;background:#dcfce7;color:#15803d}
+    .set-wa-status{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;margin-top:8px}
+    .set-wa-dot{width:8px;height:8px;border-radius:50%;background:#e5e7eb}
+    .set-wa-dot.active{background:#25d366}
+    .set-danger{border-color:rgba(239,68,68,.2)!important;background:#fffafa!important}
+    .set-danger .set-card-title{color:#dc2626}
+    @media(max-width:700px){.set-grid{grid-template-columns:1fr}}
   </style>
 </head>
 <body>
@@ -269,9 +296,9 @@
       <div class="si-tooltip">Reactivación</div>
     </div>
     <div class="si-divider"></div>
-    <div class="si">
-      <svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-      <div class="si-tooltip">Configuración</div>
+    <div class="si" data-panel="4" onclick="switchPanel(4)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      <div class="si-tooltip">Ajustes</div>
     </div>
     <div class="si-bottom">
       <div class="si-ava">Dr</div>
@@ -514,6 +541,76 @@
         </table>
       </div>
     </div>
+    <!-- PANEL 4: AJUSTES -->
+    <div class="panel p-settings" id="panel-4">
+      <div class="set-title">Ajustes</div>
+      <div class="set-sub">Configura tu clínica y tu asistente virtual</div>
+      <div class="set-grid">
+
+        <!-- Info clínica -->
+        <div class="set-card">
+          <div class="set-card-title">🏥 Información de la clínica</div>
+          <span class="set-label">Nombre de la clínica</span>
+          <input class="set-input" id="s-name" placeholder="BarnaDental">
+          <span class="set-label">Teléfono</span>
+          <input class="set-input" id="s-phone" type="tel" placeholder="+34 932 123 456">
+          <span class="set-label">Email</span>
+          <input class="set-input" id="s-email" type="email" placeholder="info@clinica.com">
+          <span class="set-label">Dirección</span>
+          <input class="set-input" id="s-address" placeholder="Calle, número, ciudad">
+          <span class="set-label">Horario de atención</span>
+          <input class="set-input" id="s-hours" placeholder="L-V 9:00-20:00, Sáb 10:00-14:00">
+          <button class="set-btn" onclick="saveSettings('clinic')">Guardar cambios</button>
+          <div class="set-saved" id="saved-clinic">✓ Guardado</div>
+        </div>
+
+        <!-- Asistente IA -->
+        <div class="set-card">
+          <div class="set-card-title">🤖 Asistente virtual</div>
+          <span class="set-label">Nombre del asistente</span>
+          <input class="set-input" id="s-assistant" placeholder="Natalia">
+          <span class="set-label">Servicios y precios</span>
+          <textarea class="set-textarea" id="s-services" placeholder="Higiene dental: 55€&#10;Blanqueamiento: 280€&#10;..."></textarea>
+          <span class="set-label">Información adicional (seguros, parking, FAQ…)</span>
+          <textarea class="set-textarea" id="s-extra" placeholder="Aceptamos Adeslas y Sanitas. Parking 1h gratis..."></textarea>
+          <button class="set-btn" onclick="saveSettings('assistant')">Guardar cambios</button>
+          <div class="set-saved" id="saved-assistant">✓ Guardado</div>
+        </div>
+
+        <!-- WhatsApp -->
+        <div class="set-card">
+          <div class="set-card-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="#25d366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M11.9 0C5.336 0 0 5.291 0 11.8c0 2.085.548 4.04 1.503 5.73L0 24l6.639-1.737A11.91 11.91 0 0 0 11.9 23.6C18.464 23.6 24 18.309 24 11.8 24 5.291 18.464 0 11.9 0zm0 21.6a9.9 9.9 0 0 1-5.035-1.374l-.361-.214-3.742.978.999-3.629-.235-.374A9.737 9.737 0 0 1 2 11.8C2 6.395 6.44 2 11.9 2 17.36 2 21.8 6.395 21.8 11.8c0 5.405-4.44 9.8-9.9 9.8z"/></svg> WhatsApp Business</div>
+          <span class="set-label">Número de WhatsApp</span>
+          <input class="set-input" id="s-wa" placeholder="+34 612 345 678">
+          <div class="set-wa-status"><div class="set-wa-dot" id="wa-dot"></div><span id="wa-status-txt">Sin configurar</span></div>
+          <button class="set-btn" onclick="saveSettings('wa')">Guardar número</button>
+          <div class="set-saved" id="saved-wa">✓ Guardado</div>
+          <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border)">
+            <div style="font-size:11px;font-weight:700;color:var(--text2);margin-bottom:6px">URL del webhook (Twilio)</div>
+            <div style="font-size:11px;font-family:monospace;background:var(--bg2);padding:7px 10px;border-radius:6px;color:var(--text);word-break:break-all" id="webhook-url"></div>
+          </div>
+        </div>
+
+        <!-- Plan y cuenta -->
+        <div class="set-card">
+          <div class="set-card-title">💳 Plan y cuenta</div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+            <span style="font-size:13px;color:var(--text2)">Plan activo</span>
+            <span class="set-plan-badge" id="s-plan-badge">—</span>
+          </div>
+          <div style="font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:16px" id="s-plan-desc"></div>
+          <a href="/contacto?plan=upgrade" class="set-btn" style="text-decoration:none;display:inline-block;text-align:center">Cambiar plan →</a>
+          <div style="border-top:1px solid var(--border);margin-top:16px;padding-top:16px">
+            <span class="set-label" style="margin-top:0">Cambiar contraseña</span>
+            <input class="set-input" id="s-pass1" type="password" placeholder="Nueva contraseña">
+            <input class="set-input" id="s-pass2" type="password" placeholder="Repetir contraseña" style="margin-top:6px">
+            <button class="set-btn-ghost" onclick="changePassword()">Actualizar contraseña</button>
+            <div class="set-saved" id="saved-pass">✓ Contraseña actualizada</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
   </main>
 
   <!-- IMPORT MODAL -->
@@ -555,6 +652,66 @@
 </div>
 
 <script>
+  // ── Ajustes ───────────────────────────────────────────────────────────────
+  async function loadSettings() {
+    const r = await fetch('/api/settings');
+    if (!r.ok) return;
+    const d = await r.json();
+    const cfg = d.config || {};
+    document.getElementById('s-name').value = d.name || '';
+    document.getElementById('s-phone').value = cfg.phone || '';
+    document.getElementById('s-email').value = cfg.email || '';
+    document.getElementById('s-address').value = cfg.address || '';
+    document.getElementById('s-hours').value = cfg.hours || '';
+    document.getElementById('s-assistant').value = cfg.assistant_name || 'Natalia';
+    document.getElementById('s-services').value = cfg.services || '';
+    document.getElementById('s-extra').value = cfg.extra || '';
+    document.getElementById('s-wa').value = d.whatsapp_number || '';
+    const waConfigured = !!d.whatsapp_number;
+    document.getElementById('wa-dot').classList.toggle('active', waConfigured);
+    document.getElementById('wa-status-txt').textContent = waConfigured ? 'Conectado: ' + d.whatsapp_number : 'Sin configurar';
+    document.getElementById('webhook-url').textContent = location.origin + '/webhook/whatsapp';
+    const plans = { starter:'Starter — Chat web 24/7, hasta 500 conversaciones/mes', pro:'Pro — Web + WhatsApp, 2.000 conversaciones/mes, Calendar', clinica:'Clínica — Todo incluido, reactivación de pacientes, soporte 24/7' };
+    document.getElementById('s-plan-badge').textContent = (d.plan || 'starter').charAt(0).toUpperCase() + (d.plan||'starter').slice(1);
+    document.getElementById('s-plan-desc').textContent = plans[d.plan] || plans.starter;
+  }
+
+  async function saveSettings(section) {
+    const body = {
+      name: document.getElementById('s-name').value,
+      phone: document.getElementById('s-phone').value,
+      email_clinic: document.getElementById('s-email').value,
+      address: document.getElementById('s-address').value,
+      hours: document.getElementById('s-hours').value,
+      assistant_name: document.getElementById('s-assistant').value,
+      services: document.getElementById('s-services').value,
+      extra: document.getElementById('s-extra').value,
+      whatsapp_number: document.getElementById('s-wa').value
+    };
+    const r = await fetch('/api/settings', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
+    if (r.ok) {
+      const el = document.getElementById('saved-' + section);
+      el.style.display = 'block';
+      setTimeout(() => el.style.display = 'none', 2500);
+      loadSettings();
+    }
+  }
+
+  async function changePassword() {
+    const p1 = document.getElementById('s-pass1').value;
+    const p2 = document.getElementById('s-pass2').value;
+    if (!p1 || p1.length < 8) { alert('Mínimo 8 caracteres'); return; }
+    if (p1 !== p2) { alert('Las contraseñas no coinciden'); return; }
+    const r = await fetch('/api/settings/password', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ password: p1 }) });
+    if (r.ok) {
+      document.getElementById('s-pass1').value = '';
+      document.getElementById('s-pass2').value = '';
+      const el = document.getElementById('saved-pass');
+      el.style.display = 'block';
+      setTimeout(() => el.style.display = 'none', 2500);
+    }
+  }
+
   // ── Auth check ────────────────────────────────────────────────────────────
   (async function(){
     try {
@@ -750,6 +907,7 @@
   function switchPanel(n){
     document.querySelectorAll('.panel').forEach((p,i) => p.classList.toggle('active', i===n));
     document.querySelectorAll('.si[data-panel]').forEach(s => s.classList.toggle('active', parseInt(s.dataset.panel)===n));
+    if (n === 4) loadSettings();
   }
   function selectConv(el){
     document.querySelectorAll('.conv-item').forEach(i => i.classList.remove('active'));
