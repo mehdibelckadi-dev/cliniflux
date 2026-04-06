@@ -183,7 +183,7 @@ app.get('/api/me', (req, res) => {
 
 app.get('/api/dashboard/leads', requireAuth, async (req, res) => {
   try {
-    const leads = await getLeads(50);
+    const leads = await getLeads(req.session.clinic.id, 50);
     res.json(leads);
   } catch (err) {
     res.status(500).json({ error: 'Error' });

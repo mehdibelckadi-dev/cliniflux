@@ -26,6 +26,7 @@ async function initDb() {
 
     CREATE TABLE IF NOT EXISTS leads (
       id SERIAL PRIMARY KEY,
+      clinic_id INTEGER REFERENCES clinics(id),
       nombre TEXT,
       clinica TEXT,
       telefono TEXT,
@@ -35,6 +36,7 @@ async function initDb() {
       source TEXT DEFAULT 'web',
       created_at TIMESTAMP DEFAULT NOW()
     );
+    ALTER TABLE leads ADD COLUMN IF NOT EXISTS clinic_id INTEGER REFERENCES clinics(id);
 
     CREATE TABLE IF NOT EXISTS clinics (
       id SERIAL PRIMARY KEY,
@@ -105,10 +107,10 @@ async function saveSession(sessionId, history) {
 }
 
 async function saveLead(data) {
-  const { nombre, clinica, telefono, email, tipo, mensaje, source } = data;
+  const { nombre, clinica, telefono, email, tipo, mensaje, source, clinic_id } = data;
   await pool.query(
-    'INSERT INTO leads (nombre, clinica, telefono, email, tipo, mensaje, source) VALUES ($1,$2,$3,$4,$5,$6,$7)',
-    [nombre, clinica||null, telefono||null, email, tipo||null, mensaje||null, source||'web']
+    'INSERT INTO leads (clinic_id, nombre, clinica, telefono, email, tipo, mensaje, source) VALUES ($1,$2,$3,$4,$5,$6,$7,$8)',
+    [clinic_id||null, nombre, clinica||null, telefono||null, email, tipo||null, mensaje||null, source||'web']
   );
 }
 
@@ -182,8 +184,13 @@ NORMAS:
 - Cuando tengas nombre + servicio + franja: CITA_CONFIRMADA|tratamiento=...|fecha=...|hora=...|nombre=...|email=...`;
 }
 
-async function getLeads(limit = 50) {
-  const { rows } = await pool.query('SELECT * FROM leads ORDER BY created_at DESC LIMIT $1', [limit]);
+async function getLeads(clinic_id, limit = 50) {
+  // Los leads de contacto web son globales (no tienen clinic_id) — los ve la clínica con id=1 (demo/admin)
+  // En producción multi-tenant los leads llegan con clinic_id si el formulario lo incluye
+  const { rows } = await pool.query(
+    'SELECT * FROM leads WHERE clinic_id=$1 OR (clinic_id IS NULL AND $1=1) ORDER BY created_at DESC LIMIT $2',
+    [clinic_id, limit]
+  );
   return rows;
 }
 
