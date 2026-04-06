@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Admin — Cliniflux</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    :root{--green:#16a34a;--gdim:rgba(22,163,74,0.08);--text:#0f172a;--t2:rgba(15,23,42,0.6);--t3:rgba(15,23,42,0.35);--border:rgba(0,0,0,0.09);--bg2:#f8f9fb}
+    body{font-family:'Inter',sans-serif;background:#f4f5f7;-webkit-font-smoothing:antialiased;min-height:100vh}
+    a{color:inherit;text-decoration:none}
+    /* LOGIN */
+    .login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px}
+    .card{background:#fff;border-radius:16px;padding:36px;width:100%;max-width:360px;box-shadow:0 4px 40px rgba(0,0,0,0.08)}
+    .logo{font-size:20px;font-weight:800;letter-spacing:-.8px;margin-bottom:4px}
+    .logo span{color:var(--green)}
+    .sub{font-size:12px;color:var(--t2);margin-bottom:24px}
+    label{display:block;font-size:12px;font-weight:600;margin-bottom:4px;margin-top:12px}
+    input{width:100%;font-family:inherit;font-size:13px;border:1.5px solid var(--border);border-radius:8px;padding:9px 11px;outline:none;transition:border-color .2s}
+    input:focus{border-color:var(--green)}
+    .btn{width:100%;font-family:inherit;font-size:14px;font-weight:700;color:#fff;background:var(--green);border:none;padding:11px;border-radius:40px;cursor:pointer;margin-top:16px;transition:background .2s}
+    .btn:hover{background:#15803d}
+    .btn:disabled{opacity:.6;cursor:not-allowed}
+    .err{font-size:12px;color:#dc2626;background:#fef2f2;border:1px solid rgba(220,38,38,.2);border-radius:7px;padding:8px 11px;margin-top:10px;display:none}
+    /* PANEL */
+    .panel{display:none;min-height:100vh;flex-direction:column}
+    .topbar{background:#0f172a;padding:0 24px;height:48px;display:flex;align-items:center;gap:16px}
+    .t-logo{font-size:16px;font-weight:800;color:#fff;letter-spacing:-.5px}
+    .t-logo span{color:#22c55e}
+    .t-badge{font-size:10px;font-weight:700;background:rgba(34,197,94,0.2);color:#22c55e;padding:2px 8px;border-radius:100px;border:1px solid rgba(34,197,94,.3)}
+    .t-right{margin-left:auto;display:flex;gap:8px}
+    .t-btn{font-family:inherit;font-size:12px;font-weight:600;color:rgba(255,255,255,.6);background:none;border:1px solid rgba(255,255,255,.15);padding:4px 12px;border-radius:6px;cursor:pointer;transition:all .15s}
+    .t-btn:hover{color:#fff;border-color:rgba(255,255,255,.4)}
+    .content{flex:1;padding:28px 32px;max-width:900px;width:100%;margin:0 auto}
+    .section-title{font-size:18px;font-weight:800;letter-spacing:-.5px;margin-bottom:4px}
+    .section-sub{font-size:13px;color:var(--t2);margin-bottom:24px}
+    /* FORM NUEVA CLÍNICA */
+    .new-clinic-box{background:#fff;border-radius:14px;padding:24px;border:1px solid var(--border);margin-bottom:28px}
+    .nc-title{font-size:14px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+    .nc-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .nc-full{grid-column:1/-1}
+    .nc-label{font-size:11px;font-weight:600;color:var(--t2);margin-bottom:3px}
+    .nc-input{width:100%;font-family:inherit;font-size:13px;border:1.5px solid var(--border);border-radius:8px;padding:8px 11px;outline:none;transition:border-color .2s}
+    .nc-input:focus{border-color:var(--green);box-shadow:0 0 0 3px var(--gdim)}
+    .nc-select{width:100%;font-family:inherit;font-size:13px;border:1.5px solid var(--border);border-radius:8px;padding:8px 11px;outline:none;background:#fff;cursor:pointer}
+    .nc-btn{font-family:inherit;font-size:13px;font-weight:700;color:#fff;background:var(--green);border:none;padding:9px 20px;border-radius:8px;cursor:pointer;transition:background .2s}
+    .nc-btn:hover{background:#15803d}
+    /* RESULT BOX */
+    .result-box{background:#f0fdf4;border:1px solid rgba(22,163,74,.25);border-radius:10px;padding:16px;margin-top:14px;display:none}
+    .result-box h4{font-size:13px;font-weight:700;color:var(--green);margin-bottom:10px}
+    .result-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+    .result-label{font-size:11px;font-weight:600;color:var(--t2);width:130px;flex-shrink:0}
+    .result-val{font-size:12px;font-family:monospace;background:#fff;border:1px solid var(--border);border-radius:5px;padding:4px 9px;flex:1;word-break:break-all}
+    .copy-btn{font-size:11px;font-weight:600;color:var(--green);background:none;border:1px solid rgba(22,163,74,.3);border-radius:5px;padding:3px 8px;cursor:pointer;white-space:nowrap;flex-shrink:0}
+    /* TABLA CLÍNICAS */
+    .clinics-table{width:100%;border-collapse:collapse;background:#fff;border-radius:12px;overflow:hidden;border:1px solid var(--border)}
+    .clinics-table th{background:var(--bg2);font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;padding:10px 14px;text-align:left;border-bottom:1px solid var(--border)}
+    .clinics-table td{padding:10px 14px;font-size:13px;border-bottom:1px solid rgba(0,0,0,.04)}
+    .clinics-table tr:last-child td{border:none}
+    .clinics-table tr:hover td{background:#fafafa}
+    .plan-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:100px}
+    .plan-starter{background:#f1f5f9;color:var(--t2)}
+    .plan-pro{background:#dbeafe;color:#1d4ed8}
+    .plan-clinica{background:#dcfce7;color:#15803d}
+    .empty-clinics{text-align:center;padding:40px;color:var(--t2);font-size:13px}
+    @media(max-width:600px){.nc-grid{grid-template-columns:1fr}.content{padding:16px}}
+  </style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="login-wrap" id="loginView">
+  <div class="card">
+    <div class="logo">clini<span>flux</span></div>
+    <div class="sub">Panel de administración</div>
+    <div class="err" id="loginErr"></div>
+    <label>Clave de administrador</label>
+    <input type="password" id="adminKey" placeholder="••••••••" onkeydown="if(event.key==='Enter')adminLogin()">
+    <button class="btn" onclick="adminLogin()">Entrar</button>
+  </div>
+</div>
+
+<!-- PANEL -->
+<div class="panel" id="panelView">
+  <div class="topbar">
+    <span class="t-logo">clini<span>flux</span></span>
+    <span class="t-badge">Admin</span>
+    <div class="t-right">
+      <button class="t-btn" onclick="adminLogout()">Salir</button>
+    </div>
+  </div>
+  <div class="content">
+    <div class="section-title">Panel de administración</div>
+    <div class="section-sub">Gestión de clínicas y onboarding</div>
+
+    <!-- NUEVA CLÍNICA -->
+    <div class="new-clinic-box">
+      <div class="nc-title">➕ Crear nueva clínica</div>
+      <div class="nc-grid">
+        <div>
+          <div class="nc-label">Nombre de la clínica *</div>
+          <input class="nc-input" id="nc-name" placeholder="BarnaDental">
+        </div>
+        <div>
+          <div class="nc-label">Email de acceso *</div>
+          <input class="nc-input" id="nc-email" type="email" placeholder="info@barnadental.cat">
+        </div>
+        <div>
+          <div class="nc-label">Plan</div>
+          <select class="nc-select" id="nc-plan">
+            <option value="starter">Starter — 99€/mes</option>
+            <option value="pro">Pro — 199€/mes</option>
+            <option value="clinica">Clínica — 349€/mes</option>
+          </select>
+        </div>
+        <div style="display:flex;align-items:flex-end">
+          <button class="nc-btn" id="nc-btn" onclick="createClinic()" style="width:100%">Generar acceso →</button>
+        </div>
+      </div>
+      <div class="result-box" id="resultBox">
+        <h4>✅ Clínica creada — comparte estos datos con el cliente</h4>
+        <div class="result-row">
+          <span class="result-label">URL Onboarding</span>
+          <span class="result-val" id="res-url"></span>
+          <button class="copy-btn" onclick="copy('res-url')">Copiar</button>
+        </div>
+        <div class="result-row">
+          <span class="result-label">Contraseña temporal</span>
+          <span class="result-val" id="res-pass"></span>
+          <button class="copy-btn" onclick="copy('res-pass')">Copiar</button>
+        </div>
+        <div class="result-row">
+          <span class="result-label">Email</span>
+          <span class="result-val" id="res-email"></span>
+        </div>
+        <p style="font-size:11px;color:var(--t2);margin-top:8px">⚠️ La contraseña temporal desaparecerá cuando el cliente complete el onboarding.</p>
+      </div>
+    </div>
+
+    <!-- TABLA CLÍNICAS -->
+    <div class="section-title" style="font-size:15px;margin-bottom:12px">Clínicas activas</div>
+    <table class="clinics-table" id="clinicsTable">
+      <thead><tr>
+        <th>Clínica</th><th>Email</th><th>Plan</th><th>WhatsApp</th><th>Creada</th>
+      </tr></thead>
+      <tbody id="clinicsTbody"><tr><td colspan="5" class="empty-clinics">Cargando...</td></tr></tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+  let adminSecret = '';
+
+  function adminLogin() {
+    const key = document.getElementById('adminKey').value.trim();
+    if (!key) return;
+    adminSecret = key;
+    loadClinics();
+  }
+
+  async function loadClinics() {
+    try {
+      const r = await fetch(`/admin/clinics?secret=${encodeURIComponent(adminSecret)}`);
+      if (r.status === 403) {
+        document.getElementById('loginErr').textContent = 'Clave incorrecta.';
+        document.getElementById('loginErr').style.display = 'block';
+        adminSecret = '';
+        return;
+      }
+      const clinics = await r.json();
+      document.getElementById('loginView').style.display = 'none';
+      document.getElementById('panelView').style.display = 'flex';
+      renderClinics(clinics);
+    } catch { document.getElementById('loginErr').textContent = 'Error de conexión.'; document.getElementById('loginErr').style.display = 'block'; }
+  }
+
+  function renderClinics(clinics) {
+    const tbody = document.getElementById('clinicsTbody');
+    if (!clinics.length) { tbody.innerHTML = '<tr><td colspan="5" class="empty-clinics">Sin clínicas aún. Crea la primera arriba.</td></tr>'; return; }
+    tbody.innerHTML = clinics.map(c => `
+      <tr>
+        <td><strong>${esc(c.name)}</strong></td>
+        <td>${esc(c.email)}</td>
+        <td><span class="plan-badge plan-${c.plan||'starter'}">${(c.plan||'starter').charAt(0).toUpperCase()+(c.plan||'starter').slice(1)}</span></td>
+        <td>${c.whatsapp_number ? `<span style="color:#25d366;font-weight:600">${esc(c.whatsapp_number)}</span>` : '<span style="color:var(--t3)">No configurado</span>'}</td>
+        <td style="color:var(--t2)">${new Date(c.created_at).toLocaleDateString('es-ES')}</td>
+      </tr>`).join('');
+  }
+
+  async function createClinic() {
+    const name = document.getElementById('nc-name').value.trim();
+    const email = document.getElementById('nc-email').value.trim();
+    const plan = document.getElementById('nc-plan').value;
+    if (!name || !email) { alert('Nombre y email son obligatorios'); return; }
+    const btn = document.getElementById('nc-btn');
+    btn.disabled = true; btn.textContent = 'Creando...';
+    try {
+      const r = await fetch(`/admin/new-clinic?secret=${encodeURIComponent(adminSecret)}&email=${encodeURIComponent(email)}&name=${encodeURIComponent(name)}&plan=${plan}`);
+      const d = await r.json();
+      if (r.ok) {
+        const base = location.origin;
+        document.getElementById('res-url').textContent = base + d.setup_url;
+        document.getElementById('res-pass').textContent = d.temp_password;
+        document.getElementById('res-email').textContent = email;
+        document.getElementById('resultBox').style.display = 'block';
+        document.getElementById('nc-name').value = '';
+        document.getElementById('nc-email').value = '';
+        loadClinics();
+      } else { alert(d.error || d || 'Error'); }
+    } catch { alert('Error de conexión'); }
+    btn.disabled = false; btn.textContent = 'Generar acceso →';
+  }
+
+  function copy(id) {
+    navigator.clipboard.writeText(document.getElementById(id).textContent)
+      .then(() => { const b = event.target; b.textContent='✓ Copiado'; setTimeout(()=>b.textContent='Copiar',1500); });
+  }
+
+  function adminLogout() { adminSecret=''; document.getElementById('panelView').style.display='none'; document.getElementById('loginView').style.display='flex'; document.getElementById('adminKey').value=''; }
+  function esc(s){ return String(s||'').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+</script>
+</body>
+</html>

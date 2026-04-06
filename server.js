@@ -96,6 +96,16 @@ FEATURES.forEach(slug => {
 
 app.get('/dashboard', requireAuth, (req, res) => res.sendFile('dashboard.html', { root: 'public' }));
 
+// ── Admin ───────────────────────────────────────────────────────────────────
+
+app.get('/admin', (req, res) => res.sendFile('admin.html', { root: 'public' }));
+
+app.get('/admin/clinics', async (req, res) => {
+  if (req.query.secret !== (process.env.ADMIN_SECRET || 'cliniflux-admin')) return res.status(403).json({ error: 'Forbidden' });
+  const { rows } = await pool.query('SELECT id,name,email,plan,whatsapp_number,created_at FROM clinics ORDER BY created_at DESC');
+  res.json(rows);
+});
+
 // ── Onboarding ──────────────────────────────────────────────────────────────
 
 // Tú creas el token: GET /admin/new-clinic?secret=ADMIN_SECRET&email=x&name=y&plan=pro
