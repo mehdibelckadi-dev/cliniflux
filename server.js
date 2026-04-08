@@ -126,13 +126,14 @@ setInterval(() => rateLimits.clear(), 3600000);
 
 // ── Stripe webhook (raw body ANTES de express.json) ──────────────────────────
 app.post('/webhook/stripe', express.raw({ type: 'application/json' }), async (req, res) => {
-  if (!stripe) return res.sendStatus(503);
+  console.log('[Stripe] Webhook recibido:', req.headers['stripe-signature'] ? 'con firma' : 'SIN FIRMA');
+  if (!stripe) { console.error('[Stripe] SDK no inicializado'); return res.sendStatus(503); }
   const sig = req.headers['stripe-signature'];
   let event;
   try {
     event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET);
   } catch (err) {
-    console.error('Stripe webhook signature error:', err.message);
+    console.error('[Stripe] Webhook firma inválida:', err.message, '| STRIPE_WEBHOOK_SECRET set:', !!process.env.STRIPE_WEBHOOK_SECRET);
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
 
@@ -141,7 +142,7 @@ app.post('/webhook/stripe', express.raw({ type: 'application/json' }), async (re
     const plan = s.metadata?.plan || 'starter';
     const email = s.customer_details?.email || s.metadata?.email || '';
     const name = s.customer_details?.name || email;
-    const appBase = process.env.APP_URL || 'https://cliniflux.com';
+    const appBase = (process.env.APP_URL || 'https://cliniflux.com').replace(/\/$/, '');
     console.log(`[Stripe] checkout.session.completed email=${email} plan=${plan}`);
     try {
       // Buscar si ya existe (re-compra o test repetido)
@@ -584,7 +585,7 @@ app.post('/api/checkout', rateLimit(20, 60000), async (req, res) => {
     return res.status(400).json({ error: 'Plan o ciclo inválido' });
 
   const priceId = STRIPE_PRICES[plan][billing];
-  const base = process.env.APP_URL || `${req.protocol}://${req.get('host')}`;
+  const base = (process.env.APP_URL || `${req.protocol}://${req.get('host')}`).replace(/\/$/, '');
   try {
     const session = await stripe.checkout.sessions.create({
       mode: 'subscription',
