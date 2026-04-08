@@ -4,19 +4,112 @@ const session = require('express-session');
 const PgSession = require('connect-pg-simple')(session);
 const OpenAI = require('openai');
 const crypto = require('crypto');
+const Stripe = require('stripe');
 const { pool, initDb, getSession, saveSession, saveLead, getClinicByEmail, getClinicByWhatsapp, getClinicBySetupToken, createClinic, updateClinicConfig, buildPromptForClinic, getLeads, getAppointments, saveAppointment, verifyPassword, hashPassword, importLeads, getImportedLeads, updateLeadEstado } = require('./db');
+
+const stripe = process.env.STRIPE_SECRET_KEY ? Stripe(process.env.STRIPE_SECRET_KEY) : null;
+
+// Stripe price IDs (test mode)
+const STRIPE_PRICES = {
+  starter: { mes: 'price_1TJuTfCegLT4YskFbMdyTro1', ano: 'price_1TJuUBCegLT4YskFemo6YFZ6' },
+  pro:     { mes: 'price_1TJuUiCegLT4YskFgWob0MlZ', ano: 'price_1TJuV2CegLT4YskFsvRnEF7W' },
+  clinica: { mes: 'price_1TJuVbCegLT4YskFgiv64JUn', ano: 'price_1TJuWACegLT4YskFwnJvYAIc' }
+};
 
 const app = express();
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+// ── Seguridad: headers HTTP ─────────────────────────────────────────────────
+app.disable('x-powered-by');
+app.use((req, res, next) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.setHeader('Permissions-Policy', 'geolocation=(), microphone=(), camera=()');
+  next();
+});
+
+// ── Rate limiting simple (sin dependencias) ────────────────────────────────
+const rateLimits = new Map();
+function rateLimit(max, windowMs) {
+  return (req, res, next) => {
+    const key = req.ip + req.path;
+    const now = Date.now();
+    const entry = rateLimits.get(key) || { count: 0, start: now };
+    if (now - entry.start > windowMs) { entry.count = 0; entry.start = now; }
+    entry.count++;
+    rateLimits.set(key, entry);
+    if (entry.count > max) return res.status(429).json({ error: 'Demasiadas solicitudes. Espera un momento.' });
+    next();
+  };
+}
+// Limpiar mapa cada hora
+setInterval(() => rateLimits.clear(), 3600000);
+
+// ── Stripe webhook (raw body ANTES de express.json) ──────────────────────────
+app.post('/webhook/stripe', express.raw({ type: 'application/json' }), async (req, res) => {
+  if (!stripe) return res.sendStatus(503);
+  const sig = req.headers['stripe-signature'];
+  let event;
+  try {
+    event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET);
+  } catch (err) {
+    console.error('Stripe webhook signature error:', err.message);
+    return res.status(400).send(`Webhook Error: ${err.message}`);
+  }
+
+  if (event.type === 'checkout.session.completed') {
+    const s = event.data.object;
+    const plan = s.metadata?.plan || 'starter';
+    const email = s.customer_details?.email || s.metadata?.email || '';
+    const token = crypto.randomBytes(20).toString('hex');
+    const tempPass = crypto.randomBytes(8).toString('hex');
+    try {
+      await createClinic({
+        email,
+        password_hash: hashPassword(tempPass),
+        name: s.customer_details?.name || email,
+        plan,
+        setup_token: token,
+        stripe_customer_id: s.customer,
+        stripe_subscription_id: s.subscription
+      });
+      console.log(`Nueva clínica creada: ${email} plan=${plan} token=${token}`);
+      // TODO: enviar email con setup_url cuando esté SMTP configurado
+    } catch (e) {
+      console.error('Error creando clínica tras pago:', e.message);
+    }
+  }
+
+  if (event.type === 'customer.subscription.deleted') {
+    const sub = event.data.object;
+    try {
+      await pool.query(
+        "UPDATE clinics SET plan='cancelado' WHERE stripe_subscription_id=$1",
+        [sub.id]
+      );
+      console.log(`Suscripción cancelada: ${sub.id}`);
+    } catch (e) {
+      console.error('Error cancelando suscripción:', e.message);
+    }
+  }
+
+  res.json({ received: true });
+});
+
+app.use(express.json({ limit: '100kb' }));
+app.use(express.urlencoded({ extended: false, limit: '100kb' }));
 app.use(session({
   store: new PgSession({ pool, tableName: 'web_sessions', createTableIfMissing: true }),
   secret: process.env.SESSION_SECRET || 'cliniflux-secret-change-in-prod',
   resave: false,
   saveUninitialized: false,
-  cookie: { maxAge: 7 * 24 * 60 * 60 * 1000, httpOnly: true }
+  cookie: {
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax'
+  }
 }));
 app.use(express.static('public'));
 
@@ -154,18 +247,22 @@ app.post('/api/onboarding', async (req, res) => {
 
 // ── Auth routes ─────────────────────────────────────────────────────────────
 
-app.post('/auth/login', async (req, res) => {
+app.post('/auth/login', rateLimit(10, 60000), async (req, res) => {
   const { email, password } = req.body;
-  if (!email || !password) return res.status(400).json({ error: 'Campos requeridos' });
+  if (!email || !password || typeof email !== 'string' || typeof password !== 'string') {
+    return res.status(400).json({ error: 'Campos requeridos' });
+  }
   try {
     const clinic = await getClinicByEmail(email.toLowerCase().trim());
-    if (!clinic || !verifyPassword(password, clinic.password_hash)) {
-      return res.status(401).json({ error: 'Email o contraseña incorrectos' });
-    }
-    req.session.clinic = { id: clinic.id, name: clinic.name, email: clinic.email };
-    res.json({ ok: true, name: clinic.name });
+    // Siempre verificar (evita timing attack)
+    const valid = clinic && verifyPassword(password, clinic.password_hash);
+    if (!valid) return res.status(401).json({ error: 'Email o contraseña incorrectos' });
+    req.session.regenerate((err) => {
+      if (err) return res.status(500).json({ error: 'Error de sesión' });
+      req.session.clinic = { id: clinic.id, name: clinic.name, email: clinic.email };
+      res.json({ ok: true, name: clinic.name });
+    });
   } catch (err) {
-    console.error('Login error:', err.message);
     res.status(500).json({ error: 'Error interno' });
   }
 });
@@ -191,10 +288,11 @@ app.get('/api/dashboard/leads', requireAuth, async (req, res) => {
 });
 
 // ── Importar leads (CSV raw text) ───────────────────────────────────────────
-app.post('/api/leads/import', requireAuth, async (req, res) => {
+app.post('/api/leads/import', requireAuth, rateLimit(10, 60000), async (req, res) => {
   try {
-    const { csv } = req.body; // cliente envía el texto del CSV
-    if (!csv) return res.status(400).json({ error: 'CSV vacío' });
+    const { csv } = req.body;
+    if (!csv || typeof csv !== 'string') return res.status(400).json({ error: 'CSV vacío' });
+    if (csv.length > 500000) return res.status(400).json({ error: 'CSV demasiado grande (max 500KB)' });
     const lines = csv.trim().split('\n').filter(l => l.trim());
     if (lines.length < 2) return res.status(400).json({ error: 'CSV sin datos' });
     const headers = lines[0].split(',').map(h => h.trim().toLowerCase()
@@ -298,7 +396,7 @@ app.post('/webhook/whatsapp', async (req, res) => {
 
 // ── POST /chat ──────────────────────────────────────────────────────────────
 
-app.post('/chat', async (req, res) => {
+app.post('/chat', rateLimit(30, 60000), async (req, res) => {
   const { session_id, msg, clinic_id } = req.body;
   if (!session_id || !msg || msg.length > 500) return res.status(400).json({ error: 'Parámetros inválidos' });
   const safeId = session_id.replace(/[^a-zA-Z0-9\-_]/g, '').slice(0, 64);
@@ -335,9 +433,11 @@ app.post('/chat', async (req, res) => {
 
 // ── POST /api/contact ───────────────────────────────────────────────────────
 
-app.post('/api/contact', async (req, res) => {
+app.post('/api/contact', rateLimit(5, 60000), async (req, res) => {
   const { nombre, clinica, email, telefono, tipo, mensaje } = req.body;
-  if (!nombre || !email || !tipo) return res.status(400).json({ error: 'Campos requeridos' });
+  if (!nombre || !email || !tipo || typeof email !== 'string' || !email.includes('@')) {
+    return res.status(400).json({ error: 'Campos requeridos' });
+  }
   try { await saveLead({ nombre, clinica, email, telefono, tipo, mensaje, source: 'contacto' }); } catch(e) { console.error('Lead save:', e.message); }
   if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
     try {
@@ -377,6 +477,33 @@ app.post('/api/settings/password', requireAuth, async (req, res) => {
   if (!password || password.length < 8) return res.status(400).json({ error: 'Mínimo 8 caracteres' });
   await pool.query('UPDATE clinics SET password_hash=$1 WHERE id=$2', [hashPassword(password), req.session.clinic.id]);
   res.json({ ok: true });
+});
+
+// ── Stripe checkout ──────────────────────────────────────────────────────────
+app.post('/api/checkout', rateLimit(20, 60000), async (req, res) => {
+  if (!stripe) return res.status(503).json({ error: 'Pagos no configurados' });
+  const { plan, billing } = req.body;
+  if (!STRIPE_PRICES[plan] || !['mes','ano'].includes(billing))
+    return res.status(400).json({ error: 'Plan o ciclo inválido' });
+
+  const priceId = STRIPE_PRICES[plan][billing];
+  const base = process.env.APP_URL || 'https://cliniflux.com';
+  try {
+    const session = await stripe.checkout.sessions.create({
+      mode: 'subscription',
+      payment_method_types: ['card'],
+      line_items: [{ price: priceId, quantity: 1 }],
+      metadata: { plan, billing },
+      success_url: `${base}/checkout-success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${base}/checkout-cancel`,
+      allow_promotion_codes: true,
+      locale: 'es',
+    });
+    res.json({ url: session.url });
+  } catch (e) {
+    console.error('Stripe checkout error:', e.message);
+    res.status(500).json({ error: 'Error al crear sesión de pago' });
+  }
 });
 
 app.post('/api/demo-request', async (req, res) => {

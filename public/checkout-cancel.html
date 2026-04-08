@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pago cancelado — Cliniflux</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Inter',system-ui,sans-serif;background:#f8f9fb;color:#0f172a;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+    .card{background:#fff;border-radius:20px;padding:52px 44px;max-width:520px;width:100%;text-align:center;box-shadow:0 16px 48px rgba(0,0,0,0.08)}
+    .icon{width:72px;height:72px;background:#fef3c7;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 28px}
+    .icon svg{width:32px;height:32px}
+    h1{font-size:28px;font-weight:800;letter-spacing:-.8px;margin-bottom:14px}
+    p{font-size:15px;color:rgba(15,23,42,.6);line-height:1.7;margin-bottom:10px}
+    .btns{display:flex;flex-direction:column;gap:10px;margin-top:28px}
+    .btn-pri{background:#16a34a;color:#fff;font-family:inherit;font-size:15px;font-weight:600;padding:13px 32px;border-radius:40px;text-decoration:none;transition:background .2s}
+    .btn-pri:hover{background:#15803d}
+    .btn-sec{background:#fff;color:#0f172a;font-family:inherit;font-size:15px;font-weight:500;padding:13px 32px;border-radius:40px;text-decoration:none;border:1px solid rgba(0,0,0,.12);transition:background .2s}
+    .btn-sec:hover{background:#f8f9fb}
+    .logo{font-size:20px;font-weight:700;color:#0f172a;letter-spacing:-.5px;text-decoration:none;display:inline-block;margin-bottom:36px}
+    .logo span{color:#16a34a}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <a href="/" class="logo">clini<span>flux</span></a>
+    <div class="icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="12" y1="8" x2="12" y2="12"/>
+        <line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+    </div>
+    <h1>Pago no completado</h1>
+    <p>No te preocupes, no se ha realizado ningún cargo. Puedes intentarlo de nuevo cuando quieras.</p>
+    <p style="font-size:13px;color:rgba(15,23,42,.4)">¿Tienes alguna duda? Escríbenos a <strong>hola@cliniflux.com</strong></p>
+    <div class="btns">
+      <a href="/#precios" class="btn-pri">Ver planes de nuevo →</a>
+      <a href="/contacto" class="btn-sec">Hablar con el equipo</a>
+    </div>
+  </div>
+</body>
+</html>

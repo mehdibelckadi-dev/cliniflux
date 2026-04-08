@@ -47,6 +47,8 @@ async function initDb() {
       whatsapp_number TEXT,
       setup_token TEXT,
       plan TEXT DEFAULT 'starter',
+      stripe_customer_id TEXT,
+      stripe_subscription_id TEXT,
       created_at TIMESTAMP DEFAULT NOW()
     );
 
@@ -135,10 +137,10 @@ async function getClinicBySetupToken(token) {
 }
 
 async function createClinic(data) {
-  const { email, password_hash, name, config, whatsapp_number, plan, setup_token } = data;
+  const { email, password_hash, name, config, whatsapp_number, plan, setup_token, stripe_customer_id, stripe_subscription_id } = data;
   const { rows } = await pool.query(
-    'INSERT INTO clinics (email,password_hash,name,config,whatsapp_number,plan,setup_token) VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING *',
-    [email, password_hash, name, JSON.stringify(config||{}), whatsapp_number||null, plan||'starter', setup_token||null]
+    'INSERT INTO clinics (email,password_hash,name,config,whatsapp_number,plan,setup_token,stripe_customer_id,stripe_subscription_id) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING *',
+    [email, password_hash, name, JSON.stringify(config||{}), whatsapp_number||null, plan||'starter', setup_token||null, stripe_customer_id||null, stripe_subscription_id||null]
   );
   return rows[0];
 }

@@ -32,6 +32,34 @@
       --r-sm:8px;--r-md:12px;--r-lg:18px;--r-xl:24px;
       --sy:112px;--cmax:1160px;--px:48px;
     }
+
+    /* REACTIVACIÓN */
+    .react-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-bottom:40px}
+    .react-card{background:#fff;border:1px solid var(--border);border-radius:var(--r-lg);padding:28px 24px}
+    .react-icon{width:44px;height:44px;background:var(--green-dim);border-radius:var(--r-md);display:flex;align-items:center;justify-content:center;margin-bottom:16px}
+    .react-card-title{font-size:15px;font-weight:700;color:var(--text);margin-bottom:8px}
+    .react-card-p{font-size:13px;color:var(--text2);line-height:1.65}
+    .react-banner{background:linear-gradient(135deg,#14532d,#16a34a);border-radius:var(--r-xl);padding:40px 48px;display:flex;align-items:center;gap:40px;flex-wrap:wrap}
+    .react-banner-stat{flex-shrink:0;min-width:180px}
+    .react-banner-label{font-size:11px;font-weight:700;color:rgba(255,255,255,.6);letter-spacing:.6px;margin-bottom:6px}
+    .react-banner-num{font-size:34px;font-weight:800;color:#fff;letter-spacing:-1.5px;line-height:1.1}
+    .react-banner-sub{font-size:13px;color:rgba(255,255,255,.7);margin-top:4px}
+    .react-banner-div{width:1px;height:56px;background:rgba(255,255,255,.15);flex-shrink:0}
+    .react-banner-quote{flex:1;min-width:220px}
+    .react-banner-quote p{font-size:15px;color:rgba(255,255,255,.85);line-height:1.7;margin:0}
+    .react-banner-author{margin-top:12px;font-size:12px;font-weight:600;color:rgba(255,255,255,.55)}
+    @media(max-width:768px){.react-grid{grid-template-columns:1fr}.react-banner{flex-direction:column;gap:24px;padding:28px 24px}.react-banner-div{display:none}}
+
+    /* DEMO TRY */
+    .demo-try-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;max-width:840px;margin:0 auto}
+    .demo-try-card{border:1.5px solid var(--border);border-radius:var(--r-xl);padding:36px 32px;display:flex;flex-direction:column;align-items:flex-start;gap:16px;background:#fff;transition:box-shadow .2s,transform .2s}
+    .demo-try-card:hover{box-shadow:var(--shadow-md);transform:translateY(-2px)}
+    .demo-try-card.wa{border-color:rgba(37,211,102,.3);background:#f0fdf4}
+    .demo-try-icon{width:52px;height:52px;border-radius:var(--r-lg);display:flex;align-items:center;justify-content:center}
+    .demo-try-title{font-size:18px;font-weight:700;color:var(--text)}
+    .demo-try-desc{font-size:14px;color:var(--text2);line-height:1.65}
+    @media(max-width:640px){.demo-try-grid{grid-template-columns:1fr}}
+
     html{scroll-behavior:smooth}
     body{font-family:'Inter','Plus Jakarta Sans',system-ui,sans-serif;background:#ffffff;color:var(--text);line-height:1.6;overflow-x:hidden;-webkit-font-smoothing:antialiased}
     .c{width:100%;max-width:var(--cmax);margin:0 auto;padding:0 var(--px)}
@@ -506,6 +534,33 @@
       .hero-ctas a{text-align:center;justify-content:center;min-width:0 !important;width:100% !important}
       .hero-proof{flex-wrap:wrap;justify-content:center;gap:8px}
 
+
+      /* Pricing */
+      .pr-grid{max-width:100%}
+      .pr-card{padding:24px 20px}
+      /* Flow section */
+      .flow2-grid{grid-template-columns:1fr !important;gap:12px}
+      .flow2-arr{display:none}
+      /* Reactivación */
+      .react-grid{grid-template-columns:1fr}
+      .react-banner{flex-direction:column;gap:20px;padding:24px 20px}
+      .react-banner-div{display:none}
+      /* Demo try */
+      .demo-try-grid{grid-template-columns:1fr}
+      /* Section headers */
+      .sec-h{font-size:clamp(26px,6vw,40px)}
+      /* Proof text */
+      .hero-proof{flex-wrap:wrap;justify-content:center}
+      /* CTA section */
+      .cta-btns{flex-direction:column;align-items:stretch;width:100%;gap:10px}
+      .cta-btns a{text-align:center;justify-content:center}
+      /* Stats */
+      .stats-grid{grid-template-columns:1fr 1fr}
+      /* Testimony scroll */
+      .t-track{gap:16px}
+      .t-card{min-width:280px;padding:24px 20px}
+
+
       /* Dashboard – simplify for mobile */
       .dash-tabs{flex-wrap:nowrap;gap:6px}
       .dash-tab{font-size:11px;padding:6px 12px}
@@ -857,7 +912,7 @@
     <button class="nav-burger" id="navBurger" aria-label="Menú"><span></span><span></span><span></span></button>
     <div class="nav-actions">
       <a href="/demo" class="btn-ghost">Ver demo</a>
-      <a href="#precios" class="btn-primary">Solicitar acceso <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg></a>
+      <a href="/contacto" class="btn-primary">Solicitar acceso <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg></a>
     </div>
   </div>
 </nav>
@@ -872,7 +927,7 @@
     <li><a href="/about" class="mob-link">Nosotros</a></li>
   </ul>
   <div class="mob-menu-actions">
-    <a href="#precios" class="btn-primary" style="width:100%;justify-content:center;padding:13px 22px">Solicitar demo gratuita →</a>
+    <a href="/contacto" class="btn-primary" style="width:100%;justify-content:center;padding:13px 22px">Solicitar demo gratuita →</a>
   </div>
 </div>
 
@@ -884,7 +939,7 @@
       <h1>Tu clínica responde <span class="g">24/7.</span><br>Sin equipo extra.</h1>
       <p class="hero-desc">Cliniflux automatiza WhatsApp para que cada paciente reciba respuesta instantánea, agende su cita y tu equipo se centre en lo que importa.</p>
       <div class="hero-ctas">
-        <a href="#precios" class="btn-primary" style="font-size:15px;padding:12px 28px;border-radius:40px">Solicitar demo gratuita <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg></a>
+        <a href="/contacto" class="btn-primary" style="font-size:15px;padding:12px 28px;border-radius:40px">Solicitar demo gratuita <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg></a>
         <a href="/demo" class="btn-wa-hero">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M11.9 0C5.336 0 0 5.291 0 11.8c0 2.085.548 4.04 1.503 5.73L0 24l6.639-1.737A11.91 11.91 0 0 0 11.9 23.6C18.464 23.6 24 18.309 24 11.8 24 5.291 18.464 0 11.9 0zm0 21.6a9.9 9.9 0 0 1-5.035-1.374l-.361-.214-3.742.978.999-3.629-.235-.374A9.737 9.737 0 0 1 2 11.8C2 6.395 6.44 2 11.9 2 17.36 2 21.8 6.395 21.8 11.8c0 5.405-4.44 9.8-9.9 9.8z"/></svg>
           Probar demo web
@@ -1196,7 +1251,7 @@
       </div>
       <div class="pv2-hd-right">
         <p>El 67% de los pacientes elige la primera clínica que les responde. Cada minuto sin respuesta es una cita que se va a la competencia — para siempre.</p>
-        <a href="#precios" class="btn-primary" style="border-radius:40px">Solicitar demo gratuita →</a>
+        <a href="/contacto" class="btn-primary" style="border-radius:40px">Solicitar demo gratuita →</a>
       </div>
     </div>
 
@@ -1351,14 +1406,15 @@
           </div>
         </div>
 
-        <!-- Row 3: Instagram ↔ Recordatorio -->
+
+        <!-- Row 3: Web Chat ↔ Escalar -->
         <div style="grid-column:1;grid-row:3" class="flow2-ch soon">
-          <div class="flow2-ch-icon" style="background:#fce7f3">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#ec4899" stroke-width="2" stroke-linecap="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="#ec4899"/></svg>
+          <div class="flow2-ch-icon" style="background:#ecfdf5">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
           </div>
           <div class="flow2-ch-info">
-            <div class="flow2-ch-name">Instagram DM</div>
-            <div class="flow2-ch-sub">Direct messages</div>
+            <div class="flow2-ch-name">Web Chat</div>
+            <div class="flow2-ch-sub">Widget en tu web</div>
           </div>
           <div class="flow2-badge">Pronto</div>
         </div>
@@ -1370,22 +1426,22 @@
         </div>
         <div style="grid-column:5;grid-row:3" class="flow2-ac">
           <div class="flow2-ac-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
           </div>
           <div>
-            <div class="flow2-ac-name">Recordatorio</div>
-            <div class="flow2-ac-sub">24h antes de la cita</div>
+            <div class="flow2-ac-name">Escalar a recepción</div>
+            <div class="flow2-ac-sub">Cuando la IA no puede</div>
           </div>
         </div>
 
-        <!-- Row 4: Facebook ↔ Responder FAQ -->
+        <!-- Row 4: App Clínica ↔ Informe -->
         <div style="grid-column:1;grid-row:4" class="flow2-ch soon">
-          <div class="flow2-ch-icon" style="background:#dbeafe">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+          <div class="flow2-ch-icon" style="background:#f0fdf4">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
           </div>
           <div class="flow2-ch-info">
-            <div class="flow2-ch-name">Facebook Messenger</div>
-            <div class="flow2-ch-sub">Mensajería social</div>
+            <div class="flow2-ch-name">App / Portal Clínica</div>
+            <div class="flow2-ch-sub">Plataforma propia</div>
           </div>
           <div class="flow2-badge">Pronto</div>
         </div>
@@ -1396,60 +1452,6 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14m-7-7 7 7-7 7"/></svg>
         </div>
         <div style="grid-column:5;grid-row:4" class="flow2-ac">
-          <div class="flow2-ac-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><line x1="9" y1="10" x2="15" y2="10"/><line x1="12" y1="7" x2="12" y2="13"/></svg>
-          </div>
-          <div>
-            <div class="flow2-ac-name">Responder FAQ</div>
-            <div class="flow2-ac-sub">Sin intervención humana</div>
-          </div>
-        </div>
-
-        <!-- Row 5: Web Chat ↔ Escalar -->
-        <div style="grid-column:1;grid-row:5" class="flow2-ch soon">
-          <div class="flow2-ch-icon" style="background:#ecfdf5">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-          </div>
-          <div class="flow2-ch-info">
-            <div class="flow2-ch-name">Web Chat</div>
-            <div class="flow2-ch-sub">Widget en tu web</div>
-          </div>
-          <div class="flow2-badge">Pronto</div>
-        </div>
-        <div style="grid-column:2;grid-row:5" class="flow2-arr">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14m-7-7 7 7-7 7"/></svg>
-        </div>
-        <div style="grid-column:4;grid-row:5" class="flow2-arr">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14m-7-7 7 7-7 7"/></svg>
-        </div>
-        <div style="grid-column:5;grid-row:5" class="flow2-ac">
-          <div class="flow2-ac-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-          </div>
-          <div>
-            <div class="flow2-ac-name">Escalar a recepción</div>
-            <div class="flow2-ac-sub">Cuando la IA no puede</div>
-          </div>
-        </div>
-
-        <!-- Row 6: App Clínica ↔ Informe -->
-        <div style="grid-column:1;grid-row:6" class="flow2-ch soon">
-          <div class="flow2-ch-icon" style="background:#f0fdf4">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
-          </div>
-          <div class="flow2-ch-info">
-            <div class="flow2-ch-name">App / Portal Clínica</div>
-            <div class="flow2-ch-sub">Plataforma propia</div>
-          </div>
-          <div class="flow2-badge">Pronto</div>
-        </div>
-        <div style="grid-column:2;grid-row:6" class="flow2-arr">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14m-7-7 7 7-7 7"/></svg>
-        </div>
-        <div style="grid-column:4;grid-row:6" class="flow2-arr">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14m-7-7 7 7-7 7"/></svg>
-        </div>
-        <div style="grid-column:5;grid-row:6" class="flow2-ac">
           <div class="flow2-ac-icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
           </div>
@@ -1741,6 +1743,53 @@
   </div>
 </section>
 
+<!-- REACTIVACIÓN DE LEADS -->
+<section style="padding:var(--sy) 0;border-top:1px solid var(--border);background:var(--bg2)" id="reactivacion">
+  <div class="c">
+    <div class="reveal" style="text-align:center;margin-bottom:52px">
+      <div class="label" style="justify-content:center;margin-bottom:14px">Reactivación de pacientes</div>
+      <h2 class="sec-h">Tus leads dormidos son<br>ingresos sin cobrar</h2>
+      <p class="sec-p" style="margin:0 auto;max-width:560px">El 70% de los pacientes que consultan pero no reservan están dispuestos a volver — solo necesitan un mensaje en el momento correcto.</p>
+    </div>
+    <div class="reveal d1 react-grid">
+      <div class="react-card">
+        <div class="react-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
+        <div class="react-card-title">Importa tus contactos</div>
+        <p class="react-card-p">Sube un CSV con tus pacientes inactivos o conecta Google Sheets. Cliniflux los organiza automáticamente.</p>
+      </div>
+      <div class="react-card">
+        <div class="react-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </div>
+        <div class="react-card-title">Natalia contacta por WhatsApp</div>
+        <p class="react-card-p">La IA envía mensajes personalizados a cada paciente. Detecta intención y agenda citas en tiempo real, sin intervención manual.</p>
+      </div>
+      <div class="react-card">
+        <div class="react-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" stroke-linecap="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+        </div>
+        <div class="react-card-title">Mide los resultados</div>
+        <p class="react-card-p">Sigue el estado de cada lead: contactado, interesado, cita confirmada. Exporta informes en un clic desde tu panel.</p>
+      </div>
+    </div>
+    <div class="react-banner reveal d2">
+      <div class="react-banner-stat">
+        <div class="react-banner-label">RESULTADO REAL</div>
+        <div class="react-banner-num">&gt;80 pacientes</div>
+        <div class="react-banner-sub">reactivados en el primer mes</div>
+      </div>
+      <div class="react-banner-div"></div>
+      <div class="react-banner-quote">
+        <p>"Reactivamos más de 80 pacientes inactivos en el primer mes. El ROI fue inmediato. No podría imaginar la clínica sin esta herramienta."</p>
+        <div class="react-banner-author">— Roberto G., Director médico · Clínica estética, Barcelona</div>
+      </div>
+      <a href="/contacto?plan=clinica" class="btn-primary" style="background:#fff;color:var(--green);font-weight:700;padding:12px 24px;border-radius:40px;flex-shrink:0">Ver cómo funciona →</a>
+    </div>
+  </div>
+</section>
+
 <!-- PRICING -->
 <section class="pricing-section" id="precios">
   <div class="c">
@@ -1753,7 +1802,7 @@
         <button class="pr-tog-btn" id="togAno" onclick="setPricing('ano')">Anual <span class="pr-tog-save">Ahorra 20%</span></button>
       </div>
     </div>
-    <div class="pr-setup-note reveal d3">🎁 <strong>Setup gratuito</strong> en todos los planes — sin coste de activación, sin permanencia</div>
+    <div class="pr-setup-note reveal d3">🎁 <strong>Setup gratuito</strong> en todos los planes — ahórrate <s style="opacity:.55">499€</s> de configuración. Sin permanencia.</div>
     <div class="pr-grid">
       <div class="pr-card reveal">
         <div class="pr-plan">Starter</div>
@@ -1769,7 +1818,7 @@
           <li><div class="pfc">✓</div>Soporte por email</li>
         </ul>
         <div class="pr-wa-note">💬 WhatsApp disponible en Pro</div>
-        <a href="/contacto?plan=starter" class="btn-pl btn-pl-out">Solicitar demo →</a>
+        <button class="btn-pl btn-pl-out" onclick="startCheckout('starter')">Empezar ahora →</button>
       </div>
       <div class="pr-card hot reveal d1">
         <div class="hot-badge">Más popular</div>
@@ -1786,7 +1835,7 @@
           <li><div class="pfc">✓</div>Soporte prioritario</li>
           <li><div class="pfc">✓</div>Setup gratuito incluido</li>
         </ul>
-        <a href="/contacto?plan=pro" class="btn-pl btn-pl-sol">Empezar ahora →</a>
+        <button class="btn-pl btn-pl-sol" onclick="startCheckout('pro')">Empezar ahora →</button>
       </div>
       <div class="pr-card reveal d2">
         <div class="pr-plan">Clínica</div>
@@ -1802,10 +1851,11 @@
           <li><div class="pfc">✓</div>Soporte 24/7 + SLA garantizado</li>
           <li><div class="pfc">✓</div>Setup gratuito incluido</li>
         </ul>
-        <a href="/contacto?plan=clinica" class="btn-pl btn-pl-out">Contactar →</a>
+        <button class="btn-pl btn-pl-out" onclick="startCheckout('clinica')">Empezar ahora →</button>
       </div>
     </div>
     <p class="pr-footer-note reveal">Todos los precios incluyen IVA. Gastos de API, WhatsApp Business y modelos de IA incluidos en el plan.</p>
+    <div style="text-align:center;margin-top:20px" class="reveal"><a href="/contacto" class="btn-secondary" style="font-size:14px">¿Tienes dudas? Habla con nosotros →</a></div>
   </div>
 </section>
 
@@ -1825,6 +1875,35 @@
   </div>
 </section>
 
+<!-- DEMO INTERACTIVA -->
+<section style="padding:var(--sy) 0;border-top:1px solid var(--border)" id="demo">
+  <div class="c">
+    <div class="reveal" style="text-align:center;margin-bottom:44px">
+      <div class="label" style="justify-content:center;margin-bottom:14px">Pruébalo ahora</div>
+      <h2 class="sec-h">Habla con Natalia<br>antes de decidir</h2>
+      <p class="sec-p" style="margin:0 auto;max-width:500px">Sin registro, sin tarjeta. Experimenta en primera persona cómo responde la IA de Cliniflux.</p>
+    </div>
+    <div class="demo-try-grid reveal d1">
+      <div class="demo-try-card">
+        <div class="demo-try-icon" style="background:var(--green-dim)">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="m9 12 2 2 4-4"/></svg>
+        </div>
+        <div class="demo-try-title">Demo interactiva web</div>
+        <p class="demo-try-desc">Chatea con Natalia directamente en el navegador. Simula una consulta real de paciente y ve cómo gestiona citas, preguntas y más.</p>
+        <a href="/demo" class="btn-primary" style="margin-top:auto;border-radius:40px">Abrir demo web →</a>
+      </div>
+      <div class="demo-try-card wa">
+        <div class="demo-try-icon" style="background:rgba(37,211,102,0.15)">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="#25d366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M11.9 0C5.336 0 0 5.291 0 11.8c0 2.085.548 4.04 1.503 5.73L0 24l6.639-1.737A11.91 11.91 0 0 0 11.9 23.6C18.464 23.6 24 18.309 24 11.8 24 5.291 18.464 0 11.9 0zm0 21.6a9.9 9.9 0 0 1-5.035-1.374l-.361-.214-3.742.978.999-3.629-.235-.374A9.737 9.737 0 0 1 2 11.8C2 6.395 6.44 2 11.9 2 17.36 2 21.8 6.395 21.8 11.8c0 5.405-4.44 9.8-9.9 9.8z"/></svg>
+        </div>
+        <div class="demo-try-title">Prueba en tu WhatsApp</div>
+        <p class="demo-try-desc">Pulsa el enlace desde tu móvil y chatea con Natalia en tu propio WhatsApp — exactamente como lo haría un paciente real. <span style="font-size:12px;color:var(--text3)">(Sandbox demo)</span></p>
+        <a href="https://wa.me/14155238886" target="_blank" rel="noopener" class="btn-primary" style="margin-top:auto;border-radius:40px;background:#25d366">Abrir en WhatsApp →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- FOOTER -->
 <footer>
   <div class="c">
@@ -1834,12 +1913,12 @@
         <p class="ft-desc">Automatización inteligente de WhatsApp para clínicas que quieren crecer sin aumentar el equipo.</p>
       </div>
       <div class="ft-links">
-        <div class="ft-col"><div class="ft-col-t">Producto</div><ul><li><a href="#flujo">Cómo funciona</a></li><li><a href="#producto">Funcionalidades</a></li><li><a href="#precios">Precios</a></li><li><a href="/demo">Demo</a></li><li><a href="/blog">Blog</a></li></ul></div>
+        <div class="ft-col"><div class="ft-col-t">Producto</div><ul><li><a href="#flujo">Cómo funciona</a></li><li><a href="#producto">Funcionalidades</a></li><li><a href="#reactivacion">Reactivación leads</a></li><li><a href="#precios">Precios</a></li><li><a href="/demo">Demo</a></li><li><a href="/blog">Blog</a></li></ul></div>
         <div class="ft-col"><div class="ft-col-t">Empresa</div><ul><li><a href="/about">Nosotros</a></li><li><a href="/contacto">Contacto</a></li></ul></div>
         <div class="ft-col"><div class="ft-col-t">Legal</div><ul><li><a href="/legal/privacidad">Privacidad</a></li><li><a href="/legal/terminos">Términos de uso</a></li><li><a href="/legal/cookies">Cookies</a></li><li><a href="/features/rgpd">RGPD</a></li></ul></div>
       </div>
     </div>
-    <div class="ft-bot"><p>© 2025 Cliniflux. Todos los derechos reservados.</p><p>Hecho con ❤️ en España</p></div>
+    <div class="ft-bot"><p>© 2025 Cliniflux. Todos los derechos reservados.</p></div>
   </div>
 </footer>
 
@@ -1851,7 +1930,7 @@
   }, {threshold:0.1, rootMargin:'0px 0px -40px 0px'});
   document.querySelectorAll('.reveal').forEach(el => io.observe(el));
   // Pricing toggle mensual/anual
-  const PRICES = {mes:[99,199,349], ano:[79,159,279]};
+  // pricing handled by startCheckout below
   const PERIODS = {mes:'/ mes · ', ano:'/ mes · (facturado anual) · '};
   const PERIFS = {mes:['1 clínica','hasta 3 clínicas','clínicas ilimitadas'], ano:['1 clínica','hasta 3 clínicas','clínicas ilimitadas']};
   function setPricing(mode){
@@ -1912,6 +1991,31 @@
       if(overlay){overlay.addEventListener('click',closeMenu)}
       document.querySelectorAll('.mob-link').forEach(function(l){l.addEventListener('click',closeMenu)})
     })();
-  </script>
+  
+  // ── Stripe Checkout ─────────────────────────────────────────────────────────
+  let currentBilling = 'mes';
+  function setPricing(mode) {
+    currentBilling = mode;
+    const prices = {mes:[99,199,349], ano:[79,159,279]};
+    document.querySelectorAll('.pr-price-val').forEach((el,i) => el.textContent = prices[mode][i]);
+    document.getElementById('togMes').classList.toggle('active', mode==='mes');
+    document.getElementById('togAno').classList.toggle('active', mode==='ano');
+  }
+  async function startCheckout(plan) {
+    try {
+      const res = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ plan, billing: currentBilling })
+      });
+      const data = await res.json();
+      if (data.url) { window.location.href = data.url; }
+      else { alert(data.error || 'Error al iniciar el pago. Inténtalo de nuevo.'); }
+    } catch(e) {
+      alert('Error de conexión. Inténtalo de nuevo.');
+    }
+  }
+
+</script>
 </body>
 </html>
