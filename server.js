@@ -97,6 +97,8 @@ const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 // ── Seguridad: headers HTTP ─────────────────────────────────────────────────
 app.disable('x-powered-by');
+app.set('trust proxy', 1); // Railway / proxies: detectar HTTPS correctamente
+
 app.use((req, res, next) => {
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('X-Frame-Options', 'DENY');
@@ -138,28 +140,40 @@ app.post('/webhook/stripe', express.raw({ type: 'application/json' }), async (re
     const s = event.data.object;
     const plan = s.metadata?.plan || 'starter';
     const email = s.customer_details?.email || s.metadata?.email || '';
-    const token = crypto.randomBytes(20).toString('hex');
-    const tempPass = crypto.randomBytes(8).toString('hex');
+    const name = s.customer_details?.name || email;
+    const appBase = process.env.APP_URL || 'https://cliniflux.com';
+    console.log(`[Stripe] checkout.session.completed email=${email} plan=${plan}`);
     try {
-      const appBase = process.env.APP_URL || 'https://cliniflux.com';
+      // Buscar si ya existe (re-compra o test repetido)
+      const existing = await pool.query('SELECT id, setup_token FROM clinics WHERE email=$1', [email]);
+      let token;
+      if (existing.rows.length) {
+        // Reusar o regenerar token para que pueda configurar
+        token = crypto.randomBytes(20).toString('hex');
+        await pool.query(
+          'UPDATE clinics SET plan=$1, setup_token=$2, stripe_customer_id=$3, stripe_subscription_id=$4 WHERE email=$5',
+          [plan, token, s.customer, s.subscription, email]
+        );
+        console.log(`[Stripe] Clínica existente actualizada: ${email}`);
+      } else {
+        token = crypto.randomBytes(20).toString('hex');
+        const tempPass = crypto.randomBytes(8).toString('hex');
+        await createClinic({
+          email, password_hash: hashPassword(tempPass), name, plan,
+          setup_token: token, stripe_customer_id: s.customer, stripe_subscription_id: s.subscription
+        });
+        console.log(`[Stripe] Nueva clínica creada: ${email}`);
+      }
       const setupUrl = `${appBase}/onboarding?token=${token}`;
-      await createClinic({
-        email,
-        password_hash: hashPassword(tempPass),
-        name: s.customer_details?.name || email,
-        plan,
-        setup_token: token,
-        stripe_customer_id: s.customer,
-        stripe_subscription_id: s.subscription
-      });
-      console.log(`Nueva clínica creada: ${email} plan=${plan} setup=${setupUrl}`);
+      console.log(`[Stripe] Enviando email setup a ${email} → ${setupUrl}`);
       await sendEmail({
         to: email,
         subject: '¡Bienvenido/a a Cliniflux! Configura tu clínica ahora',
-        html: emailSetupLink(s.customer_details?.name || email, plan, setupUrl)
+        html: emailSetupLink(name, plan, setupUrl)
       });
+      console.log(`[Stripe] Email enviado OK`);
     } catch (e) {
-      console.error('Error creando clínica tras pago:', e.message);
+      console.error('[Stripe] Error procesando pago:', e.message);
     }
   }
 
