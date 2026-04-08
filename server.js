@@ -8,6 +8,82 @@ const Stripe = require('stripe');
 const { pool, initDb, getSession, saveSession, saveLead, getClinicByEmail, getClinicByWhatsapp, getClinicBySetupToken, createClinic, updateClinicConfig, buildPromptForClinic, getLeads, getAppointments, saveAppointment, verifyPassword, hashPassword, importLeads, getImportedLeads, updateLeadEstado } = require('./db');
 
 const stripe = process.env.STRIPE_SECRET_KEY ? Stripe(process.env.STRIPE_SECRET_KEY) : null;
+const nodemailer = require('nodemailer');
+
+function getMailTransport() {
+  if (!process.env.SMTP_HOST || !process.env.SMTP_USER || !process.env.SMTP_PASS) return null;
+  return nodemailer.createTransport({
+    host: process.env.SMTP_HOST,
+    port: parseInt(process.env.SMTP_PORT || '587'),
+    secure: process.env.SMTP_PORT === '465',
+    auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS }
+  });
+}
+
+async function sendEmail({ to, subject, html, replyTo }) {
+  const t = getMailTransport();
+  if (!t) return;
+  const from = process.env.EMAIL_FROM || `"Cliniflux" <${process.env.SMTP_USER}>`;
+  try {
+    await t.sendMail({ from, to, subject, html, replyTo });
+  } catch(e) { console.error('Email error:', e.message); }
+}
+
+// ── Plantillas de email ──────────────────────────────────────────────────────
+const EMAIL_BASE = (content) => `
+<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<style>body{margin:0;padding:0;background:#f8f9fb;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif}
+.wrap{max-width:560px;margin:40px auto;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.07)}
+.hd{background:linear-gradient(135deg,#14532d,#16a34a);padding:32px 40px}
+.logo{font-size:22px;font-weight:800;color:#fff;letter-spacing:-.5px;text-decoration:none}
+.body{padding:36px 40px}
+h1{font-size:22px;font-weight:700;color:#0f172a;margin:0 0 12px;letter-spacing:-.4px}
+p{font-size:15px;color:rgba(15,23,42,.65);line-height:1.75;margin:0 0 16px}
+.btn{display:inline-block;background:#16a34a;color:#fff;font-weight:700;font-size:15px;padding:14px 32px;border-radius:40px;text-decoration:none;margin:8px 0 24px}
+.note{font-size:13px;color:rgba(15,23,42,.4);background:#f8f9fb;border-radius:8px;padding:14px 16px;margin-top:16px}
+.ft{padding:20px 40px;border-top:1px solid rgba(0,0,0,.07);font-size:12px;color:rgba(15,23,42,.35);text-align:center}
+.tag{display:inline-block;background:rgba(22,163,74,.1);color:#15803d;font-size:11px;font-weight:700;padding:3px 10px;border-radius:100px;letter-spacing:.3px;margin-bottom:20px}
+.row{display:flex;gap:8px;margin-bottom:10px}
+.label{font-size:13px;font-weight:600;color:#0f172a;min-width:100px}
+.value{font-size:13px;color:rgba(15,23,42,.6)}</style></head>
+<body><div class="wrap">
+<div class="hd"><span class="logo">cliniflux</span></div>
+<div class="body">${content}</div>
+<div class="ft">© 2025 Cliniflux · <a href="https://cliniflux.com" style="color:inherit">cliniflux.com</a></div>
+</div></body></html>`;
+
+function emailSetupLink(name, plan, setupUrl) {
+  const planLabel = { starter: 'Starter', pro: 'Pro', clinica: 'Clínica' }[plan] || plan;
+  return EMAIL_BASE(`
+<div class="tag">Plan ${planLabel} activado</div>
+<h1>¡Bienvenido/a a Cliniflux!</h1>
+<p>Hola ${name.split(' ')[0]},</p>
+<p>Tu suscripción está activa. Solo necesitas configurar tu clínica para que Natalia empiece a atender pacientes en WhatsApp.</p>
+<p>El proceso dura menos de 5 minutos:</p>
+<a href="${setupUrl}" class="btn">Configurar mi clínica →</a>
+<div class="note">Este enlace es único y caduca tras su primer uso. Si tienes algún problema, responde a este email.</div>`);
+}
+
+function emailContactNotification({ nombre, clinica, email, telefono, tipo, mensaje }) {
+  return EMAIL_BASE(`
+<div class="tag">Nuevo contacto web</div>
+<h1>${tipo}</h1>
+<div class="row"><span class="label">Nombre</span><span class="value">${nombre}</span></div>
+<div class="row"><span class="label">Clínica</span><span class="value">${clinica||'—'}</span></div>
+<div class="row"><span class="label">Email</span><span class="value"><a href="mailto:${email}" style="color:#16a34a">${email}</a></span></div>
+<div class="row"><span class="label">Teléfono</span><span class="value">${telefono||'—'}</span></div>
+${mensaje ? `<div class="note">${mensaje}</div>` : ''}`);
+}
+
+function emailWelcomeOnboarding(clinicName, loginUrl) {
+  return EMAIL_BASE(`
+<div class="tag">Configuración completada</div>
+<h1>Tu clínica está lista</h1>
+<p>Hola,</p>
+<p><strong>${clinicName}</strong> ya está configurada en Cliniflux. Natalia empezará a responder WhatsApp en cuanto conectes tu número de WhatsApp Business.</p>
+<a href="${loginUrl}" class="btn">Acceder al panel →</a>
+<div class="note">Si necesitas ayuda, escríbenos a <a href="mailto:hola@cliniflux.com" style="color:#16a34a">hola@cliniflux.com</a> y te respondemos en menos de 24h.</div>`);
+}
 
 // Stripe price IDs (test mode)
 const STRIPE_PRICES = {
@@ -65,6 +141,8 @@ app.post('/webhook/stripe', express.raw({ type: 'application/json' }), async (re
     const token = crypto.randomBytes(20).toString('hex');
     const tempPass = crypto.randomBytes(8).toString('hex');
     try {
+      const appBase = process.env.APP_URL || 'https://cliniflux.com';
+      const setupUrl = `${appBase}/onboarding?token=${token}`;
       await createClinic({
         email,
         password_hash: hashPassword(tempPass),
@@ -74,8 +152,12 @@ app.post('/webhook/stripe', express.raw({ type: 'application/json' }), async (re
         stripe_customer_id: s.customer,
         stripe_subscription_id: s.subscription
       });
-      console.log(`Nueva clínica creada: ${email} plan=${plan} token=${token}`);
-      // TODO: enviar email con setup_url cuando esté SMTP configurado
+      console.log(`Nueva clínica creada: ${email} plan=${plan} setup=${setupUrl}`);
+      await sendEmail({
+        to: email,
+        subject: '¡Bienvenido/a a Cliniflux! Configura tu clínica ahora',
+        html: emailSetupLink(s.customer_details?.name || email, plan, setupUrl)
+      });
     } catch (e) {
       console.error('Error creando clínica tras pago:', e.message);
     }
@@ -172,6 +254,8 @@ app.get('/demo', (req, res) => res.sendFile('demo.html', { root: 'public' }));
 app.get('/about', (req, res) => res.sendFile('about.html', { root: 'public' }));
 app.get('/contacto', (req, res) => res.sendFile('contacto.html', { root: 'public' }));
 app.get('/blog', (req, res) => res.sendFile('blog.html', { root: 'public' }));
+app.get('/checkout-success', (req, res) => res.sendFile('checkout-success.html', { root: 'public' }));
+app.get('/checkout-cancel', (req, res) => res.sendFile('checkout-cancel.html', { root: 'public' }));
 app.get('/login', (req, res) => {
   if (req.session?.clinic) return res.redirect('/dashboard');
   res.sendFile('login.html', { root: 'public' });
@@ -238,6 +322,12 @@ app.post('/api/onboarding', async (req, res) => {
     if (new_password) {
       await pool.query('UPDATE clinics SET password_hash=$1 WHERE id=$2', [hashPassword(new_password), clinic.id]);
     }
+    const loginUrl = (process.env.APP_URL || `${req.protocol}://${req.get('host')}`) + '/login';
+    await sendEmail({
+      to: clinic.email,
+      subject: `${clinic.name || 'Tu clínica'} ya está lista en Cliniflux`,
+      html: emailWelcomeOnboarding(clinic.name || 'Tu clínica', loginUrl)
+    });
     res.json({ ok: true });
   } catch(e) {
     console.error('Onboarding:', e.message);
@@ -439,19 +529,12 @@ app.post('/api/contact', rateLimit(5, 60000), async (req, res) => {
     return res.status(400).json({ error: 'Campos requeridos' });
   }
   try { await saveLead({ nombre, clinica, email, telefono, tipo, mensaje, source: 'contacto' }); } catch(e) { console.error('Lead save:', e.message); }
-  if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
-    try {
-      const nodemailer = require('nodemailer');
-      const t = nodemailer.createTransport({ host: process.env.SMTP_HOST, port: parseInt(process.env.SMTP_PORT || '587'), secure: false, auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS } });
-      await t.sendMail({
-        from: '"Cliniflux Web" <' + process.env.SMTP_USER + '>',
-        to: 'contacto@cliniflux.com',
-        replyTo: email,
-        subject: '[Contacto Web] ' + tipo + ' - ' + nombre + ' (' + (clinica||'-') + ')',
-        html: '<h2>Nuevo contacto</h2><p><b>Nombre:</b> ' + nombre + '</p><p><b>Clínica:</b> ' + (clinica||'-') + '</p><p><b>Email:</b> ' + email + '</p><p><b>Teléfono:</b> ' + (telefono||'-') + '</p><p><b>Tipo:</b> ' + tipo + '</p><p><b>Mensaje:</b> ' + (mensaje||'-') + '</p>'
-      });
-    } catch(e) { console.error('Email error:', e.message); }
-  }
+  await sendEmail({
+    to: process.env.EMAIL_NOTIFY || process.env.SMTP_USER || 'hola@cliniflux.com',
+    replyTo: email,
+    subject: `[Contacto Web] ${tipo} — ${nombre} (${clinica||'-'})`,
+    html: emailContactNotification({ nombre, clinica, email, telefono, tipo, mensaje })
+  });
   res.json({ ok: true });
 });
 
@@ -487,7 +570,7 @@ app.post('/api/checkout', rateLimit(20, 60000), async (req, res) => {
     return res.status(400).json({ error: 'Plan o ciclo inválido' });
 
   const priceId = STRIPE_PRICES[plan][billing];
-  const base = process.env.APP_URL || 'https://cliniflux.com';
+  const base = process.env.APP_URL || `${req.protocol}://${req.get('host')}`;
   try {
     const session = await stripe.checkout.sessions.create({
       mode: 'subscription',
