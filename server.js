@@ -47,59 +47,119 @@ async function sendEmail({ to, subject, html, replyTo }) {
 }
 
 // ── Plantillas de email ──────────────────────────────────────────────────────
-const EMAIL_BASE = (content) => `
-<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<style>body{margin:0;padding:0;background:#f8f9fb;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif}
-.wrap{max-width:560px;margin:40px auto;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.07)}
-.hd{background:linear-gradient(135deg,#14532d,#16a34a);padding:32px 40px}
-.logo{font-size:22px;font-weight:800;color:#fff;letter-spacing:-.5px;text-decoration:none}
-.body{padding:36px 40px}
-h1{font-size:22px;font-weight:700;color:#0f172a;margin:0 0 12px;letter-spacing:-.4px}
-p{font-size:15px;color:rgba(15,23,42,.65);line-height:1.75;margin:0 0 16px}
-.btn{display:inline-block;background:#16a34a;color:#fff;font-weight:700;font-size:15px;padding:14px 32px;border-radius:40px;text-decoration:none;margin:8px 0 24px}
-.note{font-size:13px;color:rgba(15,23,42,.4);background:#f8f9fb;border-radius:8px;padding:14px 16px;margin-top:16px}
-.ft{padding:20px 40px;border-top:1px solid rgba(0,0,0,.07);font-size:12px;color:rgba(15,23,42,.35);text-align:center}
-.tag{display:inline-block;background:rgba(22,163,74,.1);color:#15803d;font-size:11px;font-weight:700;padding:3px 10px;border-radius:100px;letter-spacing:.3px;margin-bottom:20px}
-.row{display:flex;gap:8px;margin-bottom:10px}
-.label{font-size:13px;font-weight:600;color:#0f172a;min-width:100px}
-.value{font-size:13px;color:rgba(15,23,42,.6)}</style></head>
-<body><div class="wrap">
-<div class="hd"><span class="logo">cliniflux</span></div>
-<div class="body">${content}</div>
-<div class="ft">© 2025 Cliniflux · <a href="https://cliniflux.com" style="color:inherit">cliniflux.com</a></div>
-</div></body></html>`;
+const EMAIL_BASE = (body, preheader = '') => `<!DOCTYPE html>
+<html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cliniflux</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;padding:0;background:#f0f4f0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Inter',sans-serif;-webkit-font-smoothing:antialiased}
+.pre{display:none;max-height:0;overflow:hidden;font-size:1px;color:#f0f4f0}
+.outer{padding:32px 16px 48px}
+.wrap{max-width:580px;margin:0 auto}
+.hd{background:linear-gradient(135deg,#0f4a23 0%,#16a34a 60%,#22c55e 100%);border-radius:16px 16px 0 0;padding:36px 44px 32px}
+.hd-logo{font-size:26px;font-weight:800;color:#fff;letter-spacing:-1px;text-decoration:none;display:block}
+.hd-logo span{opacity:.7;font-weight:400}
+.hd-tagline{font-size:13px;color:rgba(255,255,255,.6);margin-top:6px;font-weight:500}
+.body{background:#fff;padding:44px 44px 36px;border-left:1px solid #e2e8e2;border-right:1px solid #e2e8e2}
+.pill{display:inline-block;background:#dcfce7;color:#15803d;font-size:11px;font-weight:700;letter-spacing:.5px;padding:4px 12px;border-radius:100px;margin-bottom:22px;text-transform:uppercase}
+h1{font-size:26px;font-weight:800;color:#0f172a;margin:0 0 6px;letter-spacing:-.6px;line-height:1.2}
+.subtitle{font-size:16px;color:#64748b;margin:0 0 28px;line-height:1.6}
+p{font-size:15px;color:#475569;line-height:1.8;margin:0 0 18px}
+p strong{color:#0f172a;font-weight:600}
+.step-list{list-style:none;padding:0;margin:0 0 28px}
+.step-list li{display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid #f1f5f1}
+.step-list li:last-child{border-bottom:none}
+.step-n{width:26px;height:26px;border-radius:50%;background:#dcfce7;color:#16a34a;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.step-text{font-size:14px;color:#475569;line-height:1.6}
+.btn-wrap{text-align:center;margin:32px 0 24px}
+.btn{display:inline-block;background:linear-gradient(135deg,#16a34a,#22c55e);color:#fff;font-weight:700;font-size:16px;padding:16px 40px;border-radius:40px;text-decoration:none;letter-spacing:-.2px;box-shadow:0 4px 20px rgba(22,163,74,.3)}
+.note-box{background:#f8fdf8;border:1px solid #bbf7d0;border-radius:12px;padding:16px 20px;margin-top:4px}
+.note-box p{font-size:13px;color:#166534;margin:0;line-height:1.6}
+.divider{height:1px;background:#f1f5f1;margin:28px 0}
+.info-grid{display:table;width:100%;border-collapse:collapse;margin-bottom:8px}
+.info-row{display:table-row}
+.info-label{display:table-cell;font-size:13px;font-weight:600;color:#94a3b8;padding:6px 16px 6px 0;white-space:nowrap;vertical-align:top}
+.info-val{display:table-cell;font-size:13px;color:#334155;padding:6px 0;line-height:1.5}
+.highlight-box{background:linear-gradient(135deg,#f0fdf4,#dcfce7);border:1px solid #86efac;border-radius:12px;padding:20px 24px;margin:24px 0}
+.highlight-box .big{font-size:28px;font-weight:800;color:#15803d;letter-spacing:-1px;line-height:1}
+.highlight-box .small{font-size:13px;color:#166534;margin-top:4px;font-weight:500}
+.ft{background:#f8fdf8;border:1px solid #e2e8e2;border-top:none;border-radius:0 0 16px 16px;padding:24px 44px}
+.ft-inner{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.ft-logo{font-size:16px;font-weight:800;color:#16a34a;letter-spacing:-.4px}
+.ft-links{font-size:12px;color:#94a3b8}
+.ft-links a{color:#64748b;text-decoration:none;margin-left:12px}
+.ft-copy{font-size:11px;color:#94a3b8;margin-top:10px}
+@media(max-width:480px){.hd,.body,.ft{padding-left:24px;padding-right:24px}.btn{padding:15px 28px;font-size:15px}}
+</style></head>
+<body>
+${preheader ? `<div class="pre">${preheader}</div>` : ''}
+<div class="outer"><div class="wrap">
+<div class="hd">
+  <a href="https://cliniflux.com" class="hd-logo">cliniflux<span>.com</span></a>
+  <div class="hd-tagline">Automatización WhatsApp para clínicas</div>
+</div>
+<div class="body">${body}</div>
+<div class="ft">
+  <div class="ft-inner">
+    <span class="ft-logo">cliniflux</span>
+    <span class="ft-links"><a href="https://cliniflux.com">Web</a><a href="mailto:contacto@cliniflux.es">Contacto</a></span>
+  </div>
+  <div class="ft-copy">© 2025 Cliniflux. Si tienes dudas, escríbenos a <a href="mailto:contacto@cliniflux.es" style="color:#16a34a">contacto@cliniflux.es</a></div>
+</div>
+</div></div>
+</body></html>`;
 
 function emailSetupLink(name, plan, setupUrl) {
   const planLabel = { starter: 'Starter', pro: 'Pro', clinica: 'Clínica' }[plan] || plan;
+  const firstName = name.split(' ')[0];
   return EMAIL_BASE(`
-<div class="tag">Plan ${planLabel} activado</div>
-<h1>¡Bienvenido/a a Cliniflux!</h1>
-<p>Hola ${name.split(' ')[0]},</p>
-<p>Tu suscripción está activa. Solo necesitas configurar tu clínica para que Natalia empiece a atender pacientes en WhatsApp.</p>
-<p>El proceso dura menos de 5 minutos:</p>
-<a href="${setupUrl}" class="btn">Configurar mi clínica →</a>
-<div class="note">Este enlace es único y caduca tras su primer uso. Si tienes algún problema, responde a este email.</div>`);
-}
-
-function emailContactNotification({ nombre, clinica, email, telefono, tipo, mensaje }) {
-  return EMAIL_BASE(`
-<div class="tag">Nuevo contacto web</div>
-<h1>${tipo}</h1>
-<div class="row"><span class="label">Nombre</span><span class="value">${nombre}</span></div>
-<div class="row"><span class="label">Clínica</span><span class="value">${clinica||'—'}</span></div>
-<div class="row"><span class="label">Email</span><span class="value"><a href="mailto:${email}" style="color:#16a34a">${email}</a></span></div>
-<div class="row"><span class="label">Teléfono</span><span class="value">${telefono||'—'}</span></div>
-${mensaje ? `<div class="note">${mensaje}</div>` : ''}`);
+<div class="pill">Plan ${planLabel} activado</div>
+<h1>¡Bienvenido/a a Cliniflux, ${firstName}!</h1>
+<p class="subtitle">Tu suscripción está activa. Ya solo falta un paso.</p>
+<p>Hola ${firstName}, nos alegra mucho tenerte a bordo 🎉</p>
+<p>En menos de <strong>5 minutos</strong> puedes tener tu clínica configurada y lista para que Natalia empiece a atender pacientes en WhatsApp — incluso fuera de horario.</p>
+<ol class="step-list">
+  <li><span class="step-n">1</span><span class="step-text"><strong>Configura tu clínica</strong> — nombre, servicios, horario y precios</span></li>
+  <li><span class="step-n">2</span><span class="step-text"><strong>Personaliza a Natalia</strong> — tono, nombre del asistente y más</span></li>
+  <li><span class="step-n">3</span><span class="step-text"><strong>Conecta WhatsApp</strong> — te guiamos paso a paso</span></li>
+</ol>
+<div class="btn-wrap"><a href="${setupUrl}" class="btn">Configurar mi clínica ahora →</a></div>
+<div class="note-box"><p>🔒 Este enlace es personal y de un solo uso. Si tienes cualquier problema, responde directamente a este email y te ayudamos enseguida.</p></div>
+`, `Tu clínica está a 5 minutos de estar lista. Pulsa aquí para configurarla.`);
 }
 
 function emailWelcomeOnboarding(clinicName, loginUrl) {
   return EMAIL_BASE(`
-<div class="tag">Configuración completada</div>
-<h1>Tu clínica está lista</h1>
-<p>Hola,</p>
-<p><strong>${clinicName}</strong> ya está configurada en Cliniflux. Natalia empezará a responder WhatsApp en cuanto conectes tu número de WhatsApp Business.</p>
-<a href="${loginUrl}" class="btn">Acceder al panel →</a>
-<div class="note">Si necesitas ayuda, escríbenos a <a href="mailto:hola@cliniflux.com" style="color:#16a34a">hola@cliniflux.com</a> y te respondemos en menos de 24h.</div>`);
+<div class="pill">Todo listo</div>
+<h1>${clinicName} ya está en marcha</h1>
+<p class="subtitle">Natalia está lista para atender a tus pacientes.</p>
+<p>¡Enhorabuena! La configuración de <strong>${clinicName}</strong> está completada. A partir de ahora, Natalia responderá a tus pacientes por WhatsApp de forma automática.</p>
+<div class="highlight-box">
+  <div class="big">24/7</div>
+  <div class="small">Tu clínica responde — incluso cuando estás cerrado</div>
+</div>
+<p>Accede a tu panel para ver las conversaciones en tiempo real, revisar citas y ajustar la configuración cuando quieras.</p>
+<div class="btn-wrap"><a href="${loginUrl}" class="btn">Ir a mi panel →</a></div>
+<div class="note-box"><p>💡 Si necesitas ayuda o tienes cualquier duda, estamos a un email de distancia: <strong>contacto@cliniflux.es</strong></p></div>
+`, `${clinicName} está configurada. Natalia ya puede atender a tus pacientes.`);
+}
+
+function emailContactNotification({ nombre, clinica, email, telefono, tipo, mensaje }) {
+  const ts = new Date().toLocaleString('es-ES', { dateStyle: 'short', timeStyle: 'short' });
+  return EMAIL_BASE(`
+<div class="pill">Nuevo contacto web</div>
+<h1>${tipo}</h1>
+<p class="subtitle">Recibido el ${ts}</p>
+<div class="divider"></div>
+<div class="info-grid">
+  <div class="info-row"><span class="info-label">Nombre</span><span class="info-val"><strong>${nombre}</strong></span></div>
+  <div class="info-row"><span class="info-label">Clínica</span><span class="info-val">${clinica||'—'}</span></div>
+  <div class="info-row"><span class="info-label">Email</span><span class="info-val"><a href="mailto:${email}" style="color:#16a34a;font-weight:600">${email}</a></span></div>
+  <div class="info-row"><span class="info-label">Teléfono</span><span class="info-val">${telefono||'—'}</span></div>
+</div>
+${mensaje ? `<div class="divider"></div><p style="font-size:14px;color:#334155;background:#f8f9fb;border-radius:10px;padding:16px 18px;margin:0;line-height:1.7;border-left:3px solid #22c55e">${mensaje}</p>` : ''}
+<div class="btn-wrap" style="margin-top:28px"><a href="mailto:${email}" class="btn">Responder a ${nombre.split(' ')[0]} →</a></div>
+`, `${nombre} de ${clinica||'una clínica'} quiere hablar contigo.`);
 }
 
 // Stripe price IDs (test mode)
