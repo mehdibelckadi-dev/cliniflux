@@ -76,6 +76,12 @@ async function initDb() {
     );
   `);
 
+  // Migraciones: añadir columnas si no existen
+  await pool.query(`ALTER TABLE clinics ADD COLUMN IF NOT EXISTS setup_token TEXT`);
+  await pool.query(`ALTER TABLE clinics ADD COLUMN IF NOT EXISTS stripe_customer_id TEXT`);
+  await pool.query(`ALTER TABLE clinics ADD COLUMN IF NOT EXISTS stripe_subscription_id TEXT`);
+  await pool.query(`ALTER TABLE leads ADD COLUMN IF NOT EXISTS clinic_id INTEGER`);
+
   // Seed demo clinic if not exists
   const { rows } = await pool.query("SELECT id FROM clinics WHERE email = 'demo@cliniflux.com'");
   if (!rows.length) {
