@@ -48,117 +48,154 @@ async function sendEmail({ to, subject, html, replyTo }) {
 
 // ── Plantillas de email ──────────────────────────────────────────────────────
 const EMAIL_BASE = (body, preheader = '') => `<!DOCTYPE html>
-<html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Cliniflux</title>
-<style>
-*{box-sizing:border-box}
-body{margin:0;padding:0;background:#f0f4f0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Inter',sans-serif;-webkit-font-smoothing:antialiased}
-.pre{display:none;max-height:0;overflow:hidden;font-size:1px;color:#f0f4f0}
-.outer{padding:32px 16px 48px}
-.wrap{max-width:580px;margin:0 auto}
-.hd{background:linear-gradient(135deg,#0f4a23 0%,#16a34a 60%,#22c55e 100%);border-radius:16px 16px 0 0;padding:36px 44px 32px}
-.hd-logo{font-size:26px;font-weight:800;color:#fff;letter-spacing:-1px;text-decoration:none;display:block}
-.hd-logo span{opacity:.7;font-weight:400}
-.hd-tagline{font-size:13px;color:rgba(255,255,255,.6);margin-top:6px;font-weight:500}
-.body{background:#fff;padding:44px 44px 36px;border-left:1px solid #e2e8e2;border-right:1px solid #e2e8e2}
-.pill{display:inline-block;background:#dcfce7;color:#15803d;font-size:11px;font-weight:700;letter-spacing:.5px;padding:4px 12px;border-radius:100px;margin-bottom:22px;text-transform:uppercase}
-h1{font-size:26px;font-weight:800;color:#0f172a;margin:0 0 6px;letter-spacing:-.6px;line-height:1.2}
-.subtitle{font-size:16px;color:#64748b;margin:0 0 28px;line-height:1.6}
-p{font-size:15px;color:#475569;line-height:1.8;margin:0 0 18px}
-p strong{color:#0f172a;font-weight:600}
-.step-list{list-style:none;padding:0;margin:0 0 28px}
-.step-list li{display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid #f1f5f1}
-.step-list li:last-child{border-bottom:none}
-.step-n{width:26px;height:26px;border-radius:50%;background:#dcfce7;color:#16a34a;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
-.step-text{font-size:14px;color:#475569;line-height:1.6}
-.btn-wrap{text-align:center;margin:32px 0 24px}
-.btn{display:inline-block;background:linear-gradient(135deg,#16a34a,#22c55e);color:#fff;font-weight:700;font-size:16px;padding:16px 40px;border-radius:40px;text-decoration:none;letter-spacing:-.2px;box-shadow:0 4px 20px rgba(22,163,74,.3)}
-.note-box{background:#f8fdf8;border:1px solid #bbf7d0;border-radius:12px;padding:16px 20px;margin-top:4px}
-.note-box p{font-size:13px;color:#166534;margin:0;line-height:1.6}
-.divider{height:1px;background:#f1f5f1;margin:28px 0}
-.info-grid{display:table;width:100%;border-collapse:collapse;margin-bottom:8px}
-.info-row{display:table-row}
-.info-label{display:table-cell;font-size:13px;font-weight:600;color:#94a3b8;padding:6px 16px 6px 0;white-space:nowrap;vertical-align:top}
-.info-val{display:table-cell;font-size:13px;color:#334155;padding:6px 0;line-height:1.5}
-.highlight-box{background:linear-gradient(135deg,#f0fdf4,#dcfce7);border:1px solid #86efac;border-radius:12px;padding:20px 24px;margin:24px 0}
-.highlight-box .big{font-size:28px;font-weight:800;color:#15803d;letter-spacing:-1px;line-height:1}
-.highlight-box .small{font-size:13px;color:#166534;margin-top:4px;font-weight:500}
-.ft{background:#f8fdf8;border:1px solid #e2e8e2;border-top:none;border-radius:0 0 16px 16px;padding:24px 44px}
-.ft-inner{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
-.ft-logo{font-size:16px;font-weight:800;color:#16a34a;letter-spacing:-.4px}
-.ft-links{font-size:12px;color:#94a3b8}
-.ft-links a{color:#64748b;text-decoration:none;margin-left:12px}
-.ft-copy{font-size:11px;color:#94a3b8;margin-top:10px}
-@media(max-width:480px){.hd,.body,.ft{padding-left:24px;padding-right:24px}.btn{padding:15px 28px;font-size:15px}}
-</style></head>
-<body>
-${preheader ? `<div class="pre">${preheader}</div>` : ''}
-<div class="outer"><div class="wrap">
-<div class="hd">
-  <a href="https://cliniflux.com" class="hd-logo">cliniflux<span>.com</span></a>
-  <div class="hd-tagline">Automatización WhatsApp para clínicas</div>
-</div>
-<div class="body">${body}</div>
-<div class="ft">
-  <div class="ft-inner">
-    <span class="ft-logo">cliniflux</span>
-    <span class="ft-links"><a href="https://cliniflux.com">Web</a><a href="mailto:contacto@cliniflux.es">Contacto</a></span>
-  </div>
-  <div class="ft-copy">© 2025 Cliniflux. Si tienes dudas, escríbenos a <a href="mailto:contacto@cliniflux.es" style="color:#16a34a">contacto@cliniflux.es</a></div>
-</div>
-</div></div>
+<!--[if mso]><style>td,th,div,p,a{font-family:Arial,sans-serif!important}</style><![endif]-->
+</head>
+<body style="margin:0;padding:0;background-color:#f1f5f1;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;-webkit-font-smoothing:antialiased">
+${preheader ? `<div style="display:none;max-height:0;overflow:hidden;font-size:1px;color:#f1f5f1;line-height:1px">${preheader}&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;</div>` : ''}
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f1f5f1">
+<tr><td align="center" style="padding:32px 16px 48px">
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:580px">
+  <!-- HEADER -->
+  <tr><td style="background:#0f172a;border-radius:16px 16px 0 0;padding:32px 44px 28px">
+    <table width="100%" cellpadding="0" cellspacing="0" border="0">
+      <tr>
+        <td>
+          <a href="https://cliniflux.es" style="text-decoration:none;display:inline-block">
+            <span style="font-size:24px;font-weight:800;color:#ffffff;letter-spacing:-0.8px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif">clini</span><span style="font-size:24px;font-weight:800;color:#22c55e;letter-spacing:-0.8px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif">flux</span>
+          </a>
+          <p style="margin:6px 0 0;font-size:12px;color:rgba(255,255,255,0.5);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif">Automatización WhatsApp para clínicas</p>
+        </td>
+      </tr>
+    </table>
+  </td></tr>
+  <!-- BODY -->
+  <tr><td style="background:#ffffff;padding:44px 44px 36px;border-left:1px solid #e5e7eb;border-right:1px solid #e5e7eb">
+    ${body}
+  </td></tr>
+  <!-- FOOTER -->
+  <tr><td style="background:#f9fafb;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 16px 16px;padding:22px 44px">
+    <table width="100%" cellpadding="0" cellspacing="0" border="0">
+      <tr>
+        <td><span style="font-size:15px;font-weight:800;color:#16a34a;letter-spacing:-0.4px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif">cliniflux</span></td>
+        <td align="right"><a href="https://cliniflux.es" style="font-size:12px;color:#6b7280;text-decoration:none;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;margin-left:16px">Web</a>&nbsp;&nbsp;<a href="mailto:contacto@cliniflux.es" style="font-size:12px;color:#6b7280;text-decoration:none;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;margin-left:8px">Contacto</a></td>
+      </tr>
+      <tr><td colspan="2" style="padding-top:12px"><p style="margin:0;font-size:11px;color:#9ca3af;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif">© 2025 Cliniflux. Si tienes dudas, escríbenos a <a href="mailto:contacto@cliniflux.es" style="color:#16a34a;text-decoration:none">contacto@cliniflux.es</a></p></td></tr>
+    </table>
+  </td></tr>
+</table>
+</td></tr>
+</table>
 </body></html>`;
 
 function emailSetupLink(name, plan, setupUrl) {
   const planLabel = { starter: 'Starter', pro: 'Pro', clinica: 'Clínica' }[plan] || plan;
   const firstName = name.split(' ')[0];
   return EMAIL_BASE(`
-<div class="pill">Plan ${planLabel} activado</div>
-<h1>¡Bienvenido/a a Cliniflux, ${firstName}!</h1>
-<p class="subtitle">Tu suscripción está activa. Ya solo falta un paso.</p>
-<p>Hola ${firstName}, nos alegra mucho tenerte a bordo 🎉</p>
-<p>En menos de <strong>5 minutos</strong> puedes tener tu clínica configurada y lista para que Natalia empiece a atender pacientes en WhatsApp — incluso fuera de horario.</p>
-<ol class="step-list">
-  <li><span class="step-n">1</span><span class="step-text"><strong>Configura tu clínica</strong> — nombre, servicios, horario y precios</span></li>
-  <li><span class="step-n">2</span><span class="step-text"><strong>Personaliza a Natalia</strong> — tono, nombre del asistente y más</span></li>
-  <li><span class="step-n">3</span><span class="step-text"><strong>Conecta WhatsApp</strong> — te guiamos paso a paso</span></li>
-</ol>
-<div class="btn-wrap"><a href="${setupUrl}" class="btn">Configurar mi clínica ahora →</a></div>
-<div class="note-box"><p>🔒 Este enlace es personal y de un solo uso. Si tienes cualquier problema, responde directamente a este email y te ayudamos enseguida.</p></div>
+<p style="margin:0 0 20px"><span style="display:inline-block;background:#dcfce7;color:#15803d;font-size:11px;font-weight:700;letter-spacing:0.6px;padding:5px 14px;border-radius:100px;text-transform:uppercase;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif">Plan ${planLabel} activado</span></p>
+<h1 style="margin:0 0 8px;font-size:26px;font-weight:800;color:#0f172a;letter-spacing:-0.6px;line-height:1.2;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif">¡Bienvenido/a a Cliniflux, ${firstName}!</h1>
+<p style="margin:0 0 28px;font-size:16px;color:#64748b;line-height:1.6;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif">Tu suscripción está activa. Ya solo falta un paso.</p>
+<p style="margin:0 0 18px;font-size:15px;color:#475569;line-height:1.8;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif">Hola ${firstName}, nos alegra mucho tenerte a bordo 🎉</p>
+<p style="margin:0 0 24px;font-size:15px;color:#475569;line-height:1.8;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif">En menos de <strong style="color:#0f172a;font-weight:600">5 minutos</strong> puedes tener tu clínica configurada y lista para que Natalia empiece a atender pacientes en WhatsApp — incluso fuera de horario.</p>
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:28px">
+  <tr><td style="padding:12px 0;border-bottom:1px solid #f1f5f1">
+    <table cellpadding="0" cellspacing="0" border="0"><tr>
+      <td style="width:32px;height:32px;background:#dcfce7;border-radius:50%;text-align:center;vertical-align:middle"><span style="font-size:13px;font-weight:800;color:#16a34a;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;line-height:32px">1</span></td>
+      <td style="padding-left:12px;font-size:14px;color:#475569;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;line-height:1.6"><strong style="color:#0f172a">Configura tu clínica</strong> — nombre, servicios, horario y precios</td>
+    </tr></table>
+  </td></tr>
+  <tr><td style="padding:12px 0;border-bottom:1px solid #f1f5f1">
+    <table cellpadding="0" cellspacing="0" border="0"><tr>
+      <td style="width:32px;height:32px;background:#dcfce7;border-radius:50%;text-align:center;vertical-align:middle"><span style="font-size:13px;font-weight:800;color:#16a34a;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;line-height:32px">2</span></td>
+      <td style="padding-left:12px;font-size:14px;color:#475569;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;line-height:1.6"><strong style="color:#0f172a">Personaliza a Natalia</strong> — tono, nombre del asistente y más</td>
+    </tr></table>
+  </td></tr>
+  <tr><td style="padding:12px 0">
+    <table cellpadding="0" cellspacing="0" border="0"><tr>
+      <td style="width:32px;height:32px;background:#dcfce7;border-radius:50%;text-align:center;vertical-align:middle"><span style="font-size:13px;font-weight:800;color:#16a34a;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;line-height:32px">3</span></td>
+      <td style="padding-left:12px;font-size:14px;color:#475569;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;line-height:1.6"><strong style="color:#0f172a">Conecta WhatsApp</strong> — te guiamos paso a paso</td>
+    </tr></table>
+  </td></tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:32px 0 24px">
+  <tr><td align="center">
+    <a href="${setupUrl}" style="display:inline-block;background:#16a34a;color:#ffffff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:16px;font-weight:700;text-decoration:none;padding:16px 40px;border-radius:40px;letter-spacing:-0.2px;mso-padding-alt:0" target="_blank">
+      <span style="color:#ffffff;text-decoration:none">Configurar mi clínica ahora →</span>
+    </a>
+  </td></tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr><td style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:16px 20px">
+    <p style="margin:0;font-size:13px;color:#166534;line-height:1.6;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif">🔒 Este enlace es personal y de un solo uso. Si tienes cualquier problema, responde directamente a este email y te ayudamos enseguida.</p>
+  </td></tr>
+</table>
 `, `Tu clínica está a 5 minutos de estar lista. Pulsa aquí para configurarla.`);
 }
 
 function emailWelcomeOnboarding(clinicName, loginUrl) {
   return EMAIL_BASE(`
-<div class="pill">Todo listo</div>
-<h1>${clinicName} ya está en marcha</h1>
-<p class="subtitle">Natalia está lista para atender a tus pacientes.</p>
-<p>¡Enhorabuena! La configuración de <strong>${clinicName}</strong> está completada. A partir de ahora, Natalia responderá a tus pacientes por WhatsApp de forma automática.</p>
-<div class="highlight-box">
-  <div class="big">24/7</div>
-  <div class="small">Tu clínica responde — incluso cuando estás cerrado</div>
-</div>
-<p>Accede a tu panel para ver las conversaciones en tiempo real, revisar citas y ajustar la configuración cuando quieras.</p>
-<div class="btn-wrap"><a href="${loginUrl}" class="btn">Ir a mi panel →</a></div>
-<div class="note-box"><p>💡 Si necesitas ayuda o tienes cualquier duda, estamos a un email de distancia: <strong>contacto@cliniflux.es</strong></p></div>
+<p style="margin:0 0 20px"><span style="display:inline-block;background:#dcfce7;color:#15803d;font-size:11px;font-weight:700;letter-spacing:0.6px;padding:5px 14px;border-radius:100px;text-transform:uppercase;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif">Todo listo</span></p>
+<h1 style="margin:0 0 8px;font-size:26px;font-weight:800;color:#0f172a;letter-spacing:-0.6px;line-height:1.2;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif">${clinicName} ya está en marcha</h1>
+<p style="margin:0 0 28px;font-size:16px;color:#64748b;line-height:1.6;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif">Natalia está lista para atender a tus pacientes.</p>
+<p style="margin:0 0 24px;font-size:15px;color:#475569;line-height:1.8;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif">¡Enhorabuena! La configuración de <strong style="color:#0f172a;font-weight:600">${clinicName}</strong> está completada. A partir de ahora, Natalia responderá a tus pacientes por WhatsApp de forma automática.</p>
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:24px 0">
+  <tr><td style="background:#f0fdf4;border:1px solid #86efac;border-radius:12px;padding:24px;text-align:center">
+    <p style="margin:0 0 4px;font-size:36px;font-weight:800;color:#15803d;letter-spacing:-1px;line-height:1;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif">24/7</p>
+    <p style="margin:0;font-size:13px;color:#166534;font-weight:500;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif">Tu clínica responde — incluso cuando estás cerrado</p>
+  </td></tr>
+</table>
+<p style="margin:0 0 24px;font-size:15px;color:#475569;line-height:1.8;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif">Accede a tu panel para ver las conversaciones en tiempo real, revisar citas y ajustar la configuración cuando quieras.</p>
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:32px 0 24px">
+  <tr><td align="center">
+    <a href="${loginUrl}" style="display:inline-block;background:#16a34a;color:#ffffff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:16px;font-weight:700;text-decoration:none;padding:16px 40px;border-radius:40px;letter-spacing:-0.2px" target="_blank">
+      <span style="color:#ffffff;text-decoration:none">Ir a mi panel →</span>
+    </a>
+  </td></tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr><td style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:16px 20px">
+    <p style="margin:0;font-size:13px;color:#166534;line-height:1.6;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif">💡 Si necesitas ayuda o tienes cualquier duda, estamos a un email de distancia: <strong>contacto@cliniflux.es</strong></p>
+  </td></tr>
+</table>
 `, `${clinicName} está configurada. Natalia ya puede atender a tus pacientes.`);
 }
 
 function emailContactNotification({ nombre, clinica, email, telefono, tipo, mensaje }) {
   const ts = new Date().toLocaleString('es-ES', { dateStyle: 'short', timeStyle: 'short' });
   return EMAIL_BASE(`
-<div class="pill">Nuevo contacto web</div>
-<h1>${tipo}</h1>
-<p class="subtitle">Recibido el ${ts}</p>
-<div class="divider"></div>
-<div class="info-grid">
-  <div class="info-row"><span class="info-label">Nombre</span><span class="info-val"><strong>${nombre}</strong></span></div>
-  <div class="info-row"><span class="info-label">Clínica</span><span class="info-val">${clinica||'—'}</span></div>
-  <div class="info-row"><span class="info-label">Email</span><span class="info-val"><a href="mailto:${email}" style="color:#16a34a;font-weight:600">${email}</a></span></div>
-  <div class="info-row"><span class="info-label">Teléfono</span><span class="info-val">${telefono||'—'}</span></div>
-</div>
-${mensaje ? `<div class="divider"></div><p style="font-size:14px;color:#334155;background:#f8f9fb;border-radius:10px;padding:16px 18px;margin:0;line-height:1.7;border-left:3px solid #22c55e">${mensaje}</p>` : ''}
-<div class="btn-wrap" style="margin-top:28px"><a href="mailto:${email}" class="btn">Responder a ${nombre.split(' ')[0]} →</a></div>
+<p style="margin:0 0 20px"><span style="display:inline-block;background:#dcfce7;color:#15803d;font-size:11px;font-weight:700;letter-spacing:0.6px;padding:5px 14px;border-radius:100px;text-transform:uppercase;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif">Nuevo contacto web</span></p>
+<h1 style="margin:0 0 8px;font-size:24px;font-weight:800;color:#0f172a;letter-spacing:-0.4px;line-height:1.2;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif">${tipo}</h1>
+<p style="margin:0 0 24px;font-size:14px;color:#94a3b8;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif">Recibido el ${ts}</p>
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-top:1px solid #f1f5f9;margin-bottom:8px">
+  <tr>
+    <td style="padding:12px 16px 12px 0;font-size:12px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;white-space:nowrap;vertical-align:top;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;border-bottom:1px solid #f1f5f9">Nombre</td>
+    <td style="padding:12px 0;font-size:14px;color:#0f172a;font-weight:600;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;border-bottom:1px solid #f1f5f9">${nombre}</td>
+  </tr>
+  <tr>
+    <td style="padding:12px 16px 12px 0;font-size:12px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;white-space:nowrap;vertical-align:top;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;border-bottom:1px solid #f1f5f9">Clínica</td>
+    <td style="padding:12px 0;font-size:14px;color:#334155;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;border-bottom:1px solid #f1f5f9">${clinica||'—'}</td>
+  </tr>
+  <tr>
+    <td style="padding:12px 16px 12px 0;font-size:12px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;white-space:nowrap;vertical-align:top;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;border-bottom:1px solid #f1f5f9">Email</td>
+    <td style="padding:12px 0;border-bottom:1px solid #f1f5f9"><a href="mailto:${email}" style="font-size:14px;color:#16a34a;font-weight:600;text-decoration:none;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif">${email}</a></td>
+  </tr>
+  <tr>
+    <td style="padding:12px 16px 12px 0;font-size:12px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;white-space:nowrap;vertical-align:top;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif">Teléfono</td>
+    <td style="padding:12px 0;font-size:14px;color:#334155;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif">${telefono||'—'}</td>
+  </tr>
+</table>
+${mensaje ? `<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:20px 0"><tr><td style="background:#f8f9fb;border-left:3px solid #22c55e;border-radius:0 8px 8px 0;padding:16px 18px"><p style="margin:0;font-size:14px;color:#334155;line-height:1.7;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif">${mensaje}</p></td></tr></table>` : ''}
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:28px">
+  <tr><td align="center">
+    <a href="mailto:${email}" style="display:inline-block;background:#16a34a;color:#ffffff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:15px;font-weight:700;text-decoration:none;padding:14px 36px;border-radius:40px" target="_blank">
+      <span style="color:#ffffff;text-decoration:none">Responder a ${nombre.split(' ')[0]} →</span>
+    </a>
+  </td></tr>
+</table>
 `, `${nombre} de ${clinica||'una clínica'} quiere hablar contigo.`);
 }
 
