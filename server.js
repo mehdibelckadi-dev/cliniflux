@@ -16,7 +16,9 @@ async function sendEmail({ to, subject, html, replyTo }) {
   // Resend (preferido — HTTP, sin problemas de firewall)
   if (process.env.RESEND_API_KEY) {
     try {
-      const body = { from, to, subject, html };
+      // Si dominio no verificado, enviar a la cuenta Resend como fallback
+      const toAddr = process.env.RESEND_VERIFIED ? to : (process.env.EMAIL_NOTIFY || to);
+      const body = { from, to: toAddr, subject: toAddr !== to ? `[PARA: ${to}] ${subject}` : subject, html };
       if (replyTo) body.reply_to = replyTo;
       const r = await fetch('https://api.resend.com/emails', {
         method: 'POST',
