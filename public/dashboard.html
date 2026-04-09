@@ -266,8 +266,8 @@
     <div class="tb-logo">CF</div>
   </div>
   <div class="tb-clinic">
-    <span class="tb-clinic-name">Clínica Demo</span>
-    <span class="tb-clinic-tag">Vista previa</span>
+    <span class="tb-clinic-name" id="tb-clinic-name-main"></span>
+    <span class="tb-clinic-tag" id="tb-plan-tag"></span>
   </div>
   <div class="tb-right">
     <div class="tb-ia"><div class="tb-ia-dot"></div>IA activa</div>
@@ -302,7 +302,7 @@
       <div class="si-tooltip">Ajustes</div>
     </div>
     <div class="si-bottom">
-      <div class="si-ava">Dr</div>
+      <div class="si-ava" id="si-ava">CF</div>
     </div>
   </nav>
 
@@ -402,23 +402,15 @@
     <div class="panel p-agenda" id="panel-1">
       <div class="ag-hd">
         <div>
-          <div class="ag-title-day">Hoy · Miércoles</div>
-          <div class="ag-title-full">2 de Abril, 2026</div>
+          <div class="ag-title-day" id="ag-day-label"></div>
+          <div class="ag-title-full" id="ag-date-full"></div>
         </div>
         <div class="ag-count">
-          <div class="ag-count-n">8</div>
+          <div class="ag-count-n" id="ag-count-n">0</div>
           <div class="ag-count-l">citas hoy</div>
         </div>
       </div>
-      <div class="ag-week">
-        <div class="ag-wd"><div class="ag-wd-lbl">L</div><div class="ag-wd-num">30</div></div>
-        <div class="ag-wd has-dot"><div class="ag-wd-lbl">M</div><div class="ag-wd-num">1</div></div>
-        <div class="ag-wd today"><div class="ag-wd-lbl">X</div><div class="ag-wd-num">2</div></div>
-        <div class="ag-wd has-dot"><div class="ag-wd-lbl">J</div><div class="ag-wd-num">3</div></div>
-        <div class="ag-wd has-dot"><div class="ag-wd-lbl">V</div><div class="ag-wd-num">4</div></div>
-        <div class="ag-wd"><div class="ag-wd-lbl">S</div><div class="ag-wd-num">5</div></div>
-        <div class="ag-wd"><div class="ag-wd-lbl">D</div><div class="ag-wd-num">6</div></div>
-      </div>
+      <div class="ag-week" id="ag-week"></div>
       <div class="ag-body">
         <div class="ag-list">
           <div class="ag-slot"><div class="slot-bar" style="background:#16a34a"></div><div class="ag-time">09:00</div><div class="ag-info"><div class="ag-name">Laura Martínez</div><div class="ag-svc">Revisión dental · Dr. Ruiz</div></div><div class="ag-badge conf">✓ Confirmada</div></div>
@@ -672,7 +664,7 @@
     document.getElementById('wa-dot').classList.toggle('active', waConfigured);
     document.getElementById('wa-status-txt').textContent = waConfigured ? 'Conectado: ' + d.whatsapp_number : 'Sin configurar';
     document.getElementById('webhook-url').textContent = location.origin + '/webhook/whatsapp';
-    const plans = { starter:'Starter — Chat web 24/7, hasta 500 conversaciones/mes', pro:'Pro — Web + WhatsApp, 2.000 conversaciones/mes, Calendar', clinica:'Clínica — Todo incluido, reactivación de pacientes, soporte 24/7' };
+    const plans = { starter:'Starter — WhatsApp 24/7, hasta 300 conversaciones/mes', pro:'Pro — WhatsApp + reactivación de pacientes, 2.000 conversaciones/mes', clinica:'Clínica — Todo incluido, multi-sede, reactivación y soporte 24/7' };
     document.getElementById('s-plan-badge').textContent = (d.plan || 'starter').charAt(0).toUpperCase() + (d.plan||'starter').slice(1);
     document.getElementById('s-plan-desc').textContent = plans[d.plan] || plans.starter;
   }
@@ -719,11 +711,41 @@
       const r = await fetch('/api/me');
       if (!r.ok) { window.location.href = '/login'; return; }
       const me = await r.json();
+      // Topbar
       document.getElementById('tb-clinic-name').textContent = me.name;
-      document.querySelector('.tb-clinic-name').textContent = me.name;
+      document.getElementById('tb-clinic-name-main').textContent = me.name;
+      const planTag = document.getElementById('tb-plan-tag');
+      if (planTag) { planTag.textContent = (me.plan||'starter').charAt(0).toUpperCase()+(me.plan||'starter').slice(1); }
+      // Avatar sidebar
+      const ava = document.getElementById('si-ava');
+      if (ava) ava.textContent = (me.name||'CF').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+      // Agenda dinámica
+      initAgenda();
       loadData();
     } catch { window.location.href = '/login'; }
   })();
+
+  function initAgenda() {
+    const days = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+    const months = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+    const today = new Date();
+    const dow = today.getDay(); // 0=Dom
+    document.getElementById('ag-day-label').textContent = `Hoy · ${days[dow]}`;
+    document.getElementById('ag-date-full').textContent = `${today.getDate()} de ${months[today.getMonth()]}, ${today.getFullYear()}`;
+    // Semana: lunes a domingo
+    const week = document.getElementById('ag-week');
+    const monday = new Date(today); monday.setDate(today.getDate() - (dow===0?6:dow-1));
+    const lbls = ['L','M','X','J','V','S','D'];
+    week.innerHTML = '';
+    for (let i=0; i<7; i++) {
+      const d = new Date(monday); d.setDate(monday.getDate()+i);
+      const isToday = d.toDateString()===today.toDateString();
+      const div = document.createElement('div');
+      div.className = 'ag-wd' + (isToday?' today':'');
+      div.innerHTML = `<div class="ag-wd-lbl">${lbls[i]}</div><div class="ag-wd-num">${d.getDate()}</div>`;
+      week.appendChild(div);
+    }
+  }
 
   async function logout() {
     await fetch('/auth/logout', { method: 'POST' });
@@ -822,7 +844,7 @@
         <div class="ag-badge conf">✓ Confirmada</div>`;
       list.appendChild(div);
     });
-    document.querySelector('.ag-count-n').textContent = appts.length;
+    document.getElementById('ag-count-n').textContent = appts.length;
   }
 
   function timeAgo(dateStr) {
