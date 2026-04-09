@@ -203,7 +203,7 @@ ${mensaje ? `<table width="100%" cellpadding="0" cellspacing="0" border="0" styl
 const STRIPE_PRICES = {
   starter: { mes: 'price_1TJuFFCzcmmCvDMjzNORnnZC', ano: 'price_1TJuFFCzcmmCvDMjrctpYWqo' },
   pro:     { mes: 'price_1TJuGDCzcmmCvDMjWWEk2LmF', ano: 'price_1TJuGrCzcmmCvDMjBHhWsDj0' },
-  clinica: { mes: 'price_1TJuICCzcmmCvDMjUiur152i', ano: 'price_1TJuICCzcmmCvDMjUiur152i' }
+  clinica: { mes: 'price_1TJuHZCzcmmCvDMjlQXorUBN', ano: 'price_1TJuICCzcmmCvDMjUiur152i' }
 };
 
 const app = express();
