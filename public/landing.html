@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>cliniflux — WhatsApp IA para clínicas</title>
+  <title>Cliniflux — Automatización WhatsApp para clínicas</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -32,6 +32,41 @@
       --r-sm:8px;--r-md:12px;--r-lg:18px;--r-xl:24px;
       --sy:112px;--cmax:1160px;--px:48px;
     }
+
+
+
+    /* ROI CALC */
+    .roi-calc{background:#fff;border:1px solid var(--border);border-radius:var(--r-xl);padding:36px 40px}
+    .roi-inputs{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:28px}
+    .roi-field{display:flex;flex-direction:column;gap:10px}
+    .roi-label{font-size:13px;font-weight:600;color:var(--text)}
+    .roi-slider-wrap{display:flex;align-items:center;gap:12px}
+    .roi-slider{flex:1;-webkit-appearance:none;height:5px;border-radius:3px;background:var(--green-dim2);outline:none;cursor:pointer}
+    .roi-slider::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--green);cursor:pointer;box-shadow:0 2px 8px rgba(22,163,74,.3)}
+    .roi-val{font-size:14px;font-weight:700;color:var(--green);min-width:44px;text-align:right}
+    .roi-result{display:flex;align-items:center;background:var(--bg2);border-radius:var(--r-lg);padding:24px 32px;gap:0}
+    .roi-res-item{flex:1;text-align:center}
+    .roi-res-n{font-size:28px;font-weight:800;color:var(--green);letter-spacing:-1px;line-height:1}
+    .roi-res-l{font-size:12px;color:var(--text2);margin-top:4px;font-weight:500}
+    .roi-res-div{width:1px;height:44px;background:var(--border2)}
+    @media(max-width:640px){.roi-inputs{grid-template-columns:1fr}.roi-calc{padding:24px 20px}.roi-result{flex-direction:column;gap:16px;padding:20px}.roi-res-div{width:44px;height:1px}}
+
+    /* FLUJO MÓVIL — alternativa dinámica */
+    .flow-mobile{display:none}
+    @media(max-width:640px){
+      .flow2-section .flow2-grid{display:none}
+      .flow-mobile{display:block;padding:0 4px}
+    }
+    .flow-mob-steps{display:flex;flex-direction:column;gap:0}
+    .flow-mob-step{display:flex;gap:14px;align-items:flex-start;padding:16px 0;border-bottom:1px solid var(--border)}
+    .flow-mob-step:last-child{border-bottom:none}
+    .flow-mob-num{width:32px;height:32px;border-radius:50%;background:var(--green);color:#fff;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+    .flow-mob-body{flex:1}
+    .flow-mob-title{font-size:15px;font-weight:700;color:var(--text);margin-bottom:4px}
+    .flow-mob-desc{font-size:13px;color:var(--text2);line-height:1.6}
+    .flow-mob-result{margin-top:20px;background:linear-gradient(135deg,#14532d,#16a34a);border-radius:var(--r-lg);padding:20px;text-align:center}
+    .flow-mob-result-n{font-size:32px;font-weight:800;color:#fff;letter-spacing:-1px}
+    .flow-mob-result-l{font-size:13px;color:rgba(255,255,255,.75);margin-top:4px}
 
     /* REACTIVACIÓN */
     .react-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-bottom:40px}
@@ -565,6 +600,7 @@
       .dash-tabs{flex-wrap:nowrap;gap:6px}
       .dash-tab{font-size:11px;padding:6px 12px}
       .dash-panels{height:420px}
+      .hero-visual{display:none}
       .dash-icons{display:none}
       .dash-body{grid-template-columns:1fr !important}
       .dash-conv-list{display:none}
@@ -963,7 +999,7 @@
         <div class="dash-chrome">
           <div class="tl tl-r"></div><div class="tl tl-y"></div><div class="tl tl-g"></div>
           <div class="dash-chrome-url"><svg class="chrome-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>app.cliniflux.com</div>
-          <div class="dash-chrome-live"><div class="live-dot"></div>IA activa</div>
+          <div class="dash-chrome-live"><div class="live-dot"></div>Cliniflux activo</div>
         </div>
         <!-- Layout: sidebar + content -->
         <div class="dash-layout">
@@ -1285,8 +1321,8 @@
               <div class="pv2-chart-sub">↑ vs. antes de Cliniflux</div>
             </div>
             <div class="pv2-legend">
-              <div class="pv2-leg"><div class="pv2-leg-dot" style="background:#22c55e"></div>Con IA</div>
-              <div class="pv2-leg"><div class="pv2-leg-dot" style="background:#f97316"></div>Sin IA</div>
+              <div class="pv2-leg"><div class="pv2-leg-dot" style="background:#22c55e"></div>Con Cliniflux</div>
+              <div class="pv2-leg"><div class="pv2-leg-dot" style="background:#f97316"></div>Sin Cliniflux</div>
             </div>
           </div>
           <div class="pv2-svg-wrap">
@@ -1308,9 +1344,9 @@
               <!-- Area fills -->
               <polygon points="0,95 42,90 85,80 128,65 171,45 214,30 257,18 300,12 300,110 0,110" fill="url(#gGrad)"/>
               <polygon points="0,80 42,82 85,85 128,83 171,86 214,82 257,85 300,88 300,110 0,110" fill="url(#oGrad)"/>
-              <!-- Sin IA line (flat/declining) -->
+              <!-- Sin Cliniflux line (flat/declining) -->
               <polyline points="0,80 42,82 85,85 128,83 171,86 214,82 257,85 300,88" fill="none" stroke="#f97316" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="4 2"/>
-              <!-- Con IA line (rising) -->
+              <!-- Con Cliniflux line (rising) -->
               <polyline points="0,95 42,90 85,80 128,65 171,45 214,30 257,18 300,12" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
               <!-- End dots -->
               <circle cx="300" cy="12" r="4" fill="#22c55e"/>
@@ -1464,7 +1500,7 @@
         <!-- ── CENTER: Motor IA (spans rows 1-6) ─────────── -->
         <div class="flow2-engine">
           <div class="flow2-eng-live"><div class="flow2-eng-live-dot"></div>IA Activa</div>
-          <div class="flow2-eng-title">Motor IA<br>Cliniflux</div>
+          <div class="flow2-eng-title">Motor<br>Cliniflux</div>
           <div class="flow2-eng-steps">
             <div class="flow2-eng-step"><div class="flow2-eng-step-n">1</div>Recibe el mensaje</div>
             <div class="flow2-eng-step"><div class="flow2-eng-step-n">2</div>Analiza la intención</div>
@@ -1581,8 +1617,8 @@
             <div class="sc2-a-chart-hd">
               <span class="sc2-a-chart-title">CITAS CONFIRMADAS — ÚLTIMOS 7 DÍAS</span>
               <div class="sc2-a-legend">
-                <div class="sc2-a-leg"><div class="sc2-a-leg-dot" style="background:#22c55e"></div>Con IA</div>
-                <div class="sc2-a-leg"><div class="sc2-a-leg-dot" style="background:#374151"></div>Sin IA</div>
+                <div class="sc2-a-leg"><div class="sc2-a-leg-dot" style="background:#22c55e"></div>Con Cliniflux</div>
+                <div class="sc2-a-leg"><div class="sc2-a-leg-dot" style="background:#374151"></div>Sin Cliniflux</div>
               </div>
             </div>
             <div class="sc2-a-chart-wrap">
@@ -1739,6 +1775,44 @@
         <button class="faq-q">¿Puedo cancelar en cualquier momento? <span class="faq-icon">+</span></button>
         <div class="faq-a"><p>Sí, sin permanencias ni penalizaciones. Si en algún momento decides cancelar, conservas acceso hasta el final del período pagado y te devolvemos todos tus datos en un formato estándar.</p></div>
       </div>
+
+      <!-- Versión móvil del flujo -->
+      <div class="flow-mobile">
+        <div class="flow-mob-steps">
+          <div class="flow-mob-step">
+            <div class="flow-mob-num">1</div>
+            <div class="flow-mob-body">
+              <div class="flow-mob-title">Paciente escribe por WhatsApp</div>
+              <div class="flow-mob-desc">A cualquier hora, sin esperas. Cliniflux recibe el mensaje al instante.</div>
+            </div>
+          </div>
+          <div class="flow-mob-step">
+            <div class="flow-mob-num">2</div>
+            <div class="flow-mob-body">
+              <div class="flow-mob-title">Natalia responde en segundos</div>
+              <div class="flow-mob-desc">Entiende la consulta, informa de servicios y precios, y propone hueco en la agenda.</div>
+            </div>
+          </div>
+          <div class="flow-mob-step">
+            <div class="flow-mob-num">3</div>
+            <div class="flow-mob-body">
+              <div class="flow-mob-title">Cita confirmada automáticamente</div>
+              <div class="flow-mob-desc">El paciente elige horario y queda registrado. Tu equipo recibe la notificación.</div>
+            </div>
+          </div>
+          <div class="flow-mob-step">
+            <div class="flow-mob-num">4</div>
+            <div class="flow-mob-body">
+              <div class="flow-mob-title">Recordatorio 24h antes</div>
+              <div class="flow-mob-desc">Cliniflux envía recordatorio automático. Reduce no-shows hasta un 40%.</div>
+            </div>
+          </div>
+        </div>
+        <div class="flow-mob-result">
+          <div class="flow-mob-result-n">+47%</div>
+          <div class="flow-mob-result-l">más citas confirmadas de media</div>
+        </div>
+      </div>
     </div>
   </div>
 </section>
@@ -1775,18 +1849,56 @@
       </div>
     </div>
     <div class="react-banner reveal d2">
-      <div class="react-banner-stat">
-        <div class="react-banner-label">RESULTADO REAL</div>
-        <div class="react-banner-num">&gt;80 pacientes</div>
-        <div class="react-banner-sub">reactivados en el primer mes</div>
-      </div>
-      <div class="react-banner-div"></div>
+      <div class="react-banner-div" style="display:none"></div>
       <div class="react-banner-quote">
         <p>"Reactivamos más de 80 pacientes inactivos en el primer mes. El ROI fue inmediato. No podría imaginar la clínica sin esta herramienta."</p>
         <div class="react-banner-author">— Roberto G., Director médico · Clínica estética, Barcelona</div>
       </div>
       <a href="/contacto?plan=clinica" class="btn-primary" style="background:#fff;color:var(--green);font-weight:700;padding:12px 24px;border-radius:40px;flex-shrink:0">Ver cómo funciona →</a>
     </div>
+
+  <!-- Calculadora ROI -->
+  <div class="roi-calc reveal d3" style="margin-top:40px">
+    <div style="text-align:center;margin-bottom:28px">
+      <div class="label" style="justify-content:center;margin-bottom:10px">Calculadora de impacto</div>
+      <h3 style="font-size:22px;font-weight:700;letter-spacing:-.5px;color:var(--text);margin:0 0 8px">¿Cuánto puede recuperar tu clínica?</h3>
+      <p style="font-size:14px;color:var(--text2);margin:0">Estimación orientativa. Los resultados reales varían según clínica.</p>
+    </div>
+    <div class="roi-inputs">
+      <div class="roi-field">
+        <label class="roi-label">Pacientes inactivos (leads)</label>
+        <div class="roi-slider-wrap">
+          <input type="range" min="50" max="1000" step="50" value="200" class="roi-slider" id="roiLeads" oninput="calcROI()">
+          <span class="roi-val" id="roiLeadsVal">200</span>
+        </div>
+      </div>
+      <div class="roi-field">
+        <label class="roi-label">Ticket medio por visita (€)</label>
+        <div class="roi-slider-wrap">
+          <input type="range" min="50" max="500" step="10" value="120" class="roi-slider" id="roiTicket" oninput="calcROI()">
+          <span class="roi-val" id="roiTicketVal">120€</span>
+        </div>
+      </div>
+    </div>
+    <div class="roi-result" id="roiResult">
+      <div class="roi-res-item">
+        <div class="roi-res-n" id="roiCitas">32</div>
+        <div class="roi-res-l">Citas estimadas</div>
+      </div>
+      <div class="roi-res-div"></div>
+      <div class="roi-res-item">
+        <div class="roi-res-n" id="roiIngresos">3.840€</div>
+        <div class="roi-res-l">Ingresos potenciales</div>
+      </div>
+      <div class="roi-res-div"></div>
+      <div class="roi-res-item">
+        <div class="roi-res-n" id="roiROI">+19x</div>
+        <div class="roi-res-l">ROI vs. plan Cliniflux</div>
+      </div>
+    </div>
+    <p style="text-align:center;font-size:11px;color:var(--text3);margin-top:14px">Estimación basada en tasa de reactivación media del 16%. Sin garantías de resultados.</p>
+  </div>
+
   </div>
 </section>
 
@@ -2001,6 +2113,21 @@
     document.getElementById('togMes').classList.toggle('active', mode==='mes');
     document.getElementById('togAno').classList.toggle('active', mode==='ano');
   }
+
+  function calcROI() {
+    const leads = parseInt(document.getElementById('roiLeads').value);
+    const ticket = parseInt(document.getElementById('roiTicket').value);
+    document.getElementById('roiLeadsVal').textContent = leads;
+    document.getElementById('roiTicketVal').textContent = ticket + '€';
+    const citas = Math.round(leads * 0.16);
+    const ingresos = citas * ticket;
+    const planCost = 199; // Pro plan
+    const roi = Math.round(ingresos / planCost);
+    document.getElementById('roiCitas').textContent = citas;
+    document.getElementById('roiIngresos').textContent = ingresos.toLocaleString('es-ES') + '€';
+    document.getElementById('roiROI').textContent = '+' + roi + 'x';
+  }
+
   async function startCheckout(plan) {
     try {
       const res = await fetch('/api/checkout', {
