@@ -10,27 +10,38 @@ const { pool, initDb, getSession, saveSession, saveLead, getClinicByEmail, getCl
 const stripe = process.env.STRIPE_SECRET_KEY ? Stripe(process.env.STRIPE_SECRET_KEY) : null;
 const nodemailer = require('nodemailer');
 
-function getMailTransport() {
-  if (!process.env.SMTP_HOST || !process.env.SMTP_USER || !process.env.SMTP_PASS) return null;
-  const port = parseInt(process.env.SMTP_PORT || '465');
-  return nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port,
-    secure: port === 465,
-    auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS },
-    connectionTimeout: 10000,
-    greetingTimeout: 10000,
-    socketTimeout: 15000,
-  });
-}
-
 async function sendEmail({ to, subject, html, replyTo }) {
-  const t = getMailTransport();
-  if (!t) return;
-  const from = process.env.EMAIL_FROM || `"Cliniflux" <${process.env.SMTP_USER}>`;
+  const from = process.env.EMAIL_FROM || 'Cliniflux <contacto@cliniflux.es>';
+
+  // Resend (preferido — HTTP, sin problemas de firewall)
+  if (process.env.RESEND_API_KEY) {
+    try {
+      const body = { from, to, subject, html };
+      if (replyTo) body.reply_to = replyTo;
+      const r = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${process.env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      const data = await r.json();
+      if (!r.ok) throw new Error(JSON.stringify(data));
+      console.log('Email enviado via Resend:', data.id);
+    } catch(e) { console.error('Resend error:', e.message); }
+    return;
+  }
+
+  // Fallback SMTP (nodemailer)
+  if (!process.env.SMTP_HOST || !process.env.SMTP_USER || !process.env.SMTP_PASS) return;
+  const port = parseInt(process.env.SMTP_PORT || '465');
+  const t = nodemailer.createTransport({
+    host: process.env.SMTP_HOST, port, secure: port === 465,
+    auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS },
+    connectionTimeout: 10000, socketTimeout: 15000,
+  });
   try {
     await t.sendMail({ from, to, subject, html, replyTo });
-  } catch(e) { console.error('Email error:', e.message); }
+    console.log('Email enviado via SMTP');
+  } catch(e) { console.error('SMTP error:', e.message); }
 }
 
 // ── Plantillas de email ──────────────────────────────────────────────────────
