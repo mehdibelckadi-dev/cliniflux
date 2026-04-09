@@ -77,10 +77,15 @@ async function initDb() {
   `);
 
   // Migraciones: añadir columnas si no existen
-  await pool.query(`ALTER TABLE clinics ADD COLUMN IF NOT EXISTS setup_token TEXT`);
-  await pool.query(`ALTER TABLE clinics ADD COLUMN IF NOT EXISTS stripe_customer_id TEXT`);
-  await pool.query(`ALTER TABLE clinics ADD COLUMN IF NOT EXISTS stripe_subscription_id TEXT`);
-  await pool.query(`ALTER TABLE leads ADD COLUMN IF NOT EXISTS clinic_id INTEGER`);
+  const migrations = [
+    `ALTER TABLE clinics ADD COLUMN IF NOT EXISTS setup_token TEXT`,
+    `ALTER TABLE clinics ADD COLUMN IF NOT EXISTS whatsapp_number TEXT`,
+    `ALTER TABLE clinics ADD COLUMN IF NOT EXISTS plan TEXT DEFAULT 'starter'`,
+    `ALTER TABLE clinics ADD COLUMN IF NOT EXISTS stripe_customer_id TEXT`,
+    `ALTER TABLE clinics ADD COLUMN IF NOT EXISTS stripe_subscription_id TEXT`,
+    `ALTER TABLE leads ADD COLUMN IF NOT EXISTS clinic_id INTEGER`,
+  ];
+  for (const sql of migrations) await pool.query(sql);
 
   // Seed demo clinic if not exists
   const { rows } = await pool.query("SELECT id FROM clinics WHERE email = 'demo@cliniflux.com'");
