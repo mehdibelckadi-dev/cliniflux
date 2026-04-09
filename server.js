@@ -294,6 +294,13 @@ function requireAuth(req, res, next) {
   res.redirect('/login');
 }
 
+function requirePlan(...plans) {
+  return (req, res, next) => {
+    if (plans.includes(req.session?.clinic?.plan)) return next();
+    res.status(403).json({ error: 'Esta función requiere el plan Pro o Clínica.', upgrade: true });
+  };
+}
+
 // ── Demo prompt (BarnaDental) — usado por /demo y /webhook sin clinic_id ───
 function buildDemoPrompt() {
   const now = new Date();
@@ -470,7 +477,7 @@ app.get('/api/dashboard/leads', requireAuth, async (req, res) => {
 });
 
 // ── Importar leads (CSV raw text) ───────────────────────────────────────────
-app.post('/api/leads/import', requireAuth, rateLimit(10, 60000), async (req, res) => {
+app.post('/api/leads/import', requireAuth, requirePlan('pro','clinica'), rateLimit(10, 60000), async (req, res) => {
   try {
     const { csv } = req.body;
     if (!csv || typeof csv !== 'string') return res.status(400).json({ error: 'CSV vacío' });
@@ -500,12 +507,12 @@ app.post('/api/leads/import', requireAuth, rateLimit(10, 60000), async (req, res
   }
 });
 
-app.get('/api/leads/imported', requireAuth, async (req, res) => {
+app.get('/api/leads/imported', requireAuth, requirePlan('pro','clinica'), async (req, res) => {
   try { res.json(await getImportedLeads(req.session.clinic.id)); }
   catch (err) { res.status(500).json({ error: 'Error' }); }
 });
 
-app.patch('/api/leads/imported/:id', requireAuth, async (req, res) => {
+app.patch('/api/leads/imported/:id', requireAuth, requirePlan('pro','clinica'), async (req, res) => {
   try {
     await updateLeadEstado(req.params.id, req.body.estado);
     res.json({ ok: true });
@@ -513,7 +520,7 @@ app.patch('/api/leads/imported/:id', requireAuth, async (req, res) => {
 });
 
 // Exportar a CSV (compatible Google Sheets)
-app.get('/api/leads/export', requireAuth, async (req, res) => {
+app.get('/api/leads/export', requireAuth, requirePlan('pro','clinica'), async (req, res) => {
   try {
     const leads = await getImportedLeads(req.session.clinic.id);
     const header = 'nombre,telefono,email,ultima_visita,servicio,notas,estado,creado';

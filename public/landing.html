@@ -427,6 +427,7 @@
     .pr-setup-note{text-align:center;font-size:13px;color:var(--text2);background:var(--green-dim);border:1px solid rgba(22,163,74,0.2);border-radius:100px;padding:8px 20px;width:fit-content;margin:0 auto 28px}
     .pr-wa-note{font-size:11px;color:var(--text3);text-align:center;margin-bottom:10px}
     .pfc-wa{background:rgba(37,211,102,0.15)!important;color:#25d366!important}
+    .pr-badge-soon{display:inline-block;font-size:9px;font-weight:700;background:var(--orange-dim);color:var(--orange);padding:2px 7px;border-radius:100px;letter-spacing:.3px;margin-left:4px;vertical-align:middle}
     .pr-footer-note{text-align:center;font-size:12px;color:var(--text3);margin-top:20px}
     .btn-wa-hero{font-family:inherit;font-size:15px;font-weight:600;color:#fff;background:#25d366;border:none;padding:12px 24px;border-radius:40px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:7px;transition:all .2s}
     .btn-wa-hero:hover{background:#128c7e;transform:translateY(-1px);box-shadow:0 4px 20px rgba(37,211,102,0.4)}
@@ -1855,7 +1856,7 @@
         <p>"Reactivamos más de 80 pacientes inactivos en el primer mes. El ROI fue inmediato. No podría imaginar la clínica sin esta herramienta."</p>
         <div class="react-banner-author">— Roberto G., Director médico · Clínica estética, Barcelona</div>
       </div>
-      <a href="/contacto?plan=clinica" class="btn-primary" style="background:#fff;color:var(--green);font-weight:700;padding:12px 24px;border-radius:40px;flex-shrink:0">Ver cómo funciona →</a>
+      <a href="#precios" class="btn-primary" style="background:#fff;color:var(--green);font-weight:700;padding:12px 24px;border-radius:40px;flex-shrink:0">Ver planes →</a>
     </div>
 
   <!-- Calculadora ROI -->
@@ -1923,14 +1924,14 @@
         <div class="pr-per">/ mes · 1 clínica</div>
         <div class="pr-div"></div>
         <ul class="pr-feats">
-          <li><div class="pfc">✓</div>Asistente web 24/7</li>
+          <li><div class="pfc pfc-wa">✓</div><strong>WhatsApp Business 24/7</strong></li>
           <li><div class="pfc">✓</div>Gestión de citas automática</li>
-          <li><div class="pfc">✓</div>Hasta 500 conversaciones/mes</li>
+          <li><div class="pfc">✓</div>Hasta 300 conversaciones/mes</li>
           <li><div class="pfc">✓</div>Panel de control básico</li>
+          <li><div class="pfc">✓</div>Personalización de Natalia</li>
           <li><div class="pfc">✓</div>Setup gratuito incluido</li>
-          <li><div class="pfc">✓</div>Soporte por email</li>
+          <li><div class="pfc">✓</div>Soporte por email (48h)</li>
         </ul>
-        <div class="pr-wa-note">💬 WhatsApp disponible en Pro</div>
         <button class="btn-pl btn-pl-out" onclick="startCheckout('starter')">Empezar ahora →</button>
       </div>
       <div class="pr-card hot reveal d1">
@@ -1941,11 +1942,12 @@
         <div class="pr-div"></div>
         <ul class="pr-feats">
           <li><div class="pfc">✓</div>Todo lo de Starter</li>
-          <li><div class="pfc pfc-wa">✓</div><strong>WhatsApp Business 24/7</strong></li>
-          <li><div class="pfc">✓</div>2.000 conversaciones/mes</li>
-          <li><div class="pfc">✓</div>Integración Google Calendar</li>
-          <li><div class="pfc">✓</div>Panel de control avanzado</li>
-          <li><div class="pfc">✓</div>Soporte prioritario</li>
+          <li><div class="pfc">✓</div>Conversaciones ilimitadas</li>
+          <li><div class="pfc pfc-wa">✓</div><strong>Reactivación de leads</strong></li>
+          <li><div class="pfc">✓</div>Importación CSV / Google Sheets</li>
+          <li><div class="pfc">✓</div>Métricas avanzadas en panel</li>
+          <li><div class="pfc">✓</div>Google Calendar <span class="pr-badge-soon">Pronto</span></li>
+          <li><div class="pfc">✓</div>Soporte prioritario (24h)</li>
           <li><div class="pfc">✓</div>Setup gratuito incluido</li>
         </ul>
         <button class="btn-pl btn-pl-sol" onclick="startCheckout('pro')">Empezar ahora →</button>
@@ -1953,15 +1955,15 @@
       <div class="pr-card reveal d2">
         <div class="pr-plan">Clínica</div>
         <div class="pr-amt"><sup>€</sup><span class="pr-price-val">349</span></div>
-        <div class="pr-per">/ mes · 1 clínica</div>
+        <div class="pr-per">/ mes · hasta 3 sedes</div>
         <div class="pr-div"></div>
         <ul class="pr-feats">
           <li><div class="pfc">✓</div>Todo lo de Pro</li>
-          <li><div class="pfc">✓</div>Dashboard en tiempo real</li>
-          <li><div class="pfc">✓</div>Conversaciones ilimitadas</li>
-          <li><div class="pfc">✓</div>Reactivación de pacientes</li>
+          <li><div class="pfc pfc-wa">✓</div><strong>Multi-sede (hasta 3 números)</strong></li>
+          <li><div class="pfc">✓</div>Onboarding personalizado</li>
           <li><div class="pfc">✓</div>Account manager dedicado</li>
           <li><div class="pfc">✓</div>Soporte 24/7 + SLA garantizado</li>
+          <li><div class="pfc">✓</div>Integraciones a medida <span class="pr-badge-soon">Pronto</span></li>
           <li><div class="pfc">✓</div>Setup gratuito incluido</li>
         </ul>
         <button class="btn-pl btn-pl-out" onclick="startCheckout('clinica')">Empezar ahora →</button>

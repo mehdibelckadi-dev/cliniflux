@@ -837,6 +837,16 @@
   async function loadImportedLeads() {
     try {
       const r = await fetch('/api/leads/imported');
+      if (r.status === 403) {
+        const panel = document.getElementById('panel-3');
+        panel.innerHTML = `<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:16px;padding:40px;text-align:center">
+          <div style="width:56px;height:56px;background:#fef3c7;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px">🔒</div>
+          <h3 style="font-size:20px;font-weight:700;margin:0">Disponible en Plan Pro</h3>
+          <p style="font-size:14px;color:#64748b;max-width:360px;margin:0;line-height:1.6">La reactivación de leads está disponible a partir del plan Pro. Recupera pacientes inactivos de forma automática con Cliniflux.</p>
+          <a href="/#precios" target="_blank" style="background:#16a34a;color:#fff;font-weight:600;padding:12px 28px;border-radius:40px;text-decoration:none;font-size:14px">Ver planes →</a>
+        </div>`;
+        return;
+      }
       if (!r.ok) return;
       const leads = await r.json();
       renderImportedLeads(leads);
