@@ -201,9 +201,9 @@ ${mensaje ? `<table width="100%" cellpadding="0" cellspacing="0" border="0" styl
 
 // Stripe price IDs (test mode)
 const STRIPE_PRICES = {
-  starter: { mes: 'price_1TJuTfCegLT4YskFbMdyTro1', ano: 'price_1TJuUBCegLT4YskFemo6YFZ6' },
-  pro:     { mes: 'price_1TJuUiCegLT4YskFgWob0MlZ', ano: 'price_1TJuV2CegLT4YskFsvRnEF7W' },
-  clinica: { mes: 'price_1TJuVbCegLT4YskFgiv64JUn', ano: 'price_1TJuWACegLT4YskFwnJvYAIc' }
+  starter: { mes: 'price_1TJuFFCzcmmCvDMjzNORnnZC', ano: 'price_1TJuFFCzcmmCvDMjrctpYWqo' },
+  pro:     { mes: 'price_1TJuGDCzcmmCvDMjWWEk2LmF', ano: 'price_1TJuGrCzcmmCvDMjBHhWsDj0' },
+  clinica: { mes: 'price_1TJuICCzcmmCvDMjUiur152i', ano: 'price_1TJuICCzcmmCvDMjUiur152i' }
 };
 
 const app = express();
