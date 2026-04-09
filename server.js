@@ -11,7 +11,7 @@ const stripe = process.env.STRIPE_SECRET_KEY ? Stripe(process.env.STRIPE_SECRET_
 const nodemailer = require('nodemailer');
 
 async function sendEmail({ to, subject, html, replyTo }) {
-  const from = process.env.EMAIL_FROM || 'Cliniflux <contacto@cliniflux.es>';
+  const from = process.env.EMAIL_FROM || 'Cliniflux <onboarding@resend.dev>';
 
   // Resend (preferido — HTTP, sin problemas de firewall)
   if (process.env.RESEND_API_KEY) {
