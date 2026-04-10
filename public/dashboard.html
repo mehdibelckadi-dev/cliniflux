@@ -592,6 +592,15 @@
             <span class="set-plan-badge" id="s-plan-badge">—</span>
           </div>
           <div style="font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:16px" id="s-plan-desc"></div>
+          <div id="s-usage-wrap" style="margin-bottom:16px;display:none">
+            <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px">
+              <span style="font-size:11px;font-weight:600;color:var(--text2)">Conversaciones este mes</span>
+              <span style="font-size:12px;font-weight:700;color:var(--text)" id="s-usage-label"></span>
+            </div>
+            <div style="height:6px;background:rgba(0,0,0,0.08);border-radius:100px;overflow:hidden">
+              <div id="s-usage-bar" style="height:100%;border-radius:100px;transition:width .4s"></div>
+            </div>
+          </div>
           <button class="set-btn" onclick="openBillingPortal()">Gestionar suscripción →</button>
           <div style="border-top:1px solid var(--border);margin-top:16px;padding-top:16px">
             <span class="set-label" style="margin-top:0">Cambiar contraseña</span>
@@ -745,6 +754,22 @@
       div.innerHTML = `<div class="ag-wd-lbl">${lbls[i]}</div><div class="ag-wd-num">${d.getDate()}</div>`;
       week.appendChild(div);
     }
+  }
+
+  async function loadUsage() {
+    try {
+      const r = await fetch('/api/usage');
+      if (!r.ok) return;
+      const d = await r.json();
+      if (!d.limit) return; // ilimitado — no mostrar
+      const pct = Math.min(Math.round(d.count / d.limit * 100), 100);
+      const color = pct >= 100 ? '#ef4444' : pct >= 80 ? '#f59e0b' : 'var(--green)';
+      document.getElementById('s-usage-wrap').style.display = 'block';
+      document.getElementById('s-usage-label').textContent = `${d.count} / ${d.limit}`;
+      const bar = document.getElementById('s-usage-bar');
+      bar.style.width = pct + '%';
+      bar.style.background = color;
+    } catch {}
   }
 
   async function openBillingPortal() {
@@ -949,7 +974,7 @@
   function switchPanel(n){
     document.querySelectorAll('.panel').forEach((p,i) => p.classList.toggle('active', i===n));
     document.querySelectorAll('.si[data-panel]').forEach(s => s.classList.toggle('active', parseInt(s.dataset.panel)===n));
-    if (n === 4) loadSettings();
+    if (n === 4) { loadSettings(); loadUsage(); }
   }
   function selectConv(el){
     document.querySelectorAll('.conv-item').forEach(i => i.classList.remove('active'));

@@ -84,6 +84,9 @@ async function initDb() {
     `ALTER TABLE clinics ADD COLUMN IF NOT EXISTS stripe_customer_id TEXT`,
     `ALTER TABLE clinics ADD COLUMN IF NOT EXISTS stripe_subscription_id TEXT`,
     `ALTER TABLE leads ADD COLUMN IF NOT EXISTS clinic_id INTEGER`,
+    `ALTER TABLE clinics ADD COLUMN IF NOT EXISTS conv_count INTEGER DEFAULT 0`,
+    `ALTER TABLE clinics ADD COLUMN IF NOT EXISTS conv_reset_at TIMESTAMP DEFAULT NOW()`,
+    `ALTER TABLE clinics ADD COLUMN IF NOT EXISTS conv_warned BOOLEAN DEFAULT FALSE`,
   ];
   for (const sql of migrations) await pool.query(sql);
 
@@ -246,4 +249,27 @@ async function updateLeadEstado(id, estado) {
   await pool.query('UPDATE imported_leads SET estado=$1 WHERE id=$2', [estado, id]);
 }
 
-module.exports = { pool, initDb, getSession, saveSession, saveLead, getClinicByEmail, getClinicByWhatsapp, getClinicBySetupToken, createClinic, updateClinicConfig, buildPromptForClinic, getLeads, saveAppointment, getAppointments, verifyPassword, hashPassword, importLeads, getImportedLeads, updateLeadEstado };
+const PLAN_LIMITS = { starter: 300, pro: 2000, clinica: null };
+
+// Devuelve { count, limit, pct, blocked }. Incrementa el contador con reset mensual.
+async function incrementConversation(clinic_id) {
+  // Reset si ha cambiado el mes
+  await pool.query(`
+    UPDATE clinics SET conv_count=0, conv_reset_at=NOW(), conv_warned=FALSE
+    WHERE id=$1 AND date_trunc('month', conv_reset_at) < date_trunc('month', NOW())
+  `, [clinic_id]);
+
+  const { rows } = await pool.query(
+    'UPDATE clinics SET conv_count=conv_count+1 WHERE id=$1 RETURNING conv_count, plan, email, name, conv_warned',
+    [clinic_id]
+  );
+  const r = rows[0];
+  if (!r) return { count: 0, limit: null, pct: 0, blocked: false };
+  const limit = PLAN_LIMITS[r.plan] ?? null;
+  const count = r.conv_count;
+  const pct = limit ? Math.round(count / limit * 100) : 0;
+  const blocked = limit ? count > limit : false;
+  return { count, limit, pct, blocked, email: r.email, name: r.name, plan: r.plan, warned: r.conv_warned };
+}
+
+module.exports = { pool, initDb, getSession, saveSession, saveLead, getClinicByEmail, getClinicByWhatsapp, getClinicBySetupToken, createClinic, updateClinicConfig, buildPromptForClinic, getLeads, saveAppointment, getAppointments, verifyPassword, hashPassword, importLeads, getImportedLeads, updateLeadEstado, incrementConversation, PLAN_LIMITS };

@@ -5,7 +5,7 @@ const PgSession = require('connect-pg-simple')(session);
 const OpenAI = require('openai');
 const crypto = require('crypto');
 const Stripe = require('stripe');
-const { pool, initDb, getSession, saveSession, saveLead, getClinicByEmail, getClinicByWhatsapp, getClinicBySetupToken, createClinic, updateClinicConfig, buildPromptForClinic, getLeads, getAppointments, saveAppointment, verifyPassword, hashPassword, importLeads, getImportedLeads, updateLeadEstado } = require('./db');
+const { pool, initDb, getSession, saveSession, saveLead, getClinicByEmail, getClinicByWhatsapp, getClinicBySetupToken, createClinic, updateClinicConfig, buildPromptForClinic, getLeads, getAppointments, saveAppointment, verifyPassword, hashPassword, importLeads, getImportedLeads, updateLeadEstado, incrementConversation, PLAN_LIMITS } = require('./db');
 
 const stripe = process.env.STRIPE_SECRET_KEY ? Stripe(process.env.STRIPE_SECRET_KEY) : null;
 const nodemailer = require('nodemailer');
@@ -199,7 +199,47 @@ ${mensaje ? `<table width="100%" cellpadding="0" cellspacing="0" border="0" styl
 `, `${nombre} de ${clinica||'una clínica'} quiere hablar contigo.`);
 }
 
-// Stripe price IDs (test mode)
+function emailUsageWarning(name, email, count, limit, pct) {
+  const isBlocked = pct >= 100;
+  const title = isBlocked ? `Has alcanzado el límite de conversaciones` : `Has usado el ${pct}% de tus conversaciones`;
+  const badge = isBlocked ? 'Límite alcanzado' : `${pct}% usado`;
+  const badgeBg = isBlocked ? '#fee2e2' : '#fef3c7';
+  const badgeColor = isBlocked ? '#991b1b' : '#92400e';
+  const body = isBlocked
+    ? `Tu plan actual ha llegado al límite de <strong>${limit} conversaciones</strong> este mes. Natalia ha dejado de responder hasta que actualices el plan o empiece el próximo mes.`
+    : `Ya llevas <strong>${count} de ${limit} conversaciones</strong> este mes. Si las agotás, Natalia dejará de responder automáticamente.`;
+  return EMAIL_BASE(`
+<p style="margin:0 0 20px"><span style="display:inline-block;background:${badgeBg};color:${badgeColor};font-size:11px;font-weight:700;letter-spacing:0.6px;padding:5px 14px;border-radius:100px;text-transform:uppercase;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif">${badge}</span></p>
+<h1 style="margin:0 0 8px;font-size:24px;font-weight:800;color:#0f172a;letter-spacing:-0.6px;line-height:1.2;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif">${title}</h1>
+<p style="margin:0 0 24px;font-size:15px;color:#475569;line-height:1.8;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif">${body}</p>
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 28px"><tr><td style="background:#f8fafc;border-radius:12px;padding:20px 24px">
+  <p style="margin:0 0 8px;font-size:12px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif">Uso este mes</p>
+  <p style="margin:0 0 10px;font-size:28px;font-weight:800;color:#0f172a;letter-spacing:-1px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif">${count} <span style="font-size:14px;font-weight:500;color:#94a3b8">/ ${limit}</span></p>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="background:#e5e7eb;border-radius:100px;height:8px"><table width="${Math.min(pct,100)}%" cellpadding="0" cellspacing="0" border="0"><tr><td style="background:${isBlocked?'#ef4444':'#f59e0b'};border-radius:100px;height:8px"></td></tr></table></td></tr></table>
+</td></tr></table>
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 24px"><tr><td align="center">
+  <a href="https://cliniflux.es/dashboard" style="display:inline-block;background:#16a34a;color:#ffffff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:15px;font-weight:700;text-decoration:none;padding:14px 36px;border-radius:40px" target="_blank">
+    <span style="color:#ffffff;text-decoration:none">Ampliar plan →</span>
+  </a>
+</td></tr></table>
+<table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:16px 20px">
+  <p style="margin:0;font-size:13px;color:#166534;line-height:1.6;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif">💡 El contador se reinicia automáticamente el 1 de cada mes. Si necesitas más, escríbenos a <strong>contacto@cliniflux.es</strong></p>
+</td></tr></table>
+`, title);
+}
+
+async function checkAndNotifyUsage(usage, clinicId) {
+  if (!usage.limit) return; // Clínica = ilimitado
+  if (usage.blocked && !usage.warned) {
+    await pool.query('UPDATE clinics SET conv_warned=TRUE WHERE id=$1', [clinicId]);
+    await sendEmail({ to: usage.email, subject: '⚠️ Límite de conversaciones alcanzado — Cliniflux', html: emailUsageWarning(usage.name, usage.email, usage.count, usage.limit, 100) });
+  } else if (usage.pct >= 80 && usage.pct < 100 && !usage.warned) {
+    await pool.query('UPDATE clinics SET conv_warned=TRUE WHERE id=$1', [clinicId]);
+    await sendEmail({ to: usage.email, subject: `Aviso: has usado el ${usage.pct}% de tus conversaciones — Cliniflux`, html: emailUsageWarning(usage.name, usage.email, usage.count, usage.limit, usage.pct) });
+  }
+}
+
+// Stripe price IDs (live)
 const STRIPE_PRICES = {
   starter: { mes: 'price_1TJuFFCzcmmCvDMjzNORnnZC', ano: 'price_1TJuFFCzcmmCvDMjrctpYWqo' },
   pro:     { mes: 'price_1TJuGDCzcmmCvDMjWWEk2LmF', ano: 'price_1TJuGrCzcmmCvDMjBHhWsDj0' },
@@ -596,6 +636,14 @@ app.post('/webhook/whatsapp', async (req, res) => {
   const sessionId = `wa_${clinicId}_` + from.replace(/\D/g,'').slice(-10);
 
   try {
+    // Contador de conversaciones (solo clínicas reales, no demo)
+    if (clinic?.id) {
+      const usage = await incrementConversation(clinic.id);
+      checkAndNotifyUsage(usage, clinic.id).catch(e => console.error('usage notify:', e.message));
+      if (usage.blocked) {
+        return res.type('text/xml').send('<Response><Message>Lo sentimos, la clínica ha alcanzado el límite de conversaciones este mes. Llámenos directamente para ayudarle.</Message></Response>');
+      }
+    }
     const history = await getSession(sessionId);
     const completion = await openai.chat.completions.create({
       model: process.env.AI_MODEL || 'gpt-4o-mini',
@@ -634,6 +682,12 @@ app.post('/chat', rateLimit(30, 60000), async (req, res) => {
     if (rows[0]) { prompt = buildPromptForClinic(rows[0]); clinicId = rows[0].id; }
   }
   try {
+    // Contador de conversaciones (solo clínicas reales)
+    if (clinicId !== 1) {
+      const usage = await incrementConversation(clinicId);
+      checkAndNotifyUsage(usage, clinicId).catch(e => console.error('usage notify:', e.message));
+      if (usage.blocked) return res.status(429).json({ error: 'Límite de conversaciones alcanzado este mes. Actualiza tu plan para continuar.' });
+    }
     const history = await getSession(safeId);
     const completion = await openai.chat.completions.create({
       model: process.env.AI_MODEL || 'gpt-4o-mini',
@@ -672,6 +726,13 @@ app.post('/api/contact', rateLimit(5, 60000), async (req, res) => {
     html: emailContactNotification({ nombre, clinica, email, telefono, tipo, mensaje })
   });
   res.json({ ok: true });
+});
+
+app.get('/api/usage', requireAuth, async (req, res) => {
+  const { rows } = await pool.query('SELECT plan, conv_count, conv_reset_at FROM clinics WHERE id=$1', [req.session.clinicId]);
+  const r = rows[0] || {};
+  const limit = PLAN_LIMITS[r.plan] ?? null;
+  res.json({ count: r.conv_count || 0, limit, plan: r.plan, reset_at: r.conv_reset_at });
 });
 
 app.get('/api/settings', requireAuth, async (req, res) => {
