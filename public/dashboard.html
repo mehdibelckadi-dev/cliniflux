@@ -256,6 +256,62 @@
     .set-danger{border-color:rgba(239,68,68,.2)!important;background:#fffafa!important}
     .set-danger .set-card-title{color:#dc2626}
     @media(max-width:700px){.set-grid{grid-template-columns:1fr}}
+
+    /* ─── MOBILE ─── */
+    .bottom-nav{display:none}
+    @media(max-width:700px){
+      /* Layout */
+      .app-layout{flex-direction:column;height:calc(100vh - 48px - 56px)}
+      .sidebar{display:none}
+      .main{height:100%}
+
+      /* Bottom nav */
+      .bottom-nav{display:flex;position:fixed;bottom:0;left:0;right:0;height:56px;background:#fff;border-top:1px solid rgba(0,0,0,0.08);z-index:100;justify-content:space-around;align-items:center}
+      .bn-item{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:6px 12px;border-radius:10px;flex:1}
+      .bn-item svg{width:20px;height:20px;stroke:rgba(0,0,0,0.35);transition:stroke .15s}
+      .bn-item span{font-size:9px;font-weight:600;color:rgba(0,0,0,0.35);transition:color .15s}
+      .bn-item.active svg{stroke:var(--green)}
+      .bn-item.active span{color:var(--green)}
+      .bn-badge{position:absolute;top:4px;right:8px;width:14px;height:14px;border-radius:50%;background:#ef4444;font-size:8px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center}
+
+      /* Topbar */
+      .topbar{padding:0 12px 0 0}
+      .tb-ia span{display:none}
+      .tb-clinic-tag{display:none}
+      #tb-clinic-name{display:none}
+
+      /* Conversaciones */
+      .conv-stats{grid-template-columns:1fr 1fr}
+      .quick-chips{gap:4px;padding:6px 8px}
+      .qc{font-size:10px;padding:4px 8px}
+      .chat-msgs{padding:10px 10px}
+      .msg{max-width:85%}
+
+      /* Agenda */
+      .ag-side{display:none}
+      .ag-body{overflow-y:auto}
+      .ag-slot{padding:10px 14px}
+      .ag-week{gap:2px;padding:8px 12px}
+
+      /* Métricas */
+      .p-metrics{padding:14px}
+      .met-kpis{grid-template-columns:1fr 1fr;gap:8px}
+      .kpi{padding:12px 14px}
+      .kpi-n{font-size:22px}
+
+      /* Leads tabla → cards */
+      .leads-table{display:none}
+      .leads-table-wrap{padding:0 12px 80px}
+      .leads-topbar{padding:10px 12px;gap:6px}
+      .leads-title{font-size:14px}
+      .leads-stats{padding:8px 12px;gap:6px}
+      .lstat{padding:8px 10px}
+      #leads-cards{display:flex;flex-direction:column;gap:8px;margin-top:4px}
+
+      /* Ajustes */
+      .p-settings{padding:16px 14px 80px}
+      .set-card{padding:16px}
+    }
   </style>
 </head>
 <body>
@@ -525,6 +581,7 @@
             <div style="font-size:12px;color:var(--text2)">Formato CSV — columnas: nombre, telefono, email, ultima_visita, servicio</div>
           </div>
         </div>
+        <div id="leads-cards"></div>
         <table class="leads-table" id="leads-table" style="display:none">
           <thead><tr>
             <th>Nombre</th><th>Teléfono</th><th>Email</th>
@@ -614,6 +671,31 @@
       </div>
     </div>
   </main>
+
+  <!-- BOTTOM NAV (mobile) -->
+  <nav class="bottom-nav">
+    <div class="bn-item active" data-panel="0" onclick="switchPanel(0)" style="position:relative">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      <span>Chats</span>
+      <div class="bn-badge" id="bn-badge">4</div>
+    </div>
+    <div class="bn-item" data-panel="1" onclick="switchPanel(1)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      <span>Agenda</span>
+    </div>
+    <div class="bn-item" data-panel="2" onclick="switchPanel(2)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      <span>Métricas</span>
+    </div>
+    <div class="bn-item" data-panel="3" onclick="switchPanel(3)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      <span>Leads</span>
+    </div>
+    <div class="bn-item" data-panel="4" onclick="switchPanel(4)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      <span>Ajustes</span>
+    </div>
+  </nav>
 
   <!-- IMPORT MODAL -->
   <div class="import-modal" id="importModal">
@@ -807,10 +889,8 @@
       if (appts.length > 0) renderAppointments(appts);
 
       // Actualizar contador badge
-      const badge = document.querySelector('.si-badge');
-      if (badge) badge.textContent = leads.filter(l => {
-        const d = new Date(l.created_at); return (Date.now() - d) < 86400000;
-      }).length || leads.length;
+      const cnt = leads.filter(l => (Date.now()-new Date(l.created_at)) < 86400000).length || leads.length;
+      document.querySelectorAll('.si-badge, #bn-badge').forEach(b => b && (b.textContent = cnt));
 
     } catch(e) { console.error('loadData:', e); }
   }
@@ -915,7 +995,25 @@
     const table = document.getElementById('leads-table');
     const tbody = document.getElementById('leads-tbody');
     if (!leads.length) { empty.style.display='block'; table.style.display='none'; return; }
-    empty.style.display='none'; table.style.display='table';
+    empty.style.display='none';
+    const isMobile = window.innerWidth <= 700;
+    if (isMobile) { table.style.display='none'; } else { table.style.display='table'; }
+    // Render cards for mobile
+    const cardsEl = document.getElementById('leads-cards');
+    if (cardsEl) cardsEl.innerHTML = leads.map(l => `
+      <div style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:12px 14px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+          <strong style="font-size:14px">${esc(l.nombre||'—')}</strong>
+          <select class="lead-estado estado-${l.estado}" onchange="cambiarEstado(${l.id},this)" style="font-size:11px;border:none;background:transparent;font-family:inherit;font-weight:700">
+            ${['pendiente','contactado','reactivado','descartado'].map(e=>`<option value="${e}"${e===l.estado?' selected':''}>${e.charAt(0).toUpperCase()+e.slice(1)}</option>`).join('')}
+          </select>
+        </div>
+        <div style="font-size:12px;color:var(--text2);display:flex;flex-direction:column;gap:2px">
+          ${l.telefono?`<span>📞 ${esc(l.telefono)}</span>`:''}
+          ${l.servicio?`<span>🦷 ${esc(l.servicio)}</span>`:''}
+          ${l.ultima_visita?`<span>📅 Última visita: ${esc(l.ultima_visita)}</span>`:''}
+        </div>
+      </div>`).join('');
     const pend = leads.filter(l=>l.estado==='pendiente').length;
     const cont = leads.filter(l=>l.estado==='contactado').length;
     const react = leads.filter(l=>l.estado==='reactivado').length;
@@ -973,8 +1071,9 @@
   // ── Panel switching ───────────────────────────────────────────────────────
   function switchPanel(n){
     document.querySelectorAll('.panel').forEach((p,i) => p.classList.toggle('active', i===n));
-    document.querySelectorAll('.si[data-panel]').forEach(s => s.classList.toggle('active', parseInt(s.dataset.panel)===n));
+    document.querySelectorAll('.si[data-panel],.bn-item[data-panel]').forEach(s => s.classList.toggle('active', parseInt(s.dataset.panel)===n));
     if (n === 4) { loadSettings(); loadUsage(); }
+    if (n === 3) loadImportedLeads();
   }
   function selectConv(el){
     document.querySelectorAll('.conv-item').forEach(i => i.classList.remove('active'));
