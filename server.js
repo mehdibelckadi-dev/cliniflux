@@ -735,6 +735,7 @@ app.post('/api/billing-portal', requireAuth, async (req, res) => {
     const session = await stripe.billingPortal.sessions.create({
       customer: customerId,
       return_url: `${base}/dashboard`,
+      configuration: 'bpc_1TKU6jCzcmmCvDMjROnl5QGI',
     });
     res.json({ url: session.url });
   } catch (e) {
