@@ -725,6 +725,24 @@ app.post('/api/checkout', rateLimit(20, 60000), async (req, res) => {
   }
 });
 
+app.post('/api/billing-portal', requireAuth, async (req, res) => {
+  if (!stripe) return res.status(503).json({ error: 'Pagos no configurados' });
+  try {
+    const { rows } = await pool.query('SELECT stripe_customer_id FROM clinics WHERE id=$1', [req.session.clinicId]);
+    const customerId = rows[0]?.stripe_customer_id;
+    if (!customerId) return res.status(400).json({ error: 'No hay suscripción activa' });
+    const base = (process.env.APP_URL || `${req.protocol}://${req.get('host')}`).replace(/\/$/, '');
+    const session = await stripe.billingPortal.sessions.create({
+      customer: customerId,
+      return_url: `${base}/dashboard`,
+    });
+    res.json({ url: session.url });
+  } catch (e) {
+    console.error('Billing portal error:', e.message);
+    res.status(500).json({ error: 'Error al abrir portal' });
+  }
+});
+
 app.post('/api/demo-request', async (req, res) => {
   try { await saveLead(req.body); res.json({ ok: true }); }
   catch (err) { res.status(500).json({ error: 'Error' }); }

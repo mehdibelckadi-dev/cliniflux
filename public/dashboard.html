@@ -592,7 +592,7 @@
             <span class="set-plan-badge" id="s-plan-badge">—</span>
           </div>
           <div style="font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:16px" id="s-plan-desc"></div>
-          <a href="/contacto?plan=upgrade" class="set-btn" style="text-decoration:none;display:inline-block;text-align:center">Cambiar plan →</a>
+          <button class="set-btn" onclick="openBillingPortal()">Gestionar suscripción →</button>
           <div style="border-top:1px solid var(--border);margin-top:16px;padding-top:16px">
             <span class="set-label" style="margin-top:0">Cambiar contraseña</span>
             <input class="set-input" id="s-pass1" type="password" placeholder="Nueva contraseña">
@@ -745,6 +745,15 @@
       div.innerHTML = `<div class="ag-wd-lbl">${lbls[i]}</div><div class="ag-wd-num">${d.getDate()}</div>`;
       week.appendChild(div);
     }
+  }
+
+  async function openBillingPortal() {
+    try {
+      const r = await fetch('/api/billing-portal', { method:'POST' });
+      const d = await r.json();
+      if (d.url) window.location.href = d.url;
+      else alert(d.error || 'Error al abrir portal de facturación');
+    } catch { alert('Error de conexión'); }
   }
 
   async function logout() {
