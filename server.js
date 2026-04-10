@@ -164,6 +164,45 @@ function emailWelcomeOnboarding(clinicName, loginUrl) {
 `, `${clinicName} está configurada. Natalia ya puede atender a tus pacientes.`);
 }
 
+function emailTwilioSetup({ clinic, cfg, whatsapp_number }) {
+  const ts = new Date().toLocaleString('es-ES', { dateStyle: 'short', timeStyle: 'short' });
+  const waNum = whatsapp_number || '— (no proporcionado)';
+  return EMAIL_BASE(`
+<p style="margin:0 0 20px"><span style="display:inline-block;background:#dcfce7;color:#15803d;font-size:11px;font-weight:700;letter-spacing:0.6px;padding:5px 14px;border-radius:100px;text-transform:uppercase;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif">Nuevo cliente — acción requerida</span></p>
+<h1 style="margin:0 0 8px;font-size:24px;font-weight:800;color:#0f172a;letter-spacing:-0.4px;line-height:1.2;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif">${clinic.name}</h1>
+<p style="margin:0 0 24px;font-size:14px;color:#94a3b8;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif">Onboarding completado el ${ts} · Plan <strong style="color:#0f172a">${clinic.plan||'starter'}</strong></p>
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-top:1px solid #f1f5f9;margin-bottom:24px">
+  ${[
+    ['Email', clinic.email],
+    ['Teléfono clínica', cfg.phone||'—'],
+    ['Dirección', cfg.address||'—'],
+    ['Horario', cfg.hours||'—'],
+    ['Asistente', cfg.assistant_name||'Natalia'],
+    ['WhatsApp Business', `<strong style="color:#16a34a">${waNum}</strong>`],
+  ].map(([l,v]) => `<tr>
+    <td style="padding:10px 16px 10px 0;font-size:12px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;white-space:nowrap;vertical-align:top;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;border-bottom:1px solid #f1f5f9">${l}</td>
+    <td style="padding:10px 0;font-size:14px;color:#334155;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;border-bottom:1px solid #f1f5f9">${v}</td>
+  </tr>`).join('')}
+</table>
+${cfg.services ? `<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:24px"><tr><td style="background:#f8f9fb;border-left:3px solid #22c55e;border-radius:0 8px 8px 0;padding:14px 16px"><p style="margin:0 0 4px;font-size:11px;font-weight:700;color:#94a3b8;text-transform:uppercase;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif">Servicios</p><p style="margin:0;font-size:13px;color:#334155;line-height:1.6;white-space:pre-wrap;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif">${cfg.services}</p></td></tr></table>` : ''}
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:20px"><tr><td style="background:#fef3c7;border:1px solid rgba(245,158,11,0.3);border-radius:12px;padding:16px 20px">
+  <p style="margin:0 0 8px;font-size:13px;font-weight:700;color:#92400e;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif">⚡ Pasos para activar WhatsApp en Twilio</p>
+  <ol style="margin:0;padding-left:18px;font-size:13px;color:#78350f;line-height:1.8;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif">
+    <li>Entra en <strong>console.twilio.com</strong> y compra un número</li>
+    <li>Ve a Messaging → Settings → WhatsApp Senders → añade <strong>${waNum}</strong></li>
+    <li>Configura el webhook: <strong>POST https://cliniflux.es/webhook/whatsapp</strong></li>
+    <li>Actualiza en la DB: <code>UPDATE clinics SET whatsapp_number='${waNum}' WHERE id=${clinic.id}</code></li>
+    <li>Envía email al cliente confirmando activación</li>
+  </ol>
+</td></tr></table>
+<table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td align="center">
+  <a href="mailto:${clinic.email}" style="display:inline-block;background:#16a34a;color:#ffffff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:15px;font-weight:700;text-decoration:none;padding:14px 36px;border-radius:40px" target="_blank">
+    <span style="color:#ffffff;text-decoration:none">Responder al cliente →</span>
+  </a>
+</td></tr></table>
+`, `${clinic.name} completó el onboarding — configura Twilio`);
+}
+
 function emailContactNotification({ nombre, clinica, email, telefono, tipo, mensaje }) {
   const ts = new Date().toLocaleString('es-ES', { dateStyle: 'short', timeStyle: 'short' });
   return EMAIL_BASE(`
@@ -498,12 +537,21 @@ app.post('/api/onboarding', async (req, res) => {
     if (new_password) {
       await pool.query('UPDATE clinics SET password_hash=$1 WHERE id=$2', [hashPassword(new_password), clinic.id]);
     }
-    const loginUrl = (process.env.APP_URL || `${req.protocol}://${req.get('host')}`) + '/login';
+    const loginUrl = (process.env.APP_URL || `${req.protocol}://${req.get('host')}`).replace(/\/$/, '') + '/login';
+    // Email al cliente
     await sendEmail({
       to: clinic.email,
-      subject: `${clinic.name || 'Tu clínica'} ya está lista en Cliniflux`,
+      subject: `Tu asistente Cliniflux estará activo en menos de 24h`,
       html: emailWelcomeOnboarding(clinic.name || 'Tu clínica', loginUrl)
     });
+    // Email interno para configurar Twilio
+    const cfg = { phone, address, hours, services, extra, assistant_name: assistant_name||'Natalia' };
+    const notify = process.env.EMAIL_NOTIFY || process.env.EMAIL_FROM || 'contacto@cliniflux.es';
+    await sendEmail({
+      to: notify,
+      subject: `🔧 Nuevo cliente listo para activar — ${clinic.name}`,
+      html: emailTwilioSetup({ clinic, cfg, whatsapp_number })
+    }).catch(e => console.error('notify email:', e.message));
     res.json({ ok: true });
   } catch(e) {
     console.error('Onboarding:', e.message);
