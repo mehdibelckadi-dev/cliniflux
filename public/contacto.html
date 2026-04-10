@@ -5,24 +5,25 @@
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-75KSF9KX7Q"></script>
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-75KSF9KX7Q');</script>
   <meta charset="UTF-8">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
   <title>Contacto — Cliniflux</title>
   <meta name="description" content="Solicita una demo gratuita de Cliniflux. Te mostramos cómo automatizar WhatsApp para tu clínica en menos de 30 minutos.">
   <meta name="robots" content="index, follow">
-  <link rel="canonical" href="https://cliniflux.com/contacto">
+  <link rel="canonical" href="https://cliniflux.es/contacto">
   <!-- Open Graph -->
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Cliniflux">
   <meta property="og:title" content="Contacto — Cliniflux">
   <meta property="og:description" content="Solicita una demo gratuita de Cliniflux. Te mostramos cómo automatizar WhatsApp para tu clínica en menos de 30 minutos.">
-  <meta property="og:url" content="https://cliniflux.com/contacto">
-  <meta property="og:image" content="https://cliniflux.com/og-image.png">
+  <meta property="og:url" content="https://cliniflux.es/contacto">
+  <meta property="og:image" content="https://cliniflux.es/og-image.png">
   <meta property="og:locale" content="es_ES">
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Contacto — Cliniflux">
   <meta name="twitter:description" content="Solicita una demo gratuita de Cliniflux. Te mostramos cómo automatizar WhatsApp para tu clínica en menos de 30 minutos.">
-  <meta name="twitter:image" content="https://cliniflux.com/og-image.png">
+  <meta name="twitter:image" content="https://cliniflux.es/og-image.png">
   <!-- Analytics (activar con ID real) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -177,7 +178,7 @@
       <div class="contact-info reveal d1">
         <div class="ci-card">
           <div class="ci-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
-          <div><div class="ci-t">Email</div><div class="ci-v"><a href="mailto:contacto@cliniflux.com">contacto@cliniflux.com</a><br>Respondemos en &lt; 24h laborables</div></div>
+          <div><div class="ci-t">Email</div><div class="ci-v"><a href="mailto:contacto@cliniflux.es">contacto@cliniflux.es</a><br>Respondemos en &lt; 24h laborables</div></div>
         </div>
         <div class="ci-card">
           <div class="ci-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
@@ -218,7 +219,7 @@ async function submitForm(){
     const r=await fetch('/api/contact',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nombre,clinica,email,telefono:document.getElementById('cf-telefono').value,tipo,mensaje:document.getElementById('cf-mensaje').value})});
     if(r.ok){document.getElementById('cfForm').style.display='none';document.getElementById('cfSuccess').style.display='block';}
     else throw new Error();
-  }catch(e){btn.textContent='Enviar mensaje →';btn.disabled=false;alert('Error al enviar. Por favor escríbenos a contacto@cliniflux.com');}
+  }catch(e){btn.textContent='Enviar mensaje →';btn.disabled=false;alert('Error al enviar. Por favor escríbenos a contacto@cliniflux.es');}
 }
 </script>
 <!-- COOKIE BANNER -->

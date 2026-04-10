@@ -335,7 +335,7 @@ app.post('/webhook/stripe', express.raw({ type: 'application/json' }), async (re
     const plan = s.metadata?.plan || 'starter';
     const email = s.customer_details?.email || s.metadata?.email || '';
     const name = s.customer_details?.name || email;
-    const appBase = (process.env.APP_URL || 'https://cliniflux.com').replace(/\/$/, '');
+    const appBase = (process.env.APP_URL || 'https://cliniflux.es').replace(/\/$/, '');
     console.log(`[Stripe] checkout.session.completed email=${email} plan=${plan}`);
     try {
       // Buscar si ya existe (re-compra o test repetido)
@@ -768,7 +768,7 @@ app.post('/api/contact', rateLimit(5, 60000), async (req, res) => {
   }
   try { await saveLead({ nombre, clinica, email, telefono, tipo, mensaje, source: 'contacto' }); } catch(e) { console.error('Lead save:', e.message); }
   await sendEmail({
-    to: process.env.EMAIL_NOTIFY || process.env.SMTP_USER || 'hola@cliniflux.com',
+    to: process.env.EMAIL_NOTIFY || process.env.SMTP_USER || 'contacto@cliniflux.es',
     replyTo: email,
     subject: `[Contacto Web] ${tipo} — ${nombre} (${clinica||'-'})`,
     html: emailContactNotification({ nombre, clinica, email, telefono, tipo, mensaje })
