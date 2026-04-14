@@ -6,15 +6,15 @@
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-75KSF9KX7Q');</script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cliniflux — Automatización WhatsApp para clínicas</title>
-  <meta name="description" content="Cliniflux automatiza WhatsApp para que cada paciente reciba respuesta instantánea, agende su cita y tu equipo se centre en lo que importa. Setup gratuito.">
+  <title>Automatización WhatsApp para Clínicas | Activo en 48h — Cliniflux</title>
+  <meta name="description" content="Automatiza WhatsApp en tu clínica con IA: responde 24/7, agenda citas y reactiva pacientes inactivos. Setup gratuito, activo en 48h. Más de 40 clínicas en España.">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://cliniflux.es/">
   <!-- Open Graph -->
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Cliniflux">
-  <meta property="og:title" content="Cliniflux — Automatización WhatsApp para clínicas">
-  <meta property="og:description" content="Cliniflux automatiza WhatsApp para que cada paciente reciba respuesta instantánea, agende su cita y tu equipo se centre en lo que importa. Setup gratuito.">
+  <meta property="og:title" content="Automatización WhatsApp para Clínicas | Activo en 48h — Cliniflux">
+  <meta property="og:description" content="Automatiza WhatsApp en tu clínica con IA: responde 24/7, agenda citas y reactiva pacientes inactivos. Setup gratuito, activo en 48h.">
   <meta property="og:url" content="https://cliniflux.es/">
   <meta property="og:image" content="https://cliniflux.es/og-image.png">
   <meta property="og:locale" content="es_ES">
@@ -135,6 +135,15 @@
     .nav-links{display:flex;gap:2px;list-style:none;margin:0 auto}
     .nav-links a{font-size:14px;font-weight:500;color:var(--text2);text-decoration:none;padding:7px 13px;border-radius:var(--r-sm);transition:color .2s,background .2s}
     .nav-links a:hover{color:var(--text);background:rgba(0,0,0,0.04)}
+    .nav-dropdown{position:relative}
+    .nav-dropdown>a{display:flex;align-items:center;gap:4px}
+    .nav-dropdown>a svg{transition:transform .2s}
+    .nav-dropdown:hover>a svg{transform:rotate(180deg)}
+    .nav-dd-menu{display:none;position:absolute;top:calc(100% + 6px);left:50%;transform:translateX(-50%);background:#fff;border:1px solid var(--border2);border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,0.12);padding:8px;min-width:220px;z-index:300}
+    .nav-dropdown:hover .nav-dd-menu{display:block}
+    .nav-dd-menu a{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:500;color:var(--text2);text-decoration:none;padding:8px 12px;border-radius:8px;transition:background .15s,color .15s;white-space:nowrap}
+    .nav-dd-menu a:hover{background:var(--green-dim);color:var(--green)}
+    .nav-dd-menu a span{font-size:16px}
     .nav-actions{display:flex;align-items:center;gap:8px;flex-shrink:0}
     .btn-ghost{font-family:inherit;font-size:14px;font-weight:500;color:var(--text2);background:none;border:none;padding:7px 13px;border-radius:var(--r-sm);cursor:pointer;text-decoration:none;transition:color .2s,background .2s}
     .btn-ghost:hover{color:var(--text);background:rgba(0,0,0,0.04)}
@@ -416,6 +425,19 @@
     .t-av{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0}
     .t-name{font-size:12px;font-weight:700;color:var(--text)}
     .t-clinic{font-size:11px;color:var(--text3)}
+
+    /* ESPECIALIDADES */
+    .esp-section{padding:var(--sy) 0;border-top:1px solid var(--border)}
+    .esp-hd{text-align:center;margin-bottom:48px}
+    .esp-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:16px}
+    .esp-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px 20px 24px;text-align:center;text-decoration:none;color:inherit;transition:box-shadow .2s,transform .2s,border-color .2s;display:flex;flex-direction:column;align-items:center;gap:12px}
+    .esp-card:hover{box-shadow:0 8px 28px rgba(0,0,0,0.09);transform:translateY(-3px);border-color:var(--green)}
+    .esp-icon{font-size:36px;line-height:1}
+    .esp-name{font-size:14px;font-weight:600;color:var(--text)}
+    .esp-desc{font-size:12px;color:var(--text2);line-height:1.5}
+    .esp-arrow{font-size:12px;color:var(--green);font-weight:600;margin-top:auto}
+    @media(max-width:900px){.esp-grid{grid-template-columns:repeat(3,1fr)}}
+    @media(max-width:600px){.esp-grid{grid-template-columns:repeat(2,1fr)}.esp-card{padding:22px 16px 20px}.esp-icon{font-size:30px}}
 
     /* PRICING */
     .pricing-section{padding:var(--sy) 0;border-top:1px solid var(--border)}
@@ -962,8 +984,10 @@
     {
       "@type": "SoftwareApplication",
       "name": "Cliniflux",
-      "applicationCategory": "BusinessApplication",
+      "applicationCategory": "HealthcareApplication",
       "operatingSystem": "Web",
+      "url": "https://cliniflux.es",
+      "offers": {"@type": "AggregateOffer", "lowPrice": "99", "highPrice": "349", "priceCurrency": "EUR"},
       "offers": [
         {"@type": "Offer", "name": "Starter", "price": "99", "priceCurrency": "EUR", "billingIncrement": "P1M"},
         {"@type": "Offer", "name": "Pro", "price": "199", "priceCurrency": "EUR", "billingIncrement": "P1M"},
@@ -1008,6 +1032,16 @@
     <ul class="nav-links">
       <li><a href="#producto">Producto</a></li>
       <li><a href="#flujo">Cómo funciona</a></li>
+      <li class="nav-dropdown">
+        <a href="#">Especialidades <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg></a>
+        <div class="nav-dd-menu">
+          <a href="/whatsapp-clinica-dental"><span>🦷</span> Clínicas Dentales</a>
+          <a href="/whatsapp-fisioterapia"><span>💪</span> Fisioterapia</a>
+          <a href="/whatsapp-clinica-estetica"><span>✨</span> Clínica Estética</a>
+          <a href="/whatsapp-psicologia"><span>🧠</span> Psicología</a>
+          <a href="/whatsapp-nutricion"><span>🥗</span> Nutrición</a>
+        </div>
+      </li>
       <li><a href="#precios">Precios</a></li>
       <li><a href="/about">Nosotros</a></li>
     </ul>
@@ -1938,6 +1972,49 @@
   </div>
 </section>
 
+<!-- ESPECIALIDADES -->
+<section class="esp-section">
+  <div class="c">
+    <div class="esp-hd">
+      <div class="section-label reveal">Para tu tipo de clínica</div>
+      <h2 class="section-title reveal">Soluciones específicas para cada especialidad</h2>
+      <p class="section-sub reveal">Cliniflux se adapta al flujo de trabajo de tu clínica, con mensajes, recordatorios y automatizaciones diseñados para tu especialidad.</p>
+    </div>
+    <div class="esp-grid">
+      <a href="/whatsapp-clinica-dental" class="esp-card reveal">
+        <div class="esp-icon">🦷</div>
+        <div class="esp-name">Clínica Dental</div>
+        <div class="esp-desc">Agenda ortodoncia, blanqueamientos y revisiones sin llamadas</div>
+        <div class="esp-arrow">Ver solución →</div>
+      </a>
+      <a href="/whatsapp-fisioterapia" class="esp-card reveal">
+        <div class="esp-icon">💪</div>
+        <div class="esp-name">Fisioterapia</div>
+        <div class="esp-desc">Gestiona sesiones, altas y seguimiento de pacientes con lesión</div>
+        <div class="esp-arrow">Ver solución →</div>
+      </a>
+      <a href="/whatsapp-clinica-estetica" class="esp-card reveal">
+        <div class="esp-icon">✨</div>
+        <div class="esp-name">Clínica Estética</div>
+        <div class="esp-desc">Automatiza reservas de tratamientos y campañas de temporada</div>
+        <div class="esp-arrow">Ver solución →</div>
+      </a>
+      <a href="/whatsapp-psicologia" class="esp-card reveal">
+        <div class="esp-icon">🧠</div>
+        <div class="esp-name">Psicología</div>
+        <div class="esp-desc">Confirma citas con discreción total y cumplimiento RGPD</div>
+        <div class="esp-arrow">Ver solución →</div>
+      </a>
+      <a href="/whatsapp-nutricion" class="esp-card reveal">
+        <div class="esp-icon">🥗</div>
+        <div class="esp-name">Nutrición</div>
+        <div class="esp-desc">Segmenta campañas por objetivo y recupera pacientes inactivos</div>
+        <div class="esp-arrow">Ver solución →</div>
+      </a>
+    </div>
+  </div>
+</section>
+
 <!-- PRICING -->
 <section class="pricing-section" id="precios">
   <div class="c">
@@ -2063,9 +2140,10 @@
         <p class="ft-desc">Automatización inteligente de WhatsApp para clínicas que quieren crecer sin aumentar el equipo.</p>
       </div>
       <div class="ft-links">
-        <div class="ft-col"><div class="ft-col-t">Producto</div><ul><li><a href="#flujo">Cómo funciona</a></li><li><a href="#producto">Funcionalidades</a></li><li><a href="#reactivacion">Reactivación leads</a></li><li><a href="#precios">Precios</a></li><li><a href="/demo">Demo</a></li><li><a href="/blog">Blog</a></li></ul></div>
-        <div class="ft-col"><div class="ft-col-t">Empresa</div><ul><li><a href="/about">Nosotros</a></li><li><a href="/contacto">Contacto</a></li></ul></div>
-        <div class="ft-col"><div class="ft-col-t">Legal</div><ul><li><a href="/legal/privacidad">Privacidad</a></li><li><a href="/legal/terminos">Términos de uso</a></li><li><a href="/legal/cookies">Cookies</a></li><li><a href="/features/rgpd">RGPD</a></li></ul></div>
+        <div class="ft-col"><div class="ft-col-t">Producto</div><ul><li><a href="#flujo">Cómo funciona</a></li><li><a href="#producto">Funcionalidades</a></li><li><a href="#reactivacion">Reactivación leads</a></li><li><a href="#precios">Precios</a></li><li><a href="/demo">Demo</a></li></ul></div>
+        <div class="ft-col"><div class="ft-col-t">Especialidades</div><ul><li><a href="/whatsapp-clinica-dental">Clínicas Dentales</a></li><li><a href="/whatsapp-fisioterapia">Fisioterapia</a></li><li><a href="/whatsapp-clinica-estetica">Clínica Estética</a></li><li><a href="/whatsapp-psicologia">Psicología</a></li><li><a href="/whatsapp-nutricion">Nutrición</a></li></ul></div>
+        <div class="ft-col"><div class="ft-col-t">Recursos</div><ul><li><a href="/blog">Blog</a></li><li><a href="/blog/automatizacion-whatsapp-clinicas-guia-completa">Guía Automatización</a></li><li><a href="/blog/como-reducir-no-shows-clinica-whatsapp">Reducir No-Shows</a></li><li><a href="/blog/whatsapp-business-api-clinicas-rgpd-espana">RGPD WhatsApp</a></li><li><a href="/blog/chatbot-citas-clinica-dental-whatsapp">Chatbot Dental</a></li><li><a href="/blog/cliniflux-vs-clinicsay-vs-automatedoctor">Comparativa</a></li></ul></div>
+        <div class="ft-col"><div class="ft-col-t">Empresa</div><ul><li><a href="/about">Nosotros</a></li><li><a href="/contacto">Contacto</a></li></ul><div class="ft-col-t" style="margin-top:16px">Legal</div><ul><li><a href="/legal/privacidad">Privacidad</a></li><li><a href="/legal/terminos">Términos</a></li><li><a href="/legal/cookies">Cookies</a></li><li><a href="/features/rgpd">RGPD</a></li></ul></div>
       </div>
     </div>
     <div class="ft-bot"><p>© 2025 Cliniflux. Todos los derechos reservados.</p></div>

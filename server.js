@@ -462,6 +462,38 @@ NORMAS:
   CITA_CONFIRMADA|tratamiento=...|fecha=...|hora=...|nombre=...|email=...`;
 }
 
+// ── Sitemap dinámico ────────────────────────────────────────────────────────
+
+app.get('/sitemap.xml', (req, res) => {
+  const base = 'https://cliniflux.es';
+  const { BLOG_POSTS } = require('./blog-posts');
+  const static_urls = [
+    { loc: '/', changefreq: 'weekly', priority: '1.0' },
+    { loc: '/contacto', changefreq: 'monthly', priority: '0.9' },
+    { loc: '/demo', changefreq: 'monthly', priority: '0.8' },
+    { loc: '/blog', changefreq: 'weekly', priority: '0.8' },
+    { loc: '/about', changefreq: 'monthly', priority: '0.6' },
+    { loc: '/whatsapp-clinica-dental', changefreq: 'monthly', priority: '0.9' },
+    { loc: '/whatsapp-fisioterapia', changefreq: 'monthly', priority: '0.9' },
+    { loc: '/whatsapp-clinica-estetica', changefreq: 'monthly', priority: '0.9' },
+    { loc: '/whatsapp-psicologia', changefreq: 'monthly', priority: '0.9' },
+    { loc: '/whatsapp-nutricion', changefreq: 'monthly', priority: '0.9' },
+    { loc: '/features/respuesta-automatica', changefreq: 'monthly', priority: '0.7' },
+    { loc: '/features/agenda-inteligente', changefreq: 'monthly', priority: '0.7' },
+    { loc: '/features/reactivacion-pacientes', changefreq: 'monthly', priority: '0.7' },
+    { loc: '/features/panel-control', changefreq: 'monthly', priority: '0.7' },
+    { loc: '/features/implementacion', changefreq: 'monthly', priority: '0.7' },
+    { loc: '/features/rgpd', changefreq: 'monthly', priority: '0.6' },
+    { loc: '/legal/privacidad', changefreq: 'yearly', priority: '0.3' },
+    { loc: '/legal/terminos', changefreq: 'yearly', priority: '0.3' },
+    { loc: '/legal/cookies', changefreq: 'yearly', priority: '0.3' },
+  ];
+  const blog_urls = BLOG_POSTS.map(p => ({ loc: `/blog/${p.slug}`, changefreq: 'monthly', priority: '0.8' }));
+  const all = [...static_urls, ...blog_urls];
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${all.map(u => `  <url><loc>${base}${u.loc}</loc><changefreq>${u.changefreq}</changefreq><priority>${u.priority}</priority></url>`).join('\n')}\n</urlset>`;
+  res.type('application/xml').send(xml);
+});
+
 // ── Rutas páginas públicas ──────────────────────────────────────────────────
 
 app.get('/', (req, res) => res.sendFile('landing.html', { root: 'public' }));
@@ -482,6 +514,21 @@ app.get('/legal/cookies', (req, res) => res.sendFile('legal/cookies.html', { roo
 const FEATURES = ['respuesta-automatica','agenda-inteligente','reactivacion-pacientes','panel-control','implementacion','rgpd'];
 FEATURES.forEach(slug => {
   app.get(`/features/${slug}`, (req, res) => res.sendFile(`features/${slug}.html`, { root: 'public' }));
+});
+
+// ── Páginas de especialidad ─────────────────────────────────────────────────
+const SPECIALTY_PAGES = ['whatsapp-clinica-dental','whatsapp-fisioterapia','whatsapp-clinica-estetica','whatsapp-psicologia','whatsapp-nutricion'];
+SPECIALTY_PAGES.forEach(slug => {
+  app.get(`/${slug}`, (req, res) => res.sendFile(`${slug}.html`, { root: 'public' }));
+});
+
+// ── Blog dinámico ───────────────────────────────────────────────────────────
+app.get('/blog/:slug', (req, res) => {
+  const { BLOG_POSTS, renderBlogPost } = require('./blog-posts');
+  const post = BLOG_POSTS.find(p => p.slug === req.params.slug);
+  if (!post) return res.status(404).sendFile('landing.html', { root: 'public' });
+  const related = BLOG_POSTS.filter(p => p.slug !== post.slug && p.category === post.category).slice(0, 3);
+  res.type('text/html').send(renderBlogPost(post, related));
 });
 
 // ── Dashboard (protegido) ───────────────────────────────────────────────────
