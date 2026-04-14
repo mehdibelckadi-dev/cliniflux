@@ -6,5 +6,6 @@ Disallow: /onboarding
 Disallow: /api/
 Disallow: /checkout-success
 Disallow: /checkout-cancel
+Disallow: /login
 
-Sitemap: https://cliniflux.com/sitemap.xml
+Sitemap: https://cliniflux.es/sitemap.xml
