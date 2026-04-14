@@ -16,7 +16,22 @@ function verifyPassword(pass, stored) {
 }
 
 async function initDb() {
+  // clinics primero — el resto tienen FK a clinics(id)
   await pool.query(`
+    CREATE TABLE IF NOT EXISTS clinics (
+      id SERIAL PRIMARY KEY,
+      email TEXT UNIQUE NOT NULL,
+      password_hash TEXT NOT NULL,
+      name TEXT NOT NULL,
+      config JSONB DEFAULT '{}',
+      whatsapp_number TEXT,
+      setup_token TEXT,
+      plan TEXT DEFAULT 'starter',
+      stripe_customer_id TEXT,
+      stripe_subscription_id TEXT,
+      created_at TIMESTAMP DEFAULT NOW()
+    );
+
     CREATE TABLE IF NOT EXISTS chat_sessions (
       id TEXT PRIMARY KEY,
       history JSONB DEFAULT '[]',
@@ -34,21 +49,6 @@ async function initDb() {
       tipo TEXT,
       mensaje TEXT,
       source TEXT DEFAULT 'web',
-      created_at TIMESTAMP DEFAULT NOW()
-    );
-    ALTER TABLE leads ADD COLUMN IF NOT EXISTS clinic_id INTEGER REFERENCES clinics(id);
-
-    CREATE TABLE IF NOT EXISTS clinics (
-      id SERIAL PRIMARY KEY,
-      email TEXT UNIQUE NOT NULL,
-      password_hash TEXT NOT NULL,
-      name TEXT NOT NULL,
-      config JSONB DEFAULT '{}',
-      whatsapp_number TEXT,
-      setup_token TEXT,
-      plan TEXT DEFAULT 'starter',
-      stripe_customer_id TEXT,
-      stripe_subscription_id TEXT,
       created_at TIMESTAMP DEFAULT NOW()
     );
 
