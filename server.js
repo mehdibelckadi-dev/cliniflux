@@ -533,7 +533,7 @@ app.get('/blog', (req, res) => {
   nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(255,255,255,0.93);backdrop-filter:blur(20px);box-shadow:0 1px 0 var(--border)}
   .nav-inner{max-width:var(--cmax);margin:0 auto;padding:0 var(--px);height:64px;display:flex;align-items:center;gap:24px}
   .nav-logo{font-size:21px;font-weight:800;color:var(--text);letter-spacing:-.6px}
-  .nav-links{display:flex;gap:2px;list-style:none;margin:0 auto}
+  .nav-links{display:flex;align-items:center;gap:2px;list-style:none;margin:0 auto}
   .nav-links a{font-size:14px;font-weight:500;color:var(--text2);padding:7px 13px;border-radius:8px;transition:color .2s,background .2s}
   .nav-links a:hover{color:var(--text);background:rgba(0,0,0,0.04)}
   .nav-dropdown{position:relative;z-index:10}
