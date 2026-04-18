@@ -500,7 +500,107 @@ app.get('/', (req, res) => res.sendFile('landing.html', { root: 'public' }));
 app.get('/demo', (req, res) => res.sendFile('demo.html', { root: 'public' }));
 app.get('/about', (req, res) => res.sendFile('about.html', { root: 'public' }));
 app.get('/contacto', (req, res) => res.sendFile('contacto.html', { root: 'public' }));
-app.get('/blog', (req, res) => res.sendFile('blog.html', { root: 'public' }));
+app.get('/blog', (req, res) => {
+  const { BLOG_POSTS } = require('./blog-posts');
+  const cards = BLOG_POSTS.map(p => `
+    <a href="/blog/${p.slug}" class="bl-card">
+      <span class="bl-cat">${p.category}</span>
+      <h2>${p.title}</h2>
+      <p>${p.excerpt}</p>
+      <div class="bl-meta">
+        <span>${p.author}</span>
+        <span>${p.readTime}</span>
+      </div>
+    </a>`).join('');
+  const html = `<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Blog — WhatsApp para Clínicas | Cliniflux</title>
+<meta name="description" content="Guías y recursos sobre automatización WhatsApp para clínicas en España: reducir no-shows, RGPD, comparativas e integraciones con software médico.">
+<link rel="canonical" href="https://cliniflux.es/blog">
+<meta property="og:title" content="Blog — WhatsApp para Clínicas | Cliniflux">
+<meta property="og:description" content="Guías y recursos sobre automatización WhatsApp para clínicas en España.">
+<meta property="og:url" content="https://cliniflux.es/blog">
+<meta property="og:type" content="website">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Blog","name":"Blog de Cliniflux","url":"https://cliniflux.es/blog","description":"Guías sobre automatización WhatsApp para clínicas en España.","publisher":{"@type":"Organization","name":"Cliniflux","url":"https://cliniflux.es"}}</script>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{--green:#16a34a;--text:#0f172a;--text2:#475569;--border:#e2e8f0;--bg2:#f8fafc;--px:clamp(20px,5vw,80px);--cmax:1120px;--r:12px}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:var(--text);background:#fff;line-height:1.6}
+  a{text-decoration:none;color:inherit}
+  nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(255,255,255,0.93);backdrop-filter:blur(20px);box-shadow:0 1px 0 var(--border)}
+  .nav-inner{max-width:var(--cmax);margin:0 auto;padding:0 var(--px);height:64px;display:flex;align-items:center;gap:24px}
+  .nav-logo{font-size:21px;font-weight:800;color:var(--text);letter-spacing:-.6px}
+  .nav-links{display:flex;gap:2px;list-style:none;margin:0 auto}
+  .nav-links a{font-size:14px;font-weight:500;color:var(--text2);padding:7px 13px;border-radius:8px;transition:color .2s,background .2s}
+  .nav-links a:hover{color:var(--text);background:rgba(0,0,0,0.04)}
+  .nav-dropdown{position:relative;z-index:10}
+  .nav-dropdown>a{display:flex;align-items:center;gap:4px}
+  .nav-dropdown>a svg{transition:transform .2s}
+  .nav-dropdown:hover>a svg{transform:rotate(180deg)}
+  .nav-dd-menu{display:none;position:absolute;top:calc(100% + 6px);left:50%;transform:translateX(-50%);background:#fff;border:1px solid var(--border);border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,0.12);padding:8px;min-width:200px;z-index:300}
+  .nav-dropdown:hover .nav-dd-menu{display:block}
+  .nav-dd-menu a{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text2);padding:8px 12px;border-radius:8px;transition:background .15s,color .15s;white-space:nowrap}
+  .nav-dd-menu a:hover{background:#f0fdf4;color:var(--green)}
+  .nav-cta{font-size:13.5px;font-weight:600;color:#fff;background:var(--green);padding:9px 20px;border-radius:100px;white-space:nowrap}
+  .nav-cta:hover{background:#15803d}
+  .nav-login{font-size:14px;font-weight:500;color:var(--text2);padding:8px 14px;border-radius:8px}
+  .nav-actions{display:flex;align-items:center;gap:8px;flex-shrink:0}
+  .hero{padding:calc(64px + 64px) var(--px) 40px;max-width:var(--cmax);margin:0 auto}
+  .hero h1{font-size:clamp(28px,4vw,40px);font-weight:800;letter-spacing:-.03em;margin-bottom:12px}
+  .hero p{font-size:17px;color:var(--text2);max-width:560px}
+  .grid{max-width:var(--cmax);margin:0 auto;padding:24px var(--px) 80px;display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:24px}
+  .bl-card{background:#fff;border:1px solid var(--border);border-radius:var(--r);padding:28px;display:flex;flex-direction:column;gap:12px;transition:box-shadow .2s,transform .2s}
+  .bl-card:hover{box-shadow:0 8px 32px rgba(0,0,0,0.10);transform:translateY(-2px)}
+  .bl-cat{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--green);background:#f0fdf4;border-radius:100px;padding:3px 10px;width:fit-content}
+  .bl-card h2{font-size:18px;font-weight:700;letter-spacing:-.02em;line-height:1.35}
+  .bl-card p{font-size:14px;color:var(--text2);line-height:1.55;flex:1}
+  .bl-meta{display:flex;gap:16px;font-size:12px;color:#94a3b8;margin-top:4px}
+  footer{border-top:1px solid var(--border);padding:32px var(--px);text-align:center;font-size:13px;color:var(--text2)}
+  @media(max-width:640px){.nav-links,.nav-actions{display:none}}
+</style>
+</head>
+<body>
+<nav>
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">cliniflux</a>
+    <ul class="nav-links">
+      <li><a href="/#producto">Producto</a></li>
+      <li><a href="/#flujo">Cómo funciona</a></li>
+      <li class="nav-dropdown">
+        <a href="#">Especialidades <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg></a>
+        <div class="nav-dd-menu">
+          <a href="/whatsapp-clinica-dental">🦷 Clínicas Dentales</a>
+          <a href="/whatsapp-fisioterapia">💪 Fisioterapia</a>
+          <a href="/whatsapp-clinica-estetica">✨ Clínica Estética</a>
+          <a href="/whatsapp-psicologia">🧠 Psicología</a>
+          <a href="/whatsapp-nutricion">🥗 Nutrición</a>
+        </div>
+      </li>
+      <li><a href="/#precios">Precios</a></li>
+      <li><a href="/about">Nosotros</a></li>
+      <li><a href="/blog" style="color:var(--green);font-weight:600">Blog</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a href="/login" class="nav-login">Acceder</a>
+      <a href="/contacto" class="nav-cta">Solicitar acceso →</a>
+    </div>
+  </div>
+</nav>
+<div class="hero">
+  <h1>Blog — Cliniflux</h1>
+  <p>Guías y recursos sobre automatización WhatsApp para clínicas en España.</p>
+</div>
+<div class="grid">${cards}</div>
+<footer>
+  <p>© 2025 Cliniflux · <a href="/legal/privacidad">Privacidad</a> · <a href="/legal/terminos">Términos</a></p>
+</footer>
+</body>
+</html>`;
+  res.type('text/html').send(html);
+});
 app.get('/checkout-success', (req, res) => res.sendFile('checkout-success.html', { root: 'public' }));
 app.get('/checkout-cancel', (req, res) => res.sendFile('checkout-cancel.html', { root: 'public' }));
 app.get('/login', (req, res) => {
