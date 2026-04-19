@@ -164,7 +164,7 @@ function emailWelcomeOnboarding(clinicName, loginUrl) {
 `, `${clinicName} está configurada. Natalia ya puede atender a tus pacientes.`);
 }
 
-function emailTwilioSetup({ clinic, cfg, whatsapp_number }) {
+function emailOnboardingSetup({ clinic, cfg, whatsapp_number }) {
   const ts = new Date().toLocaleString('es-ES', { dateStyle: 'short', timeStyle: 'short' });
   const waNum = whatsapp_number || '— (no proporcionado)';
   return EMAIL_BASE(`
@@ -186,11 +186,11 @@ function emailTwilioSetup({ clinic, cfg, whatsapp_number }) {
 </table>
 ${cfg.services ? `<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:24px"><tr><td style="background:#f8f9fb;border-left:3px solid #22c55e;border-radius:0 8px 8px 0;padding:14px 16px"><p style="margin:0 0 4px;font-size:11px;font-weight:700;color:#94a3b8;text-transform:uppercase;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif">Servicios</p><p style="margin:0;font-size:13px;color:#334155;line-height:1.6;white-space:pre-wrap;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif">${cfg.services}</p></td></tr></table>` : ''}
 <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:20px"><tr><td style="background:#fef3c7;border:1px solid rgba(245,158,11,0.3);border-radius:12px;padding:16px 20px">
-  <p style="margin:0 0 8px;font-size:13px;font-weight:700;color:#92400e;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif">⚡ Pasos para activar WhatsApp en Twilio</p>
+  <p style="margin:0 0 8px;font-size:13px;font-weight:700;color:#92400e;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif">⚡ Pasos para activar WhatsApp (Meta Cloud API)</p>
   <ol style="margin:0;padding-left:18px;font-size:13px;color:#78350f;line-height:1.8;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif">
-    <li>Entra en <strong>console.twilio.com</strong> y compra un número</li>
-    <li>Ve a Messaging → Settings → WhatsApp Senders → añade <strong>${waNum}</strong></li>
-    <li>Configura el webhook: <strong>POST https://cliniflux.es/webhook/whatsapp</strong></li>
+    <li>Entra en <strong>developers.facebook.com</strong> → WhatsApp → Configuration</li>
+    <li>Añade el número del cliente <strong>${waNum}</strong> como WhatsApp Business sender</li>
+    <li>Webhook configurado: <strong>POST https://cliniflux.es/webhook/whatsapp</strong></li>
     <li>Actualiza en la DB: <code>UPDATE clinics SET whatsapp_number='${waNum}' WHERE id=${clinic.id}</code></li>
     <li>Envía email al cliente confirmando activación</li>
   </ol>
@@ -200,7 +200,7 @@ ${cfg.services ? `<table width="100%" cellpadding="0" cellspacing="0" border="0"
     <span style="color:#ffffff;text-decoration:none">Responder al cliente →</span>
   </a>
 </td></tr></table>
-`, `${clinic.name} completó el onboarding — configura Twilio`);
+`, `${clinic.name} completó el onboarding — activar WhatsApp`);
 }
 
 function emailContactNotification({ nombre, clinica, email, telefono, tipo, mensaje }) {
@@ -696,13 +696,13 @@ app.post('/api/onboarding', async (req, res) => {
       subject: `Tu asistente Cliniflux estará activo en menos de 24h`,
       html: emailWelcomeOnboarding(clinic.name || 'Tu clínica', loginUrl)
     });
-    // Email interno para configurar Twilio
+    // Email interno para activar en Meta Cloud API
     const cfg = { phone, address, hours, services, extra, assistant_name: assistant_name||'Natalia' };
     const notify = process.env.EMAIL_NOTIFY || process.env.EMAIL_FROM || 'contacto@cliniflux.es';
     await sendEmail({
       to: notify,
       subject: `🔧 Nuevo cliente listo para activar — ${clinic.name}`,
-      html: emailTwilioSetup({ clinic, cfg, whatsapp_number })
+      html: emailOnboardingSetup({ clinic, cfg, whatsapp_number })
     }).catch(e => console.error('notify email:', e.message));
     res.json({ ok: true });
   } catch(e) {
@@ -821,29 +821,58 @@ app.get('/api/dashboard/appointments', requireAuth, async (req, res) => {
   }
 });
 
-// ── POST /webhook/whatsapp (Twilio) ────────────────────────────────────────
+// ── WhatsApp Business API (Meta) ────────────────────────────────────────────
+
+async function sendWhatsAppMessage(to, text) {
+  const phoneId = process.env.WHATSAPP_PHONE_ID;
+  const token   = process.env.WHATSAPP_TOKEN;
+  if (!phoneId || !token) { console.error('[WA] Faltan WHATSAPP_PHONE_ID o WHATSAPP_TOKEN'); return; }
+  await fetch(`https://graph.facebook.com/v19.0/${phoneId}/messages`, {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ messaging_product: 'whatsapp', to, type: 'text', text: { body: text } })
+  }).catch(e => console.error('[WA] send error:', e.message));
+}
+
+// Verificación del webhook (Meta hace GET al configurarlo)
+app.get('/webhook/whatsapp', (req, res) => {
+  const mode  = req.query['hub.mode'];
+  const token = req.query['hub.verify_token'];
+  const challenge = req.query['hub.challenge'];
+  if (mode === 'subscribe' && token === process.env.WHATSAPP_VERIFY_TOKEN) {
+    return res.status(200).send(challenge);
+  }
+  res.sendStatus(403);
+});
 
 app.post('/webhook/whatsapp', async (req, res) => {
-  const from  = (req.body.From || '').replace('whatsapp:', '');
-  const to    = (req.body.To   || '').replace('whatsapp:', '');
-  const msg   = (req.body.Body || '').trim().slice(0, 500);
-  if (!from || !msg) return res.type('text/xml').send('<Response></Response>');
-
-  // Identificar clínica por número destino (multi-tenant)
-  const clinic = to ? await getClinicByWhatsapp(to).catch(() => null) : null;
-  const prompt = clinic ? buildPromptForClinic(clinic) : buildDemoPrompt();
-  const clinicId = clinic?.id || 1;
-  const sessionId = `wa_${clinicId}_` + from.replace(/\D/g,'').slice(-10);
+  res.sendStatus(200); // Meta requiere 200 inmediato
 
   try {
-    // Contador de conversaciones (solo clínicas reales, no demo)
+    const entry = req.body?.entry?.[0];
+    const change = entry?.changes?.[0]?.value;
+    const message = change?.messages?.[0];
+    if (!message || message.type !== 'text') return;
+
+    const from = message.from; // número del paciente (e.g. "34612345678")
+    const to   = change?.metadata?.display_phone_number?.replace(/\D/g,'');
+    const msg  = message.text?.body?.trim().slice(0, 500);
+    if (!from || !msg) return;
+
+    const clinic   = to ? await getClinicByWhatsapp(to).catch(() => null) : null;
+    const prompt   = clinic ? buildPromptForClinic(clinic) : buildDemoPrompt();
+    const clinicId = clinic?.id || 1;
+    const sessionId = `wa_${clinicId}_` + from.slice(-10);
+
     if (clinic?.id) {
       const usage = await incrementConversation(clinic.id);
       checkAndNotifyUsage(usage, clinic.id).catch(e => console.error('usage notify:', e.message));
       if (usage.blocked) {
-        return res.type('text/xml').send('<Response><Message>Lo sentimos, la clínica ha alcanzado el límite de conversaciones este mes. Llámenos directamente para ayudarle.</Message></Response>');
+        await sendWhatsAppMessage(from, 'Lo sentimos, la clínica ha alcanzado el límite de conversaciones este mes. Llámenos directamente para ayudarle.');
+        return;
       }
     }
+
     const history = await getSession(sessionId);
     const completion = await openai.chat.completions.create({
       model: process.env.AI_MODEL || 'gpt-4o-mini',
@@ -860,11 +889,9 @@ app.post('/webhook/whatsapp', async (req, res) => {
     history.push({ role:'user', content: msg });
     history.push({ role:'assistant', content: reply });
     await saveSession(sessionId, history.slice(-20));
-    const safe = reply.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-    res.type('text/xml').send(`<?xml version="1.0" encoding="UTF-8"?><Response><Message>${safe}</Message></Response>`);
+    await sendWhatsAppMessage(from, reply);
   } catch(err) {
     console.error('[WA]', err.message);
-    res.type('text/xml').send('<Response><Message>Lo sentimos, ha ocurrido un error. Inténtelo de nuevo en unos minutos.</Message></Response>');
   }
 });
 
