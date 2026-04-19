@@ -821,29 +821,58 @@ app.get('/api/dashboard/appointments', requireAuth, async (req, res) => {
   }
 });
 
-// ── POST /webhook/whatsapp (Twilio) ────────────────────────────────────────
+// ── WhatsApp Business API (Meta) ────────────────────────────────────────────
+
+async function sendWhatsAppMessage(to, text) {
+  const phoneId = process.env.WHATSAPP_PHONE_ID;
+  const token   = process.env.WHATSAPP_TOKEN;
+  if (!phoneId || !token) { console.error('[WA] Faltan WHATSAPP_PHONE_ID o WHATSAPP_TOKEN'); return; }
+  await fetch(`https://graph.facebook.com/v19.0/${phoneId}/messages`, {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ messaging_product: 'whatsapp', to, type: 'text', text: { body: text } })
+  }).catch(e => console.error('[WA] send error:', e.message));
+}
+
+// Verificación del webhook (Meta hace GET al configurarlo)
+app.get('/webhook/whatsapp', (req, res) => {
+  const mode  = req.query['hub.mode'];
+  const token = req.query['hub.verify_token'];
+  const challenge = req.query['hub.challenge'];
+  if (mode === 'subscribe' && token === process.env.WHATSAPP_VERIFY_TOKEN) {
+    return res.status(200).send(challenge);
+  }
+  res.sendStatus(403);
+});
 
 app.post('/webhook/whatsapp', async (req, res) => {
-  const from  = (req.body.From || '').replace('whatsapp:', '');
-  const to    = (req.body.To   || '').replace('whatsapp:', '');
-  const msg   = (req.body.Body || '').trim().slice(0, 500);
-  if (!from || !msg) return res.type('text/xml').send('<Response></Response>');
-
-  // Identificar clínica por número destino (multi-tenant)
-  const clinic = to ? await getClinicByWhatsapp(to).catch(() => null) : null;
-  const prompt = clinic ? buildPromptForClinic(clinic) : buildDemoPrompt();
-  const clinicId = clinic?.id || 1;
-  const sessionId = `wa_${clinicId}_` + from.replace(/\D/g,'').slice(-10);
+  res.sendStatus(200); // Meta requiere 200 inmediato
 
   try {
-    // Contador de conversaciones (solo clínicas reales, no demo)
+    const entry = req.body?.entry?.[0];
+    const change = entry?.changes?.[0]?.value;
+    const message = change?.messages?.[0];
+    if (!message || message.type !== 'text') return;
+
+    const from = message.from; // número del paciente (e.g. "34612345678")
+    const to   = change?.metadata?.display_phone_number?.replace(/\D/g,'');
+    const msg  = message.text?.body?.trim().slice(0, 500);
+    if (!from || !msg) return;
+
+    const clinic   = to ? await getClinicByWhatsapp(to).catch(() => null) : null;
+    const prompt   = clinic ? buildPromptForClinic(clinic) : buildDemoPrompt();
+    const clinicId = clinic?.id || 1;
+    const sessionId = `wa_${clinicId}_` + from.slice(-10);
+
     if (clinic?.id) {
       const usage = await incrementConversation(clinic.id);
       checkAndNotifyUsage(usage, clinic.id).catch(e => console.error('usage notify:', e.message));
       if (usage.blocked) {
-        return res.type('text/xml').send('<Response><Message>Lo sentimos, la clínica ha alcanzado el límite de conversaciones este mes. Llámenos directamente para ayudarle.</Message></Response>');
+        await sendWhatsAppMessage(from, 'Lo sentimos, la clínica ha alcanzado el límite de conversaciones este mes. Llámenos directamente para ayudarle.');
+        return;
       }
     }
+
     const history = await getSession(sessionId);
     const completion = await openai.chat.completions.create({
       model: process.env.AI_MODEL || 'gpt-4o-mini',
@@ -860,11 +889,9 @@ app.post('/webhook/whatsapp', async (req, res) => {
     history.push({ role:'user', content: msg });
     history.push({ role:'assistant', content: reply });
     await saveSession(sessionId, history.slice(-20));
-    const safe = reply.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-    res.type('text/xml').send(`<?xml version="1.0" encoding="UTF-8"?><Response><Message>${safe}</Message></Response>`);
+    await sendWhatsAppMessage(from, reply);
   } catch(err) {
     console.error('[WA]', err.message);
-    res.type('text/xml').send('<Response><Message>Lo sentimos, ha ocurrido un error. Inténtelo de nuevo en unos minutos.</Message></Response>');
   }
 });
 
