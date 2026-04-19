@@ -965,6 +965,46 @@
 
     @media(max-width:1024px){.sc2-grid{grid-template-columns:1fr;gap:40px}.sc2-grid.rev{direction:ltr}}
     @media(max-width:640px){.sc2-a-kpis{grid-template-columns:repeat(3,1fr)}.sc2-b-bottom{grid-template-columns:repeat(3,1fr)}}
+
+    /* ── Safety protocol ── */
+    .safety-flow{display:flex;align-items:flex-start;gap:0;flex-wrap:wrap;justify-content:center;margin-top:40px}
+    .safety-step{flex:1;min-width:160px;max-width:220px;text-align:center;padding:28px 20px;background:var(--bg2);border:1px solid var(--border);border-radius:16px;position:relative}
+    .safety-arrow{display:flex;align-items:center;padding:0 8px;color:var(--text3);font-size:22px;align-self:center}
+    .safety-icon{width:48px;height:48px;border-radius:12px;background:rgba(34,197,94,0.1);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-size:22px}
+    .safety-step h4{font-size:14px;font-weight:700;color:var(--text1);margin-bottom:6px}
+    .safety-step p{font-size:12px;color:var(--text2);line-height:1.5;margin:0}
+    .safety-step-split .safety-icon,.safety-step-alert .safety-icon{background:rgba(239,68,68,0.1)}
+    .safety-anchor{display:block;text-align:center;margin-top:28px;font-size:13px;color:var(--text2);font-style:italic}
+    @media(max-width:640px){.safety-flow{flex-direction:column;align-items:center}.safety-arrow{transform:rotate(90deg)}}
+
+    /* ── Division table (IA vs human team) ── */
+    .vs-table{border:1px solid var(--border);border-radius:16px;overflow:hidden}
+    .vs-header{display:grid;grid-template-columns:1.4fr 1fr 1fr;background:var(--bg2);padding:16px 20px;gap:0}
+    .vs-col-head{text-align:center;font-size:13px;font-weight:700;color:var(--text1)}
+    .vs-col-cf{text-align:center}
+    .vs-col-rec{text-align:center}
+    .vs-col-head.vs-col-cf .vs-logo-badge{display:inline-block;background:#22c55e;color:#fff;font-size:11px;font-weight:800;padding:3px 10px;border-radius:20px}
+    .vs-col-price{font-size:11px;font-weight:500;color:var(--text2);margin-top:4px}
+    .vs-col-price-rec{color:var(--text3)}
+    .vs-logo-badge{display:inline-block;background:#0f172a;color:#22c55e;font-size:11px;font-weight:800;padding:3px 10px;border-radius:20px}
+    .vs-row{display:grid;grid-template-columns:1.4fr 1fr 1fr;padding:13px 20px;border-top:1px solid var(--border);align-items:center;gap:0}
+    .vs-row-alt{background:var(--bg2)}
+    .vs-col-label{font-size:13px;font-weight:600;color:var(--text1)}
+    .vs-win{text-align:center;font-size:13px;font-weight:700;color:#16a34a}
+    .vs-lose{text-align:center;font-size:13px;color:var(--text3)}
+    @media(max-width:640px){.vs-header,.vs-row{grid-template-columns:1fr 1fr;}.vs-col-label{grid-column:1/3;font-size:12px;padding-bottom:4px}.vs-header .vs-col-label{display:none}}
+
+    /* ── Guarantee badge ── */
+    .pr-guarantee{display:inline-flex;align-items:center;gap:6px;background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);color:#16a34a;font-size:12px;font-weight:600;padding:6px 14px;border-radius:20px;margin-bottom:12px}
+    .pr-guarantee svg{flex-shrink:0}
+
+    /* ── RGPD badge bar (footer) ── */
+    .ft-rgpd-bar{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;padding:20px 0 0;border-top:1px solid var(--border);margin-top:24px}
+    .ft-rgpd-badge{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;color:var(--text2);background:var(--bg2);border:1px solid var(--border);padding:5px 12px;border-radius:20px}
+    .ft-rgpd-badge svg{color:#22c55e;flex-shrink:0}
+
+    /* ── RGPD row in pricing ── */
+    .pr-rgpd-row{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:20px}
   </style>
 <script type="application/ld+json">
 {
@@ -2080,60 +2120,65 @@
   </div>
 </section>
 
-<!-- CLINIFLUX VS RECEPCIONISTA -->
+<!-- LO QUE CLINIFLUX HACE PARA TU EQUIPO -->
 <section style="padding:var(--sy) 0;border-top:1px solid var(--border)">
   <div class="c">
     <div style="text-align:center;margin-bottom:48px" class="reveal">
-      <div class="label" style="justify-content:center;margin-bottom:14px">La comparativa honesta</div>
-      <h2 class="sec-h">Tu competidor real no es otro software.<br>Es contratar a <span class="g">una persona más.</span></h2>
-      <p class="sec-p" style="margin:0 auto;max-width:520px">Compara los números antes de decidir.</p>
+      <div class="label" style="justify-content:center;margin-bottom:14px">División de tareas</div>
+      <h2 class="sec-h">Lo que Cliniflux hace<br>para que <span class="g">tu equipo trabaje mejor.</span></h2>
+      <p class="sec-p" style="margin:0 auto;max-width:520px">Natalia gestiona el WhatsApp. Tu equipo se centra en las personas.</p>
     </div>
     <div class="vs-table reveal d1">
       <div class="vs-header">
         <div class="vs-col-label"></div>
         <div class="vs-col-head vs-col-cf">
-          <span class="vs-logo-badge">cliniflux</span>
-          <div class="vs-col-price">199€/mes</div>
+          <span class="vs-logo-badge">Natalia (IA)</span>
+          <div class="vs-col-price">Gestión automática</div>
         </div>
         <div class="vs-col-head vs-col-rec">
-          <span>Recepcionista adicional</span>
-          <div class="vs-col-price vs-col-price-rec">2.100€/mes</div>
+          <span>Tu equipo humano</span>
+          <div class="vs-col-price vs-col-price-rec">Lo que de verdad importa</div>
         </div>
       </div>
       <div class="vs-row">
-        <div class="vs-col-label">Coste mensual</div>
-        <div class="vs-col-cf vs-win">199€</div>
-        <div class="vs-col-rec vs-lose">2.100€ + SS</div>
+        <div class="vs-col-label">WhatsApp a las 11pm</div>
+        <div class="vs-col-cf vs-win">Responde en 1.2s</div>
+        <div class="vs-col-rec" style="color:var(--text2)">Descansa</div>
       </div>
       <div class="vs-row vs-row-alt">
-        <div class="vs-col-label">Disponibilidad</div>
-        <div class="vs-col-cf vs-win">24/7 — 365 días</div>
-        <div class="vs-col-rec vs-lose">8h laborables</div>
+        <div class="vs-col-label">Confirmación de citas</div>
+        <div class="vs-col-cf vs-win">Automática, 24/7</div>
+        <div class="vs-col-rec" style="color:var(--text2)">Sin interrupciones</div>
       </div>
       <div class="vs-row">
-        <div class="vs-col-label">Tiempo de respuesta</div>
-        <div class="vs-col-cf vs-win">1.2 segundos</div>
-        <div class="vs-col-rec vs-lose">Minutos / horas</div>
+        <div class="vs-col-label">Recordatorios</div>
+        <div class="vs-col-cf vs-win">Enviados solos</div>
+        <div class="vs-col-rec" style="color:var(--text2)">Tiempo liberado</div>
       </div>
       <div class="vs-row vs-row-alt">
-        <div class="vs-col-label">Errores en citas</div>
-        <div class="vs-col-cf vs-win">0%</div>
-        <div class="vs-col-rec vs-lose">Humano</div>
+        <div class="vs-col-label">Reactivar pacientes inactivos</div>
+        <div class="vs-col-cf vs-win">Campaña automática</div>
+        <div class="vs-col-rec" style="color:var(--text2)">Sin llamadas en frío</div>
       </div>
       <div class="vs-row">
-        <div class="vs-col-label">Vacaciones y bajas</div>
-        <div class="vs-col-cf vs-win">Nunca</div>
-        <div class="vs-col-rec vs-lose">22 días/año + bajas</div>
+        <div class="vs-col-label">Recibir pacientes</div>
+        <div class="vs-col-cf" style="color:var(--text3);text-align:center">—</div>
+        <div class="vs-col-rec" style="color:#0f172a;font-weight:700;text-align:center">Tu equipo ✓</div>
       </div>
       <div class="vs-row vs-row-alt">
-        <div class="vs-col-label">Escalabilidad</div>
-        <div class="vs-col-cf vs-win">Ilimitada</div>
-        <div class="vs-col-rec vs-lose">Contratar más personas</div>
+        <div class="vs-col-label">Situaciones complejas</div>
+        <div class="vs-col-cf" style="color:var(--text3);text-align:center">—</div>
+        <div class="vs-col-rec" style="color:#0f172a;font-weight:700;text-align:center">Tu equipo ✓</div>
       </div>
       <div class="vs-row">
-        <div class="vs-col-label">Formación</div>
-        <div class="vs-col-cf vs-win">0 horas</div>
-        <div class="vs-col-rec vs-lose">Semanas</div>
+        <div class="vs-col-label">Construir confianza</div>
+        <div class="vs-col-cf" style="color:var(--text3);text-align:center">—</div>
+        <div class="vs-col-rec" style="color:#0f172a;font-weight:700;text-align:center">Tu equipo ✓</div>
+      </div>
+      <div class="vs-row vs-row-alt">
+        <div class="vs-col-label">Diagnósticos</div>
+        <div class="vs-col-cf" style="color:var(--text3);text-align:center">—</div>
+        <div class="vs-col-rec" style="color:#0f172a;font-weight:700;text-align:center">Solo tu equipo ✓</div>
       </div>
     </div>
     <div style="text-align:center;margin-top:36px" class="reveal d2">
