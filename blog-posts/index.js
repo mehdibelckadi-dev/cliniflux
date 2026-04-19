@@ -86,9 +86,18 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;transition:background .3s,bo
 nav.scrolled{background:rgba(255,255,255,0.95);backdrop-filter:blur(16px);box-shadow:0 1px 0 var(--border)}
 .nav-inner{max-width:var(--cmax);margin:0 auto;padding:0 var(--px);height:64px;display:flex;align-items:center;gap:32px}
 .nav-logo{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-.5px}.logo-g{color:var(--green)}
-.nav-links{display:flex;gap:2px;list-style:none;margin:0 auto}
+.nav-links{display:flex;align-items:center;gap:2px;list-style:none;margin:0 auto}
 .nav-links a{font-size:14px;font-weight:500;color:var(--text2);padding:7px 13px;border-radius:8px;transition:all .2s}
 .nav-links a:hover{color:var(--text);background:var(--bg2)}
+.nav-dropdown{position:relative;z-index:10}
+.nav-dropdown>a{display:flex;align-items:center;gap:4px}
+.nav-dropdown>a svg{transition:transform .2s}
+.nav-dropdown:hover>a svg{transform:rotate(180deg)}
+.nav-dd-menu{display:none;position:absolute;top:calc(100% + 6px);left:50%;transform:translateX(-50%);background:#fff;border:1px solid var(--border);border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,0.12);padding:8px;min-width:220px;z-index:300}
+.nav-dropdown:hover .nav-dd-menu{display:block}
+.nav-dd-menu a{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:500;color:var(--text2);text-decoration:none;padding:8px 12px;border-radius:8px;transition:background .15s,color .15s;white-space:nowrap}
+.nav-dd-menu a:hover{background:var(--green-dim);color:var(--green)}
+.nav-dd-menu a span{font-size:16px}
 .nav-actions{display:flex;align-items:center;gap:8px;flex-shrink:0}
 .btn-ghost{font-size:14px;font-weight:600;color:var(--text2);padding:8px 16px;border-radius:8px;border:1px solid var(--border);transition:all .2s}
 .btn-primary{font-size:14px;font-weight:600;color:#fff;background:var(--green);padding:8px 18px;border-radius:8px;transition:all .2s;display:inline-block}
@@ -139,13 +148,23 @@ footer{border-top:1px solid var(--border);padding:44px 0;background:var(--bg2)}
     <a href="/" class="nav-logo">clini<span class="logo-g">flux</span></a>
     <ul class="nav-links">
       <li><a href="/#producto">Producto</a></li>
+      <li><a href="/#flujo">Cómo funciona</a></li>
+      <li class="nav-dropdown">
+        <a href="#">Especialidades <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg></a>
+        <div class="nav-dd-menu">
+          <a href="/whatsapp-clinica-dental"><span>🦷</span> Clínicas Dentales</a>
+          <a href="/whatsapp-fisioterapia"><span>💪</span> Fisioterapia</a>
+          <a href="/whatsapp-clinica-estetica"><span>✨</span> Clínica Estética</a>
+          <a href="/whatsapp-psicologia"><span>🧠</span> Psicología</a>
+          <a href="/whatsapp-nutricion"><span>🥗</span> Nutrición</a>
+        </div>
+      </li>
       <li><a href="/#precios">Precios</a></li>
-      <li><a href="/blog">Blog</a></li>
       <li><a href="/about">Nosotros</a></li>
     </ul>
     <div class="nav-actions">
       <a href="/login" class="btn-ghost">Acceder</a>
-      <a href="/contacto" class="btn-primary">Solicitar demo →</a>
+      <a href="/contacto" class="btn-primary">Solicitar acceso →</a>
     </div>
   </div>
 </nav>

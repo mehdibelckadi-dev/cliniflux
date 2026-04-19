@@ -513,7 +513,8 @@ app.get('/blog', (req, res) => {
       <p>${p.excerpt}</p>
       <div class="bl-meta">
         <span>${p.author}</span>
-        <span>${p.readTime}</span>
+        <span>${p.readingTime}</span>
+        <span>${new Date(p.date).toLocaleDateString('es-ES',{day:'numeric',month:'long',year:'numeric'})}</span>
       </div>
     </a>`).join('');
   const html = `<!DOCTYPE html>
