@@ -541,11 +541,11 @@ app.get('/blog', (req, res) => {
   .nav-links{display:flex;align-items:center;gap:2px;list-style:none;margin:0 auto}
   .nav-links a{font-size:14px;font-weight:500;color:var(--text2);padding:7px 13px;border-radius:8px;transition:color .2s,background .2s}
   .nav-links a:hover{color:var(--text);background:rgba(0,0,0,0.04)}
-  .nav-dropdown{position:relative;z-index:10}
+  .nav-dropdown{position:relative;z-index:10;padding-bottom:8px;margin-bottom:-8px}
   .nav-dropdown>a{display:flex;align-items:center;gap:4px}
   .nav-dropdown>a svg{transition:transform .2s}
   .nav-dropdown:hover>a svg{transform:rotate(180deg)}
-  .nav-dd-menu{display:none;position:absolute;top:calc(100% + 6px);left:50%;transform:translateX(-50%);background:#fff;border:1px solid var(--border);border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,0.12);padding:8px;min-width:200px;z-index:300}
+  .nav-dd-menu{display:none;position:absolute;top:100%;left:50%;transform:translateX(-50%);background:#fff;border:1px solid var(--border);border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,0.12);padding:8px;min-width:200px;z-index:300}
   .nav-dropdown:hover .nav-dd-menu{display:block}
   .nav-dd-menu a{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text2);padding:8px 12px;border-radius:8px;transition:background .15s,color .15s;white-space:nowrap}
   .nav-dd-menu a:hover{background:#f0fdf4;color:var(--green)}
@@ -564,7 +564,15 @@ app.get('/blog', (req, res) => {
   .bl-card p{font-size:14px;color:var(--text2);line-height:1.55;flex:1}
   .bl-meta{display:flex;gap:16px;font-size:12px;color:#94a3b8;margin-top:4px}
   footer{border-top:1px solid var(--border);padding:32px var(--px);text-align:center;font-size:13px;color:var(--text2)}
-  @media(max-width:640px){.nav-links,.nav-actions{display:none}}
+  .nav-burger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:8px;margin-left:auto;background:none;border:none}
+  .nav-burger span{display:block;width:22px;height:2px;background:var(--text);border-radius:2px;transition:all .25s}
+  .mob-nav{display:none;position:fixed;top:64px;left:0;right:0;background:#fff;border-bottom:1px solid var(--border);z-index:190;padding:16px var(--px) 20px;flex-direction:column;gap:4px}
+  .mob-nav a{font-size:15px;font-weight:500;color:var(--text2);padding:10px 12px;border-radius:8px;display:block}
+  .mob-nav a:hover{background:var(--bg2);color:var(--text)}
+  .mob-nav .mob-sep{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#94a3b8;padding:12px 12px 4px}
+  .mob-nav .mob-cta{background:var(--green);color:#fff;text-align:center;border-radius:100px;font-weight:600;margin-top:8px}
+  .mob-nav.open{display:flex}
+  @media(max-width:640px){.nav-links,.nav-actions{display:none}.nav-burger{display:flex}}
 </style>
 </head>
 <body>
@@ -592,8 +600,31 @@ app.get('/blog', (req, res) => {
       <a href="/login" class="nav-login">Acceder</a>
       <a href="/contacto" class="nav-cta">Solicitar acceso →</a>
     </div>
+    <button class="nav-burger" id="blogBurger" aria-label="Menú">
+      <span></span><span></span><span></span>
+    </button>
   </div>
 </nav>
+<div class="mob-nav" id="blogMobNav">
+  <a href="/#producto">Producto</a>
+  <a href="/#flujo">Cómo funciona</a>
+  <a href="/#precios">Precios</a>
+  <a href="/about">Nosotros</a>
+  <a href="/blog" style="color:var(--green);font-weight:600">Blog</a>
+  <div class="mob-sep">Especialidades</div>
+  <a href="/whatsapp-clinica-dental">🦷 Clínicas Dentales</a>
+  <a href="/whatsapp-fisioterapia">💪 Fisioterapia</a>
+  <a href="/whatsapp-clinica-estetica">✨ Clínica Estética</a>
+  <a href="/whatsapp-psicologia">🧠 Psicología</a>
+  <a href="/whatsapp-nutricion">🥗 Nutrición</a>
+  <a href="/login" style="margin-top:4px">Acceder</a>
+  <a href="/contacto" class="mob-cta">Solicitar acceso →</a>
+</div>
+<script>
+  document.getElementById('blogBurger').addEventListener('click',function(){
+    document.getElementById('blogMobNav').classList.toggle('open');
+  });
+</script>
 <div class="hero">
   <h1>Blog — Cliniflux</h1>
   <p>Guías y recursos sobre automatización WhatsApp para clínicas en España.</p>
