@@ -55,9 +55,10 @@ nav.scrolled{background:rgba(255,255,255,0.93);backdrop-filter:blur(20px);-webki
 .nav-inner{max-width:var(--cmax);margin:0 auto;padding:0 var(--px);height:68px;display:flex;align-items:center;gap:24px}
 .nav-logo{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-.6px;flex-shrink:0}
 .nav-logo span{color:var(--green)}
-.nav-links{display:flex;gap:2px;list-style:none;margin:0 auto}
+.nav-links{display:flex;align-items:center;gap:2px;list-style:none;margin:0 auto}
 .nav-links a{font-size:14px;font-weight:500;color:var(--text2);padding:7px 14px;border-radius:8px;transition:color .2s,background .2s}
 .nav-links a:hover{color:var(--text);background:rgba(0,0,0,0.04)}
+.nav-dropdown{position:relative;z-index:10}.nav-dropdown>a{display:flex;align-items:center;gap:4px}.nav-dropdown>a svg{transition:transform .2s}.nav-dropdown:hover>a svg{transform:rotate(180deg)}.nav-dd-menu{display:none;position:absolute;top:calc(100% + 6px);left:50%;transform:translateX(-50%);background:#fff;border:1px solid #e5e7eb;border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,0.12);padding:8px;min-width:220px;z-index:300}.nav-dropdown:hover .nav-dd-menu{display:block}.nav-dd-menu a{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:500;padding:8px 12px;border-radius:8px;white-space:nowrap}.nav-dd-menu a:hover{background:#f0fdf4;color:#16a34a}.nav-dd-menu a span{font-size:16px}
 .nav-actions{display:flex;align-items:center;gap:8px;flex-shrink:0}
 .nav-login{font-size:14px;font-weight:500;color:var(--text2);padding:8px 14px;border-radius:8px;transition:color .2s,background .2s}
 .nav-login:hover{color:var(--text);background:rgba(0,0,0,0.04)}
@@ -248,8 +249,18 @@ footer{border-top:1px solid var(--border);padding:56px 0 32px;background:#fff}
     <a href="/" class="nav-logo">clini<span>flux</span></a>
     <ul class="nav-links">
       <li><a href="/#producto">Producto</a></li>
+      <li><a href="/#flujo">Cómo funciona</a></li>
+      <li class="nav-dropdown">
+        <a href="#">Especialidades <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg></a>
+        <div class="nav-dd-menu">
+          <a href="/whatsapp-clinica-dental"><span>🦷</span> Clínicas Dentales</a>
+          <a href="/whatsapp-fisioterapia"><span>💪</span> Fisioterapia</a>
+          <a href="/whatsapp-clinica-estetica"><span>✨</span> Clínica Estética</a>
+          <a href="/whatsapp-psicologia"><span>🧠</span> Psicología</a>
+          <a href="/whatsapp-nutricion"><span>🥗</span> Nutrición</a>
+        </div>
+      </li>
       <li><a href="/#precios">Precios</a></li>
-      <li><a href="/blog">Blog</a></li>
       <li><a href="/about">Nosotros</a></li>
     </ul>
     <div class="nav-actions">
