@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Roadmap — Funcionalidades en Desarrollo | Cliniflux</title>
+<meta name="description" content="Roadmap público de Cliniflux: funcionalidades en desarrollo, próximas y planificadas. Tu feedback decide las prioridades. Transparencia total.">
+<link rel="canonical" href="https://cliniflux.es/roadmap">
+<meta property="og:title" content="Roadmap — Cliniflux">
+<meta property="og:description" content="Roadmap público de Cliniflux. Tu feedback lo construye.">
+<meta property="og:url" content="https://cliniflux.es/roadmap">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Roadmap — Cliniflux">
+<meta name="twitter:description" content="Roadmap público de Cliniflux. Tu feedback lo construye.">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{--green:#16a34a;--text:#0f172a;--text2:#475569;--text3:#94a3b8;--border:#e2e8f0;--bg2:#f8fafc;--px:clamp(20px,5vw,80px);--cmax:1000px;--r:12px;--shadow-sm:0 1px 3px rgba(0,0,0,.06)}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:var(--text);background:#fff;line-height:1.6}
+  a{text-decoration:none;color:inherit}
+  nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(255,255,255,0.93);backdrop-filter:blur(20px);box-shadow:0 1px 0 var(--border)}
+  .nav-inner{max-width:var(--cmax);margin:0 auto;padding:0 var(--px);height:64px;display:flex;align-items:center;gap:24px}
+  .nav-logo{font-size:21px;font-weight:800;color:var(--text);letter-spacing:-.6px}
+  .nav-links{display:flex;align-items:center;gap:2px;list-style:none;margin:0 auto}
+  .nav-links a{font-size:14px;font-weight:500;color:var(--text2);padding:7px 13px;border-radius:8px;transition:color .2s,background .2s}
+  .nav-links a:hover{color:var(--text);background:rgba(0,0,0,0.04)}
+  .nav-actions{display:flex;align-items:center;gap:8px;flex-shrink:0}
+  .nav-cta{font-size:13.5px;font-weight:600;color:#fff;background:var(--green);padding:9px 20px;border-radius:100px}
+  .nav-login{font-size:14px;font-weight:500;color:var(--text2);padding:8px 14px;border-radius:8px}
+  .hero{padding:calc(64px + 64px) var(--px) 48px;max-width:var(--cmax);margin:0 auto;text-align:center}
+  .label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--green);display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:16px}
+  h1{font-size:clamp(28px,4vw,42px);font-weight:800;letter-spacing:-.04em;margin-bottom:16px}
+  .hero-sub{font-size:17px;color:var(--text2);max-width:520px;margin:0 auto 32px}
+  .tagline{display:inline-flex;align-items:center;gap:8px;background:#f0fdf4;border:1px solid rgba(22,163,74,0.25);border-radius:100px;padding:8px 20px;font-size:14px;font-weight:600;color:var(--green);margin-bottom:48px}
+  .c{max-width:var(--cmax);margin:0 auto;padding:0 var(--px)}
+  section{padding:56px 0}
+  .status-bar{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-bottom:56px}
+  .status-pill{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:5px 14px;border-radius:100px}
+  .pill-progress{background:#fef3c7;color:#d97706}
+  .pill-next{background:#f0fdf4;color:#16a34a}
+  .pill-planned{background:#f1f5f9;color:#64748b}
+  .features-grid{display:flex;flex-direction:column;gap:12px;margin-bottom:48px}
+  .feat-row{display:grid;grid-template-columns:140px 1fr auto;align-items:start;gap:16px;background:#fff;border:1px solid var(--border);border-radius:14px;padding:20px 24px}
+  .feat-status{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;padding:4px 10px;border-radius:100px;white-space:nowrap}
+  .st-progress{background:#fef3c7;color:#d97706}
+  .st-next{background:#f0fdf4;color:#16a34a}
+  .st-planned{background:#f1f5f9;color:#64748b}
+  .feat-name{font-size:15px;font-weight:700;color:var(--text);margin-bottom:4px}
+  .feat-desc{font-size:13px;color:var(--text2);line-height:1.5}
+  .feat-date{font-size:12px;font-weight:600;color:var(--text3);white-space:nowrap;padding-top:2px}
+  .vote-section{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:40px;text-align:center;margin-bottom:48px}
+  .vote-section h2{font-size:22px;font-weight:800;letter-spacing:-.03em;margin-bottom:10px}
+  .vote-section p{font-size:15px;color:var(--text2);margin-bottom:24px}
+  .vote-form{display:flex;gap:10px;max-width:480px;margin:0 auto}
+  .vote-input{flex:1;border:1px solid var(--border);border-radius:10px;padding:11px 16px;font-size:14px;font-family:inherit;outline:none}
+  .vote-input:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(22,163,74,.1)}
+  .vote-btn{font-size:13.5px;font-weight:600;color:#fff;background:var(--green);border:none;padding:11px 20px;border-radius:10px;cursor:pointer;white-space:nowrap}
+  footer{border-top:1px solid var(--border);padding:32px var(--px);text-align:center;font-size:13px;color:var(--text2)}
+  @media(max-width:640px){.feat-row{grid-template-columns:1fr;gap:8px}.nav-links,.nav-actions{display:none}}
+</style>
+</head>
+<body>
+<nav>
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">cliniflux</a>
+    <ul class="nav-links">
+      <li><a href="/#producto">Producto</a></li>
+      <li><a href="/#flujo">Cómo funciona</a></li>
+      <li><a href="/#precios">Precios</a></li>
+      <li><a href="/about">Nosotros</a></li>
+      <li><a href="/blog">Blog</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a href="/login" class="nav-login">Acceder</a>
+      <a href="/contacto" class="nav-cta">Solicitar acceso →</a>
+    </div>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="label">Transparencia total</div>
+  <h1>Roadmap público</h1>
+  <p class="hero-sub">Aquí puedes ver todo lo que estamos construyendo, cuándo llega y votar lo que más necesitas. Tu clínica lo construye.</p>
+  <div class="tagline">🛠 Roadmap público · Tu feedback lo construye</div>
+</div>
+
+<div class="c">
+  <div class="status-bar">
+    <span class="status-pill pill-progress">🔧 En progreso — disponible pronto</span>
+    <span class="status-pill pill-next">✅ Próximo — Q3/Q4 2026</span>
+    <span class="status-pill pill-planned">📋 Planificado — 2027</span>
+  </div>
+
+  <div class="features-grid">
+
+    <div class="feat-row">
+      <span class="feat-status st-progress">🔧 En progreso</span>
+      <div>
+        <div class="feat-name">Integración Google Calendar</div>
+        <div class="feat-desc">Sincronización bidireccional con Google Calendar. Las citas confirmadas por WhatsApp aparecen automáticamente en tu calendario y viceversa.</div>
+      </div>
+      <div class="feat-date">Q3 2026</div>
+    </div>
+
+    <div class="feat-row">
+      <span class="feat-status st-progress">🔧 En progreso</span>
+      <div>
+        <div class="feat-name">Integración Gesden / Clinic Cloud</div>
+        <div class="feat-desc">Conexión directa con los software de gestión clínica más usados en España. Las citas de WhatsApp se crean automáticamente en tu agenda.</div>
+      </div>
+      <div class="feat-date">Q3 2026</div>
+    </div>
+
+    <div class="feat-row">
+      <span class="feat-status st-next">✅ Próximo</span>
+      <div>
+        <div class="feat-name">Web Chat embebible</div>
+        <div class="feat-desc">Widget de chat para instalar en tu web. Los visitantes pueden chatear con Natalia directamente desde tu página, sin salir a WhatsApp.</div>
+      </div>
+      <div class="feat-date">Q4 2026</div>
+    </div>
+
+    <div class="feat-row">
+      <span class="feat-status st-next">✅ Próximo</span>
+      <div>
+        <div class="feat-name">Informes automáticos semanales</div>
+        <div class="feat-desc">Recibe cada lunes un resumen por email con: citas gestionadas, no-shows evitados, pacientes reactivados y ROI estimado de la semana.</div>
+      </div>
+      <div class="feat-date">Q4 2026</div>
+    </div>
+
+    <div class="feat-row">
+      <span class="feat-status st-next">✅ Próximo</span>
+      <div>
+        <div class="feat-name">Campañas segmentadas por especialidad</div>
+        <div class="feat-desc">Envía mensajes masivos a segmentos específicos: pacientes de ortodoncia, de revisión anual, de tratamientos estéticos de temporada...</div>
+      </div>
+      <div class="feat-date">Q4 2026</div>
+    </div>
+
+    <div class="feat-row">
+      <span class="feat-status st-planned">📋 Planificado</span>
+      <div>
+        <div class="feat-name">App móvil para clínicas</div>
+        <div class="feat-desc">App nativa iOS y Android para gestionar conversaciones, ver el panel de control y recibir alertas de urgencias en tiempo real, desde cualquier lugar.</div>
+      </div>
+      <div class="feat-date">2027</div>
+    </div>
+
+    <div class="feat-row">
+      <span class="feat-status st-planned">📋 Planificado</span>
+      <div>
+        <div class="feat-name">Integración con sistemas de pago</div>
+        <div class="feat-desc">Cobro de señales y reservas directamente desde WhatsApp. El paciente confirma la cita y paga la señal sin salir de la conversación.</div>
+      </div>
+      <div class="feat-date">2027</div>
+    </div>
+
+    <div class="feat-row">
+      <span class="feat-status st-planned">📋 Planificado</span>
+      <div>
+        <div class="feat-name">Multi-idioma (catalán, euskera, gallego)</div>
+        <div class="feat-desc">Natalia podrá responder en las lenguas co-oficiales de España. La clínica configura el idioma preferente por número o sede.</div>
+      </div>
+      <div class="feat-date">2027</div>
+    </div>
+
+  </div>
+
+  <div class="vote-section">
+    <h2>¿Echas en falta algo?</h2>
+    <p>Dinos qué funcionalidad cambiaría el juego para tu clínica. Las más votadas entran en el roadmap.</p>
+    <div class="vote-form">
+      <input type="text" class="vote-input" placeholder="Describe la funcionalidad que necesitas...">
+      <button class="vote-btn" onclick="this.textContent='✓ Enviado'; this.disabled=true">Votar →</button>
+    </div>
+    <p style="font-size:12px;color:var(--text3);margin-top:12px">O escríbenos directamente a <a href="mailto:hola@cliniflux.es" style="color:var(--green)">hola@cliniflux.es</a></p>
+  </div>
+</div>
+
+<footer>
+  <p>© 2025 Cliniflux · <a href="/legal/privacidad">Privacidad</a> · <a href="/legal/terminos">Términos</a> · <a href="/contacto">Contacto</a></p>
+</footer>
+</body>
+</html>

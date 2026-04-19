@@ -484,6 +484,8 @@ app.get('/sitemap.xml', (req, res) => {
     { loc: '/features/panel-control', changefreq: 'monthly', priority: '0.7' },
     { loc: '/features/implementacion', changefreq: 'monthly', priority: '0.7' },
     { loc: '/features/rgpd', changefreq: 'monthly', priority: '0.6' },
+    { loc: '/roadmap', changefreq: 'monthly', priority: '0.6' },
+    { loc: '/rgpd-clinicas', changefreq: 'monthly', priority: '0.7' },
     { loc: '/legal/privacidad', changefreq: 'yearly', priority: '0.3' },
     { loc: '/legal/terminos', changefreq: 'yearly', priority: '0.3' },
     { loc: '/legal/cookies', changefreq: 'yearly', priority: '0.3' },
@@ -499,6 +501,8 @@ app.get('/sitemap.xml', (req, res) => {
 app.get('/', (req, res) => res.sendFile('landing.html', { root: 'public' }));
 app.get('/demo', (req, res) => res.sendFile('demo.html', { root: 'public' }));
 app.get('/about', (req, res) => res.sendFile('about.html', { root: 'public' }));
+app.get('/roadmap', (req, res) => res.sendFile('roadmap.html', { root: 'public' }));
+app.get('/rgpd-clinicas', (req, res) => res.sendFile('rgpd-clinicas.html', { root: 'public' }));
 app.get('/contacto', (req, res) => res.sendFile('contacto.html', { root: 'public' }));
 app.get('/blog', (req, res) => {
   const { BLOG_POSTS } = require('./blog-posts');

@@ -1073,10 +1073,10 @@
   <div class="hero-inner">
     <div class="hero-body">
       <div class="hero-badge"><span class="badge-dot"></span>Automatización IA para clínicas</div>
-      <h1>Tu clínica responde <span class="g">24/7.</span><br>Sin equipo extra.</h1>
-      <p class="hero-desc">Cliniflux automatiza WhatsApp para que cada paciente reciba respuesta instantánea, agende su cita y tu equipo se centre en lo que importa.</p>
+      <h1>Cada mes pierdes entre <span class="g">30 y 50 citas.</span><br>No porque no tengas pacientes, sino porque no las respondes a tiempo.</h1>
+      <p class="hero-desc">Cliniflux responde en <strong>1.2 segundos</strong>, agenda la cita y manda el recordatorio. Tu recepcionista deja de perder el tiempo al teléfono. Tú dejas de perder <strong>3.600€ al mes</strong>.</p>
       <div class="hero-ctas">
-        <a href="/contacto" class="btn-primary" style="font-size:15px;padding:12px 28px;border-radius:40px">Solicitar demo gratuita <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg></a>
+        <a href="/contacto" class="btn-primary" style="font-size:15px;padding:12px 28px;border-radius:40px">Ver cómo recuperarías 4.200€/mes <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg></a>
         <a href="/demo" class="btn-wa-hero">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M11.9 0C5.336 0 0 5.291 0 11.8c0 2.085.548 4.04 1.503 5.73L0 24l6.639-1.737A11.91 11.91 0 0 0 11.9 23.6C18.464 23.6 24 18.309 24 11.8 24 5.291 18.464 0 11.9 0zm0 21.6a9.9 9.9 0 0 1-5.035-1.374l-.361-.214-3.742.978.999-3.629-.235-.374A9.737 9.737 0 0 1 2 11.8C2 6.395 6.44 2 11.9 2 17.36 2 21.8 6.395 21.8 11.8c0 5.405-4.44 9.8-9.9 9.8z"/></svg>
           Probar demo web
@@ -1346,6 +1346,56 @@
 
 
 <!-- PROBLEM V2 -->
+<!-- ROI CALCULATOR — 2o bloque del hero -->
+<section style="padding:60px 0;border-top:1px solid var(--border);background:var(--bg2)">
+  <div class="c">
+    <div style="text-align:center;margin-bottom:32px" class="reveal">
+      <div class="label" style="justify-content:center;margin-bottom:10px">Calculadora de impacto</div>
+      <h2 class="sec-h">¿Cuánto estás dejando sobre la mesa<br>cada mes?</h2>
+      <p class="sec-p" style="margin:0 auto;max-width:480px">Mueve los sliders y ve el dinero que puedes recuperar. Estimación basada en datos reales de nuestras clínicas.</p>
+    </div>
+    <div class="roi-calc reveal d1" style="max-width:680px;margin:0 auto">
+      <div class="roi-inputs">
+        <div class="roi-field">
+          <label class="roi-label">Pacientes inactivos (leads)</label>
+          <div class="roi-slider-wrap">
+            <input type="range" min="50" max="1000" step="50" value="200" class="roi-slider" id="roiLeads" oninput="calcROI()">
+            <span class="roi-val" id="roiLeadsVal">200</span>
+          </div>
+        </div>
+        <div class="roi-field">
+          <label class="roi-label">Ticket medio por visita (€)</label>
+          <div class="roi-slider-wrap">
+            <input type="range" min="50" max="500" step="10" value="120" class="roi-slider" id="roiTicket" oninput="calcROI()">
+            <span class="roi-val" id="roiTicketVal">120€</span>
+          </div>
+        </div>
+      </div>
+      <div class="roi-result" id="roiResult">
+        <div class="roi-res-item">
+          <div class="roi-res-n" id="roiCitas">32</div>
+          <div class="roi-res-l">Citas estimadas</div>
+        </div>
+        <div class="roi-res-div"></div>
+        <div class="roi-res-item">
+          <div class="roi-res-n" id="roiIngresos">3.840€</div>
+          <div class="roi-res-l">Ingresos potenciales</div>
+        </div>
+        <div class="roi-res-div"></div>
+        <div class="roi-res-item">
+          <div class="roi-res-n" id="roiROI">+19x</div>
+          <div class="roi-res-l">ROI vs. plan Cliniflux</div>
+        </div>
+      </div>
+      <div style="text-align:center;margin-top:24px">
+        <a href="/contacto" class="btn-primary" style="font-size:15px;padding:12px 28px;border-radius:40px">Quiero recuperar ese dinero →</a>
+        <p style="font-size:11px;color:var(--text3);margin-top:10px">Estimación orientativa basada en datos reales de clínicas activas en Cliniflux.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
 <section class="pv2-section" id="producto">
   <div class="c">
 
@@ -1356,8 +1406,8 @@
         <h2>Clínicas que pierden pacientes<br>por no responder a tiempo</h2>
       </div>
       <div class="pv2-hd-right">
-        <p>El 67% de los pacientes elige la primera clínica que les responde. Cada minuto sin respuesta es una cita que se va a la competencia — para siempre.</p>
-        <a href="/contacto" class="btn-primary" style="border-radius:40px">Solicitar demo gratuita →</a>
+        <p>Si tu clínica recibe 80 mensajes de WhatsApp a la semana y tardas más de 10 minutos en responder, estás perdiendo al menos <strong>12 citas</strong>. A 120€ de ticket medio: <strong>1.440€/semana</strong> que se van a la clínica de enfrente.</p>
+        <a href="/contacto" class="btn-primary" style="border-radius:40px">Ver cómo recuperarías 4.200€/mes →</a>
       </div>
     </div>
 
@@ -1514,7 +1564,7 @@
 
 
         <!-- Row 3: Web Chat ↔ Escalar -->
-        <div style="grid-column:1;grid-row:3" class="flow2-ch soon">
+        <div style="grid-column:1;grid-row:3" class="flow2-ch">
           <div class="flow2-ch-icon" style="background:#ecfdf5">
             <svg viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
           </div>
@@ -1522,7 +1572,6 @@
             <div class="flow2-ch-name">Web Chat</div>
             <div class="flow2-ch-sub">Widget en tu web</div>
           </div>
-          <div class="flow2-badge">Pronto</div>
         </div>
         <div style="grid-column:2;grid-row:3" class="flow2-arr">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14m-7-7 7 7-7 7"/></svg>
@@ -1541,7 +1590,7 @@
         </div>
 
         <!-- Row 4: App Clínica ↔ Informe -->
-        <div style="grid-column:1;grid-row:4" class="flow2-ch soon">
+        <div style="grid-column:1;grid-row:4" class="flow2-ch">
           <div class="flow2-ch-icon" style="background:#f0fdf4">
             <svg viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
           </div>
@@ -1549,7 +1598,6 @@
             <div class="flow2-ch-name">App / Portal Clínica</div>
             <div class="flow2-ch-sub">Plataforma propia</div>
           </div>
-          <div class="flow2-badge">Pronto</div>
         </div>
         <div style="grid-column:2;grid-row:4" class="flow2-arr">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14m-7-7 7 7-7 7"/></svg>
@@ -1812,6 +1860,65 @@
   </div>
 </section>
 
+<!-- PROTOCOLO SEGURIDAD IA -->
+<section style="padding:var(--sy) 0;border-top:1px solid var(--border);background:var(--bg2)">
+  <div class="c">
+    <div style="text-align:center;margin-bottom:48px" class="reveal">
+      <div class="label" style="justify-content:center;margin-bottom:14px">Seguridad clínica</div>
+      <h2 class="sec-h">Natalia nunca da diagnósticos.<br>Solo agenda, informa y <span class="g">escala.</span></h2>
+      <p class="sec-p" style="margin:0 auto;max-width:560px">El mayor miedo del Director Médico: ¿qué pasa si la IA le dice algo incorrecto a un paciente? Este es el protocolo que lo impide.</p>
+    </div>
+    <div class="safety-flow reveal d1">
+      <div class="safety-step">
+        <div class="safety-num">01</div>
+        <div class="safety-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </div>
+        <div class="safety-label">Recibe el mensaje</div>
+        <div class="safety-desc">El paciente escribe por WhatsApp a cualquier hora</div>
+      </div>
+      <div class="safety-arrow">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--text3)" stroke-width="2"><path d="M5 12h14m-7-7 7 7-7 7"/></svg>
+      </div>
+      <div class="safety-step">
+        <div class="safety-num">02</div>
+        <div class="safety-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+        </div>
+        <div class="safety-label">IA analiza intención</div>
+        <div class="safety-desc">Detecta si es una cita estándar, una pregunta de precio o una urgencia</div>
+      </div>
+      <div class="safety-arrow">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--text3)" stroke-width="2"><path d="M5 12h14m-7-7 7 7-7 7"/></svg>
+      </div>
+      <div class="safety-step safety-step-split">
+        <div class="safety-num">03A</div>
+        <div class="safety-icon safety-icon-green">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2" stroke-linecap="round"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
+        </div>
+        <div class="safety-label">Responde y agenda</div>
+        <div class="safety-desc">Cita estándar → confirma, envía recordatorio, cierra la conversación</div>
+      </div>
+      <div class="safety-arrow">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--text3)" stroke-width="2"><path d="M5 12h14m-7-7 7 7-7 7"/></svg>
+      </div>
+      <div class="safety-step safety-step-alert">
+        <div class="safety-num">03B</div>
+        <div class="safety-icon safety-icon-amber">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0zM12 9v4M12 17h.01"/></svg>
+        </div>
+        <div class="safety-label">Alerta inmediata</div>
+        <div class="safety-desc">Urgencia o duda médica → alerta a recepción con el contexto completo del mensaje</div>
+      </div>
+    </div>
+    <div class="safety-anchor reveal d2">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      <strong>Natalia nunca da diagnósticos médicos.</strong> Solo agenda, informa sobre disponibilidad y escala cualquier duda clínica al equipo humano de inmediato.
+    </div>
+  </div>
+</section>
+
+
 <!-- FAQ -->
 <section class="faq-section" id="faq">
   <div class="c">
@@ -1927,48 +2034,6 @@
       <a href="#precios" class="btn-primary" style="background:#fff;color:var(--green);font-weight:700;padding:12px 24px;border-radius:40px;flex-shrink:0">Ver planes →</a>
     </div>
 
-  <!-- Calculadora ROI -->
-  <div class="roi-calc reveal d3" style="margin-top:40px">
-    <div style="text-align:center;margin-bottom:28px">
-      <div class="label" style="justify-content:center;margin-bottom:10px">Calculadora de impacto</div>
-      <h3 style="font-size:22px;font-weight:700;letter-spacing:-.5px;color:var(--text);margin:0 0 8px">¿Cuánto puede recuperar tu clínica?</h3>
-      <p style="font-size:14px;color:var(--text2);margin:0">Estimación orientativa. Los resultados reales varían según clínica.</p>
-    </div>
-    <div class="roi-inputs">
-      <div class="roi-field">
-        <label class="roi-label">Pacientes inactivos (leads)</label>
-        <div class="roi-slider-wrap">
-          <input type="range" min="50" max="1000" step="50" value="200" class="roi-slider" id="roiLeads" oninput="calcROI()">
-          <span class="roi-val" id="roiLeadsVal">200</span>
-        </div>
-      </div>
-      <div class="roi-field">
-        <label class="roi-label">Ticket medio por visita (€)</label>
-        <div class="roi-slider-wrap">
-          <input type="range" min="50" max="500" step="10" value="120" class="roi-slider" id="roiTicket" oninput="calcROI()">
-          <span class="roi-val" id="roiTicketVal">120€</span>
-        </div>
-      </div>
-    </div>
-    <div class="roi-result" id="roiResult">
-      <div class="roi-res-item">
-        <div class="roi-res-n" id="roiCitas">32</div>
-        <div class="roi-res-l">Citas estimadas</div>
-      </div>
-      <div class="roi-res-div"></div>
-      <div class="roi-res-item">
-        <div class="roi-res-n" id="roiIngresos">3.840€</div>
-        <div class="roi-res-l">Ingresos potenciales</div>
-      </div>
-      <div class="roi-res-div"></div>
-      <div class="roi-res-item">
-        <div class="roi-res-n" id="roiROI">+19x</div>
-        <div class="roi-res-l">ROI vs. plan Cliniflux</div>
-      </div>
-    </div>
-    <p style="text-align:center;font-size:11px;color:var(--text3);margin-top:14px">Estimación basada en tasa de reactivación media del 16%. Sin garantías de resultados.</p>
-  </div>
-
   </div>
 </section>
 
@@ -2015,12 +2080,76 @@
   </div>
 </section>
 
+<!-- CLINIFLUX VS RECEPCIONISTA -->
+<section style="padding:var(--sy) 0;border-top:1px solid var(--border)">
+  <div class="c">
+    <div style="text-align:center;margin-bottom:48px" class="reveal">
+      <div class="label" style="justify-content:center;margin-bottom:14px">La comparativa honesta</div>
+      <h2 class="sec-h">Tu competidor real no es otro software.<br>Es contratar a <span class="g">una persona más.</span></h2>
+      <p class="sec-p" style="margin:0 auto;max-width:520px">Compara los números antes de decidir.</p>
+    </div>
+    <div class="vs-table reveal d1">
+      <div class="vs-header">
+        <div class="vs-col-label"></div>
+        <div class="vs-col-head vs-col-cf">
+          <span class="vs-logo-badge">cliniflux</span>
+          <div class="vs-col-price">199€/mes</div>
+        </div>
+        <div class="vs-col-head vs-col-rec">
+          <span>Recepcionista adicional</span>
+          <div class="vs-col-price vs-col-price-rec">2.100€/mes</div>
+        </div>
+      </div>
+      <div class="vs-row">
+        <div class="vs-col-label">Coste mensual</div>
+        <div class="vs-col-cf vs-win">199€</div>
+        <div class="vs-col-rec vs-lose">2.100€ + SS</div>
+      </div>
+      <div class="vs-row vs-row-alt">
+        <div class="vs-col-label">Disponibilidad</div>
+        <div class="vs-col-cf vs-win">24/7 — 365 días</div>
+        <div class="vs-col-rec vs-lose">8h laborables</div>
+      </div>
+      <div class="vs-row">
+        <div class="vs-col-label">Tiempo de respuesta</div>
+        <div class="vs-col-cf vs-win">1.2 segundos</div>
+        <div class="vs-col-rec vs-lose">Minutos / horas</div>
+      </div>
+      <div class="vs-row vs-row-alt">
+        <div class="vs-col-label">Errores en citas</div>
+        <div class="vs-col-cf vs-win">0%</div>
+        <div class="vs-col-rec vs-lose">Humano</div>
+      </div>
+      <div class="vs-row">
+        <div class="vs-col-label">Vacaciones y bajas</div>
+        <div class="vs-col-cf vs-win">Nunca</div>
+        <div class="vs-col-rec vs-lose">22 días/año + bajas</div>
+      </div>
+      <div class="vs-row vs-row-alt">
+        <div class="vs-col-label">Escalabilidad</div>
+        <div class="vs-col-cf vs-win">Ilimitada</div>
+        <div class="vs-col-rec vs-lose">Contratar más personas</div>
+      </div>
+      <div class="vs-row">
+        <div class="vs-col-label">Formación</div>
+        <div class="vs-col-cf vs-win">0 horas</div>
+        <div class="vs-col-rec vs-lose">Semanas</div>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:36px" class="reveal d2">
+      <a href="/contacto" class="btn-primary" style="font-size:15px;padding:13px 32px;border-radius:40px">Ver cómo recuperarías 4.200€/mes →</a>
+      <p style="font-size:13px;color:var(--text2);margin-top:12px">Demo de 20 minutos. Sin compromiso. Sin tarjeta.</p>
+    </div>
+  </div>
+</section>
+
+
 <!-- PRICING -->
 <section class="pricing-section" id="precios">
   <div class="c">
     <div class="pr-hd">
       <div class="reveal"><div class="label">Precios</div></div>
-      <h2 class="sec-h reveal d1">Simple, transparente,<br>sin sorpresas</h2>
+      <h2 class="sec-h reveal d1">El plan Pro cuesta 199€/mes.<br>Una recepcionista adicional cuesta 2.100€/mes.<br><span class="g">Tú decides.</span></h2>
       <p class="sec-p reveal d2">Sin permanencias. Cancela cuando quieras. Resultados desde el primer día.</p>
       <div class="pr-toggle reveal d3">
         <button class="pr-tog-btn active" id="togMes" onclick="setPricing('mes')">Mensual</button>
@@ -2039,10 +2168,11 @@
           <li><div class="pfc">✓</div>Gestión de citas automática</li>
           <li><div class="pfc">✓</div>Hasta 300 conversaciones/mes</li>
           <li><div class="pfc">✓</div>Panel de control básico</li>
-          <li><div class="pfc">✓</div>Personalización de Natalia</li>
+          <li><div class="pfc">✓</div>Personalización de Natalia <span style="font-size:11px;color:var(--text2);display:block;padding-left:24px;margin-top:2px">Natalia es el nombre por defecto de tu asistente IA. Puedes cambiarlo durante la configuración.</span></li>
           <li><div class="pfc">✓</div>Setup gratuito incluido</li>
           <li><div class="pfc">✓</div>Soporte por email (48h)</li>
         </ul>
+        <div class="pr-guarantee"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Activo en 48h o devolución</div>
         <button class="btn-pl btn-pl-out" onclick="startCheckout('starter')">Empezar ahora →</button>
       </div>
       <div class="pr-card hot reveal d1">
@@ -2057,10 +2187,11 @@
           <li><div class="pfc pfc-wa">✓</div><strong>Reactivación de leads</strong></li>
           <li><div class="pfc">✓</div>Importación CSV / Google Sheets</li>
           <li><div class="pfc">✓</div>Métricas avanzadas en panel</li>
-          <li><div class="pfc">✓</div>Google Calendar <span class="pr-badge-soon">Pronto</span></li>
+          <li><div class="pfc">✓</div>Google Calendar <span class="pr-badge-soon" style="background:#f0fdf4;color:#16a34a;font-size:10px;padding:2px 7px;border-radius:100px;font-weight:600">Q3 2026</span></li>
           <li><div class="pfc">✓</div>Soporte prioritario (24h)</li>
           <li><div class="pfc">✓</div>Setup gratuito incluido</li>
         </ul>
+        <div class="pr-guarantee"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Activo en 48h o devolución</div>
         <button class="btn-pl btn-pl-sol" onclick="startCheckout('pro')">Empezar ahora →</button>
       </div>
       <div class="pr-card reveal d2">
@@ -2075,13 +2206,19 @@
           <li><div class="pfc">✓</div>Onboarding personalizado</li>
           <li><div class="pfc">✓</div>Account manager dedicado</li>
           <li><div class="pfc">✓</div>Soporte 24/7 + SLA garantizado</li>
-          <li><div class="pfc">✓</div>Integraciones a medida <span class="pr-badge-soon">Pronto</span></li>
+          <li><div class="pfc">✓</div>Integraciones a medida <span class="pr-badge-soon" style="background:#f0fdf4;color:#16a34a;font-size:10px;padding:2px 7px;border-radius:100px;font-weight:600">Q4 2026</span></li>
           <li><div class="pfc">✓</div>Setup gratuito incluido</li>
         </ul>
+        <div class="pr-guarantee"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Activo en 48h o devolución</div>
         <button class="btn-pl btn-pl-out" onclick="startCheckout('clinica')">Empezar ahora →</button>
       </div>
     </div>
     <p class="pr-footer-note reveal">Todos los precios incluyen IVA. Gastos de API, WhatsApp Business y modelos de IA incluidos en el plan.</p>
+    <div class="pr-rgpd-row reveal">
+      <span class="pr-rgpd-badge"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> RGPD Verificado · Servidores UE</span>
+      <span class="pr-rgpd-badge"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg> Pago seguro · Sin permanencia</span>
+      <a href="/rgpd-clinicas" class="pr-rgpd-badge" style="text-decoration:none;color:inherit">Ver certificaciones RGPD →</a>
+    </div>
     <div style="text-align:center;margin-top:20px" class="reveal"><a href="/contacto" class="btn-secondary" style="font-size:14px">¿Tienes dudas? Habla con nosotros →</a></div>
   </div>
 </section>
@@ -2135,8 +2272,13 @@
         <div class="ft-col"><div class="ft-col-t">Producto</div><ul><li><a href="#flujo">Cómo funciona</a></li><li><a href="#producto">Funcionalidades</a></li><li><a href="#reactivacion">Reactivación leads</a></li><li><a href="#precios">Precios</a></li><li><a href="/demo">Demo</a></li></ul></div>
         <div class="ft-col"><div class="ft-col-t">Especialidades</div><ul><li><a href="/whatsapp-clinica-dental">Clínicas Dentales</a></li><li><a href="/whatsapp-fisioterapia">Fisioterapia</a></li><li><a href="/whatsapp-clinica-estetica">Clínica Estética</a></li><li><a href="/whatsapp-psicologia">Psicología</a></li><li><a href="/whatsapp-nutricion">Nutrición</a></li></ul></div>
         <div class="ft-col"><div class="ft-col-t">Recursos</div><ul><li><a href="/blog">Blog</a></li><li><a href="/blog/automatizacion-whatsapp-clinicas-guia-completa">Guía Automatización</a></li><li><a href="/blog/como-reducir-no-shows-clinica-whatsapp">Reducir No-Shows</a></li><li><a href="/blog/whatsapp-business-api-clinicas-rgpd-espana">RGPD WhatsApp</a></li><li><a href="/blog/chatbot-citas-clinica-dental-whatsapp">Chatbot Dental</a></li><li><a href="/blog/cliniflux-vs-clinicsay-vs-automatedoctor">Comparativa</a></li></ul></div>
-        <div class="ft-col"><div class="ft-col-t">Empresa</div><ul><li><a href="/about">Nosotros</a></li><li><a href="/contacto">Contacto</a></li></ul><div class="ft-col-t" style="margin-top:16px">Legal</div><ul><li><a href="/legal/privacidad">Privacidad</a></li><li><a href="/legal/terminos">Términos</a></li><li><a href="/legal/cookies">Cookies</a></li><li><a href="/features/rgpd">RGPD</a></li></ul></div>
+        <div class="ft-col"><div class="ft-col-t">Empresa</div><ul><li><a href="/about">Nosotros</a></li><li><a href="/roadmap">Roadmap</a></li><li><a href="/rgpd-clinicas">Seguridad RGPD</a></li><li><a href="/contacto">Contacto</a></li></ul><div class="ft-col-t" style="margin-top:16px">Legal</div><ul><li><a href="/legal/privacidad">Privacidad</a></li><li><a href="/legal/terminos">Términos</a></li><li><a href="/legal/cookies">Cookies</a></li></ul></div>
       </div>
+    </div>
+    <div class="ft-rgpd-bar">
+      <span class="ft-rgpd-badge"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> RGPD Verificado · Servidores UE</span>
+      <span class="ft-rgpd-badge"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> LOPDGDD Conforme</span>
+      <span class="ft-rgpd-badge"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg> Datos cifrados TLS/AES-256</span>
     </div>
     <div class="ft-bot"><p>© 2025 Cliniflux. Todos los derechos reservados.</p></div>
   </div>
