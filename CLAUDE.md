@@ -71,6 +71,9 @@ NO hay layout compartido — cada HTML es independiente.
 - Los archivos en `/public/` se sirven directamente
 - El sitemap se genera en cada request (dinámico)
 - Variables de entorno en Railway: DATABASE_URL, STRIPE_*, OPENAI_API_KEY, SESSION_SECRET
+- Git remote: `https://github.com/mehdibelckadi-dev/cliniflux.git`
+- Deploy via PAT (classic token, scope: repo) — configura con: `git remote set-url origin https://TOKEN@github.com/mehdibelckadi-dev/cliniflux.git`
+- GA4 Measurement ID: `G-75KSF9KX7Q`
 
 ## Blog
 - `blog-posts/index.js` exporta `BLOG_POSTS` (array) y `renderBlogPost(post, related)`
@@ -78,12 +81,12 @@ NO hay layout compartido — cada HTML es independiente.
 - Artículo pilar: `automatizacion-whatsapp-clinicas-guia-completa`
 
 ## Acciones manuales pendientes del fundador
-- [ ] Google Search Console: verificar dominio y enviar sitemap
-- [ ] Google Analytics 4: crear propiedad y pasar Measurement ID (G-XXXXXXXX)
-- [ ] Foto + nombre + LinkedIn para /about
-- [ ] Número real de citas gestionadas (para sustituir "+40 clínicas")
-- [ ] Proveedor de servidores Railway (región AWS para /rgpd-clinicas)
-- [ ] Grabar vídeo testimonial con cliente real (60-90s)
-- [ ] Publicar ficha en Product Hunt
+- [ ] Google Search Console: verificar dominio y enviar sitemap (acción manual)
+- [x] Google Analytics 4: G-75KSF9KX7Q (ya implementado en todas las páginas)
+- [ ] Foto + nombre + LinkedIn para /about — **BLOQUEADO, pendiente del fundador**
+- [ ] Vídeo testimonial con cliente real (60-90s) — **BLOQUEADO, pendiente de grabar**
+- [ ] Testimonios reales (nombre + clínica) — **BLOQUEADO, sin clientes reales aún**
+- [ ] Número real de citas/clínicas — **BLOQUEADO: "+40 clínicas" es gancho temporal, sustituir cuando haya datos reales**
+- [ ] Publicar ficha en Product Hunt — ejecutable cuando haya tracción inicial
 - [ ] Crear fichas en G2 y Capterra
 - [ ] Contactar Gaceta Dental, Diario Médico, asociaciones profesionales
