@@ -511,7 +511,7 @@ app.get('/blog', (req, res) => {
     <a href="/blog/${p.slug}" class="bl-card">
       <span class="bl-cat">${p.category}</span>
       <h2>${p.title}</h2>
-      <p>${p.excerpt}</p>
+      <p>${p.excerpt || p.description}</p>
       <div class="bl-meta">
         <span>${p.author}</span>
         <span>${p.readingTime}</span>
@@ -632,7 +632,7 @@ app.get('/blog', (req, res) => {
 </div>
 <div class="grid">${cards}</div>
 <footer>
-  <p>© 2025 Cliniflux · <a href="/legal/privacidad">Privacidad</a> · <a href="/legal/terminos">Términos</a></p>
+  <p>© 2026 Cliniflux · <a href="/legal/privacidad">Privacidad</a> · <a href="/legal/terminos">Términos</a></p>
 </footer>
 </body>
 </html>`;

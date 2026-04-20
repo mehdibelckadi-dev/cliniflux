@@ -89,11 +89,11 @@ nav.scrolled{background:rgba(255,255,255,0.95);backdrop-filter:blur(16px);box-sh
 .nav-links{display:flex;align-items:center;gap:2px;list-style:none;margin:0 auto}
 .nav-links a{font-size:14px;font-weight:500;color:var(--text2);padding:7px 13px;border-radius:8px;transition:all .2s}
 .nav-links a:hover{color:var(--text);background:var(--bg2)}
-.nav-dropdown{position:relative;z-index:10}
+.nav-dropdown{position:relative;z-index:10;padding-bottom:8px;margin-bottom:-8px}
 .nav-dropdown>a{display:flex;align-items:center;gap:4px}
 .nav-dropdown>a svg{transition:transform .2s}
 .nav-dropdown:hover>a svg{transform:rotate(180deg)}
-.nav-dd-menu{display:none;position:absolute;top:calc(100% + 6px);left:50%;transform:translateX(-50%);background:#fff;border:1px solid var(--border);border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,0.12);padding:8px;min-width:220px;z-index:300}
+.nav-dd-menu{display:none;position:absolute;top:100%;left:50%;transform:translateX(-50%);background:#fff;border:1px solid var(--border);border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,0.12);padding:8px;min-width:220px;z-index:300}
 .nav-dropdown:hover .nav-dd-menu{display:block}
 .nav-dd-menu a{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:500;color:var(--text2);text-decoration:none;padding:8px 12px;border-radius:8px;transition:background .15s,color .15s;white-space:nowrap}
 .nav-dd-menu a:hover{background:var(--green-dim);color:var(--green)}
@@ -233,7 +233,7 @@ ${relatedHtml}
 const BLOG_POSTS = [
   {
     slug: 'automatizacion-whatsapp-clinicas-guia-completa',
-    title: 'Automatización WhatsApp para Clínicas: Guía Completa 2025',
+    title: 'Automatización WhatsApp para Clínicas: Guía Completa 2026',
     description: 'Guía definitiva sobre automatización WhatsApp para clínicas en España: qué es, cómo implementarlo, costes, RGPD y herramientas. Todo lo que necesitas saber para empezar.',
     date: '2025-03-15',
     modified: '2025-04-01',
@@ -806,7 +806,7 @@ Puede revocar este consentimiento en cualquier momento escribiéndonos a [email]
   },
   {
     slug: 'chatbot-citas-clinica-dental-whatsapp',
-    title: 'Chatbot WhatsApp para Citas en Clínica Dental: Guía 2025',
+    title: 'Chatbot WhatsApp para Citas en Clínica Dental: Guía 2026',
     description: 'Cómo implementar un chatbot de WhatsApp para gestionar citas en tu clínica dental: qué puede hacer, qué no puede hacer, y cómo configurarlo correctamente.',
     date: '2025-04-01',
     modified: '2025-04-01',
@@ -1019,7 +1019,7 @@ Natalia: "Sí, trabajamos con Adeslas. Para la revisión anual está completamen
   },
   {
     slug: 'cliniflux-vs-clinicsay-vs-automatedoctor',
-    title: 'Mejor Software WhatsApp para Clínicas en España 2025: Comparativa Honesta',
+    title: 'Mejor Software WhatsApp para Clínicas en España 2026: Comparativa Honesta',
     description: 'Comparativa objetiva de las mejores herramientas de automatización WhatsApp para clínicas en España: funcionalidades, precios, RGPD y casos de uso. Guía para tomar la mejor decisión.',
     date: '2025-04-05',
     modified: '2025-04-05',
@@ -1242,7 +1242,7 @@ Natalia: "Sí, trabajamos con Adeslas. Para la revisión anual está completamen
   },
   {
     slug: 'integracion-whatsapp-gesden-cliniccloud-doctoralia',
-    title: 'Integración WhatsApp con Gesden, Clinic Cloud y Doctoralia: Guía 2025',
+    title: 'Integración WhatsApp con Gesden, Clinic Cloud y Doctoralia: Guía 2026',
     description: 'Cómo integrar WhatsApp automatizado con tu software de gestión clínica: Gesden, Clinic Cloud, Doctoralia y otros. Qué es posible, qué no, y cómo sacar el máximo partido.',
     date: '2025-04-08',
     modified: '2025-04-08',
