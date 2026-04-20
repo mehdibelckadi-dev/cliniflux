@@ -490,9 +490,10 @@ app.get('/sitemap.xml', (req, res) => {
     { loc: '/legal/terminos', changefreq: 'yearly', priority: '0.3' },
     { loc: '/legal/cookies', changefreq: 'yearly', priority: '0.3' },
   ];
-  const blog_urls = BLOG_POSTS.map(p => ({ loc: `/blog/${p.slug}`, changefreq: 'monthly', priority: '0.8' }));
-  const all = [...static_urls, ...blog_urls];
-  const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${all.map(u => `  <url><loc>${base}${u.loc}</loc><changefreq>${u.changefreq}</changefreq><priority>${u.priority}</priority></url>`).join('\n')}\n</urlset>`;
+  const today = new Date().toISOString().split('T')[0];
+  const blog_urls = BLOG_POSTS.map(p => ({ loc: `/blog/${p.slug}`, changefreq: 'monthly', priority: '0.8', lastmod: p.date || today }));
+  const all = [...static_urls.map(u => ({...u, lastmod: today})), ...blog_urls];
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${all.map(u => `  <url><loc>${base}${u.loc}</loc><lastmod>${u.lastmod}</lastmod><changefreq>${u.changefreq}</changefreq><priority>${u.priority}</priority></url>`).join('\n')}\n</urlset>`;
   res.type('application/xml').send(xml);
 });
 
