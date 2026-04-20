@@ -429,14 +429,17 @@
     .esp-section{padding:var(--sy) 0;border-top:1px solid var(--border)}
     .esp-hd{text-align:center;margin-bottom:48px}
     .esp-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:16px}
-    .esp-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px 20px 24px;text-align:center;text-decoration:none;color:inherit;transition:box-shadow .2s,transform .2s,border-color .2s;display:flex;flex-direction:column;align-items:center;gap:12px}
-    .esp-card:hover{box-shadow:0 8px 28px rgba(0,0,0,0.09);transform:translateY(-3px);border-color:var(--green)}
-    .esp-icon{font-size:36px;line-height:1}
-    .esp-name{font-size:14px;font-weight:600;color:var(--text)}
-    .esp-desc{font-size:12px;color:var(--text2);line-height:1.5}
-    .esp-arrow{font-size:12px;color:var(--green);font-weight:600;margin-top:auto}
-    @media(max-width:900px){.esp-grid{grid-template-columns:repeat(3,1fr)}}
-    @media(max-width:600px){.esp-grid{grid-template-columns:repeat(2,1fr)}.esp-card{padding:22px 16px 20px}.esp-icon{font-size:30px}}
+    .esp-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden;text-decoration:none;color:inherit;transition:box-shadow .25s,transform .25s,border-color .25s;display:flex;flex-direction:column}
+    .esp-card:hover{box-shadow:0 12px 36px rgba(0,0,0,0.11);transform:translateY(-4px);border-color:var(--green)}
+    .esp-card:hover .esp-img{transform:scale(1.04)}
+    .esp-img-wrap{height:200px;overflow:hidden;background:#f0fdf4}
+    .esp-img{width:100%;height:100%;object-fit:cover;object-position:center top;display:block;transition:transform .4s ease}
+    .esp-body{padding:18px 16px 16px;display:flex;flex-direction:column;gap:6px;flex:1}
+    .esp-name{font-size:14px;font-weight:700;color:var(--text);letter-spacing:-.2px}
+    .esp-desc{font-size:12px;color:var(--text2);line-height:1.55;flex:1}
+    .esp-arrow{font-size:12px;color:var(--green);font-weight:600;margin-top:8px;display:inline-flex;align-items:center;gap:3px}
+    @media(max-width:1100px){.esp-grid{grid-template-columns:repeat(3,1fr)}}
+    @media(max-width:640px){.esp-grid{grid-template-columns:repeat(2,1fr)}.esp-img-wrap{height:160px}}
 
     /* PRICING */
     .pricing-section{padding:var(--sy) 0;border-top:1px solid var(--border)}
@@ -2075,34 +2078,44 @@
     </div>
     <div class="esp-grid">
       <a href="/whatsapp-clinica-dental" class="esp-card reveal">
-        <div class="esp-icon">🦷</div>
-        <div class="esp-name">Clínica Dental</div>
-        <div class="esp-desc">Agenda ortodoncia, blanqueamientos y revisiones sin llamadas</div>
-        <div class="esp-arrow">Ver solución →</div>
+        <div class="esp-img-wrap"><img src="/esp-dentista.jpg" alt="Automatización WhatsApp para clínica dental" class="esp-img" loading="lazy" width="900" height="600"></div>
+        <div class="esp-body">
+          <div class="esp-name">Clínica Dental</div>
+          <div class="esp-desc">Agenda ortodoncia, blanqueamientos y revisiones sin llamadas</div>
+          <span class="esp-arrow">Ver solución →</span>
+        </div>
       </a>
-      <a href="/whatsapp-fisioterapia" class="esp-card reveal">
-        <div class="esp-icon">💪</div>
-        <div class="esp-name">Fisioterapia</div>
-        <div class="esp-desc">Gestiona sesiones, altas y seguimiento de pacientes con lesión</div>
-        <div class="esp-arrow">Ver solución →</div>
+      <a href="/whatsapp-fisioterapia" class="esp-card reveal d1">
+        <div class="esp-img-wrap"><img src="/esp-physiotherapy.jpg" alt="WhatsApp automatizado para fisioterapia" class="esp-img" loading="lazy" width="600" height="900"></div>
+        <div class="esp-body">
+          <div class="esp-name">Fisioterapia</div>
+          <div class="esp-desc">Gestiona sesiones, altas y seguimiento de pacientes con lesión</div>
+          <span class="esp-arrow">Ver solución →</span>
+        </div>
       </a>
-      <a href="/whatsapp-clinica-estetica" class="esp-card reveal">
-        <div class="esp-icon">✨</div>
-        <div class="esp-name">Clínica Estética</div>
-        <div class="esp-desc">Automatiza reservas de tratamientos y campañas de temporada</div>
-        <div class="esp-arrow">Ver solución →</div>
+      <a href="/whatsapp-clinica-estetica" class="esp-card reveal d2">
+        <div class="esp-img-wrap"><img src="/esp-estetica.jpg" alt="WhatsApp para clínica estética" class="esp-img" loading="lazy" width="600" height="900"></div>
+        <div class="esp-body">
+          <div class="esp-name">Clínica Estética</div>
+          <div class="esp-desc">Automatiza reservas de tratamientos y campañas de temporada</div>
+          <span class="esp-arrow">Ver solución →</span>
+        </div>
       </a>
-      <a href="/whatsapp-psicologia" class="esp-card reveal">
-        <div class="esp-icon">🧠</div>
-        <div class="esp-name">Psicología</div>
-        <div class="esp-desc">Confirma citas con discreción total y cumplimiento RGPD</div>
-        <div class="esp-arrow">Ver solución →</div>
+      <a href="/whatsapp-psicologia" class="esp-card reveal d3">
+        <div class="esp-img-wrap"><img src="/esp-psychology.jpg" alt="WhatsApp discreto para psicología" class="esp-img" loading="lazy" width="600" height="900"></div>
+        <div class="esp-body">
+          <div class="esp-name">Psicología</div>
+          <div class="esp-desc">Confirma citas con discreción total y cumplimiento RGPD</div>
+          <span class="esp-arrow">Ver solución →</span>
+        </div>
       </a>
-      <a href="/whatsapp-nutricion" class="esp-card reveal">
-        <div class="esp-icon">🥗</div>
-        <div class="esp-name">Nutrición</div>
-        <div class="esp-desc">Segmenta campañas por objetivo y recupera pacientes inactivos</div>
-        <div class="esp-arrow">Ver solución →</div>
+      <a href="/whatsapp-nutricion" class="esp-card reveal d3">
+        <div class="esp-img-wrap"><img src="/esp-nutritionist.jpg" alt="WhatsApp para nutricionistas" class="esp-img" loading="lazy" width="600" height="900"></div>
+        <div class="esp-body">
+          <div class="esp-name">Nutrición</div>
+          <div class="esp-desc">Segmenta campañas por objetivo y recupera pacientes inactivos</div>
+          <span class="esp-arrow">Ver solución →</span>
+        </div>
       </a>
     </div>
   </div>
