@@ -385,54 +385,38 @@
 
     <!-- PANEL 0: CONVERSACIONES -->
     <div class="panel p-conv active" id="panel-0">
-      <div class="conv-list">
+      <div class="conv-list" id="conv-list">
         <div class="conv-list-hd">
-          <span class="conv-list-title">Bandeja <span class="conv-cnt">4</span></span>
-          <span class="conv-ia-badge">● IA ON</span>
+          <span class="conv-list-title">WhatsApp <span class="conv-cnt" id="conv-cnt" style="display:none">0</span></span>
+          <span class="conv-ia-badge" id="ws-status">● Conectando</span>
         </div>
-        <div class="conv-search"><input placeholder="🔍  Buscar paciente..." readonly></div>
-        <div class="conv-item active" onclick="selectConv(this)">
-          <div class="c-ava" style="background:linear-gradient(135deg,#16a34a,#22c55e)">MG</div>
-          <div class="c-info"><div class="c-name">María García</div><div class="c-prev">Quiero pedir cita para limp...</div></div>
-          <div class="c-meta"><span class="c-time">2m</span><span class="c-unread">2</span></div>
-        </div>
-        <div class="conv-item" onclick="selectConv(this)">
-          <div class="c-ava" style="background:linear-gradient(135deg,#0ea5e9,#0284c7)">JP</div>
-          <div class="c-info"><div class="c-name">Juan Pérez</div><div class="c-prev">¿Tenéis ortodoncia invisible?</div></div>
-          <div class="c-meta"><span class="c-time">8m</span><span class="c-ai">IA</span></div>
-        </div>
-        <div class="conv-item" onclick="selectConv(this)">
-          <div class="c-ava" style="background:linear-gradient(135deg,#f43f5e,#e11d48)">AL</div>
-          <div class="c-info"><div class="c-name">Ana López</div><div class="c-prev">Cita confirmada ✓ mañana 10h</div></div>
-          <div class="c-meta"><span class="c-time">17m</span><span class="c-ai">IA</span></div>
-        </div>
-        <div class="conv-item" onclick="selectConv(this)">
-          <div class="c-ava" style="background:linear-gradient(135deg,#f97316,#ea580c)">PS</div>
-          <div class="c-info"><div class="c-name">Pedro Sánchez</div><div class="c-prev">Muchas gracias, hasta pronto</div></div>
-          <div class="c-meta"><span class="c-time">23m</span><span class="c-ai">IA</span></div>
+        <div class="conv-search"><input id="conv-search-input" placeholder="🔍  Buscar por número..." oninput="filterConvs(this.value)"></div>
+        <div id="conv-items-container" style="flex:1;overflow-y:auto">
+          <div id="conv-empty" style="padding:32px 16px;text-align:center;color:var(--text3);font-size:13px">
+            <div style="font-size:28px;margin-bottom:8px">💬</div>
+            <div>Sin conversaciones aún</div>
+            <div style="font-size:11px;margin-top:4px">Los mensajes de WhatsApp aparecerán aquí en tiempo real</div>
+          </div>
         </div>
         <div class="conv-stats">
-          <div class="cs"><div class="cs-n" style="color:var(--green)">94%</div><div class="cs-l">Resueltos IA</div></div>
-          <div class="cs"><div class="cs-n">1.2s</div><div class="cs-l">Resp. media</div></div>
-          <div class="cs"><div class="cs-n">342</div><div class="cs-l">Esta semana</div></div>
-          <div class="cs"><div class="cs-n">47</div><div class="cs-l">Citas mes</div></div>
+          <div class="cs"><div class="cs-n" id="cs-total">0</div><div class="cs-l">Total chats</div></div>
+          <div class="cs"><div class="cs-n" id="cs-today" style="color:var(--green)">0</div><div class="cs-l">Hoy</div></div>
         </div>
       </div>
       <div class="chat-area">
-        <div class="chat-hd">
-          <div class="chat-hd-av" style="background:linear-gradient(135deg,#16a34a,#22c55e)">MG</div>
+        <div class="chat-hd" id="chat-hd">
+          <div class="chat-hd-av" id="chat-hd-av" style="background:linear-gradient(135deg,#94a3b8,#64748b)">?</div>
           <div style="flex:1;min-width:0">
-            <div class="chat-hd-title">María García</div>
-            <div class="chat-hd-sub"><span class="wa-dot"></span>WhatsApp · IA respondiendo</div>
+            <div class="chat-hd-title" id="chat-hd-title">Selecciona una conversación</div>
+            <div class="chat-hd-sub" id="chat-hd-sub"><span class="wa-dot"></span>WhatsApp · IA activa</div>
           </div>
-          <div class="chat-status">En progreso</div>
+          <div class="chat-status" id="chat-hd-status" style="display:none">En progreso</div>
         </div>
-        <div class="chat-msgs">
-          <div class="msg mi">Hola, quería pedir una cita 🦷</div>
-          <div class="msg mo">¡Hola María! 👋 Claro, con gusto te ayudo. ¿Para qué servicio deseas la cita?<div class="msg-ts">Visto · 9min · IA</div></div>
-          <div class="msg mi">Para una limpieza, ¿tenéis hueco mañana?</div>
-          <div class="msg mo-green">✅ Tenemos disponibilidad mañana a las 10:00h con la Dra. Vega. ¿Confirmo la cita a su nombre?<div class="msg-ts">Visto · 4min · IA</div></div>
-          <div class="msg mi"><div class="typing"><div class="td"></div><div class="td"></div><div class="td"></div></div></div>
+        <div class="chat-msgs" id="chat-msgs">
+          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:8px;color:var(--text3)">
+            <div style="font-size:36px">💬</div>
+            <div style="font-size:13px">Selecciona una conversación para verla</div>
+          </div>
         </div>
         <div class="quick-chips">
           <div class="qc">✓ Confirmar cita</div>
@@ -442,32 +426,28 @@
           <div class="qc">💰 Ver precios</div>
         </div>
         <div class="chat-input-row">
-          <input class="chat-input" placeholder="Escribir respuesta manual..." readonly>
-          <button class="send-btn"><svg width="13" height="13" viewBox="0 0 24 24" fill="white"><path d="m22 2-7 20-4-9-9-4 20-7z"/></svg></button>
+          <input class="chat-input" placeholder="Respuesta manual (próximamente)..." disabled>
+          <button class="send-btn" disabled><svg width="13" height="13" viewBox="0 0 24 24" fill="white"><path d="m22 2-7 20-4-9-9-4 20-7z"/></svg></button>
         </div>
       </div>
       <div class="patient-panel">
-        <div class="pp-hd">Paciente</div>
+        <div class="pp-hd">Conversación</div>
         <div class="pp-profile">
-          <div class="pp-ava">MG</div>
-          <div class="pp-name">María García</div>
-          <div class="pp-phone">+34 612 345 678</div>
+          <div class="pp-ava" id="pp-ava">?</div>
+          <div class="pp-name" id="pp-name">—</div>
+          <div class="pp-phone" id="pp-phone">—</div>
           <div class="pp-wa"><svg width="10" height="10" viewBox="0 0 24 24" fill="#25d366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M11.9 0C5.336 0 0 5.291 0 11.8c0 2.085.548 4.04 1.503 5.73L0 24l6.639-1.737A11.91 11.91 0 0 0 11.9 23.6C18.464 23.6 24 18.309 24 11.8 24 5.291 18.464 0 11.9 0zm0 21.6a9.9 9.9 0 0 1-5.035-1.374l-.361-.214-3.742.978.999-3.629-.235-.374A9.737 9.737 0 0 1 2 11.8C2 6.395 6.44 2 11.9 2 17.36 2 21.8 6.395 21.8 11.8c0 5.405-4.44 9.8-9.9 9.8z"/></svg>WhatsApp</div>
         </div>
-        <div class="pp-sect">Próxima cita</div>
-        <div class="pp-apt">
-          <div class="pp-apt-t">Mañana · 10:00h</div>
-          <div class="pp-apt-s">Limpieza · Dra. Vega</div>
+        <div class="pp-sect">Detalles</div>
+        <div class="pp-apt" id="pp-details">
+          <div class="pp-apt-t" id="pp-session">—</div>
+          <div class="pp-apt-s" id="pp-last-msg">Sin mensajes</div>
         </div>
-        <div class="pp-sect">Historial</div>
-        <div class="pp-hist-item">Mar 26 · Revisión<span>✓</span></div>
-        <div class="pp-hist-item">Ene 26 · Limpieza<span>✓</span></div>
-        <div class="pp-hist-item">Nov 25 · Ortodoncia<span>✓</span></div>
-        <div class="pp-sect">IA Análisis</div>
+        <div class="pp-sect">Estado IA</div>
         <div class="pp-ai">
-          <div class="pp-ai-lbl">⚡ Intención detectada</div>
-          <div class="pp-ai-val">Reservar cita</div>
-          <div class="pp-ai-conf">Confianza: 97%</div>
+          <div class="pp-ai-lbl">⚡ Respondiendo automáticamente</div>
+          <div class="pp-ai-val" id="pp-ai-status">IA activa</div>
+          <div class="pp-ai-conf" id="pp-msg-count">0 mensajes</div>
         </div>
       </div>
     </div>
@@ -1097,6 +1077,210 @@
     document.querySelectorAll('.conv-item').forEach(i => i.classList.remove('active'));
     el.classList.add('active');
   }
+
+  // ── Conversaciones WhatsApp en tiempo real ────────────────────────────────
+  let allConvs = [];
+  let activeSessionId = null;
+  const CONV_COLORS = ['#16a34a,#22c55e','#0ea5e9,#0284c7','#f43f5e,#e11d48','#f97316,#ea580c','#8b5cf6,#7c3aed'];
+
+  function phoneLabel(num) {
+    if (!num) return '??';
+    const digits = num.replace(/\D/g,'');
+    return digits.slice(-4) || '??';
+  }
+
+  function phoneDisplay(num) {
+    if (!num) return 'WhatsApp';
+    const d = num.replace(/\D/g,'');
+    if (d.length >= 11) return '+' + d.slice(0,2) + ' ' + d.slice(2,5) + ' ' + d.slice(5,8) + ' ' + d.slice(8);
+    return num;
+  }
+
+  function convColor(sessionId) {
+    let h = 0;
+    for (let i = 0; i < sessionId.length; i++) h = (h * 31 + sessionId.charCodeAt(i)) & 0xffffffff;
+    return CONV_COLORS[Math.abs(h) % CONV_COLORS.length];
+  }
+
+  async function loadConversations() {
+    try {
+      const r = await fetch('/api/conversations');
+      if (!r.ok) return;
+      allConvs = await r.json();
+      renderConvList(allConvs);
+    } catch(e) { console.error('loadConversations:', e); }
+  }
+
+  function renderConvList(convs) {
+    const container = document.getElementById('conv-items-container');
+    const empty = document.getElementById('conv-empty');
+    const cnt = document.getElementById('conv-cnt');
+    if (!convs.length) {
+      container.innerHTML = '';
+      container.appendChild(empty);
+      empty.style.display = 'block';
+      cnt.style.display = 'none';
+      document.getElementById('cs-total').textContent = 0;
+      document.getElementById('cs-today').textContent = 0;
+      return;
+    }
+    empty.style.display = 'none';
+    cnt.textContent = convs.length;
+    cnt.style.display = '';
+
+    const today = new Date().toDateString();
+    const todayCount = convs.filter(c => new Date(c.created_at).toDateString() === today).length;
+    document.getElementById('cs-total').textContent = convs.length;
+    document.getElementById('cs-today').textContent = todayCount;
+
+    container.innerHTML = '';
+    convs.forEach((c, i) => {
+      const label = phoneLabel(c.from_number);
+      const color = convColor(c.session_id);
+      const ago = timeAgo(c.created_at);
+      const preview = (c.content || '').slice(0, 40) + (c.content?.length > 40 ? '…' : '');
+      const isActive = c.session_id === activeSessionId;
+      const div = document.createElement('div');
+      div.className = 'conv-item' + (isActive ? ' active' : '');
+      div.dataset.sessionId = c.session_id;
+      div.onclick = () => openConversation(c, div);
+      div.innerHTML = `
+        <div class="c-ava" style="background:linear-gradient(135deg,${color})">${label}</div>
+        <div class="c-info">
+          <div class="c-name">${esc(phoneDisplay(c.from_number))}</div>
+          <div class="c-prev">${c.direction==='outbound'?'<span style="color:var(--green)">→</span> ':''} ${esc(preview)}</div>
+        </div>
+        <div class="c-meta">
+          <span class="c-time">${ago}</span>
+          <span class="c-ai">${c.responded_by==='ai'?'IA':'Manual'}</span>
+        </div>`;
+      container.appendChild(div);
+    });
+  }
+
+  async function openConversation(conv, el) {
+    // Mark active in list
+    document.querySelectorAll('.conv-item').forEach(i => i.classList.remove('active'));
+    el.classList.add('active');
+    activeSessionId = conv.session_id;
+
+    // Update header
+    const color = convColor(conv.session_id);
+    const label = phoneLabel(conv.from_number);
+    document.getElementById('chat-hd-av').style.background = `linear-gradient(135deg,${color})`;
+    document.getElementById('chat-hd-av').textContent = label;
+    document.getElementById('chat-hd-title').textContent = phoneDisplay(conv.from_number);
+    document.getElementById('chat-hd-status').style.display = '';
+    document.getElementById('chat-hd-sub').innerHTML = `<span class="wa-dot"></span>WhatsApp · IA respondiendo`;
+
+    // Update patient panel
+    document.getElementById('pp-ava').style.background = `linear-gradient(135deg,${color})`;
+    document.getElementById('pp-ava').textContent = label;
+    document.getElementById('pp-name').textContent = phoneDisplay(conv.from_number);
+    document.getElementById('pp-phone').textContent = conv.from_number || '—';
+    document.getElementById('pp-session').textContent = `Sesión: ${conv.session_id.slice(-12)}`;
+    document.getElementById('pp-last-msg').textContent = `Última actividad: ${timeAgo(conv.created_at)}`;
+
+    // Load messages
+    const chatMsgs = document.getElementById('chat-msgs');
+    chatMsgs.innerHTML = `<div style="display:flex;justify-content:center;padding:20px"><div class="typing"><div class="td"></div><div class="td"></div><div class="td"></div></div></div>`;
+    try {
+      const r = await fetch(`/api/conversations/${encodeURIComponent(conv.session_id)}/messages`);
+      const msgs = await r.json();
+      renderMessages(msgs);
+      document.getElementById('pp-msg-count').textContent = `${msgs.length} mensajes`;
+    } catch(e) { chatMsgs.innerHTML = '<div style="padding:20px;color:var(--text3);text-align:center">Error cargando mensajes</div>'; }
+  }
+
+  function renderMessages(msgs) {
+    const chatMsgs = document.getElementById('chat-msgs');
+    if (!msgs.length) {
+      chatMsgs.innerHTML = '<div style="padding:20px;color:var(--text3);text-align:center">Sin mensajes</div>';
+      return;
+    }
+    chatMsgs.innerHTML = '';
+    msgs.forEach(m => {
+      const div = document.createElement('div');
+      const isOut = m.direction === 'outbound';
+      div.className = 'msg ' + (isOut ? 'mo' : 'mi');
+      const ts = new Date(m.created_at).toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'});
+      const by = isOut ? (m.responded_by==='ai'?'IA':'Manual') : 'Paciente';
+      div.innerHTML = esc(m.content) + `<div class="msg-ts">${ts} · ${by}</div>`;
+      chatMsgs.appendChild(div);
+    });
+    chatMsgs.scrollTop = chatMsgs.scrollHeight;
+  }
+
+  function filterConvs(q) {
+    const filtered = q ? allConvs.filter(c => (c.from_number||'').includes(q) || (c.content||'').toLowerCase().includes(q.toLowerCase())) : allConvs;
+    renderConvList(filtered);
+  }
+
+  // ── socket.io ─────────────────────────────────────────────────────────────
+  let socket = null;
+  function initSocket() {
+    if (typeof io === 'undefined') return;
+    socket = io({ path: '/socket.io', transports: ['websocket','polling'] });
+
+    socket.on('connect', () => {
+      document.getElementById('ws-status').textContent = '● EN VIVO';
+      document.getElementById('ws-status').style.color = 'var(--green)';
+    });
+
+    socket.on('disconnect', () => {
+      document.getElementById('ws-status').textContent = '● Desconectado';
+      document.getElementById('ws-status').style.color = '#ef4444';
+    });
+
+    socket.on('connected', (data) => {
+      console.log('[WS] Sala clínica', data.clinicId);
+    });
+
+    // Nuevo mensaje entrante → actualizar lista y chat si está abierto
+    socket.on('message:new', (msg) => {
+      // Actualizar o insertar conversación en la lista
+      const idx = allConvs.findIndex(c => c.session_id === msg.session_id);
+      const updated = { ...msg };
+      if (idx >= 0) allConvs.splice(idx, 1);
+      allConvs.unshift(updated);
+      renderConvList(allConvs);
+
+      // Notificación badge
+      const badge = document.querySelector('.si-badge');
+      if (badge) badge.textContent = allConvs.length;
+
+      // Si está abierta esa conversación, añadir mensaje
+      if (activeSessionId === msg.session_id) {
+        const chatMsgs = document.getElementById('chat-msgs');
+        const div = document.createElement('div');
+        div.className = 'msg mi';
+        const ts = new Date(msg.created_at).toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'});
+        div.innerHTML = esc(msg.content) + `<div class="msg-ts">${ts} · Paciente</div>`;
+        chatMsgs.appendChild(div);
+        chatMsgs.scrollTop = chatMsgs.scrollHeight;
+      }
+    });
+
+    // Respuesta IA enviada
+    socket.on('message:sent', (msg) => {
+      if (activeSessionId === msg.session_id) {
+        const chatMsgs = document.getElementById('chat-msgs');
+        const div = document.createElement('div');
+        div.className = 'msg mo';
+        const ts = new Date(msg.created_at).toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'});
+        div.innerHTML = esc(msg.content) + `<div class="msg-ts">${ts} · IA</div>`;
+        chatMsgs.appendChild(div);
+        chatMsgs.scrollTop = chatMsgs.scrollHeight;
+      }
+      // Actualizar preview en la lista
+      const c = allConvs.find(c => c.session_id === msg.session_id);
+      if (c) { c.content = msg.content; c.direction = 'outbound'; c.created_at = msg.created_at; renderConvList(allConvs); }
+    });
+  }
+
+  // Arrancar
+  loadConversations();
 </script>
+<script src="/socket.io/socket.io.js" onload="initSocket()"></script>
 </body>
 </html>

@@ -1,5 +1,7 @@
 require('dotenv').config();
+const http = require('http');
 const express = require('express');
+const { Server: SocketServer } = require('socket.io');
 const session = require('express-session');
 const PgSession = require('connect-pg-simple')(session);
 const OpenAI = require('openai');
@@ -398,7 +400,7 @@ app.post('/webhook/stripe', express.raw({ type: 'application/json' }), async (re
 
 app.use(express.json({ limit: '100kb' }));
 app.use(express.urlencoded({ extended: false, limit: '100kb' }));
-app.use(session({
+const sessionMiddleware = session({
   store: new PgSession({ pool, tableName: 'web_sessions', createTableIfMissing: true }),
   secret: process.env.SESSION_SECRET || 'cliniflux-secret-change-in-prod',
   resave: false,
@@ -409,7 +411,8 @@ app.use(session({
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax'
   }
-}));
+});
+app.use(sessionMiddleware);
 app.use(express.static('public', {
   maxAge: '1d',
   setHeaders: (res, path) => {
@@ -933,6 +936,12 @@ app.post('/webhook/whatsapp', async (req, res) => {
     // Persistir mensaje entrante
     await saveMessage({ clinic_id: clinicId, session_id: sessionId, direction: 'inbound', content: msg, from_number: from }).catch(() => {});
 
+    // Emitir en tiempo real al dashboard
+    req.app.get('io')?.to(`clinic_${clinicId}`).emit('message:new', {
+      session_id: sessionId, from_number: from, content: msg, direction: 'inbound',
+      created_at: new Date().toISOString(), responded_by: 'human'
+    });
+
     const completion = await openai.chat.completions.create({
       model: process.env.AI_MODEL || 'gpt-4o-mini',
       messages: [{ role:'system', content: prompt }, ...history, { role:'user', content: msg }],
@@ -952,6 +961,12 @@ app.post('/webhook/whatsapp', async (req, res) => {
       saveMessage({ clinic_id: clinicId, session_id: sessionId, direction: 'outbound', content: reply, from_number: from, responded_by: 'ai' }).catch(() => {}),
     ]);
     await sendWhatsAppMessage(from, reply);
+
+    // Emitir respuesta IA al dashboard
+    req.app.get('io')?.to(`clinic_${clinicId}`).emit('message:sent', {
+      session_id: sessionId, from_number: from, content: reply, direction: 'outbound',
+      created_at: new Date().toISOString(), responded_by: 'ai'
+    });
   } catch(err) {
     console.error('[WA]', err.message);
   }
@@ -1105,9 +1120,50 @@ app.post('/api/demo-request', async (req, res) => {
   catch (err) { res.status(500).json({ error: 'Error' }); }
 });
 
-// ── Arrancar ────────────────────────────────────────────────────────────────
+// ── API conversaciones (dashboard en tiempo real) ───────────────────────────
+
+app.get('/api/conversations', requireAuth, async (req, res) => {
+  try {
+    const convs = await getRecentConversations(req.session.clinic.id, 30);
+    res.json(convs);
+  } catch(e) { res.status(500).json({ error: 'Error' }); }
+});
+
+app.get('/api/conversations/:sessionId/messages', requireAuth, async (req, res) => {
+  try {
+    const msgs = await getMessages(req.session.clinic.id, req.params.sessionId, 50);
+    res.json(msgs);
+  } catch(e) { res.status(500).json({ error: 'Error' }); }
+});
+
+// ── Arrancar + WebSocket ─────────────────────────────────────────────────────
 
 const PORT = process.env.PORT || 3000;
+
+// Servidor HTTP explícito para socket.io
+const httpServer = http.createServer(app);
+
+// socket.io — misma sesión Express (sessionMiddleware definido arriba)
+const io = new SocketServer(httpServer, {
+  cors: { origin: process.env.APP_URL || '*', credentials: true },
+  path: '/socket.io',
+  transports: ['websocket', 'polling'],
+});
+
+io.use((socket, next) => {
+  sessionMiddleware(socket.request, socket.request.res || {}, next);
+});
+
+io.on('connection', (socket) => {
+  const clinic = socket.request.session?.clinic;
+  if (!clinic?.id) { socket.disconnect(true); return; }
+  socket.join(`clinic_${clinic.id}`);
+  socket.emit('connected', { clinicId: clinic.id });
+  console.log(`[WS] Clínica ${clinic.id} (${clinic.name}) conectada`);
+});
+
+app.set('io', io);
+
 initDb()
-  .then(() => app.listen(PORT, () => console.log(`Cliniflux en http://localhost:${PORT}`)))
+  .then(() => httpServer.listen(PORT, () => console.log(`Cliniflux en http://localhost:${PORT}`)))
   .catch(err => { console.error('DB init failed:', err.message); process.exit(1); });
