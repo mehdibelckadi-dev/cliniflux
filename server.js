@@ -5,8 +5,9 @@ const PgSession = require('connect-pg-simple')(session);
 const OpenAI = require('openai');
 const crypto = require('crypto');
 const Stripe = require('stripe');
-const { pool, initDb, getSession, saveSession, saveLead, getClinicByEmail, getClinicByWhatsapp, getClinicBySetupToken, createClinic, updateClinicConfig, buildPromptForClinic, getLeads, getAppointments, saveAppointment, verifyPassword, hashPassword, importLeads, getImportedLeads, updateLeadEstado, incrementConversation, PLAN_LIMITS } = require('./db');
+const { pool, initDb, getSession, saveSession, saveLead, getClinicByEmail, getClinicByWhatsapp, getClinicBySetupToken, createClinic, updateClinicConfig, buildPromptForClinic, getLeads, getAppointments, saveAppointment, verifyPassword, hashPassword, importLeads, getImportedLeads, updateLeadEstado, incrementConversation, PLAN_LIMITS, saveMessage, getMessages, getRecentConversations } = require('./db');
 
+const compression = require('compression');
 const stripe = process.env.STRIPE_SECRET_KEY ? Stripe(process.env.STRIPE_SECRET_KEY) : null;
 const nodemailer = require('nodemailer');
 
@@ -286,7 +287,15 @@ const STRIPE_PRICES = {
 };
 
 const app = express();
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+  timeout: 15000,
+  maxRetries: 2,
+});
+
+// ── Performance ─────────────────────────────────────────────────────────────
+app.use(compression());
+app.get('/health', (_req, res) => res.json({ status: 'ok', ts: Date.now() }));
 
 // ── Seguridad: headers HTTP ─────────────────────────────────────────────────
 app.disable('x-powered-by');
@@ -401,7 +410,12 @@ app.use(session({
     sameSite: 'lax'
   }
 }));
-app.use(express.static('public'));
+app.use(express.static('public', {
+  maxAge: '1d',
+  setHeaders: (res, path) => {
+    if (path.endsWith('.html')) res.setHeader('Cache-Control', 'no-cache');
+  }
+}));
 
 // ── Auth middleware ─────────────────────────────────────────────────────────
 
@@ -859,11 +873,20 @@ async function sendWhatsAppMessage(to, text) {
   const phoneId = process.env.WHATSAPP_PHONE_ID;
   const token   = process.env.WHATSAPP_TOKEN;
   if (!phoneId || !token) { console.error('[WA] Faltan WHATSAPP_PHONE_ID o WHATSAPP_TOKEN'); return; }
-  await fetch(`https://graph.facebook.com/v19.0/${phoneId}/messages`, {
-    method: 'POST',
-    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ messaging_product: 'whatsapp', to, type: 'text', text: { body: text } })
-  }).catch(e => console.error('[WA] send error:', e.message));
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 10000);
+  try {
+    await fetch(`https://graph.facebook.com/v19.0/${phoneId}/messages`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ messaging_product: 'whatsapp', to, type: 'text', text: { body: text } }),
+      signal: ctrl.signal,
+    });
+  } catch(e) {
+    console.error('[WA] send error:', e.message);
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 // Verificación del webhook (Meta hace GET al configurarlo)
@@ -906,6 +929,10 @@ app.post('/webhook/whatsapp', async (req, res) => {
     }
 
     const history = await getSession(sessionId);
+
+    // Persistir mensaje entrante
+    await saveMessage({ clinic_id: clinicId, session_id: sessionId, direction: 'inbound', content: msg, from_number: from }).catch(() => {});
+
     const completion = await openai.chat.completions.create({
       model: process.env.AI_MODEL || 'gpt-4o-mini',
       messages: [{ role:'system', content: prompt }, ...history, { role:'user', content: msg }],
@@ -920,7 +947,10 @@ app.post('/webhook/whatsapp', async (req, res) => {
     }
     history.push({ role:'user', content: msg });
     history.push({ role:'assistant', content: reply });
-    await saveSession(sessionId, history.slice(-20));
+    await Promise.all([
+      saveSession(sessionId, history.slice(-20)),
+      saveMessage({ clinic_id: clinicId, session_id: sessionId, direction: 'outbound', content: reply, from_number: from, responded_by: 'ai' }).catch(() => {}),
+    ]);
     await sendWhatsAppMessage(from, reply);
   } catch(err) {
     console.error('[WA]', err.message);
@@ -1004,8 +1034,14 @@ app.post('/api/settings', requireAuth, async (req, res) => {
   try {
     const { rows } = await pool.query('SELECT config FROM clinics WHERE id=$1', [req.session.clinic.id]);
     const cfg = { ...(rows[0]?.config || {}), phone, email: email_clinic, address, hours, services, extra, assistant_name };
-    await pool.query('UPDATE clinics SET config=$1, name=COALESCE($2,name), whatsapp_number=COALESCE(NULLIF($3,\'\'),whatsapp_number) WHERE id=$4',
-      [JSON.stringify(cfg), name || null, whatsapp_number || '', req.session.clinic.id]);
+    const waNum = whatsapp_number ? whatsapp_number.replace(/\D/g,'').slice(-9) : null;
+    await pool.query(
+      `UPDATE clinics SET config=$1, name=COALESCE($2,name),
+       whatsapp_number=COALESCE(NULLIF($3,''),whatsapp_number),
+       whatsapp_normalized=COALESCE($4,whatsapp_normalized)
+       WHERE id=$5`,
+      [JSON.stringify(cfg), name || null, whatsapp_number || '', waNum, req.session.clinic.id]
+    );
     req.session.clinic.name = name || req.session.clinic.name;
     res.json({ ok: true });
   } catch(e) { res.status(500).json({ error: e.message }); }

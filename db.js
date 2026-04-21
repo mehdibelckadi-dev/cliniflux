@@ -1,7 +1,12 @@
 const { Pool } = require('pg');
 const crypto = require('crypto');
 
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  max: 20,
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 3000,
+});
 
 function hashPassword(pass) {
   const salt = crypto.randomBytes(16).toString('hex');
@@ -76,6 +81,20 @@ async function initDb() {
     );
   `);
 
+  // Tabla messages (Paso 1 — persistencia real de conversaciones)
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS messages (
+      id           SERIAL PRIMARY KEY,
+      clinic_id    INTEGER REFERENCES clinics(id),
+      session_id   TEXT NOT NULL,
+      direction    TEXT NOT NULL,
+      content      TEXT NOT NULL,
+      from_number  TEXT,
+      responded_by TEXT DEFAULT 'ai',
+      created_at   TIMESTAMP DEFAULT NOW()
+    )
+  `);
+
   // Migraciones: añadir columnas si no existen
   const migrations = [
     `ALTER TABLE clinics ADD COLUMN IF NOT EXISTS setup_token TEXT`,
@@ -87,6 +106,17 @@ async function initDb() {
     `ALTER TABLE clinics ADD COLUMN IF NOT EXISTS conv_count INTEGER DEFAULT 0`,
     `ALTER TABLE clinics ADD COLUMN IF NOT EXISTS conv_reset_at TIMESTAMP DEFAULT NOW()`,
     `ALTER TABLE clinics ADD COLUMN IF NOT EXISTS conv_warned BOOLEAN DEFAULT FALSE`,
+    // whatsapp_normalized: columna indexable para lookup rápido
+    `ALTER TABLE clinics ADD COLUMN IF NOT EXISTS whatsapp_normalized TEXT`,
+    `UPDATE clinics SET whatsapp_normalized = right(regexp_replace(whatsapp_number,'\\D','','g'),9) WHERE whatsapp_number IS NOT NULL AND whatsapp_normalized IS NULL`,
+    // Índices de rendimiento
+    `CREATE INDEX IF NOT EXISTS idx_messages_clinic_session ON messages(clinic_id, session_id, created_at DESC)`,
+    `CREATE INDEX IF NOT EXISTS idx_messages_clinic_created ON messages(clinic_id, created_at DESC)`,
+    `CREATE INDEX IF NOT EXISTS idx_leads_clinic ON leads(clinic_id, created_at DESC)`,
+    `CREATE INDEX IF NOT EXISTS idx_appointments_clinic ON appointments(clinic_id, scheduled_at DESC)`,
+    `CREATE INDEX IF NOT EXISTS idx_imported_leads_clinic ON imported_leads(clinic_id, estado)`,
+    `CREATE INDEX IF NOT EXISTS idx_chat_sessions_updated ON chat_sessions(updated_at DESC)`,
+    `CREATE INDEX IF NOT EXISTS idx_clinics_whatsapp_norm ON clinics(whatsapp_normalized)`,
   ];
   for (const sql of migrations) await pool.query(sql);
 
@@ -136,11 +166,10 @@ async function getClinicByEmail(email) {
 }
 
 async function getClinicByWhatsapp(number) {
-  // Normaliza +34612... o 34612... → busca coincidencia parcial
   const clean = number.replace(/\D/g, '').slice(-9);
   const { rows } = await pool.query(
-    "SELECT * FROM clinics WHERE regexp_replace(whatsapp_number,'\\D','','g') LIKE $1",
-    [`%${clean}`]
+    'SELECT * FROM clinics WHERE whatsapp_normalized = $1',
+    [clean]
   );
   return rows[0] || null;
 }
@@ -253,16 +282,17 @@ const PLAN_LIMITS = { starter: 300, pro: 2000, clinica: null };
 
 // Devuelve { count, limit, pct, blocked }. Incrementa el contador con reset mensual.
 async function incrementConversation(clinic_id) {
-  // Reset si ha cambiado el mes
-  await pool.query(`
-    UPDATE clinics SET conv_count=0, conv_reset_at=NOW(), conv_warned=FALSE
-    WHERE id=$1 AND date_trunc('month', conv_reset_at) < date_trunc('month', NOW())
+  const { rows } = await pool.query(`
+    UPDATE clinics SET
+      conv_count = CASE WHEN date_trunc('month', conv_reset_at) < date_trunc('month', NOW())
+                        THEN 1 ELSE conv_count + 1 END,
+      conv_reset_at = CASE WHEN date_trunc('month', conv_reset_at) < date_trunc('month', NOW())
+                           THEN NOW() ELSE conv_reset_at END,
+      conv_warned = CASE WHEN date_trunc('month', conv_reset_at) < date_trunc('month', NOW())
+                         THEN FALSE ELSE conv_warned END
+    WHERE id=$1
+    RETURNING conv_count, plan, email, name, conv_warned
   `, [clinic_id]);
-
-  const { rows } = await pool.query(
-    'UPDATE clinics SET conv_count=conv_count+1 WHERE id=$1 RETURNING conv_count, plan, email, name, conv_warned',
-    [clinic_id]
-  );
   const r = rows[0];
   if (!r) return { count: 0, limit: null, pct: 0, blocked: false };
   const limit = PLAN_LIMITS[r.plan] ?? null;
@@ -272,4 +302,31 @@ async function incrementConversation(clinic_id) {
   return { count, limit, pct, blocked, email: r.email, name: r.name, plan: r.plan, warned: r.conv_warned };
 }
 
-module.exports = { pool, initDb, getSession, saveSession, saveLead, getClinicByEmail, getClinicByWhatsapp, getClinicBySetupToken, createClinic, updateClinicConfig, buildPromptForClinic, getLeads, saveAppointment, getAppointments, verifyPassword, hashPassword, importLeads, getImportedLeads, updateLeadEstado, incrementConversation, PLAN_LIMITS };
+async function saveMessage({ clinic_id, session_id, direction, content, from_number, responded_by = 'ai' }) {
+  await pool.query(
+    'INSERT INTO messages (clinic_id,session_id,direction,content,from_number,responded_by) VALUES ($1,$2,$3,$4,$5,$6)',
+    [clinic_id, session_id, direction, content, from_number || null, responded_by]
+  );
+}
+
+async function getMessages(clinic_id, session_id, limit = 50) {
+  const { rows } = await pool.query(
+    'SELECT * FROM messages WHERE clinic_id=$1 AND session_id=$2 ORDER BY created_at ASC LIMIT $3',
+    [clinic_id, session_id, limit]
+  );
+  return rows;
+}
+
+async function getRecentConversations(clinic_id, limit = 30) {
+  const { rows } = await pool.query(`
+    SELECT DISTINCT ON (session_id)
+      session_id, from_number, content, direction, responded_by, created_at
+    FROM messages
+    WHERE clinic_id=$1
+    ORDER BY session_id, created_at DESC
+  `, [clinic_id]);
+  // Ordenar por created_at DESC y limitar en JS (DISTINCT ON requiere ORDER BY session_id primero)
+  return rows.sort((a, b) => new Date(b.created_at) - new Date(a.created_at)).slice(0, limit);
+}
+
+module.exports = { pool, initDb, getSession, saveSession, saveLead, getClinicByEmail, getClinicByWhatsapp, getClinicBySetupToken, createClinic, updateClinicConfig, buildPromptForClinic, getLeads, saveAppointment, getAppointments, verifyPassword, hashPassword, importLeads, getImportedLeads, updateLeadEstado, incrementConversation, PLAN_LIMITS, saveMessage, getMessages, getRecentConversations };
