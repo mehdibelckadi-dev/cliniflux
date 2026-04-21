@@ -383,6 +383,81 @@ async function removePushSubscription(endpoint) {
   await pool.query('DELETE FROM push_subscriptions WHERE endpoint=$1', [endpoint]);
 }
 
+async function getAnalytics(clinic_id) {
+  const [msgs, appts, resolution, daily, avgResp] = await Promise.all([
+    // Mensajes este mes + semana pasada (para trend)
+    pool.query(`
+      SELECT
+        COUNT(*) FILTER (WHERE created_at >= date_trunc('month', NOW()))                      AS month_total,
+        COUNT(*) FILTER (WHERE created_at >= NOW() - INTERVAL '7 days')                       AS week_total,
+        COUNT(*) FILTER (WHERE created_at >= NOW() - INTERVAL '14 days'
+                           AND created_at <  NOW() - INTERVAL '7 days')                       AS prev_week
+      FROM messages WHERE clinic_id=$1 AND direction='inbound'
+    `, [clinic_id]),
+
+    // Citas este mes
+    pool.query(`
+      SELECT COUNT(*) AS total FROM appointments
+      WHERE clinic_id=$1 AND created_at >= date_trunc('month', NOW())
+    `, [clinic_id]),
+
+    // Resolución IA: sesiones sin manual este mes / total sesiones este mes
+    pool.query(`
+      SELECT
+        COUNT(DISTINCT session_id)                                                              AS total_sessions,
+        COUNT(DISTINCT session_id) FILTER (
+          WHERE session_id NOT IN (
+            SELECT session_id FROM conv_states WHERE clinic_id=$1 AND manual_mode=TRUE
+          )
+        )                                                                                       AS ia_sessions
+      FROM messages WHERE clinic_id=$1 AND created_at >= date_trunc('month', NOW())
+    `, [clinic_id]),
+
+    // Mensajes por día últimos 7 días
+    pool.query(`
+      SELECT
+        TO_CHAR(DATE_TRUNC('day', created_at), 'Dy') AS day,
+        COUNT(*)                                       AS cnt
+      FROM messages
+      WHERE clinic_id=$1 AND direction='inbound' AND created_at >= NOW() - INTERVAL '7 days'
+      GROUP BY DATE_TRUNC('day', created_at), day
+      ORDER BY DATE_TRUNC('day', created_at)
+    `, [clinic_id]),
+
+    // Tiempo medio respuesta IA (segundos)
+    pool.query(`
+      SELECT ROUND(AVG(EXTRACT(EPOCH FROM (o.created_at - i.created_at))))::INT AS avg_secs
+      FROM messages i
+      JOIN LATERAL (
+        SELECT created_at FROM messages
+        WHERE clinic_id=$1 AND session_id=i.session_id
+          AND direction='outbound' AND responded_by='ai' AND created_at > i.created_at
+        ORDER BY created_at LIMIT 1
+      ) o ON TRUE
+      WHERE i.clinic_id=$1 AND i.direction='inbound'
+        AND i.created_at >= date_trunc('month', NOW())
+    `, [clinic_id]),
+  ]);
+
+  const m = msgs.rows[0];
+  const r = resolution.rows[0];
+  const totalSess = parseInt(r.total_sessions) || 0;
+  const iaSess   = parseInt(r.ia_sessions)    || 0;
+  const weekTotal = parseInt(m.week_total)    || 0;
+  const prevWeek  = parseInt(m.prev_week)     || 1;
+  const weekTrend = prevWeek ? Math.round((weekTotal - prevWeek) / prevWeek * 100) : 0;
+
+  return {
+    month_messages : parseInt(m.month_total) || 0,
+    week_messages  : weekTotal,
+    week_trend_pct : weekTrend,
+    ia_resolution  : totalSess ? Math.round(iaSess / totalSess * 100) : 0,
+    citas_mes      : parseInt(appts.rows[0].total) || 0,
+    avg_response_s : parseInt(avgResp.rows[0]?.avg_secs) || 0,
+    daily          : daily.rows, // [{day, cnt}]
+  };
+}
+
 // Construye historial OpenAI directamente desde messages (elimina round-trip a chat_sessions)
 async function getHistoryFromMessages(clinic_id, session_id, limit = 30) {
   const { rows } = await pool.query(
@@ -392,4 +467,4 @@ async function getHistoryFromMessages(clinic_id, session_id, limit = 30) {
   return rows.map(r => ({ role: r.direction === 'inbound' ? 'user' : 'assistant', content: r.content }));
 }
 
-module.exports = { pool, initDb, getSession, saveSession, saveLead, getClinicByEmail, getClinicByWhatsapp, getClinicBySetupToken, createClinic, updateClinicConfig, buildPromptForClinic, getLeads, saveAppointment, getAppointments, verifyPassword, hashPassword, importLeads, getImportedLeads, updateLeadEstado, incrementConversation, PLAN_LIMITS, saveMessage, getMessages, getRecentConversations, getHistoryFromMessages, setConvState, getManualSessions, getConvNotes, savePushSubscription, getPushSubscriptions, removePushSubscription, closeInactiveConversations };
+module.exports = { pool, initDb, getAnalytics, getSession, saveSession, saveLead, getClinicByEmail, getClinicByWhatsapp, getClinicBySetupToken, createClinic, updateClinicConfig, buildPromptForClinic, getLeads, saveAppointment, getAppointments, verifyPassword, hashPassword, importLeads, getImportedLeads, updateLeadEstado, incrementConversation, PLAN_LIMITS, saveMessage, getMessages, getRecentConversations, getHistoryFromMessages, setConvState, getManualSessions, getConvNotes, savePushSubscription, getPushSubscriptions, removePushSubscription, closeInactiveConversations };

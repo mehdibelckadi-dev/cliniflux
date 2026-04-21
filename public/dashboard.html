@@ -527,53 +527,41 @@
     <!-- PANEL 2: MÉTRICAS -->
     <div class="panel p-metrics" id="panel-2">
       <div class="met-title">Métricas de rendimiento</div>
-      <div class="met-sub">Resumen semanal — 27 Mar al 2 Abr, 2026</div>
+      <div class="met-sub" id="met-sub">Este mes</div>
       <div class="met-kpis">
         <div class="kpi">
           <div class="kpi-l">Mensajes / semana</div>
-          <div class="kpi-n">342</div>
-          <div class="kpi-spark"><div class="sp-b" style="height:40%"></div><div class="sp-b" style="height:55%"></div><div class="sp-b" style="height:45%"></div><div class="sp-b" style="height:70%"></div><div class="sp-b" style="height:60%"></div><div class="sp-b hi" style="height:100%"></div></div>
-          <div class="kpi-trend up">↑ 18% vs semana anterior</div>
+          <div class="kpi-n" id="kpi-msgs">—</div>
+          <div class="kpi-spark" id="kpi-spark"></div>
+          <div class="kpi-trend up" id="kpi-msgs-trend"></div>
         </div>
         <div class="kpi">
           <div class="kpi-l">Resolución IA</div>
-          <div class="kpi-n" style="color:var(--green)">94%</div>
-          <div class="kpi-spark"><div class="sp-b" style="height:75%"></div><div class="sp-b" style="height:80%"></div><div class="sp-b" style="height:78%"></div><div class="sp-b" style="height:85%"></div><div class="sp-b" style="height:90%"></div><div class="sp-b hi" style="height:100%"></div></div>
-          <div class="kpi-trend up">↑ 3 puntos</div>
+          <div class="kpi-n" id="kpi-res" style="color:var(--green)">—</div>
+          <div class="kpi-spark"></div>
+          <div class="kpi-trend up" id="kpi-res-sub"></div>
         </div>
         <div class="kpi">
-          <div class="kpi-l">Tiempo respuesta</div>
-          <div class="kpi-n">1.2s</div>
-          <div class="kpi-spark"><div class="sp-b hi" style="height:100%"></div><div class="sp-b" style="height:85%"></div><div class="sp-b" style="height:70%"></div><div class="sp-b" style="height:55%"></div><div class="sp-b" style="height:45%"></div><div class="sp-b" style="height:35%"></div></div>
-          <div class="kpi-trend down">↓ 0.3s mejor</div>
+          <div class="kpi-l">Tiempo respuesta IA</div>
+          <div class="kpi-n" id="kpi-resp">—</div>
+          <div class="kpi-spark"></div>
+          <div class="kpi-trend" id="kpi-resp-sub"></div>
         </div>
         <div class="kpi">
           <div class="kpi-l">Citas confirmadas</div>
-          <div class="kpi-n">47</div>
-          <div class="kpi-spark"><div class="sp-b" style="height:50%"></div><div class="sp-b" style="height:60%"></div><div class="sp-b" style="height:55%"></div><div class="sp-b" style="height:75%"></div><div class="sp-b" style="height:80%"></div><div class="sp-b hi" style="height:100%"></div></div>
-          <div class="kpi-trend up">↑ 12 este mes</div>
+          <div class="kpi-n" id="kpi-appts">—</div>
+          <div class="kpi-spark"></div>
+          <div class="kpi-trend up" id="kpi-revenue"></div>
         </div>
       </div>
       <div class="met-row">
         <div class="met-card">
           <div class="met-card-title">Actividad — últimos 7 días</div>
-          <div class="met-chart">
-            <div class="met-bar-wrap"><div class="met-bar-val">41</div><div class="met-bar" style="height:55%"></div><div class="met-bar-lbl">L</div></div>
-            <div class="met-bar-wrap"><div class="met-bar-val">52</div><div class="met-bar" style="height:70%"></div><div class="met-bar-lbl">M</div></div>
-            <div class="met-bar-wrap"><div class="met-bar-val">36</div><div class="met-bar" style="height:48%"></div><div class="met-bar-lbl">X</div></div>
-            <div class="met-bar-wrap"><div class="met-bar-val">66</div><div class="met-bar" style="height:88%"></div><div class="met-bar-lbl">J</div></div>
-            <div class="met-bar-wrap"><div class="met-bar-val">75</div><div class="met-bar hi" style="height:100%"></div><div class="met-bar-lbl">V</div></div>
-            <div class="met-bar-wrap"><div class="met-bar-val">24</div><div class="met-bar" style="height:32%"></div><div class="met-bar-lbl">S</div></div>
-            <div class="met-bar-wrap"><div class="met-bar-val">14</div><div class="met-bar" style="height:18%"></div><div class="met-bar-lbl">D</div></div>
-          </div>
+          <div class="met-chart" id="met-chart"></div>
         </div>
         <div class="met-card">
-          <div class="met-card-title">Canal de origen</div>
-          <div class="met-sources">
-            <div class="met-src"><div class="met-src-dot" style="background:#25d366"></div><div class="met-src-name">WhatsApp</div><div class="met-src-bar"><div class="met-src-fill" style="width:82%;background:#25d366"></div></div><div class="met-src-pct">82%</div></div>
-            <div class="met-src"><div class="met-src-dot" style="background:#3b82f6"></div><div class="met-src-name">Web chat</div><div class="met-src-bar"><div class="met-src-fill" style="width:12%;background:#3b82f6"></div></div><div class="met-src-pct">12%</div></div>
-            <div class="met-src"><div class="met-src-dot" style="background:#4ade80"></div><div class="met-src-name">Teléfono</div><div class="met-src-bar"><div class="met-src-fill" style="width:6%;background:#4ade80"></div></div><div class="met-src-pct">6%</div></div>
-          </div>
+          <div class="met-card-title">Resumen del mes</div>
+          <div id="met-summary" style="padding:12px 0;display:flex;flex-direction:column;gap:10px"></div>
         </div>
       </div>
     </div>
@@ -1095,6 +1083,63 @@
     document.querySelectorAll('.si[data-panel],.bn-item[data-panel]').forEach(s => s.classList.toggle('active', parseInt(s.dataset.panel)===n));
     if (n === 4) { loadSettings(); loadUsage(); }
     if (n === 3) loadImportedLeads();
+    if (n === 2) loadAnalytics();
+  }
+
+  async function loadAnalytics() {
+    try {
+      const r = await fetch('/api/analytics');
+      if (!r.ok) return;
+      const d = await r.json();
+      const avg_ticket = 80; // €  — configurable en settings más adelante
+
+      // KPIs
+      document.getElementById('kpi-msgs').textContent = d.week_messages;
+      const trend = d.week_trend_pct;
+      document.getElementById('kpi-msgs-trend').textContent = (trend >= 0 ? '↑ ' : '↓ ') + Math.abs(trend) + '% vs semana anterior';
+
+      document.getElementById('kpi-res').textContent = d.ia_resolution + '%';
+      document.getElementById('kpi-res-sub').textContent = d.ia_resolution >= 80 ? '✓ Excelente' : d.ia_resolution >= 60 ? 'Buena resolución' : 'Mejorable';
+
+      const secs = d.avg_response_s;
+      document.getElementById('kpi-resp').textContent = secs < 60 ? secs + 's' : (secs/60).toFixed(1) + 'min';
+      document.getElementById('kpi-resp-sub').textContent = secs < 5 ? '⚡ Instantáneo' : secs < 30 ? 'Muy rápido' : 'Normal';
+
+      document.getElementById('kpi-appts').textContent = d.citas_mes;
+      const revenue = d.citas_mes * avg_ticket;
+      document.getElementById('kpi-revenue').textContent = `≈ ${revenue.toLocaleString('es-ES')}€ valor estimado`;
+
+      // Gráfico barras 7 días
+      const chart = document.getElementById('met-chart');
+      chart.innerHTML = '';
+      if (d.daily.length) {
+        const maxVal = Math.max(...d.daily.map(x => parseInt(x.cnt)), 1);
+        d.daily.forEach(x => {
+          const h = Math.round(parseInt(x.cnt) / maxVal * 100);
+          const wrap = document.createElement('div');
+          wrap.className = 'met-bar-wrap';
+          wrap.innerHTML = `<div class="met-bar-val">${x.cnt}</div><div class="met-bar${h===100?' hi':''}" style="height:${Math.max(h,6)}%"></div><div class="met-bar-lbl">${x.day}</div>`;
+          chart.appendChild(wrap);
+        });
+      } else {
+        chart.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:20px">Sin datos esta semana</div>';
+      }
+
+      // Resumen mes
+      const now = new Date();
+      const mes = now.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' });
+      document.getElementById('met-sub').textContent = mes.charAt(0).toUpperCase() + mes.slice(1);
+      document.getElementById('met-summary').innerHTML = [
+        ['💬', 'Mensajes recibidos', d.month_messages],
+        ['🤖', 'Resueltos por IA', Math.round(d.month_messages * d.ia_resolution / 100)],
+        ['📅', 'Citas confirmadas', d.citas_mes],
+        ['💶', 'Valor estimado', revenue.toLocaleString('es-ES') + '€'],
+      ].map(([icon, label, val]) => `
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border)">
+          <span style="font-size:13px;color:var(--text2)">${icon} ${label}</span>
+          <strong style="font-size:14px;color:var(--text)">${val}</strong>
+        </div>`).join('');
+    } catch(e) { console.error('analytics:', e); }
   }
   function selectConv(el){
     document.querySelectorAll('.conv-item').forEach(i => i.classList.remove('active'));

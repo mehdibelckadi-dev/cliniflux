@@ -7,7 +7,7 @@ const PgSession = require('connect-pg-simple')(session);
 const OpenAI = require('openai');
 const crypto = require('crypto');
 const Stripe = require('stripe');
-const { pool, initDb, getSession, saveSession, saveLead, getClinicByEmail, getClinicByWhatsapp, getClinicBySetupToken, createClinic, updateClinicConfig, buildPromptForClinic, getLeads, getAppointments, saveAppointment, verifyPassword, hashPassword, importLeads, getImportedLeads, updateLeadEstado, incrementConversation, PLAN_LIMITS, saveMessage, getMessages, getRecentConversations, getHistoryFromMessages, setConvState, getManualSessions, getConvNotes, savePushSubscription, getPushSubscriptions, removePushSubscription, closeInactiveConversations } = require('./db');
+const { pool, initDb, getAnalytics, getSession, saveSession, saveLead, getClinicByEmail, getClinicByWhatsapp, getClinicBySetupToken, createClinic, updateClinicConfig, buildPromptForClinic, getLeads, getAppointments, saveAppointment, verifyPassword, hashPassword, importLeads, getImportedLeads, updateLeadEstado, incrementConversation, PLAN_LIMITS, saveMessage, getMessages, getRecentConversations, getHistoryFromMessages, setConvState, getManualSessions, getConvNotes, savePushSubscription, getPushSubscriptions, removePushSubscription, closeInactiveConversations } = require('./db');
 const webpush = require('web-push');
 
 // VAPID — claves en env (Railway). Fallback: generadas en dev (no persistentes entre reinicios)
@@ -870,6 +870,11 @@ app.get('/api/dashboard/appointments', requireAuth, async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: 'Error' });
   }
+});
+
+app.get('/api/analytics', requireAuth, async (req, res) => {
+  try { res.json(await getAnalytics(req.session.clinic.id)); }
+  catch(e) { res.status(500).json({ error: 'Error' }); }
 });
 
 // ── WhatsApp Business API (Meta) ────────────────────────────────────────────
