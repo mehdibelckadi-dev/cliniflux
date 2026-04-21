@@ -468,6 +468,9 @@
           <div class="pp-ai-val" id="pp-ai-status">IA activa</div>
           <div class="pp-ai-conf" id="pp-msg-count">0 mensajes</div>
         </div>
+        <div class="pp-sect" style="margin-top:12px">Notas internas</div>
+        <textarea id="pp-notes" placeholder="Notas del equipo (solo visibles en el dashboard)..." style="width:100%;font-size:12px;font-family:inherit;color:var(--text);background:var(--bg2);border:1.5px solid var(--border);border-radius:8px;padding:8px 10px;resize:vertical;min-height:72px;outline:none;margin-top:4px" oninput="scheduleNotesSave()"></textarea>
+        <button onclick="saveNotes()" id="notes-save-btn" style="margin-top:6px;font-size:11px;font-weight:600;font-family:inherit;background:var(--green);color:#fff;border:none;padding:5px 14px;border-radius:var(--r-pill);cursor:pointer;display:none">Guardar</button>
       </div>
     </div>
 
@@ -1222,6 +1225,7 @@
       const msgs = await r.json();
       renderMessages(msgs);
       document.getElementById('pp-msg-count').textContent = `${msgs.length} mensajes`;
+      loadNotes(conv.session_id);
     } catch(e) { chatMsgs.innerHTML = '<div style="padding:20px;color:var(--text3);text-align:center">Error cargando mensajes</div>'; }
   }
 
@@ -1375,12 +1379,62 @@
     });
   }
 
-  // Enter en input manual
   document.getElementById('manual-input')?.addEventListener('keydown', e => {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendManualReply(); }
   });
 
+  // ── Paso 8: Notas internas ─────────────────────────────────────────────────
+  let notesSaveTimer = null;
+  function scheduleNotesSave() {
+    document.getElementById('notes-save-btn').style.display = '';
+    clearTimeout(notesSaveTimer);
+    notesSaveTimer = setTimeout(saveNotes, 2000);
+  }
+  async function saveNotes() {
+    if (!activeSessionId) return;
+    const notes = document.getElementById('pp-notes').value;
+    await fetch(`/api/conversations/${encodeURIComponent(activeSessionId)}/notes`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ notes })
+    }).catch(() => {});
+    document.getElementById('notes-save-btn').style.display = 'none';
+  }
+  async function loadNotes(sessionId) {
+    const r = await fetch(`/api/conversations/${encodeURIComponent(sessionId)}/notes`).catch(() => null);
+    if (!r?.ok) return;
+    const { notes } = await r.json();
+    document.getElementById('pp-notes').value = notes || '';
+    document.getElementById('notes-save-btn').style.display = 'none';
+  }
+
+  // ── Paso 7: Web Push ───────────────────────────────────────────────────────
+  async function initPush() {
+    if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
+    try {
+      const reg = await navigator.serviceWorker.register('/sw.js');
+      const permission = await Notification.requestPermission();
+      if (permission !== 'granted') return;
+      const { key } = await fetch('/api/push/vapid-public').then(r => r.json());
+      const sub = await reg.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array(key)
+      });
+      await fetch('/api/push/subscribe', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ endpoint: sub.endpoint, keys: { p256dh: arrayBufferToBase64(sub.getKey('p256dh')), auth: arrayBufferToBase64(sub.getKey('auth')) } })
+      });
+    } catch(e) { console.warn('Push setup:', e.message); }
+  }
+  function urlBase64ToUint8Array(b64) {
+    const pad = b64.length % 4 === 0 ? '' : '===='.slice(0, 4 - b64.length % 4);
+    const raw = atob((b64 + pad).replace(/-/g,'+').replace(/_/g,'/'));
+    return Uint8Array.from([...raw].map(c => c.charCodeAt(0)));
+  }
+  function arrayBufferToBase64(buf) {
+    return btoa(String.fromCharCode(...new Uint8Array(buf))).replace(/\+/g,'-').replace(/\//g,'_');
+  }
+
   loadConversations();
+  initPush();
 </script>
 <script src="/socket.io/socket.io.js" onload="initSocket()"></script>
 </body>

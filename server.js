@@ -7,7 +7,13 @@ const PgSession = require('connect-pg-simple')(session);
 const OpenAI = require('openai');
 const crypto = require('crypto');
 const Stripe = require('stripe');
-const { pool, initDb, getSession, saveSession, saveLead, getClinicByEmail, getClinicByWhatsapp, getClinicBySetupToken, createClinic, updateClinicConfig, buildPromptForClinic, getLeads, getAppointments, saveAppointment, verifyPassword, hashPassword, importLeads, getImportedLeads, updateLeadEstado, incrementConversation, PLAN_LIMITS, saveMessage, getMessages, getRecentConversations, getHistoryFromMessages, setConvState, getManualSessions } = require('./db');
+const { pool, initDb, getSession, saveSession, saveLead, getClinicByEmail, getClinicByWhatsapp, getClinicBySetupToken, createClinic, updateClinicConfig, buildPromptForClinic, getLeads, getAppointments, saveAppointment, verifyPassword, hashPassword, importLeads, getImportedLeads, updateLeadEstado, incrementConversation, PLAN_LIMITS, saveMessage, getMessages, getRecentConversations, getHistoryFromMessages, setConvState, getManualSessions, getConvNotes, savePushSubscription, getPushSubscriptions, removePushSubscription } = require('./db');
+const webpush = require('web-push');
+
+// VAPID — claves en env (Railway). Fallback: generadas en dev (no persistentes entre reinicios)
+const VAPID_PUBLIC  = process.env.VAPID_PUBLIC_KEY  || 'BJCREiK2q5ZNhc_zYlOmeOUhFKUbw8cCl93dKqsb8NHlMaJEYy2SWAObRGluIXP6MkiaCDh5ZEGgx52fiS26XrY';
+const VAPID_PRIVATE = process.env.VAPID_PRIVATE_KEY || 'ixgd2eOIj-S6Z9HzMfVlBNHgh92ZsL7EsWoLhRLucLI';
+webpush.setVapidDetails('mailto:contacto@cliniflux.es', VAPID_PUBLIC, VAPID_PRIVATE);
 
 const compression = require('compression');
 const stripe = process.env.STRIPE_SECRET_KEY ? Stripe(process.env.STRIPE_SECRET_KEY) : null;
@@ -940,6 +946,10 @@ app.post('/webhook/whatsapp', async (req, res) => {
       created_at: savedAt, responded_by: 'human', urgent, manual: inManual
     });
 
+    // Push notification al dispositivo (aunque el dashboard esté cerrado)
+    const pushTitle = urgent ? '🔴 Mensaje urgente' : '💬 Nuevo mensaje WhatsApp';
+    sendPushToClinic(clinicId, pushTitle, msg.slice(0, 80)).catch(() => {});
+
     // Leer historial (sirve tanto para IA como para co-pilot)
     const history = await getHistoryFromMessages(clinicId, sessionId, 30);
     const contextMsgs = buildContextMessages(history, 1200);
@@ -1135,7 +1145,7 @@ app.post('/api/demo-request', async (req, res) => {
 
 // ── Paso 5: Escalado a manual — email con resumen GPT ───────────────────────
 
-async function escalateConversation(sessionId, clinicId, io) {
+async function escalateConversation(sessionId, clinicId) {
   // Obtener últimos mensajes + datos de clínica en paralelo
   const [msgs, clinicRows] = await Promise.all([
     getMessages(clinicId, sessionId, 10),
@@ -1209,7 +1219,7 @@ app.post('/api/conversations/:sessionId/mode', requireAuth, async (req, res) => 
 
   // Paso 5: email de escalado al activar manual
   if (manual) {
-    escalateConversation(sessionId, clinicId, req.app.get('io')).catch(e => console.error('escalate:', e.message));
+    escalateConversation(sessionId, clinicId).catch(e => console.error('escalate:', e.message));
   }
 
   res.json({ ok: true, manual: !!manual });
@@ -1242,6 +1252,48 @@ app.post('/api/conversations/:sessionId/reply', requireAuth, rateLimit(60, 60000
     session_id: sessionId, from_number: to, content: text,
     direction: 'outbound', created_at: sentAt, responded_by: 'human'
   });
+  res.json({ ok: true });
+});
+
+// ── Paso 7: Web Push ──────────────────────────────────────────────────────────
+
+async function sendPushToClinic(clinicId, title, body, url = '/dashboard') {
+  const subs = await getPushSubscriptions(clinicId).catch(() => []);
+  const payload = JSON.stringify({ title, body, url });
+  await Promise.allSettled(subs.map(async sub => {
+    try {
+      await webpush.sendNotification({ endpoint: sub.endpoint, keys: sub.keys }, payload);
+    } catch(e) {
+      if (e.statusCode === 410 || e.statusCode === 404) await removePushSubscription(sub.endpoint).catch(() => {});
+    }
+  }));
+}
+
+app.get('/api/push/vapid-public', (_req, res) => res.json({ key: VAPID_PUBLIC }));
+
+app.post('/api/push/subscribe', requireAuth, async (req, res) => {
+  const { endpoint, keys } = req.body;
+  if (!endpoint || !keys?.p256dh || !keys?.auth) return res.status(400).json({ error: 'Suscripción inválida' });
+  await savePushSubscription(req.session.clinic.id, { endpoint, keys }).catch(() => {});
+  res.json({ ok: true });
+});
+
+app.delete('/api/push/subscribe', requireAuth, async (req, res) => {
+  await removePushSubscription(req.body.endpoint).catch(() => {});
+  res.json({ ok: true });
+});
+
+// ── Paso 8: Notas internas por conversación ───────────────────────────────────
+
+app.get('/api/conversations/:sessionId/notes', requireAuth, async (req, res) => {
+  const notes = await getConvNotes(req.params.sessionId, req.session.clinic.id).catch(() => '');
+  res.json({ notes });
+});
+
+app.post('/api/conversations/:sessionId/notes', requireAuth, async (req, res) => {
+  const { notes } = req.body;
+  if (typeof notes !== 'string' || notes.length > 2000) return res.status(400).json({ error: 'Notas inválidas' });
+  await setConvState(req.params.sessionId, req.session.clinic.id, { notes }).catch(() => {});
   res.json({ ok: true });
 });
 

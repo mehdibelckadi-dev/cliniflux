@@ -100,7 +100,18 @@ async function initDb() {
       clinic_id    INTEGER REFERENCES clinics(id),
       manual_mode  BOOLEAN DEFAULT FALSE,
       priority     TEXT DEFAULT 'normal',
+      notes        TEXT DEFAULT '',
       updated_at   TIMESTAMP DEFAULT NOW()
+    )
+  `);
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS push_subscriptions (
+      id         SERIAL PRIMARY KEY,
+      clinic_id  INTEGER REFERENCES clinics(id),
+      endpoint   TEXT UNIQUE NOT NULL,
+      keys       JSONB NOT NULL,
+      created_at TIMESTAMP DEFAULT NOW()
     )
   `);
 
@@ -318,20 +329,43 @@ async function getRecentConversations(clinic_id, limit = 30) {
   return rows.sort((a, b) => new Date(b.created_at) - new Date(a.created_at)).slice(0, limit);
 }
 
-async function setConvState(session_id, clinic_id, { manual_mode, priority }) {
+async function setConvState(session_id, clinic_id, { manual_mode, priority, notes } = {}) {
   await pool.query(`
-    INSERT INTO conv_states (session_id, clinic_id, manual_mode, priority, updated_at)
-    VALUES ($1, $2, $3, $4, NOW())
+    INSERT INTO conv_states (session_id, clinic_id, manual_mode, priority, notes, updated_at)
+    VALUES ($1, $2, $3, $4, $5, NOW())
     ON CONFLICT (session_id) DO UPDATE
       SET manual_mode = COALESCE($3, conv_states.manual_mode),
           priority    = COALESCE($4, conv_states.priority),
+          notes       = COALESCE($5, conv_states.notes),
           updated_at  = NOW()
-  `, [session_id, clinic_id, manual_mode ?? null, priority ?? null]);
+  `, [session_id, clinic_id, manual_mode ?? null, priority ?? null, notes ?? null]);
 }
 
 async function getManualSessions() {
   const { rows } = await pool.query('SELECT session_id FROM conv_states WHERE manual_mode = TRUE');
   return rows.map(r => r.session_id);
+}
+
+async function getConvNotes(session_id, clinic_id) {
+  const { rows } = await pool.query('SELECT notes FROM conv_states WHERE session_id=$1 AND clinic_id=$2', [session_id, clinic_id]);
+  return rows[0]?.notes || '';
+}
+
+async function savePushSubscription(clinic_id, subscription) {
+  await pool.query(`
+    INSERT INTO push_subscriptions (clinic_id, endpoint, keys)
+    VALUES ($1, $2, $3)
+    ON CONFLICT (endpoint) DO UPDATE SET clinic_id=$1, keys=$3
+  `, [clinic_id, subscription.endpoint, JSON.stringify(subscription.keys)]);
+}
+
+async function getPushSubscriptions(clinic_id) {
+  const { rows } = await pool.query('SELECT endpoint, keys FROM push_subscriptions WHERE clinic_id=$1', [clinic_id]);
+  return rows.map(r => ({ endpoint: r.endpoint, keys: r.keys }));
+}
+
+async function removePushSubscription(endpoint) {
+  await pool.query('DELETE FROM push_subscriptions WHERE endpoint=$1', [endpoint]);
 }
 
 // Construye historial OpenAI directamente desde messages (elimina round-trip a chat_sessions)
@@ -343,4 +377,4 @@ async function getHistoryFromMessages(clinic_id, session_id, limit = 30) {
   return rows.map(r => ({ role: r.direction === 'inbound' ? 'user' : 'assistant', content: r.content }));
 }
 
-module.exports = { pool, initDb, getSession, saveSession, saveLead, getClinicByEmail, getClinicByWhatsapp, getClinicBySetupToken, createClinic, updateClinicConfig, buildPromptForClinic, getLeads, saveAppointment, getAppointments, verifyPassword, hashPassword, importLeads, getImportedLeads, updateLeadEstado, incrementConversation, PLAN_LIMITS, saveMessage, getMessages, getRecentConversations, getHistoryFromMessages, setConvState, getManualSessions };
+module.exports = { pool, initDb, getSession, saveSession, saveLead, getClinicByEmail, getClinicByWhatsapp, getClinicBySetupToken, createClinic, updateClinicConfig, buildPromptForClinic, getLeads, saveAppointment, getAppointments, verifyPassword, hashPassword, importLeads, getImportedLeads, updateLeadEstado, incrementConversation, PLAN_LIMITS, saveMessage, getMessages, getRecentConversations, getHistoryFromMessages, setConvState, getManualSessions, getConvNotes, savePushSubscription, getPushSubscriptions, removePushSubscription };
