@@ -101,6 +101,8 @@ async function initDb() {
       manual_mode  BOOLEAN DEFAULT FALSE,
       priority     TEXT DEFAULT 'normal',
       notes        TEXT DEFAULT '',
+      status       TEXT DEFAULT 'open',
+      last_msg_at  TIMESTAMP DEFAULT NOW(),
       updated_at   TIMESTAMP DEFAULT NOW()
     )
   `);
@@ -329,16 +331,29 @@ async function getRecentConversations(clinic_id, limit = 30) {
   return rows.sort((a, b) => new Date(b.created_at) - new Date(a.created_at)).slice(0, limit);
 }
 
-async function setConvState(session_id, clinic_id, { manual_mode, priority, notes } = {}) {
+async function setConvState(session_id, clinic_id, { manual_mode, priority, notes, status, last_msg_at } = {}) {
   await pool.query(`
-    INSERT INTO conv_states (session_id, clinic_id, manual_mode, priority, notes, updated_at)
-    VALUES ($1, $2, $3, $4, $5, NOW())
+    INSERT INTO conv_states (session_id, clinic_id, manual_mode, priority, notes, status, last_msg_at, updated_at)
+    VALUES ($1, $2, $3, $4, $5, $6, COALESCE($7, NOW()), NOW())
     ON CONFLICT (session_id) DO UPDATE
       SET manual_mode = COALESCE($3, conv_states.manual_mode),
           priority    = COALESCE($4, conv_states.priority),
           notes       = COALESCE($5, conv_states.notes),
+          status      = COALESCE($6, conv_states.status),
+          last_msg_at = COALESCE($7, conv_states.last_msg_at),
           updated_at  = NOW()
-  `, [session_id, clinic_id, manual_mode ?? null, priority ?? null, notes ?? null]);
+  `, [session_id, clinic_id, manual_mode ?? null, priority ?? null, notes ?? null, status ?? null, last_msg_at ?? null]);
+}
+
+// Cierra conversaciones sin actividad — llamado por cron interno
+async function closeInactiveConversations(inactiveMinutes = 60) {
+  const { rows } = await pool.query(`
+    UPDATE conv_states SET status='closed', updated_at=NOW()
+    WHERE status='open'
+      AND last_msg_at < NOW() - ($1 || ' minutes')::INTERVAL
+    RETURNING session_id, clinic_id
+  `, [inactiveMinutes]);
+  return rows;
 }
 
 async function getManualSessions() {
@@ -377,4 +392,4 @@ async function getHistoryFromMessages(clinic_id, session_id, limit = 30) {
   return rows.map(r => ({ role: r.direction === 'inbound' ? 'user' : 'assistant', content: r.content }));
 }
 
-module.exports = { pool, initDb, getSession, saveSession, saveLead, getClinicByEmail, getClinicByWhatsapp, getClinicBySetupToken, createClinic, updateClinicConfig, buildPromptForClinic, getLeads, saveAppointment, getAppointments, verifyPassword, hashPassword, importLeads, getImportedLeads, updateLeadEstado, incrementConversation, PLAN_LIMITS, saveMessage, getMessages, getRecentConversations, getHistoryFromMessages, setConvState, getManualSessions, getConvNotes, savePushSubscription, getPushSubscriptions, removePushSubscription };
+module.exports = { pool, initDb, getSession, saveSession, saveLead, getClinicByEmail, getClinicByWhatsapp, getClinicBySetupToken, createClinic, updateClinicConfig, buildPromptForClinic, getLeads, saveAppointment, getAppointments, verifyPassword, hashPassword, importLeads, getImportedLeads, updateLeadEstado, incrementConversation, PLAN_LIMITS, saveMessage, getMessages, getRecentConversations, getHistoryFromMessages, setConvState, getManualSessions, getConvNotes, savePushSubscription, getPushSubscriptions, removePushSubscription, closeInactiveConversations };

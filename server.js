@@ -7,7 +7,7 @@ const PgSession = require('connect-pg-simple')(session);
 const OpenAI = require('openai');
 const crypto = require('crypto');
 const Stripe = require('stripe');
-const { pool, initDb, getSession, saveSession, saveLead, getClinicByEmail, getClinicByWhatsapp, getClinicBySetupToken, createClinic, updateClinicConfig, buildPromptForClinic, getLeads, getAppointments, saveAppointment, verifyPassword, hashPassword, importLeads, getImportedLeads, updateLeadEstado, incrementConversation, PLAN_LIMITS, saveMessage, getMessages, getRecentConversations, getHistoryFromMessages, setConvState, getManualSessions, getConvNotes, savePushSubscription, getPushSubscriptions, removePushSubscription } = require('./db');
+const { pool, initDb, getSession, saveSession, saveLead, getClinicByEmail, getClinicByWhatsapp, getClinicBySetupToken, createClinic, updateClinicConfig, buildPromptForClinic, getLeads, getAppointments, saveAppointment, verifyPassword, hashPassword, importLeads, getImportedLeads, updateLeadEstado, incrementConversation, PLAN_LIMITS, saveMessage, getMessages, getRecentConversations, getHistoryFromMessages, setConvState, getManualSessions, getConvNotes, savePushSubscription, getPushSubscriptions, removePushSubscription, closeInactiveConversations } = require('./db');
 const webpush = require('web-push');
 
 // VAPID — claves en env (Railway). Fallback: generadas en dev (no persistentes entre reinicios)
@@ -938,9 +938,12 @@ app.post('/webhook/whatsapp', async (req, res) => {
     const inManual = manualSessions.has(sessionId);
     const io = req.app.get('io');
 
-    // Persistir mensaje entrante + emitir al dashboard en paralelo
+    // Persistir mensaje + actualizar last_msg_at + reabrir si cerrada
     const savedAt = new Date().toISOString();
-    await saveMessage({ clinic_id: clinicId, session_id: sessionId, direction: 'inbound', content: msg, from_number: from }).catch(() => {});
+    await Promise.all([
+      saveMessage({ clinic_id: clinicId, session_id: sessionId, direction: 'inbound', content: msg, from_number: from }).catch(() => {}),
+      setConvState(sessionId, clinicId, { status: 'open', last_msg_at: new Date() }).catch(() => {}),
+    ]);
     io?.to(`clinic_${clinicId}`).emit('message:new', {
       session_id: sessionId, from_number: from, content: msg, direction: 'inbound',
       created_at: savedAt, responded_by: 'human', urgent, manual: inManual
@@ -1297,6 +1300,13 @@ app.post('/api/conversations/:sessionId/notes', requireAuth, async (req, res) =>
   res.json({ ok: true });
 });
 
+// Cierre manual desde dashboard
+app.post('/api/conversations/:sessionId/close', requireAuth, async (req, res) => {
+  await setConvState(req.params.sessionId, req.session.clinic.id, { status: 'closed' }).catch(() => {});
+  req.app.get('io')?.to(`clinic_${req.session.clinic.id}`).emit('conv:closed', { session_id: req.params.sessionId });
+  res.json({ ok: true });
+});
+
 // ── Arrancar + WebSocket ─────────────────────────────────────────────────────
 
 const PORT = process.env.PORT || 3000;
@@ -1327,10 +1337,25 @@ app.set('io', io);
 
 initDb()
   .then(async () => {
-    // Restaurar sesiones manuales persistidas tras reinicio
     const persisted = await getManualSessions();
     persisted.forEach(s => manualSessions.add(s));
-    if (persisted.length) console.log(`[Boot] ${persisted.length} sesiones en modo manual restauradas`);
+    if (persisted.length) console.log(`[Boot] ${persisted.length} sesiones manuales restauradas`);
+
+    // Cron: cierra conversaciones inactivas cada 5 min
+    const INACTIVE_MINUTES = parseInt(process.env.CONV_TIMEOUT_MINUTES || '60');
+    setInterval(async () => {
+      try {
+        const closed = await closeInactiveConversations(INACTIVE_MINUTES);
+        if (!closed.length) return;
+        console.log(`[Cron] ${closed.length} conversaciones cerradas por inactividad`);
+        // Notificar a cada clínica afectada via socket
+        const byClinic = closed.reduce((m, r) => { (m[r.clinic_id] = m[r.clinic_id] || []).push(r.session_id); return m; }, {});
+        Object.entries(byClinic).forEach(([cid, sessions]) => {
+          sessions.forEach(sid => io.to(`clinic_${cid}`).emit('conv:closed', { session_id: sid, reason: 'inactivity' }));
+        });
+      } catch(e) { console.error('[Cron] close error:', e.message); }
+    }, 5 * 60 * 1000);
+
     httpServer.listen(PORT, () => console.log(`Cliniflux en http://localhost:${PORT}`));
   })
   .catch(err => { console.error('DB init failed:', err.message); process.exit(1); });
