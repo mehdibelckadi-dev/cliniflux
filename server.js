@@ -7,7 +7,7 @@ const PgSession = require('connect-pg-simple')(session);
 const OpenAI = require('openai');
 const crypto = require('crypto');
 const Stripe = require('stripe');
-const { pool, initDb, getSession, saveSession, saveLead, getClinicByEmail, getClinicByWhatsapp, getClinicBySetupToken, createClinic, updateClinicConfig, buildPromptForClinic, getLeads, getAppointments, saveAppointment, verifyPassword, hashPassword, importLeads, getImportedLeads, updateLeadEstado, incrementConversation, PLAN_LIMITS, saveMessage, getMessages, getRecentConversations, getHistoryFromMessages } = require('./db');
+const { pool, initDb, getSession, saveSession, saveLead, getClinicByEmail, getClinicByWhatsapp, getClinicBySetupToken, createClinic, updateClinicConfig, buildPromptForClinic, getLeads, getAppointments, saveAppointment, verifyPassword, hashPassword, importLeads, getImportedLeads, updateLeadEstado, incrementConversation, PLAN_LIMITS, saveMessage, getMessages, getRecentConversations, getHistoryFromMessages, setConvState, getManualSessions } = require('./db');
 
 const compression = require('compression');
 const stripe = process.env.STRIPE_SECRET_KEY ? Stripe(process.env.STRIPE_SECRET_KEY) : null;
@@ -1123,6 +1123,55 @@ app.post('/api/demo-request', async (req, res) => {
   catch (err) { res.status(500).json({ error: 'Error' }); }
 });
 
+// ── Paso 5: Escalado a manual — email con resumen GPT ───────────────────────
+
+async function escalateConversation(sessionId, clinicId, io) {
+  // Obtener últimos mensajes + datos de clínica en paralelo
+  const [msgs, clinicRows] = await Promise.all([
+    getMessages(clinicId, sessionId, 10),
+    pool.query('SELECT name, email, config FROM clinics WHERE id=$1', [clinicId])
+  ]);
+  if (!msgs.length) return;
+  const clinic = clinicRows.rows[0];
+  if (!clinic) return;
+
+  const fromNumber = msgs[0]?.from_number || sessionId;
+  const transcript = msgs.map(m => `${m.direction === 'inbound' ? 'Paciente' : 'Natalia'}: ${m.content}`).join('\n');
+
+  // GPT summary — 80 tokens max, muy barato
+  let summary = '';
+  try {
+    const r = await openai.chat.completions.create({
+      model: 'gpt-4o-mini',
+      messages: [
+        { role: 'system', content: 'Resume en 2 frases qué quiere el paciente y por qué se ha escalado a atención manual. Directo, sin adornos.' },
+        { role: 'user', content: transcript }
+      ],
+      max_tokens: 80, temperature: 0.2
+    });
+    summary = r.choices[0].message.content;
+  } catch(e) { summary = '(resumen no disponible)'; }
+
+  const notify = process.env.EMAIL_NOTIFY || clinic.email;
+  const subject = `🔔 Conversación escalada a manual — ${fromNumber.slice(-9)} — ${clinic.name}`;
+  const html = EMAIL_BASE(`
+<p style="margin:0 0 16px"><span style="display:inline-block;background:#eff6ff;color:#1d4ed8;font-size:11px;font-weight:700;letter-spacing:0.6px;padding:5px 14px;border-radius:100px;text-transform:uppercase;font-family:sans-serif">Atención manual requerida</span></p>
+<h1 style="margin:0 0 8px;font-size:22px;font-weight:800;color:#0f172a;font-family:sans-serif">Paciente necesita atención humana</h1>
+<p style="margin:0 0 20px;font-size:14px;color:#64748b;font-family:sans-serif">Número: <strong>${fromNumber}</strong> · Clínica: ${clinic.name}</p>
+<div style="background:#f0fdf4;border-left:3px solid #22c55e;padding:14px 16px;border-radius:0 8px 8px 0;margin-bottom:20px">
+  <p style="margin:0;font-size:13px;font-weight:700;color:#166534;font-family:sans-serif;margin-bottom:4px">Resumen IA</p>
+  <p style="margin:0;font-size:14px;color:#14532d;font-family:sans-serif;line-height:1.6">${summary}</p>
+</div>
+<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:14px 16px;margin-bottom:20px">
+  <p style="margin:0 0 8px;font-size:11px;font-weight:700;color:#94a3b8;text-transform:uppercase;font-family:sans-serif">Últimos mensajes</p>
+  <pre style="margin:0;font-size:12px;color:#334155;font-family:monospace;white-space:pre-wrap;line-height:1.7">${transcript}</pre>
+</div>
+<a href="https://cliniflux.es/dashboard" style="display:inline-block;background:#2563eb;color:#fff;font-family:sans-serif;font-size:14px;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:40px">Abrir dashboard →</a>
+`, `${clinic.name} — paciente ${fromNumber.slice(-9)} espera atención`);
+
+  await sendEmail({ to: notify, subject, html });
+}
+
 // ── API conversaciones (dashboard en tiempo real) ───────────────────────────
 
 app.get('/api/conversations', requireAuth, async (req, res) => {
@@ -1139,20 +1188,25 @@ app.get('/api/conversations/:sessionId/messages', requireAuth, async (req, res) 
   } catch(e) { res.status(500).json({ error: 'Error' }); }
 });
 
-// Toggle manual mode for a session — pauses IA responses
-app.post('/api/conversations/:sessionId/mode', requireAuth, (req, res) => {
+// Toggle manual mode — persiste en DB + pausa IA
+app.post('/api/conversations/:sessionId/mode', requireAuth, async (req, res) => {
   const { sessionId } = req.params;
   const { manual } = req.body;
-  if (manual) manualSessions.add(sessionId);
-  else manualSessions.delete(sessionId);
-  // Broadcast mode change to dashboard
-  req.app.get('io')?.to(`clinic_${req.session.clinic.id}`).emit('mode:changed', { session_id: sessionId, manual: !!manual });
+  const clinicId = req.session.clinic.id;
+  if (manual) manualSessions.add(sessionId); else manualSessions.delete(sessionId);
+  await setConvState(sessionId, clinicId, { manual_mode: !!manual }).catch(() => {});
+  req.app.get('io')?.to(`clinic_${clinicId}`).emit('mode:changed', { session_id: sessionId, manual: !!manual });
+
+  // Paso 5: email de escalado al activar manual
+  if (manual) {
+    escalateConversation(sessionId, clinicId, req.app.get('io')).catch(e => console.error('escalate:', e.message));
+  }
+
   res.json({ ok: true, manual: !!manual });
 });
 
-// Current mode for a session
 app.get('/api/conversations/:sessionId/mode', requireAuth, (req, res) => {
-  res.json({ manual: manualSessions.has(req.params.sessionId), urgent: false });
+  res.json({ manual: manualSessions.has(req.params.sessionId) });
 });
 
 // ── Arrancar + WebSocket ─────────────────────────────────────────────────────
@@ -1184,5 +1238,11 @@ io.on('connection', (socket) => {
 app.set('io', io);
 
 initDb()
-  .then(() => httpServer.listen(PORT, () => console.log(`Cliniflux en http://localhost:${PORT}`)))
+  .then(async () => {
+    // Restaurar sesiones manuales persistidas tras reinicio
+    const persisted = await getManualSessions();
+    persisted.forEach(s => manualSessions.add(s));
+    if (persisted.length) console.log(`[Boot] ${persisted.length} sesiones en modo manual restauradas`);
+    httpServer.listen(PORT, () => console.log(`Cliniflux en http://localhost:${PORT}`));
+  })
   .catch(err => { console.error('DB init failed:', err.message); process.exit(1); });
