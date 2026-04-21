@@ -99,6 +99,15 @@
     .wa-dot{width:7px;height:7px;background:#25d366;border-radius:50%}
     .chat-status{font-size:10px;font-weight:700;background:#fef3c7;color:#92400e;padding:4px 10px;border-radius:var(--r-pill)}
     .chat-msgs{flex:1;padding:16px;display:flex;flex-direction:column;gap:10px;overflow-y:auto;background:#f0f2f5}
+    .copilot-bar{display:none;flex-direction:column;gap:6px;padding:10px 14px;background:#eff6ff;border-top:1px solid #bfdbfe}
+    .copilot-bar.visible{display:flex}
+    .copilot-label{font-size:10px;font-weight:700;color:#1d4ed8;text-transform:uppercase;letter-spacing:.05em}
+    .copilot-text{width:100%;font-size:12px;font-family:inherit;color:#1e3a5f;background:#fff;border:1px solid #bfdbfe;border-radius:8px;padding:8px 10px;resize:vertical;min-height:52px;outline:none}
+    .copilot-text:focus{border-color:#3b82f6}
+    .copilot-actions{display:flex;gap:6px;justify-content:flex-end}
+    .copilot-send{font-size:12px;font-weight:600;background:#2563eb;color:#fff;border:none;padding:6px 16px;border-radius:var(--r-pill);cursor:pointer;font-family:inherit}
+    .copilot-send:hover{background:#1d4ed8}
+    .copilot-dismiss{font-size:12px;font-weight:500;background:none;border:none;color:#64748b;cursor:pointer;padding:6px 10px;font-family:inherit}
     .msg{max-width:74%;padding:10px 13px;border-radius:16px;font-size:13.5px;line-height:1.5;word-break:break-word}
     .mi{background:#fff;color:#1a1a2e;align-self:flex-start;border-bottom-left-radius:4px;box-shadow:var(--shadow-xs)}
     .mo{background:#dcfce7;color:#14532d;align-self:flex-end;border-bottom-right-radius:4px}
@@ -427,16 +436,17 @@
             <div style="font-size:13px">Selecciona una conversación para verla</div>
           </div>
         </div>
-        <div class="quick-chips">
-          <div class="qc">✓ Confirmar cita</div>
-          <div class="qc">📅 Ver disponibilidad</div>
-          <div class="qc">📍 Enviar dirección</div>
-          <div class="qc">ℹ️ Info servicio</div>
-          <div class="qc">💰 Ver precios</div>
+        <div class="copilot-bar" id="copilot-bar">
+          <span class="copilot-label">🤖 Sugerencia co-pilot</span>
+          <textarea class="copilot-text" id="copilot-text" rows="2"></textarea>
+          <div class="copilot-actions">
+            <button class="copilot-dismiss" onclick="dismissCopilot()">Descartar</button>
+            <button class="copilot-send" onclick="sendCopilot()">Enviar →</button>
+          </div>
         </div>
         <div class="chat-input-row">
-          <input class="chat-input" placeholder="Respuesta manual (próximamente)..." disabled>
-          <button class="send-btn" disabled><svg width="13" height="13" viewBox="0 0 24 24" fill="white"><path d="m22 2-7 20-4-9-9-4 20-7z"/></svg></button>
+          <input class="chat-input" id="manual-input" placeholder="Respuesta manual..." disabled>
+          <button class="send-btn" id="manual-send-btn" onclick="sendManualReply()" disabled><svg width="13" height="13" viewBox="0 0 24 24" fill="white"><path d="m22 2-7 20-4-9-9-4 20-7z"/></svg></button>
         </div>
       </div>
       <div class="patient-panel">
@@ -1244,6 +1254,43 @@
     const isManual = manualSet.has(sessionId);
     btn.textContent = isManual ? 'IA pausada' : 'IA activa';
     btn.classList.toggle('on', isManual);
+    // Habilitar input manual solo si está en modo manual
+    const inp = document.getElementById('manual-input');
+    const sendBtn = document.getElementById('manual-send-btn');
+    inp.disabled = !isManual;
+    sendBtn.disabled = !isManual;
+    inp.placeholder = isManual ? 'Escribe tu respuesta...' : 'Activa modo manual para responder';
+    if (!isManual) dismissCopilot();
+  }
+
+  function dismissCopilot() {
+    document.getElementById('copilot-bar').classList.remove('visible');
+    document.getElementById('copilot-text').value = '';
+  }
+
+  async function sendCopilot() {
+    const text = document.getElementById('copilot-text').value.trim();
+    if (!text || !activeSessionId) return;
+    await sendManualText(text);
+    dismissCopilot();
+  }
+
+  async function sendManualReply() {
+    const inp = document.getElementById('manual-input');
+    const text = inp.value.trim();
+    if (!text || !activeSessionId) return;
+    inp.value = '';
+    await sendManualText(text);
+  }
+
+  async function sendManualText(text) {
+    try {
+      await fetch(`/api/conversations/${encodeURIComponent(activeSessionId)}/reply`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text })
+      });
+    } catch(e) { console.error('send:', e); }
   }
 
   async function toggleManualMode() {
@@ -1313,15 +1360,26 @@
       if (c) { c.content = msg.content; c.direction = 'outbound'; c.created_at = msg.created_at; renderConvList(allConvs); }
     });
 
-    // Cambio de modo manual/IA desde otro tab o API
     socket.on('mode:changed', (data) => {
       if (data.manual) manualSet.add(data.session_id); else manualSet.delete(data.session_id);
       renderConvList(allConvs);
       if (activeSessionId === data.session_id) updateManualBtn(data.session_id);
     });
+
+    // Sugerencia co-pilot — solo mostrar si la conversación está abierta
+    socket.on('copilot:suggestion', (data) => {
+      if (activeSessionId !== data.session_id) return;
+      const bar = document.getElementById('copilot-bar');
+      document.getElementById('copilot-text').value = data.suggestion;
+      bar.classList.add('visible');
+    });
   }
 
-  // Arrancar
+  // Enter en input manual
+  document.getElementById('manual-input')?.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendManualReply(); }
+  });
+
   loadConversations();
 </script>
 <script src="/socket.io/socket.io.js" onload="initSocket()"></script>

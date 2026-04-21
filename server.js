@@ -940,12 +940,22 @@ app.post('/webhook/whatsapp', async (req, res) => {
       created_at: savedAt, responded_by: 'human', urgent, manual: inManual
     });
 
-    // Si está en modo manual, no responder con IA
-    if (inManual) return;
-
-    // Leer historial desde messages table (elimina round-trip a chat_sessions)
+    // Leer historial (sirve tanto para IA como para co-pilot)
     const history = await getHistoryFromMessages(clinicId, sessionId, 30);
-    const contextMsgs = buildContextMessages(history, 1200); // ~1200 token budget
+    const contextMsgs = buildContextMessages(history, 1200);
+
+    // Modo manual: generar sugerencia co-pilot pero NO enviar
+    if (inManual) {
+      openai.chat.completions.create({
+        model: process.env.AI_MODEL || 'gpt-4o-mini',
+        messages: [{ role:'system', content: prompt + '\n[Modo co-pilot: redacta la respuesta ideal pero el agente humano la revisará antes de enviar]' }, ...contextMsgs, { role:'user', content: msg }],
+        max_tokens: 250, temperature: 0.3
+      }).then(r => {
+        const suggestion = r.choices[0].message.content.replace(/\nCITA_CONFIRMADA\|.+/, '').trim();
+        io?.to(`clinic_${clinicId}`).emit('copilot:suggestion', { session_id: sessionId, suggestion });
+      }).catch(() => {});
+      return;
+    }
 
     const completion = await openai.chat.completions.create({
       model: process.env.AI_MODEL || 'gpt-4o-mini',
@@ -1207,6 +1217,32 @@ app.post('/api/conversations/:sessionId/mode', requireAuth, async (req, res) => 
 
 app.get('/api/conversations/:sessionId/mode', requireAuth, (req, res) => {
   res.json({ manual: manualSessions.has(req.params.sessionId) });
+});
+
+// Enviar respuesta manual desde dashboard
+app.post('/api/conversations/:sessionId/reply', requireAuth, rateLimit(60, 60000), async (req, res) => {
+  const { sessionId } = req.params;
+  const { text } = req.body;
+  if (!text || typeof text !== 'string' || text.length > 1000) return res.status(400).json({ error: 'Texto inválido' });
+  const clinicId = req.session.clinic.id;
+
+  // Obtener from_number del último mensaje de esa sesión
+  const msgs = await getMessages(clinicId, sessionId, 1).catch(() => []);
+  const to = msgs[0]?.from_number;
+  if (!to) return res.status(404).json({ error: 'Número no encontrado' });
+
+  await Promise.all([
+    sendWhatsAppMessage(to, text),
+    saveMessage({ clinic_id: clinicId, session_id: sessionId, direction: 'outbound', content: text, from_number: to, responded_by: 'human' }).catch(() => {}),
+  ]);
+
+  const io = req.app.get('io');
+  const sentAt = new Date().toISOString();
+  io?.to(`clinic_${clinicId}`).emit('message:sent', {
+    session_id: sessionId, from_number: to, content: text,
+    direction: 'outbound', created_at: sentAt, responded_by: 'human'
+  });
+  res.json({ ok: true });
 });
 
 // ── Arrancar + WebSocket ─────────────────────────────────────────────────────
