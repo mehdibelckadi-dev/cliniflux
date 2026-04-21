@@ -7,7 +7,7 @@ const PgSession = require('connect-pg-simple')(session);
 const OpenAI = require('openai');
 const crypto = require('crypto');
 const Stripe = require('stripe');
-const { pool, initDb, getSession, saveSession, saveLead, getClinicByEmail, getClinicByWhatsapp, getClinicBySetupToken, createClinic, updateClinicConfig, buildPromptForClinic, getLeads, getAppointments, saveAppointment, verifyPassword, hashPassword, importLeads, getImportedLeads, updateLeadEstado, incrementConversation, PLAN_LIMITS, saveMessage, getMessages, getRecentConversations } = require('./db');
+const { pool, initDb, getSession, saveSession, saveLead, getClinicByEmail, getClinicByWhatsapp, getClinicBySetupToken, createClinic, updateClinicConfig, buildPromptForClinic, getLeads, getAppointments, saveAppointment, verifyPassword, hashPassword, importLeads, getImportedLeads, updateLeadEstado, incrementConversation, PLAN_LIMITS, saveMessage, getMessages, getRecentConversations, getHistoryFromMessages } = require('./db');
 
 const compression = require('compression');
 const stripe = process.env.STRIPE_SECRET_KEY ? Stripe(process.env.STRIPE_SECRET_KEY) : null;
@@ -434,49 +434,45 @@ function requirePlan(...plans) {
   };
 }
 
-// ── Demo prompt (BarnaDental) — usado por /demo y /webhook sin clinic_id ───
+// ── Token helpers ────────────────────────────────────────────────────────────
+// Rough estimate: 1 token ≈ 3.8 chars in Spanish
+function estimateTokens(text) { return Math.ceil((text || '').length / 3.8); }
+
+// Smart context: fill budget from newest → oldest (keeps most recent turns)
+function buildContextMessages(history, tokenBudget = 1200) {
+  if (!history.length) return [];
+  let used = 0;
+  const kept = [];
+  for (let i = history.length - 1; i >= 0; i--) {
+    const t = estimateTokens(history[i].content);
+    if (used + t > tokenBudget && kept.length > 0) break;
+    kept.unshift(history[i]);
+    used += t;
+  }
+  return kept;
+}
+
+// Urgency keywords (Spanish) — used for badge detection
+const URGENT_PATTERN = /urgente|emergencia|dolor intenso|sangra|no puedo|crisis|grave|inmediato|ahora mismo/i;
+function isUrgent(text) { return URGENT_PATTERN.test(text || ''); }
+
+// In-memory manual mode per session (cleared on restart — fine for now)
+const manualSessions = new Set();
+
+// ── Demo prompt (BarnaDental) ─────────────────────────────────────────────────
 function buildDemoPrompt() {
-  const now = new Date();
-  const hora = now.getHours();
-  const saludo = hora < 12 ? '¡Buenos días!' : hora < 20 ? '¡Buenas tardes!' : '¡Buenas noches!';
-  const fecha = now.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-  return `Eres Natalia, la recepcionista de BarnaDental. Hoy es ${fecha}.
-
-PERSONALIDAD: Eres cercana, cálida y natural — como una persona real que coge el teléfono, no un bot. Usas un tono conversacional con pequeñas muestras de empatía ("Perfecto", "Claro que sí", "No se preocupe", "¡Qué bien!"). Nunca suenas robótica ni formal en exceso.
-
-PRIMER MENSAJE: Saluda siempre con "${saludo} Soy Natalia, de BarnaDental 😊 ¿En qué le puedo ayudar?"
-
-CLÍNICA: BarnaDental · Carrer de València 245, Barcelona (cerca de Paseo de Gracia)
-📞 +34 932 123 456 · info@barnadental.cat
-🚇 Metro Diagonal (L3/L5) · 🅿️ 1h gratis en parking de Carrer d'Aragó
-
-HORARIO: Lunes a viernes 9:00–20:30 · Sábados 10:00–14:00 (concertadas) · Domingos cerrado · 2ª quincena agosto: vacaciones
-
-SERVICIOS:
-- Higiene dental: 55€ (incluye revisión y radiografía si hace falta)
-- Blanqueamiento LED: 280€ (sesión única)
-- Invisalign: desde 2.900€ — primera valoración GRATIS
-- Implante: desde 850€ (corona aparte, se presupuesta)
-- Urgencias: 40€ visita diagnóstico
-- Primera visita diagnóstico y presupuesto: GRATUITA
-
-EQUIPO: Dra. Laia Puig (Implantología) · Dr. Marc Soler (Ortodoncia y Estética)
-SEGUROS: Adeslas, Sanitas, Mapfre. Otras: consultar.
-
-CÓMO GESTIONAR CITAS:
-1. Recoge con naturalidad: nombre → servicio → franja horaria preferida
-2. Di que Marta les llamará en menos de 30 minutos para confirmar el hueco exacto
-3. Cancelaciones: avisar con 24h mínimo. Recordatorio SMS 48h antes.
-
-NORMAS:
-- Responde siempre en español
-- Mensajes cortos y naturales (máx 3 párrafos), nada de listas largas
-- Nunca inventes precios ni confirmes horario concreto (solo Marta puede)
-- Si preguntan algo que no sabes: "Le recomiendo llamarnos al +34 932 123 456, le atendemos encantados"
-- Nunca digas que eres una IA salvo pregunta directa
-- Puedes usar emojis con moderación (1-2 por mensaje máximo)
-- Cuando tengas nombre + servicio + franja horaria del paciente, añade al final (sin mostrarlo):
-  CITA_CONFIRMADA|tratamiento=...|fecha=...|hora=...|nombre=...|email=...`;
+  const h = new Date().getHours();
+  const saludo = h < 12 ? 'Buenos días' : h < 20 ? 'Buenas tardes' : 'Buenas noches';
+  const fecha = new Date().toLocaleDateString('es-ES', { weekday:'short', day:'numeric', month:'short' });
+  return `Eres Natalia, recepcionista de BarnaDental (${fecha}). Tono: cálido, natural, humano. 1-2 emojis/msg. Respuestas cortas (≤3 párrafos). Español siempre.
+Saludo: "¡${saludo}! Soy Natalia, de BarnaDental 😊 ¿En qué le ayudo?"
+📍 Carrer de València 245, Barcelona | 📞 +34 932 123 456 | ⏰ L-V 9-20:30 · S 10-14h
+🚇 Metro Diagonal (L3/L5) | 🅿️ 1h gratis Carrer d'Aragó | ✉ info@barnadental.cat
+Servicios: Higiene 55€ · Blanqueamiento LED 280€ · Invisalign desde 2.900€ (valoración GRATIS) · Implante desde 850€ · Urgencias 40€ · 1ª visita GRATUITA
+Seguros: Adeslas, Sanitas, Mapfre. Equipo: Dra. Laia Puig (Implantología) · Dr. Marc Soler (Ortodoncia).
+Citas: recoge nombre→servicio→franja. Di que Marta llamará en <30min para confirmar. Cancelar con 24h+.
+Desconocido: "Llámenos al +34 932 123 456, le atendemos encantados." No confirmes ser IA salvo pregunta directa.
+Con nombre+servicio+franja: CITA_CONFIRMADA|tratamiento=...|fecha=...|hora=...|nombre=...|email=...`;
 }
 
 // ── Sitemap dinámico ────────────────────────────────────────────────────────
@@ -931,21 +927,30 @@ app.post('/webhook/whatsapp', async (req, res) => {
       }
     }
 
-    const history = await getSession(sessionId);
+    // Detectar urgencia antes de cualquier espera
+    const urgent = isUrgent(msg);
+    const inManual = manualSessions.has(sessionId);
+    const io = req.app.get('io');
 
-    // Persistir mensaje entrante
+    // Persistir mensaje entrante + emitir al dashboard en paralelo
+    const savedAt = new Date().toISOString();
     await saveMessage({ clinic_id: clinicId, session_id: sessionId, direction: 'inbound', content: msg, from_number: from }).catch(() => {});
-
-    // Emitir en tiempo real al dashboard
-    req.app.get('io')?.to(`clinic_${clinicId}`).emit('message:new', {
+    io?.to(`clinic_${clinicId}`).emit('message:new', {
       session_id: sessionId, from_number: from, content: msg, direction: 'inbound',
-      created_at: new Date().toISOString(), responded_by: 'human'
+      created_at: savedAt, responded_by: 'human', urgent, manual: inManual
     });
+
+    // Si está en modo manual, no responder con IA
+    if (inManual) return;
+
+    // Leer historial desde messages table (elimina round-trip a chat_sessions)
+    const history = await getHistoryFromMessages(clinicId, sessionId, 30);
+    const contextMsgs = buildContextMessages(history, 1200); // ~1200 token budget
 
     const completion = await openai.chat.completions.create({
       model: process.env.AI_MODEL || 'gpt-4o-mini',
-      messages: [{ role:'system', content: prompt }, ...history, { role:'user', content: msg }],
-      max_tokens: 350, temperature: 0.4
+      messages: [{ role:'system', content: prompt }, ...contextMsgs, { role:'user', content: msg }],
+      max_tokens: 300, temperature: 0.4
     });
     let reply = completion.choices[0].message.content;
     const match = reply.match(/CITA_CONFIRMADA\|(.+)/);
@@ -954,18 +959,16 @@ app.post('/webhook/whatsapp', async (req, res) => {
       const parts = Object.fromEntries(match[1].split('|').map(p => p.split('=')));
       await saveAppointment({ clinic_id: clinicId, patient_name: parts.nombre||'Paciente', patient_phone: from, service: parts.tratamiento||null, scheduled_at: `${parts.fecha||''} ${parts.hora||''}`.trim() }).catch(e => console.error('Appt:', e.message));
     }
-    history.push({ role:'user', content: msg });
-    history.push({ role:'assistant', content: reply });
-    await Promise.all([
-      saveSession(sessionId, history.slice(-20)),
-      saveMessage({ clinic_id: clinicId, session_id: sessionId, direction: 'outbound', content: reply, from_number: from, responded_by: 'ai' }).catch(() => {}),
-    ]);
-    await sendWhatsAppMessage(from, reply);
 
-    // Emitir respuesta IA al dashboard
-    req.app.get('io')?.to(`clinic_${clinicId}`).emit('message:sent', {
+    // Persistir + enviar + emitir en paralelo
+    const repliedAt = new Date().toISOString();
+    await Promise.all([
+      saveMessage({ clinic_id: clinicId, session_id: sessionId, direction: 'outbound', content: reply, from_number: from, responded_by: 'ai' }).catch(() => {}),
+      sendWhatsAppMessage(from, reply),
+    ]);
+    io?.to(`clinic_${clinicId}`).emit('message:sent', {
       session_id: sessionId, from_number: from, content: reply, direction: 'outbound',
-      created_at: new Date().toISOString(), responded_by: 'ai'
+      created_at: repliedAt, responded_by: 'ai', urgent
     });
   } catch(err) {
     console.error('[WA]', err.message);
@@ -1134,6 +1137,22 @@ app.get('/api/conversations/:sessionId/messages', requireAuth, async (req, res) 
     const msgs = await getMessages(req.session.clinic.id, req.params.sessionId, 50);
     res.json(msgs);
   } catch(e) { res.status(500).json({ error: 'Error' }); }
+});
+
+// Toggle manual mode for a session — pauses IA responses
+app.post('/api/conversations/:sessionId/mode', requireAuth, (req, res) => {
+  const { sessionId } = req.params;
+  const { manual } = req.body;
+  if (manual) manualSessions.add(sessionId);
+  else manualSessions.delete(sessionId);
+  // Broadcast mode change to dashboard
+  req.app.get('io')?.to(`clinic_${req.session.clinic.id}`).emit('mode:changed', { session_id: sessionId, manual: !!manual });
+  res.json({ ok: true, manual: !!manual });
+});
+
+// Current mode for a session
+app.get('/api/conversations/:sessionId/mode', requireAuth, (req, res) => {
+  res.json({ manual: manualSessions.has(req.params.sessionId), urgent: false });
 });
 
 // ── Arrancar + WebSocket ─────────────────────────────────────────────────────

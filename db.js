@@ -194,39 +194,19 @@ async function updateClinicConfig(id, config) {
 
 function buildPromptForClinic(clinic) {
   const cfg = clinic.config || {};
-  const now = new Date();
-  const hora = now.getHours();
-  const saludo = hora < 12 ? '¡Buenos días!' : hora < 20 ? '¡Buenas tardes!' : '¡Buenas noches!';
-  const fecha = now.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+  const h = new Date().getHours();
+  const saludo = h < 12 ? 'Buenos días' : h < 20 ? 'Buenas tardes' : 'Buenas noches';
+  const fecha = new Date().toLocaleDateString('es-ES', { weekday:'short', day:'numeric', month:'short' });
   const name = cfg.assistant_name || 'Natalia';
-  return `Eres ${name}, la recepcionista de ${clinic.name}. Hoy es ${fecha}.
-
-PERSONALIDAD: Cercana, cálida y natural — como una persona real al teléfono. Usas expresiones como "Claro que sí", "Perfecto", "No se preocupe", "¡Qué bien!". Nunca suenas robótica.
-
-PRIMER MENSAJE: "${saludo} Soy ${name}, de ${clinic.name} 😊 ¿En qué le puedo ayudar?"
-
-CLÍNICA: ${clinic.name}
-📍 ${cfg.address||'Consultar dirección por teléfono'}
-📞 ${cfg.phone||'—'} · ${cfg.email||''}
-⏰ ${cfg.hours||'Lunes a Viernes 9:00-20:00'}
-
-SERVICIOS:
-${cfg.services||'Consultar disponibilidad llamando a la clínica'}
-
-${cfg.extra ? 'INFORMACIÓN ADICIONAL:\n' + cfg.extra : ''}
-
-CÓMO GESTIONAR CITAS:
-1. Recoge con naturalidad: nombre → servicio → franja horaria preferida
-2. Di que el equipo les llamará para confirmar el hueco exacto
-3. Cancelaciones con mínimo 24h de antelación
-
-NORMAS:
-- Responde siempre en español, mensajes cortos y naturales (máx 3 párrafos)
-- Nunca inventes precios ni confirmes horario concreto
-- Si no sabes algo: "Le recomiendo llamarnos al ${cfg.phone||'la clínica'}, le atendemos encantados"
-- Nunca digas que eres IA salvo pregunta directa
-- Emojis con moderación (1-2 por mensaje)
-- Cuando tengas nombre + servicio + franja: CITA_CONFIRMADA|tratamiento=...|fecha=...|hora=...|nombre=...|email=...`;
+  const phone = cfg.phone || '';
+  return `Eres ${name}, recepcionista de ${clinic.name} (${fecha}). Tono: cálido, natural, humano. Frases: "Claro que sí", "Perfecto", "No se preocupe". 1-2 emojis/msg. Respuestas cortas (≤3 párrafos). Español siempre.
+Saludo inicial: "¡${saludo}! Soy ${name} 😊 ¿En qué le ayudo?"
+📍 ${cfg.address||''} | 📞 ${phone} | ⏰ ${cfg.hours||'L-V 9:00-20:00'}${cfg.email ? ' | ✉ '+cfg.email : ''}
+Servicios: ${cfg.services||'consultar por teléfono'}${cfg.extra ? '\n'+cfg.extra : ''}
+Citas: recoge nombre→servicio→franja horaria. Di que llamarán para confirmar. Cancelaciones con 24h+. No inventes precios ni horarios exactos.
+Desconocido: "Llámenos al ${phone||'la clínica'}, le atendemos encantados."
+No confirmes ser IA salvo pregunta directa.
+Con nombre+servicio+franja: CITA_CONFIRMADA|tratamiento=...|fecha=...|hora=...|nombre=...|email=...`;
 }
 
 async function getLeads(clinic_id, limit = 50) {
@@ -329,4 +309,13 @@ async function getRecentConversations(clinic_id, limit = 30) {
   return rows.sort((a, b) => new Date(b.created_at) - new Date(a.created_at)).slice(0, limit);
 }
 
-module.exports = { pool, initDb, getSession, saveSession, saveLead, getClinicByEmail, getClinicByWhatsapp, getClinicBySetupToken, createClinic, updateClinicConfig, buildPromptForClinic, getLeads, saveAppointment, getAppointments, verifyPassword, hashPassword, importLeads, getImportedLeads, updateLeadEstado, incrementConversation, PLAN_LIMITS, saveMessage, getMessages, getRecentConversations };
+// Construye historial OpenAI directamente desde messages (elimina round-trip a chat_sessions)
+async function getHistoryFromMessages(clinic_id, session_id, limit = 30) {
+  const { rows } = await pool.query(
+    'SELECT direction, content FROM messages WHERE clinic_id=$1 AND session_id=$2 ORDER BY created_at ASC LIMIT $3',
+    [clinic_id, session_id, limit]
+  );
+  return rows.map(r => ({ role: r.direction === 'inbound' ? 'user' : 'assistant', content: r.content }));
+}
+
+module.exports = { pool, initDb, getSession, saveSession, saveLead, getClinicByEmail, getClinicByWhatsapp, getClinicBySetupToken, createClinic, updateClinicConfig, buildPromptForClinic, getLeads, saveAppointment, getAppointments, verifyPassword, hashPassword, importLeads, getImportedLeads, updateLeadEstado, incrementConversation, PLAN_LIMITS, saveMessage, getMessages, getRecentConversations, getHistoryFromMessages };

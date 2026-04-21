@@ -77,6 +77,14 @@
     .c-time{font-size:10px;color:var(--text3)}
     .c-unread{font-size:9px;font-weight:800;background:var(--green);color:#fff;padding:2px 6px;border-radius:var(--r-pill);min-width:18px;text-align:center}
     .c-ai{font-size:9px;font-weight:700;background:var(--green-dim);color:var(--green);padding:2px 6px;border-radius:4px}
+    .c-manual{font-size:9px;font-weight:700;background:#eff6ff;color:#2563eb;padding:2px 6px;border-radius:4px}
+    .c-urgent{font-size:9px;font-weight:700;background:#fef2f2;color:#dc2626;padding:2px 6px;border-radius:4px}
+    .conv-item.urgent{border-left-color:#ef4444}
+    .conv-item.manual{border-left-color:#3b82f6}
+    .toggle-manual{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:600;padding:5px 11px;border-radius:var(--r-sm);border:1px solid var(--border);background:#fff;cursor:pointer;color:var(--text2);transition:all .15s;font-family:inherit}
+    .toggle-manual.on{background:#eff6ff;color:#2563eb;border-color:#bfdbfe}
+    .toggle-manual.on::before{content:'🛑 '}
+    .toggle-manual:not(.on)::before{content:'🤖 '}
     .conv-stats{margin-top:auto;padding:10px 12px;border-top:1px solid var(--border);display:grid;grid-template-columns:1fr 1fr;gap:6px}
     .cs{background:var(--bg2);border-radius:var(--r-sm);padding:8px 10px}
     .cs-n{font-size:17px;font-weight:800;color:var(--text);letter-spacing:-.5px;line-height:1}
@@ -410,6 +418,7 @@
             <div class="chat-hd-title" id="chat-hd-title">Selecciona una conversación</div>
             <div class="chat-hd-sub" id="chat-hd-sub"><span class="wa-dot"></span>WhatsApp · IA activa</div>
           </div>
+          <button class="toggle-manual" id="toggle-manual-btn" onclick="toggleManualMode()" title="Pausar IA y tomar control manual" style="display:none">IA activa</button>
           <div class="chat-status" id="chat-hd-status" style="display:none">En progreso</div>
         </div>
         <div class="chat-msgs" id="chat-msgs">
@@ -1081,6 +1090,8 @@
   // ── Conversaciones WhatsApp en tiempo real ────────────────────────────────
   let allConvs = [];
   let activeSessionId = null;
+  const manualSet = new Set();   // sessions in manual mode (client mirror)
+  const urgentSet = new Set();   // sessions flagged urgent
   const CONV_COLORS = ['#16a34a,#22c55e','#0ea5e9,#0284c7','#f43f5e,#e11d48','#f97316,#ea580c','#8b5cf6,#7c3aed'];
 
   function phoneLabel(num) {
@@ -1140,8 +1151,16 @@
       const ago = timeAgo(c.created_at);
       const preview = (c.content || '').slice(0, 40) + (c.content?.length > 40 ? '…' : '');
       const isActive = c.session_id === activeSessionId;
+      const isManual = manualSet.has(c.session_id);
+      const isUrgent = urgentSet.has(c.session_id);
+      let cls = 'conv-item' + (isActive ? ' active' : '') + (isUrgent ? ' urgent' : '') + (isManual && !isUrgent ? ' manual' : '');
+      let badge = isUrgent
+        ? '<span class="c-urgent">🔴 Urgente</span>'
+        : isManual
+          ? '<span class="c-manual">Manual</span>'
+          : '<span class="c-ai">IA</span>';
       const div = document.createElement('div');
-      div.className = 'conv-item' + (isActive ? ' active' : '');
+      div.className = cls;
       div.dataset.sessionId = c.session_id;
       div.onclick = () => openConversation(c, div);
       div.innerHTML = `
@@ -1152,7 +1171,7 @@
         </div>
         <div class="c-meta">
           <span class="c-time">${ago}</span>
-          <span class="c-ai">${c.responded_by==='ai'?'IA':'Manual'}</span>
+          ${badge}
         </div>`;
       container.appendChild(div);
     });
@@ -1172,6 +1191,10 @@
     document.getElementById('chat-hd-title').textContent = phoneDisplay(conv.from_number);
     document.getElementById('chat-hd-status').style.display = '';
     document.getElementById('chat-hd-sub').innerHTML = `<span class="wa-dot"></span>WhatsApp · IA respondiendo`;
+    // Toggle manual button
+    const btn = document.getElementById('toggle-manual-btn');
+    btn.style.display = '';
+    updateManualBtn(conv.session_id);
 
     // Update patient panel
     document.getElementById('pp-ava').style.background = `linear-gradient(135deg,${color})`;
@@ -1216,6 +1239,26 @@
     renderConvList(filtered);
   }
 
+  function updateManualBtn(sessionId) {
+    const btn = document.getElementById('toggle-manual-btn');
+    const isManual = manualSet.has(sessionId);
+    btn.textContent = isManual ? 'IA pausada' : 'IA activa';
+    btn.classList.toggle('on', isManual);
+  }
+
+  async function toggleManualMode() {
+    if (!activeSessionId) return;
+    const isManual = !manualSet.has(activeSessionId);
+    if (isManual) manualSet.add(activeSessionId); else manualSet.delete(activeSessionId);
+    updateManualBtn(activeSessionId);
+    renderConvList(allConvs);
+    await fetch(`/api/conversations/${encodeURIComponent(activeSessionId)}/mode`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ manual: isManual })
+    }).catch(e => console.error('mode toggle:', e));
+  }
+
   // ── socket.io ─────────────────────────────────────────────────────────────
   let socket = null;
   function initSocket() {
@@ -1236,32 +1279,26 @@
       console.log('[WS] Sala clínica', data.clinicId);
     });
 
-    // Nuevo mensaje entrante → actualizar lista y chat si está abierto
+    // Nuevo mensaje entrante
     socket.on('message:new', (msg) => {
-      // Actualizar o insertar conversación en la lista
+      if (msg.urgent) urgentSet.add(msg.session_id);
       const idx = allConvs.findIndex(c => c.session_id === msg.session_id);
-      const updated = { ...msg };
       if (idx >= 0) allConvs.splice(idx, 1);
-      allConvs.unshift(updated);
+      allConvs.unshift({ ...msg });
       renderConvList(allConvs);
 
-      // Notificación badge
-      const badge = document.querySelector('.si-badge');
-      if (badge) badge.textContent = allConvs.length;
-
-      // Si está abierta esa conversación, añadir mensaje
       if (activeSessionId === msg.session_id) {
         const chatMsgs = document.getElementById('chat-msgs');
         const div = document.createElement('div');
         div.className = 'msg mi';
         const ts = new Date(msg.created_at).toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'});
-        div.innerHTML = esc(msg.content) + `<div class="msg-ts">${ts} · Paciente</div>`;
+        div.innerHTML = esc(msg.content) + `<div class="msg-ts">${ts} · Paciente${msg.urgent?' 🔴':''}</div>`;
         chatMsgs.appendChild(div);
         chatMsgs.scrollTop = chatMsgs.scrollHeight;
       }
     });
 
-    // Respuesta IA enviada
+    // Respuesta IA
     socket.on('message:sent', (msg) => {
       if (activeSessionId === msg.session_id) {
         const chatMsgs = document.getElementById('chat-msgs');
@@ -1272,9 +1309,15 @@
         chatMsgs.appendChild(div);
         chatMsgs.scrollTop = chatMsgs.scrollHeight;
       }
-      // Actualizar preview en la lista
       const c = allConvs.find(c => c.session_id === msg.session_id);
       if (c) { c.content = msg.content; c.direction = 'outbound'; c.created_at = msg.created_at; renderConvList(allConvs); }
+    });
+
+    // Cambio de modo manual/IA desde otro tab o API
+    socket.on('mode:changed', (data) => {
+      if (data.manual) manualSet.add(data.session_id); else manualSet.delete(data.session_id);
+      renderConvList(allConvs);
+      if (activeSessionId === data.session_id) updateManualBtn(data.session_id);
     });
   }
 
