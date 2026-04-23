@@ -144,48 +144,128 @@
     .pp-ai-val{font-size:12px;color:#9a3412;font-weight:700;margin-bottom:2px}
     .pp-ai-conf{font-size:10px;color:var(--text3)}
 
-    /* ── PANEL 1: AGENDA ── */
+    /* ── Broadcast modal ── */
+    .bc-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:500;align-items:center;justify-content:center}
+    .bc-modal.open{display:flex}
+    .bc-box{background:#fff;border-radius:14px;padding:24px;width:100%;max-width:480px;display:flex;flex-direction:column;gap:14px;box-shadow:0 20px 60px rgba(0,0,0,0.18)}
+    .bc-title{font-size:16px;font-weight:800;color:var(--text)}
+    .bc-label{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px}
+    .bc-seg{display:flex;gap:8px}
+    .bc-seg-btn{flex:1;padding:8px;border-radius:var(--r-sm);border:1.5px solid var(--border);background:var(--bg2);font-size:12px;font-weight:600;color:var(--text2);cursor:pointer;text-align:center;transition:all .15s}
+    .bc-seg-btn.active{border-color:var(--green);background:var(--green-dim);color:var(--green)}
+    .bc-msg{width:100%;font-family:inherit;font-size:13px;color:var(--text);background:var(--bg2);border:1.5px solid var(--border);border-radius:var(--r-sm);padding:10px 12px;resize:vertical;min-height:100px;outline:none;transition:border-color .2s}
+    .bc-msg:focus{border-color:var(--green);background:#fff}
+    .bc-counter{font-size:11px;color:var(--text3);text-align:right;margin-top:-10px}
+    .bc-preview{background:var(--green-dim);border:1px solid rgba(22,163,74,0.2);border-radius:var(--r-sm);padding:10px 12px;font-size:12px;color:var(--text2)}
+    .bc-progress{display:none;flex-direction:column;gap:6px}
+    .bc-prog-bar-wrap{height:8px;background:var(--bg2);border-radius:100px;overflow:hidden}
+    .bc-prog-bar{height:100%;background:var(--green);border-radius:100px;width:0%;transition:width .4s}
+    .bc-actions{display:flex;gap:8px;justify-content:flex-end}
+    .bc-history{max-height:180px;overflow-y:auto;display:flex;flex-direction:column;gap:6px}
+    .bc-hist-item{display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--bg2);border-radius:var(--r-sm);font-size:12px}
+    .bc-status{font-size:9px;font-weight:700;padding:2px 7px;border-radius:var(--r-pill)}
+    .bc-status.done{background:#dcfce7;color:#15803d}
+    .bc-status.sending{background:#fef3c7;color:#92400e}
+    .bc-status.pending{background:#f1f5f9;color:var(--text3)}
+    .bc-status.failed{background:#fef2f2;color:#dc2626}
+    /* ── Conv filter tabs ── */
+    .conv-filters{display:flex;gap:2px;padding:6px 8px;border-bottom:1px solid var(--border);background:#fff}
+    .cf{font-size:10px;font-weight:600;color:var(--text3);padding:4px 9px;border-radius:var(--r-pill);cursor:pointer;border:1.5px solid transparent;transition:all .12s;white-space:nowrap}
+    .cf.active{background:var(--green-dim);color:var(--green);border-color:rgba(22,163,74,0.25)}
+    .cf:hover:not(.active){background:var(--bg2)}
+    .cf-cnt{font-size:9px;font-weight:800;background:rgba(0,0,0,0.08);padding:1px 5px;border-radius:8px;margin-left:3px}
+    .cf.active .cf-cnt{background:rgba(22,163,74,0.2)}
+    /* ── Date separator ── */
+    .msg-date-sep{text-align:center;font-size:10px;font-weight:600;color:var(--text3);padding:4px 0;letter-spacing:.04em}
+    /* ── Leads tabs ── */
+    .leads-tabs{display:flex;gap:0;border-bottom:1px solid var(--border);flex-shrink:0;background:#fff}
+    .lt{font-size:12px;font-weight:600;color:var(--text3);padding:10px 20px;cursor:pointer;border-bottom:2.5px solid transparent;transition:all .15s}
+    .lt.active{color:var(--green);border-bottom-color:var(--green)}
+    .lt-risk-cnt{font-size:9px;font-weight:800;background:#fef3c7;color:#92400e;padding:2px 6px;border-radius:var(--r-pill);margin-left:5px}
+    /* ── NPS card ── */
+    .nps-card{background:#fff;border-radius:var(--r);border:1px solid var(--border);padding:16px 18px}
+    .nps-score{font-size:36px;font-weight:900;color:var(--text);letter-spacing:-2px;line-height:1}
+    .nps-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);margin-top:2px}
+    .nps-stars{display:flex;gap:2px;margin-top:8px}
+    .nps-star{font-size:14px}
+    /* ── PANEL 1: CALENDARIO ── */
     .p-agenda{flex-direction:column;background:#fff;overflow:hidden}
-    .ag-hd{padding:16px 20px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
-    .ag-title-day{font-size:11px;font-weight:700;color:var(--green);letter-spacing:.8px;text-transform:uppercase}
-    .ag-title-full{font-size:14px;font-weight:700;color:var(--text);margin-top:2px}
-    .ag-count{text-align:right}
-    .ag-count-n{font-size:32px;font-weight:900;color:var(--text);letter-spacing:-2px;line-height:1}
-    .ag-count-l{font-size:11px;color:var(--text3)}
-    .ag-week{display:flex;gap:4px;padding:10px 16px 8px;border-bottom:1px solid var(--border);flex-shrink:0}
-    .ag-wd{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;border-radius:var(--r-sm);padding:6px 2px;transition:background .15s;position:relative}
-    .ag-wd:hover{background:var(--bg2)}
-    .ag-wd-lbl{font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px}
-    .ag-wd-num{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--text)}
-    .ag-wd.today .ag-wd-lbl{color:var(--green)}
-    .ag-wd.today .ag-wd-num{background:var(--green);color:#fff;box-shadow:0 2px 8px rgba(22,163,74,0.35)}
-    .ag-wd.has-dot::after{content:'';position:absolute;bottom:3px;left:50%;transform:translateX(-50%);width:4px;height:4px;border-radius:50%;background:var(--green);opacity:.6}
-    .ag-body{display:flex;flex:1;overflow:hidden}
-    .ag-list{flex:1;overflow-y:auto;display:flex;flex-direction:column}
-    .ag-slot{display:flex;align-items:center;gap:14px;padding:13px 20px;border-bottom:1px solid rgba(0,0,0,0.04);position:relative;transition:background .12s;cursor:pointer}
-    .ag-slot:hover{background:#fafafa}
-    .slot-bar{position:absolute;left:20px;top:12px;bottom:12px;width:3px;border-radius:3px}
-    .ag-time{font-size:12px;font-weight:700;color:var(--text);width:44px;flex-shrink:0;padding-left:14px}
-    .ag-info{flex:1;min-width:0}
-    .ag-name{font-size:13px;font-weight:600;color:var(--text)}
-    .ag-svc{font-size:11px;color:var(--text3);margin-top:2px}
-    .ag-badge{font-size:10px;font-weight:700;padding:4px 11px;border-radius:var(--r-pill);flex-shrink:0}
-    .ag-badge.conf{background:var(--green-dim);color:var(--green)}
-    .ag-badge.pend{background:#fef3c7;color:#92400e}
-    .ag-side{width:240px;border-left:1px solid var(--border);background:var(--bg2);padding:16px;display:flex;flex-direction:column;gap:14px;flex-shrink:0;overflow-y:auto}
-    .ag-side-title{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text3);margin-bottom:8px}
-    .ag-side-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-    .ag-stat-card{background:#fff;border-radius:var(--r-sm);padding:10px;text-align:center;border:1px solid var(--border);box-shadow:var(--shadow-xs)}
-    .ag-stat-n{font-size:22px;font-weight:800;letter-spacing:-1px;line-height:1}
-    .ag-stat-l{font-size:9px;color:var(--text3);margin-top:2px}
-    .ag-doc{margin-bottom:10px}
-    .ag-doc-name{font-size:12px;font-weight:600;color:var(--text);margin-bottom:4px}
-    .ag-doc-bar{height:5px;background:rgba(0,0,0,0.06);border-radius:3px;overflow:hidden;margin-bottom:2px}
-    .ag-doc-fill{height:100%;border-radius:3px}
-    .ag-doc-lbl{font-size:10px;color:var(--text3)}
-    .ag-footer{padding:10px 20px;border-top:1px solid var(--border);display:flex;gap:24px;background:var(--bg2);flex-shrink:0}
-    .ag-foot-stat{font-size:12px;color:var(--text3);display:flex;align-items:center;gap:4px}
-    .ag-foot-n{font-size:18px;font-weight:800;letter-spacing:-1px;margin-right:4px;vertical-align:middle}
+    .cal-hd{padding:12px 16px 10px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-shrink:0;flex-wrap:wrap}
+    .cal-nav{display:flex;align-items:center;gap:6px}
+    .cal-nav-btn{width:28px;height:28px;border:1px solid var(--border);background:#fff;border-radius:6px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:background .12s}
+    .cal-nav-btn:hover{background:var(--bg2)}
+    .cal-title{font-size:14px;font-weight:700;color:var(--text);min-width:160px;text-align:center}
+    .cal-today-btn{font-size:11px;font-weight:600;padding:5px 12px;border:1px solid var(--border);background:#fff;border-radius:6px;cursor:pointer;color:var(--text2)}
+    .cal-today-btn:hover{background:var(--bg2)}
+    .cal-views{display:flex;gap:2px;margin-left:auto}
+    .cal-view-btn{font-size:11px;font-weight:600;padding:5px 10px;border:1px solid transparent;border-radius:6px;cursor:pointer;color:var(--text3);background:none;transition:all .12s}
+    .cal-view-btn.active{background:var(--green);color:#fff;border-color:var(--green)}
+    .cal-view-btn:not(.active):hover{background:var(--bg2);color:var(--text)}
+    .cal-add-btn{font-size:11px;font-weight:700;padding:6px 14px;background:var(--green);color:#fff;border:none;border-radius:6px;cursor:pointer;white-space:nowrap}
+    /* week/day grid */
+    .cal-grid-wrap{flex:1;overflow:hidden;display:flex;flex-direction:column}
+    .cal-day-cols-hd{display:flex;flex-shrink:0;border-bottom:1px solid var(--border)}
+    .cal-time-col-hd{width:52px;flex-shrink:0}
+    .cal-day-hd{flex:1;text-align:center;padding:6px 4px;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;border-left:1px solid var(--border)}
+    .cal-day-hd.today{color:var(--green)}
+    .cal-day-hd-num{font-size:22px;font-weight:900;color:var(--text);letter-spacing:-1px;line-height:1.1;display:block}
+    .cal-day-hd.today .cal-day-hd-num{background:var(--green);color:#fff;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto}
+    .cal-scroll{flex:1;overflow-y:auto;position:relative;display:flex}
+    .cal-time-col{width:52px;flex-shrink:0;position:relative}
+    .cal-time-lbl{position:absolute;right:8px;font-size:10px;color:var(--text3);font-weight:500;transform:translateY(-50%)}
+    .cal-cols{flex:1;display:flex;position:relative}
+    .cal-col{flex:1;border-left:1px solid var(--border);position:relative;cursor:pointer}
+    .cal-col:hover{background:rgba(22,163,74,0.02)}
+    .cal-hour-line{position:absolute;left:0;right:0;border-top:1px solid var(--border);pointer-events:none}
+    .cal-half-line{position:absolute;left:0;right:0;border-top:1px dashed rgba(0,0,0,0.06);pointer-events:none}
+    .cal-now-line{position:absolute;left:0;right:0;border-top:2px solid #ef4444;z-index:3;pointer-events:none}
+    .cal-now-line::before{content:'';position:absolute;left:-4px;top:-4px;width:8px;height:8px;border-radius:50%;background:#ef4444}
+    /* appointment blocks */
+    .cal-appt{position:absolute;left:3px;right:3px;border-radius:6px;padding:4px 7px;cursor:pointer;z-index:2;overflow:hidden;transition:opacity .12s,filter .12s}
+    .cal-appt:hover{filter:brightness(.94)}
+    .cal-appt-name{font-size:11px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .cal-appt-svc{font-size:10px;color:rgba(255,255,255,.8);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    /* status colors */
+    .cal-appt.pending{background:#f59e0b}
+    .cal-appt.confirmed{background:var(--green)}
+    .cal-appt.cancelled{background:#94a3b8}
+    .cal-appt.attended{background:#0ea5e9}
+    .cal-appt.no_show{background:#ef4444}
+    /* month grid */
+    .cal-month-wrap{flex:1;overflow-y:auto;display:flex;flex-direction:column;padding:8px}
+    .cal-month-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;flex:1}
+    .cal-month-hd{text-align:center;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);padding-bottom:4px}
+    .cal-month-cell{background:#fff;border:1px solid var(--border);border-radius:6px;min-height:80px;padding:5px;cursor:pointer;transition:border-color .12s}
+    .cal-month-cell:hover{border-color:var(--green)}
+    .cal-month-cell.today{border-color:var(--green);background:#f0fdf4}
+    .cal-month-cell.other-month{opacity:.5}
+    .cal-month-day-n{font-size:12px;font-weight:700;color:var(--text);margin-bottom:3px}
+    .cal-month-appt{font-size:9px;font-weight:600;padding:1px 5px;border-radius:3px;color:#fff;margin-bottom:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
+    .cal-month-more{font-size:9px;color:var(--text3);font-weight:600}
+    /* modal */
+    .cal-modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:1000;display:none;align-items:center;justify-content:center}
+    .cal-modal-bg.open{display:flex}
+    .cal-modal{background:#fff;border-radius:var(--r);padding:24px;width:420px;max-width:95vw;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.2)}
+    .cal-modal-title{font-size:16px;font-weight:800;color:var(--text);margin-bottom:18px;display:flex;align-items:center;justify-content:space-between}
+    .cal-modal-close{background:none;border:none;font-size:18px;cursor:pointer;color:var(--text3);padding:0 4px}
+    .cal-form-row{margin-bottom:13px}
+    .cal-form-label{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;display:block}
+    .cal-form-input{width:100%;font-size:13px;font-family:inherit;color:var(--text);background:var(--bg2);border:1.5px solid var(--border);border-radius:8px;padding:8px 10px;outline:none;transition:border-color .15s}
+    .cal-form-input:focus{border-color:var(--green)}
+    .cal-status-btns{display:flex;gap:6px;flex-wrap:wrap}
+    .cal-status-btn{font-size:11px;font-weight:600;padding:5px 11px;border-radius:20px;border:1.5px solid var(--border);background:#fff;cursor:pointer;transition:all .12s;color:var(--text2)}
+    .cal-status-btn.active{color:#fff;border-color:transparent}
+    .cal-status-btn.active.pending{background:#f59e0b}
+    .cal-status-btn.active.confirmed{background:var(--green)}
+    .cal-status-btn.active.cancelled{background:#94a3b8}
+    .cal-status-btn.active.attended{background:#0ea5e9}
+    .cal-status-btn.active.no_show{background:#ef4444}
+    .cal-modal-actions{display:flex;gap:8px;margin-top:20px;justify-content:flex-end}
+    .cal-btn-del{font-size:12px;font-weight:600;padding:8px 16px;border:1.5px solid #fca5a5;color:#dc2626;background:#fff;border-radius:8px;cursor:pointer}
+    .cal-btn-del:hover{background:#fef2f2}
+    .cal-btn-save{font-size:12px;font-weight:700;padding:8px 20px;background:var(--green);color:#fff;border:none;border-radius:8px;cursor:pointer}
+    .cal-btn-cancel{font-size:12px;font-weight:600;padding:8px 14px;border:1.5px solid var(--border);color:var(--text2);background:#fff;border-radius:8px;cursor:pointer}
+    .cal-notify-row{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text2);margin-top:10px}
 
     /* ── PANEL 2: MÉTRICAS ── */
     .p-metrics{flex-direction:column;background:var(--bg2);overflow-y:auto;padding:20px}
@@ -407,7 +487,13 @@
           <span class="conv-list-title">WhatsApp <span class="conv-cnt" id="conv-cnt" style="display:none">0</span></span>
           <span class="conv-ia-badge" id="ws-status">● Conectando</span>
         </div>
-        <div class="conv-search"><input id="conv-search-input" placeholder="🔍  Buscar por número..." oninput="filterConvs(this.value)"></div>
+        <div class="conv-search"><input id="conv-search-input" placeholder="🔍  Buscar por número o mensaje..." oninput="applyConvFilter()"></div>
+        <div class="conv-filters">
+          <div class="cf active" data-f="all" onclick="setConvFilter('all')">Todos<span class="cf-cnt" id="cf-cnt-all">0</span></div>
+          <div class="cf" data-f="open" onclick="setConvFilter('open')">Abierta<span class="cf-cnt" id="cf-cnt-open">0</span></div>
+          <div class="cf" data-f="manual" onclick="setConvFilter('manual')">Manual<span class="cf-cnt" id="cf-cnt-manual">0</span></div>
+          <div class="cf" data-f="urgent" onclick="setConvFilter('urgent')">Urgente<span class="cf-cnt" id="cf-cnt-urgent">0</span></div>
+        </div>
         <div id="conv-items-container" style="flex:1;overflow-y:auto">
           <div id="conv-empty" style="padding:32px 16px;text-align:center;color:var(--text3);font-size:13px">
             <div style="font-size:28px;margin-bottom:8px">💬</div>
@@ -445,8 +531,15 @@
             <button class="copilot-send" onclick="sendCopilot()">Enviar →</button>
           </div>
         </div>
+        <div class="quick-chips" id="quick-chips">
+          <div class="qc" onclick="insertChip('Perfecto, le confirmo la cita en breve.')">✓ Confirmar cita</div>
+          <div class="qc" onclick="insertChip('Le llamo ahora mismo para darle más información.')">📞 Llamar ahora</div>
+          <div class="qc" onclick="insertChip('Entendido, le paso con un especialista que le atenderá encantado.')">👤 Pasar a especialista</div>
+          <div class="qc" onclick="insertChip('Disculpe las molestias. Vamos a revisar su caso con prioridad.')">🙏 Pedir disculpas</div>
+          <div class="qc" onclick="insertChip('Puede llamarnos directamente al teléfono de la clínica para que le atendamos de inmediato.')">📱 Dar teléfono</div>
+        </div>
         <div class="chat-input-row">
-          <input class="chat-input" id="manual-input" placeholder="Respuesta manual..." disabled>
+          <input class="chat-input" id="manual-input" placeholder="Respuesta manual..." disabled onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendManualReply()}">
           <button class="send-btn" id="manual-send-btn" onclick="sendManualReply()" disabled><svg width="13" height="13" viewBox="0 0 24 24" fill="white"><path d="m22 2-7 20-4-9-9-4 20-7z"/></svg></button>
         </div>
       </div>
@@ -469,58 +562,96 @@
           <div class="pp-ai-val" id="pp-ai-status">IA activa</div>
           <div class="pp-ai-conf" id="pp-msg-count">0 mensajes</div>
         </div>
+        <div class="pp-sect" style="margin-top:12px">Historial paciente</div>
+        <div id="pp-patient" style="padding:0 12px 4px;font-size:11px;color:var(--text3)">—</div>
         <div class="pp-sect" style="margin-top:12px">Notas internas</div>
         <textarea id="pp-notes" placeholder="Notas del equipo (solo visibles en el dashboard)..." style="width:100%;font-size:12px;font-family:inherit;color:var(--text);background:var(--bg2);border:1.5px solid var(--border);border-radius:8px;padding:8px 10px;resize:vertical;min-height:72px;outline:none;margin-top:4px" oninput="scheduleNotesSave()"></textarea>
         <button onclick="saveNotes()" id="notes-save-btn" style="margin-top:6px;font-size:11px;font-weight:600;font-family:inherit;background:var(--green);color:#fff;border:none;padding:5px 14px;border-radius:var(--r-pill);cursor:pointer;display:none">Guardar</button>
       </div>
     </div>
 
-    <!-- PANEL 1: AGENDA -->
+    <!-- PANEL 1: CALENDARIO DINÁMICO -->
     <div class="panel p-agenda" id="panel-1">
-      <div class="ag-hd">
-        <div>
-          <div class="ag-title-day" id="ag-day-label"></div>
-          <div class="ag-title-full" id="ag-date-full"></div>
+      <div class="cal-hd">
+        <div class="cal-nav">
+          <button class="cal-nav-btn" onclick="calNav(-1)">‹</button>
+          <div class="cal-title" id="cal-title">—</div>
+          <button class="cal-nav-btn" onclick="calNav(1)">›</button>
         </div>
-        <div class="ag-count">
-          <div class="ag-count-n" id="ag-count-n">0</div>
-          <div class="ag-count-l">citas hoy</div>
+        <button class="cal-today-btn" onclick="calGoToday()">Hoy</button>
+        <div class="cal-views">
+          <button class="cal-view-btn" onclick="setCalView('day')" id="cal-view-day">Día</button>
+          <button class="cal-view-btn active" onclick="setCalView('week')" id="cal-view-week">Semana</button>
+          <button class="cal-view-btn" onclick="setCalView('month')" id="cal-view-month">Mes</button>
         </div>
+        <button class="cal-add-btn" onclick="openApptModal(null)">+ Nueva cita</button>
       </div>
-      <div class="ag-week" id="ag-week"></div>
-      <div class="ag-body">
-        <div class="ag-list">
-          <div class="ag-slot"><div class="slot-bar" style="background:#16a34a"></div><div class="ag-time">09:00</div><div class="ag-info"><div class="ag-name">Laura Martínez</div><div class="ag-svc">Revisión dental · Dr. Ruiz</div></div><div class="ag-badge conf">✓ Confirmada</div></div>
-          <div class="ag-slot"><div class="slot-bar" style="background:#0ea5e9"></div><div class="ag-time">10:00</div><div class="ag-info"><div class="ag-name">María García</div><div class="ag-svc">Limpieza dental · Dra. Vega</div></div><div class="ag-badge conf">✓ Confirmada</div></div>
-          <div class="ag-slot"><div class="slot-bar" style="background:#f59e0b"></div><div class="ag-time">11:30</div><div class="ag-info"><div class="ag-name">Carlos Ruiz</div><div class="ag-svc">Ortodoncia · Dr. López</div></div><div class="ag-badge pend">● Pendiente</div></div>
-          <div class="ag-slot"><div class="slot-bar" style="background:#0ea5e9"></div><div class="ag-time">12:00</div><div class="ag-info"><div class="ag-name">Ana Sánchez</div><div class="ag-svc">Blanqueamiento · Dra. Vega</div></div><div class="ag-badge conf">✓ Confirmada</div></div>
-          <div class="ag-slot"><div class="slot-bar" style="background:#16a34a"></div><div class="ag-time">16:00</div><div class="ag-info"><div class="ag-name">Pedro Alonso</div><div class="ag-svc">Extracción · Dr. Ruiz</div></div><div class="ag-badge conf">✓ Confirmada</div></div>
-          <div class="ag-slot"><div class="slot-bar" style="background:#f59e0b"></div><div class="ag-time">17:30</div><div class="ag-info"><div class="ag-name">Isabel Torres</div><div class="ag-svc">Primera visita · Dr. López</div></div><div class="ag-badge pend">● Pendiente</div></div>
-          <div class="ag-slot"><div class="slot-bar" style="background:#16a34a"></div><div class="ag-time">18:00</div><div class="ag-info"><div class="ag-name">Marcos Vidal</div><div class="ag-svc">Revisión · Dr. Ruiz</div></div><div class="ag-badge conf">✓ Confirmada</div></div>
-          <div class="ag-slot"><div class="slot-bar" style="background:#8b5cf6"></div><div class="ag-time">19:00</div><div class="ag-info"><div class="ag-name">Carmen Díaz</div><div class="ag-svc">Implante · Dr. López</div></div><div class="ag-badge conf">✓ Confirmada</div></div>
+      <div class="cal-grid-wrap" id="cal-grid-wrap"></div>
+    </div>
+
+    <!-- Modal Cita -->
+    <div class="cal-modal-bg" id="cal-modal-bg" onclick="if(event.target===this)closeApptModal()">
+      <div class="cal-modal">
+        <div class="cal-modal-title">
+          <span id="cal-modal-title-txt">Nueva cita</span>
+          <button class="cal-modal-close" onclick="closeApptModal()">✕</button>
         </div>
-        <div class="ag-side">
-          <div>
-            <div class="ag-side-title">Resumen del día</div>
-            <div class="ag-side-stats">
-              <div class="ag-stat-card"><div class="ag-stat-n" style="color:var(--green)">6</div><div class="ag-stat-l">Confirmadas</div></div>
-              <div class="ag-stat-card"><div class="ag-stat-n" style="color:#f59e0b">2</div><div class="ag-stat-l">Pendientes</div></div>
-              <div class="ag-stat-card"><div class="ag-stat-n" style="color:rgba(0,0,0,.35)">0</div><div class="ag-stat-l">Canceladas</div></div>
-            </div>
+        <div class="cal-form-row">
+          <label class="cal-form-label">Paciente</label>
+          <input class="cal-form-input" id="cal-f-name" placeholder="Nombre y apellidos">
+        </div>
+        <div class="cal-form-row">
+          <label class="cal-form-label">Teléfono WhatsApp</label>
+          <input class="cal-form-input" id="cal-f-phone" placeholder="+34 600 000 000" type="tel">
+        </div>
+        <div class="cal-form-row">
+          <label class="cal-form-label">Servicio / tratamiento</label>
+          <input class="cal-form-input" id="cal-f-service" placeholder="Ej: Revisión dental">
+        </div>
+        <div style="display:flex;gap:10px">
+          <div class="cal-form-row" style="flex:1">
+            <label class="cal-form-label">Fecha</label>
+            <input class="cal-form-input" id="cal-f-date" type="date">
           </div>
-          <div>
-            <div class="ag-side-title">Por doctor</div>
-            <div class="ag-doc"><div class="ag-doc-name">Dr. Ruiz</div><div class="ag-doc-bar"><div class="ag-doc-fill" style="width:62%;background:var(--green)"></div></div><div class="ag-doc-lbl">3 citas</div></div>
-            <div class="ag-doc"><div class="ag-doc-name">Dra. Vega</div><div class="ag-doc-bar"><div class="ag-doc-fill" style="width:48%;background:#22c55e"></div></div><div class="ag-doc-lbl">2 citas</div></div>
-            <div class="ag-doc"><div class="ag-doc-name">Dr. López</div><div class="ag-doc-bar"><div class="ag-doc-fill" style="width:48%;background:#0ea5e9"></div></div><div class="ag-doc-lbl">2 citas</div></div>
+          <div class="cal-form-row" style="flex:1">
+            <label class="cal-form-label">Hora</label>
+            <input class="cal-form-input" id="cal-f-time" type="time">
           </div>
         </div>
-      </div>
-      <div class="ag-footer">
-        <div class="ag-foot-stat"><span class="ag-foot-n" style="color:var(--green)">6</span>confirmadas</div>
-        <div class="ag-foot-stat"><span class="ag-foot-n" style="color:#f59e0b">2</span>pendientes</div>
-        <div class="ag-foot-stat"><span class="ag-foot-n" style="color:rgba(0,0,0,.35)">0</span>canceladas</div>
-        <div class="ag-foot-stat" style="margin-left:auto;font-size:11px;color:var(--green);font-weight:600">● Agenda sincronizada con IA</div>
+        <div class="cal-form-row">
+          <label class="cal-form-label">Duración</label>
+          <select class="cal-form-input" id="cal-f-dur">
+            <option value="15">15 min</option>
+            <option value="30">30 min</option>
+            <option value="45">45 min</option>
+            <option value="60" selected>1 hora</option>
+            <option value="90">1h 30min</option>
+            <option value="120">2 horas</option>
+          </select>
+        </div>
+        <div class="cal-form-row" id="cal-status-row" style="display:none">
+          <label class="cal-form-label">Estado</label>
+          <div class="cal-status-btns">
+            <button class="cal-status-btn pending" onclick="setApptStatus('pending')">Pendiente</button>
+            <button class="cal-status-btn confirmed" onclick="setApptStatus('confirmed')">Confirmada</button>
+            <button class="cal-status-btn attended" onclick="setApptStatus('attended')">Asistida</button>
+            <button class="cal-status-btn no_show" onclick="setApptStatus('no_show')">No asistió</button>
+            <button class="cal-status-btn cancelled" onclick="setApptStatus('cancelled')">Cancelada</button>
+          </div>
+        </div>
+        <div class="cal-form-row">
+          <label class="cal-form-label">Notas internas</label>
+          <textarea class="cal-form-input" id="cal-f-notes" rows="2" placeholder="Observaciones, alergias, preferencias..."></textarea>
+        </div>
+        <div class="cal-notify-row">
+          <input type="checkbox" id="cal-f-notify" checked>
+          <label for="cal-f-notify">Notificar al paciente por WhatsApp</label>
+        </div>
+        <div class="cal-modal-actions">
+          <button class="cal-btn-del" id="cal-btn-del" style="display:none" onclick="deleteAppt()">Eliminar</button>
+          <button class="cal-btn-cancel" onclick="closeApptModal()">Cancelar</button>
+          <button class="cal-btn-save" onclick="saveAppt()">Guardar</button>
+        </div>
       </div>
     </div>
 
@@ -564,15 +695,53 @@
           <div id="met-summary" style="padding:12px 0;display:flex;flex-direction:column;gap:10px"></div>
         </div>
       </div>
+      <div class="met-row" style="margin-top:0">
+        <div class="nps-card">
+          <div class="met-card-title">Satisfacción del paciente (NPS)</div>
+          <div style="display:flex;align-items:flex-end;gap:24px;margin-top:10px">
+            <div>
+              <div class="nps-score" id="nps-avg">—</div>
+              <div class="nps-label">Valoración media /10</div>
+              <div class="nps-stars" id="nps-stars"></div>
+            </div>
+            <div>
+              <div class="nps-score" id="nps-index" style="font-size:24px">—</div>
+              <div class="nps-label">NPS Score</div>
+            </div>
+            <div style="margin-left:auto;text-align:right">
+              <div style="font-size:20px;font-weight:800;color:var(--text)" id="nps-total">—</div>
+              <div class="nps-label">Encuestas enviadas</div>
+              <div style="font-size:20px;font-weight:800;color:var(--green);margin-top:8px" id="nps-scored">—</div>
+              <div class="nps-label">Respondidas</div>
+            </div>
+          </div>
+          <div style="font-size:11px;color:var(--text3);margin-top:10px">El NPS se envía automáticamente 24h tras confirmar una cita vía WhatsApp.</div>
+        </div>
+        <div class="met-card" id="nps-tip-card" style="display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;color:var(--text3)">
+          <div style="font-size:28px;margin-bottom:8px">⭐</div>
+          <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px">Reseñas Google</div>
+          <div style="font-size:12px;line-height:1.6">Pacientes con nota ≥ 8 reciben el enlace de reseña automáticamente.<br>Configura el enlace en <b>Ajustes → Asistente virtual</b>.</div>
+        </div>
+      </div>
     </div>
 
     <!-- PANEL 3: REACTIVACIÓN DE LEADS -->
     <div class="panel p-leads" id="panel-3">
+      <div class="leads-tabs">
+        <div class="lt active" data-lt="all" onclick="switchLeadsTab('all')">Todos los pacientes</div>
+        <div class="lt" data-lt="risk" onclick="switchLeadsTab('risk')">En riesgo<span class="lt-risk-cnt" id="lt-risk-cnt">⚠️</span></div>
+      </div>
+      <div id="leads-risk-panel" style="display:none;flex-direction:column;overflow-y:auto;flex:1;padding:16px">
+        <div style="font-size:13px;color:var(--text3);margin-bottom:14px">Pacientes sin visita en más de 90 días — candidatos a reactivación.</div>
+        <div id="risk-list"></div>
+      </div>
+      <div id="leads-main-panel" style="display:flex;flex-direction:column;flex:1;overflow:hidden">
       <div class="leads-topbar">
         <span class="leads-title">Reactivación de pacientes</span>
         <button class="leads-btn export" onclick="exportLeads()">⬇ Exportar CSV</button>
         <button class="leads-btn" style="background:#fff;color:var(--text);border:1px solid var(--border)" onclick="openSheetsHelp()">📊 Google Sheets</button>
         <button class="leads-btn upload" onclick="openImport()">⬆ Importar lista</button>
+        <button class="leads-btn" style="background:#7c3aed;color:#fff;margin-left:auto" onclick="openBroadcast()">📣 Campaña</button>
       </div>
       <div class="leads-stats">
         <div class="lstat"><strong id="ls-total">0</strong>Total importados</div>
@@ -600,6 +769,7 @@
         </table>
       </div>
     </div>
+      </div><!-- /leads-main-panel -->
     <!-- PANEL 4: AJUSTES -->
     <div class="panel p-settings" id="panel-4">
       <div class="set-title">Ajustes</div>
@@ -632,6 +802,17 @@
           <textarea class="set-textarea" id="s-services" placeholder="Higiene dental: 55€&#10;Blanqueamiento: 280€&#10;..."></textarea>
           <span class="set-label">Información adicional (seguros, parking, FAQ…)</span>
           <textarea class="set-textarea" id="s-extra" placeholder="Aceptamos Adeslas y Sanitas. Parking 1h gratis..."></textarea>
+          <span class="set-label" style="margin-top:10px">Enlace reseña Google (NPS automático)</span>
+          <input class="set-input" id="s-review-url" type="url" placeholder="https://g.page/r/...">
+          <span class="set-label" style="margin-top:10px">Palabras clave de escalado urgente</span>
+          <input class="set-input" id="s-urgent-kw" placeholder="dolor fuerte, sangrado, alergia (separadas por coma)">
+          <div style="font-size:11px;color:var(--text3);margin-top:-8px">Se suman a las palabras por defecto del sistema.</div>
+          <div style="display:flex;align-items:center;gap:10px;margin-top:10px">
+            <input type="checkbox" id="s-auto-react" style="width:16px;height:16px;accent-color:var(--green)">
+            <span class="set-label" style="margin:0">Reactivación automática de pacientes en riesgo (cada 6h)</span>
+          </div>
+          <span class="set-label" style="margin-top:8px">Mensaje de reactivación (opcional)</span>
+          <textarea class="set-textarea" id="s-react-msg" placeholder="Hola {nombre}, hace tiempo que no te vemos..."></textarea>
           <button class="set-btn" onclick="saveSettings('assistant')">Guardar cambios</button>
           <div class="set-saved" id="saved-assistant">✓ Guardado</div>
         </div>
@@ -744,6 +925,43 @@
   </div>
 </div>
 
+<!-- ── Broadcast modal ─────────────────────────────────────────────────── -->
+<div class="bc-modal" id="broadcastModal" onclick="if(event.target===this)closeBroadcast()">
+  <div class="bc-box">
+    <div class="bc-title">📣 Nueva campaña de WhatsApp</div>
+
+    <div id="bc-form">
+      <div class="bc-label">Segmento de envío</div>
+      <div class="bc-seg" style="margin-bottom:2px">
+        <div class="bc-seg-btn active" id="bc-seg-all" onclick="setBcSeg('all')">👥 Todos los pacientes</div>
+        <div class="bc-seg-btn" id="bc-seg-risk" onclick="setBcSeg('risk')">⚠️ En riesgo (+90d)</div>
+      </div>
+      <div class="bc-preview" id="bc-preview">Cargando destinatarios...</div>
+
+      <div class="bc-label" style="margin-top:8px">Mensaje</div>
+      <textarea class="bc-msg" id="bc-msg" maxlength="1000" placeholder="Ej: Hola {nombre}, ¡hace tiempo que no te vemos! Esta semana tenemos disponibilidad para tu próxima revisión. ¿Te apuntamos?" oninput="updateBcCounter()"></textarea>
+      <div class="bc-counter"><span id="bc-char">0</span>/1000</div>
+
+      <div class="bc-label" style="margin-top:4px">Historial de campañas</div>
+      <div class="bc-history" id="bc-history"><div style="font-size:12px;color:var(--text3)">Cargando...</div></div>
+
+      <div class="bc-actions">
+        <button class="leads-btn" style="background:#fff;border:1px solid var(--border);color:var(--text)" onclick="closeBroadcast()">Cancelar</button>
+        <button class="leads-btn" style="background:#7c3aed;color:#fff" id="bc-send-btn" onclick="sendBroadcast()">Enviar campaña →</button>
+      </div>
+    </div>
+
+    <div class="bc-progress" id="bc-progress">
+      <div style="font-size:14px;font-weight:700;color:var(--text)" id="bc-prog-label">Enviando...</div>
+      <div class="bc-prog-bar-wrap"><div class="bc-prog-bar" id="bc-prog-bar"></div></div>
+      <div style="font-size:12px;color:var(--text3)" id="bc-prog-sub">0 / 0 mensajes enviados</div>
+      <div class="bc-actions" style="margin-top:4px">
+        <button class="leads-btn" style="background:#fff;border:1px solid var(--border);color:var(--text)" onclick="closeBroadcast()">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
   // ── Ajustes ───────────────────────────────────────────────────────────────
   async function loadSettings() {
@@ -759,6 +977,10 @@
     document.getElementById('s-assistant').value = cfg.assistant_name || 'Natalia';
     document.getElementById('s-services').value = cfg.services || '';
     document.getElementById('s-extra').value = cfg.extra || '';
+    document.getElementById('s-review-url').value = cfg.google_review_url || '';
+    document.getElementById('s-urgent-kw').value = cfg.urgent_keywords || '';
+    document.getElementById('s-auto-react').checked = !!cfg.auto_reactivacion;
+    document.getElementById('s-react-msg').value = cfg.reactivacion_msg || '';
     document.getElementById('s-wa').value = d.whatsapp_number || '';
     const waConfigured = !!d.whatsapp_number;
     document.getElementById('wa-dot').classList.toggle('active', waConfigured);
@@ -779,6 +1001,10 @@
       assistant_name: document.getElementById('s-assistant').value,
       services: document.getElementById('s-services').value,
       extra: document.getElementById('s-extra').value,
+      google_review_url: document.getElementById('s-review-url').value,
+      urgent_keywords: document.getElementById('s-urgent-kw').value,
+      auto_reactivacion: document.getElementById('s-auto-react').checked,
+      reactivacion_msg: document.getElementById('s-react-msg').value,
       whatsapp_number: document.getElementById('s-wa').value
     };
     const r = await fetch('/api/settings', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
@@ -1083,7 +1309,8 @@
     document.querySelectorAll('.si[data-panel],.bn-item[data-panel]').forEach(s => s.classList.toggle('active', parseInt(s.dataset.panel)===n));
     if (n === 4) { loadSettings(); loadUsage(); }
     if (n === 3) loadImportedLeads();
-    if (n === 2) loadAnalytics();
+    if (n === 2) { loadAnalytics(); loadNpsResults(); }
+    if (n === 1) renderCal();
   }
 
   async function loadAnalytics() {
@@ -1203,6 +1430,16 @@
     document.getElementById('cs-total').textContent = convs.length;
     document.getElementById('cs-today').textContent = todayCount;
 
+    // Update filter badge counts (always from allConvs, not filtered subset)
+    document.getElementById('cf-cnt-all').textContent = allConvs.length;
+    document.getElementById('cf-cnt-open').textContent = allConvs.filter(c => !manualSet.has(c.session_id) && !urgentSet.has(c.session_id)).length;
+    document.getElementById('cf-cnt-manual').textContent = allConvs.filter(c => manualSet.has(c.session_id)).length;
+    document.getElementById('cf-cnt-urgent').textContent = allConvs.filter(c => urgentSet.has(c.session_id)).length;
+    // Sidebar badge = open count
+    const openCnt = allConvs.filter(c => urgentSet.has(c.session_id) || manualSet.has(c.session_id)).length;
+    const badge = document.querySelector('.si[data-panel="0"] .si-badge');
+    if (badge) { badge.textContent = openCnt || ''; badge.style.display = openCnt ? '' : 'none'; }
+
     container.innerHTML = '';
     convs.forEach((c, i) => {
       const label = phoneLabel(c.from_number);
@@ -1273,6 +1510,7 @@
       renderMessages(msgs);
       document.getElementById('pp-msg-count').textContent = `${msgs.length} mensajes`;
       loadNotes(conv.session_id);
+      loadPatientData(conv.from_number);
     } catch(e) { chatMsgs.innerHTML = '<div style="padding:20px;color:var(--text3);text-align:center">Error cargando mensajes</div>'; }
   }
 
@@ -1283,11 +1521,22 @@
       return;
     }
     chatMsgs.innerHTML = '';
+    let lastDate = null;
     msgs.forEach(m => {
+      const d = new Date(m.created_at);
+      const dayKey = d.toDateString();
+      if (dayKey !== lastDate) {
+        const sep = document.createElement('div');
+        sep.className = 'msg-date-sep';
+        const isToday = dayKey === new Date().toDateString();
+        sep.textContent = isToday ? 'Hoy' : d.toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'long'});
+        chatMsgs.appendChild(sep);
+        lastDate = dayKey;
+      }
       const div = document.createElement('div');
       const isOut = m.direction === 'outbound';
       div.className = 'msg ' + (isOut ? 'mo' : 'mi');
-      const ts = new Date(m.created_at).toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'});
+      const ts = d.toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'});
       const by = isOut ? (m.responded_by==='ai'?'IA':'Manual') : 'Paciente';
       div.innerHTML = esc(m.content) + `<div class="msg-ts">${ts} · ${by}</div>`;
       chatMsgs.appendChild(div);
@@ -1295,9 +1544,20 @@
     chatMsgs.scrollTop = chatMsgs.scrollHeight;
   }
 
-  function filterConvs(q) {
-    const filtered = q ? allConvs.filter(c => (c.from_number||'').includes(q) || (c.content||'').toLowerCase().includes(q.toLowerCase())) : allConvs;
-    renderConvList(filtered);
+  let convFilter = 'all';
+  function setConvFilter(f) {
+    convFilter = f;
+    document.querySelectorAll('.cf').forEach(el => el.classList.toggle('active', el.dataset.f === f));
+    applyConvFilter();
+  }
+  function applyConvFilter() {
+    const q = document.getElementById('conv-search-input').value.toLowerCase();
+    let list = allConvs;
+    if (convFilter === 'open')   list = list.filter(c => !manualSet.has(c.session_id) && !urgentSet.has(c.session_id));
+    if (convFilter === 'manual') list = list.filter(c => manualSet.has(c.session_id));
+    if (convFilter === 'urgent') list = list.filter(c => urgentSet.has(c.session_id));
+    if (q) list = list.filter(c => (c.from_number||'').includes(q) || (c.content||'').toLowerCase().includes(q));
+    renderConvList(list);
   }
 
   function updateManualBtn(sessionId) {
@@ -1362,11 +1622,150 @@
     }).catch(e => console.error('mode toggle:', e));
   }
 
+  // ── Broadcast ─────────────────────────────────────────────────────────────
+  let bcSeg = 'all', bcLeadCount = 0;
+
+  function setBcSeg(seg) {
+    bcSeg = seg;
+    document.getElementById('bc-seg-all').classList.toggle('active', seg === 'all');
+    document.getElementById('bc-seg-risk').classList.toggle('active', seg === 'risk');
+    updateBcPreview();
+  }
+
+  async function updateBcPreview() {
+    const el = document.getElementById('bc-preview');
+    el.textContent = 'Calculando destinatarios...';
+    try {
+      const url = bcSeg === 'risk' ? '/api/crm/at-risk' : '/api/leads/imported';
+      const r = await fetch(url);
+      if (r.status === 403) { el.textContent = 'Plan Pro o Clínica requerido para broadcasts.'; bcLeadCount = 0; return; }
+      const list = await r.json();
+      bcLeadCount = list.filter(l => l.telefono).length;
+      el.textContent = `✓ ${bcLeadCount} destinatarios con número de WhatsApp.`;
+    } catch { el.textContent = 'Error cargando destinatarios.'; }
+  }
+
+  function updateBcCounter() {
+    document.getElementById('bc-char').textContent = document.getElementById('bc-msg').value.length;
+  }
+
+  async function loadBroadcastHistory() {
+    const el = document.getElementById('bc-history');
+    try {
+      const r = await fetch('/api/broadcasts');
+      const list = await r.json();
+      if (!list.length) { el.innerHTML = '<div style="font-size:12px;color:var(--text3)">Sin campañas anteriores.</div>'; return; }
+      el.innerHTML = list.map(b => {
+        const pct = b.total ? Math.round(b.sent / b.total * 100) : 0;
+        const failTxt = b.failed > 0 ? ` · <span style="color:#ef4444">${b.failed} fallidos</span>` : '';
+        return `<div class="bc-hist-item">
+          <span class="bc-status ${b.status}">${b.status}</span>
+          <span style="flex:1;color:var(--text);font-weight:600">${esc(b.name||b.segment||'Campaña')}</span>
+          <span style="color:var(--text3)">${b.sent}/${b.total} (${pct}%)${failTxt}</span>
+          <span style="color:var(--text3);margin-left:6px">${timeAgo(b.created_at)}</span>
+        </div>`;}).join('');
+    } catch { el.innerHTML = '<div style="font-size:12px;color:var(--text3)">—</div>'; }
+  }
+
+  function openBroadcast() {
+    document.getElementById('bc-form').style.display = '';
+    document.getElementById('bc-progress').style.display = 'none';
+    document.getElementById('bc-msg').value = '';
+    document.getElementById('bc-char').textContent = '0';
+    document.getElementById('broadcastModal').classList.add('open');
+    updateBcPreview();
+    loadBroadcastHistory();
+  }
+
+  function closeBroadcast() {
+    document.getElementById('broadcastModal').classList.remove('open');
+  }
+
+  async function sendBroadcast() {
+    const msg = document.getElementById('bc-msg').value.trim();
+    if (!msg) { alert('Escribe el mensaje antes de enviar.'); return; }
+    if (!bcLeadCount) { alert('No hay destinatarios válidos.'); return; }
+    if (!confirm(`¿Enviar a ${bcLeadCount} pacientes?`)) return;
+    const btn = document.getElementById('bc-send-btn');
+    btn.disabled = true; btn.textContent = 'Enviando...';
+    try {
+      const r = await fetch('/api/broadcast', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: msg, segment: bcSeg, name: bcSeg === 'risk' ? 'En riesgo' : 'Todos' })
+      });
+      if (!r.ok) { const e = await r.json(); alert(e.error || 'Error'); btn.disabled = false; btn.textContent = 'Enviar campaña →'; return; }
+      document.getElementById('bc-form').style.display = 'none';
+      const prog = document.getElementById('bc-progress');
+      prog.style.display = 'flex';
+      document.getElementById('bc-prog-label').textContent = `Enviando a ${bcLeadCount} pacientes…`;
+      document.getElementById('bc-prog-sub').textContent = `0 / ${bcLeadCount} mensajes enviados`;
+    } catch(e) { alert('Error de conexión'); btn.disabled = false; btn.textContent = 'Enviar campaña →'; }
+  }
+
+  // ── Quick chips ───────────────────────────────────────────────────────────
+  function insertChip(text) {
+    const inp = document.getElementById('manual-input');
+    if (inp.disabled) return;
+    inp.value = text;
+    inp.focus();
+  }
+
+  // ── Leads tabs ────────────────────────────────────────────────────────────
+  function switchLeadsTab(tab) {
+    document.querySelectorAll('.lt').forEach(el => el.classList.toggle('active', el.dataset.lt === tab));
+    document.getElementById('leads-main-panel').style.display = tab === 'all' ? 'flex' : 'none';
+    document.getElementById('leads-risk-panel').style.display = tab === 'risk' ? 'flex' : 'none';
+    document.getElementById('leads-risk-panel').style.flexDirection = 'column';
+    if (tab === 'risk') loadAtRisk();
+  }
+
+  async function loadAtRisk() {
+    const list = document.getElementById('risk-list');
+    list.innerHTML = '<div style="color:var(--text3);font-size:12px">Cargando...</div>';
+    try {
+      const r = await fetch('/api/crm/at-risk');
+      if (r.status === 403) { list.innerHTML = '<div style="color:var(--text3);font-size:12px">Disponible en plan Pro o Clínica.</div>'; return; }
+      const patients = await r.json();
+      document.getElementById('lt-risk-cnt').textContent = patients.length ? `⚠️ ${patients.length}` : '✓';
+      if (!patients.length) { list.innerHTML = '<div style="color:var(--text3);font-size:12px">Sin pacientes en riesgo. ¡Bien hecho!</div>'; return; }
+      list.innerHTML = patients.map(p => `
+        <div style="background:#fff;border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:12px">
+          <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#f59e0b,#d97706);font-size:13px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            ${(p.nombre||'?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase()}
+          </div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:13px;font-weight:600;color:var(--text)">${esc(p.nombre||'—')}</div>
+            <div style="font-size:11px;color:var(--text3)">${esc(p.servicio||'')} · Última visita: <b>${esc(p.ultima_visita||'—')}</b></div>
+          </div>
+          <div style="font-size:11px;color:#f59e0b;font-weight:700;flex-shrink:0">⚠️ En riesgo</div>
+        </div>`).join('');
+    } catch(e) { list.innerHTML = '<div style="color:#ef4444;font-size:12px">Error cargando pacientes.</div>'; }
+  }
+
+  // ── NPS results ───────────────────────────────────────────────────────────
+  async function loadNpsResults() {
+    try {
+      const r = await fetch('/api/nps');
+      if (!r.ok) return;
+      const d = await r.json();
+      document.getElementById('nps-avg').textContent = d.avg_score !== null ? d.avg_score.toFixed(1) : '—';
+      document.getElementById('nps-index').textContent = d.nps !== null ? (d.nps > 0 ? '+' : '') + d.nps : '—';
+      document.getElementById('nps-total').textContent = d.total_sent;
+      document.getElementById('nps-scored').textContent = d.scored;
+      if (d.avg_score !== null) {
+        const stars = Math.round(d.avg_score / 2);
+        document.getElementById('nps-stars').innerHTML = Array.from({length:5},(_,i) =>
+          `<span class="nps-star">${i < stars ? '⭐' : '☆'}</span>`).join('');
+      }
+    } catch(e) {}
+  }
+
   // ── socket.io ─────────────────────────────────────────────────────────────
   let socket = null;
   function initSocket() {
     if (typeof io === 'undefined') return;
-    socket = io({ path: '/socket.io', transports: ['websocket','polling'] });
+    socket = io({ path: '/socket.io', transports: ['websocket','polling'], reconnection: true, reconnectionDelay: 2000, reconnectionDelayMax: 15000 });
 
     socket.on('connect', () => {
       document.getElementById('ws-status').textContent = '● EN VIVO';
@@ -1374,8 +1773,13 @@
     });
 
     socket.on('disconnect', () => {
-      document.getElementById('ws-status').textContent = '● Desconectado';
-      document.getElementById('ws-status').style.color = '#ef4444';
+      document.getElementById('ws-status').textContent = '● Reconectando…';
+      document.getElementById('ws-status').style.color = '#f59e0b';
+    });
+    socket.on('reconnect', () => {
+      document.getElementById('ws-status').textContent = '● EN VIVO';
+      document.getElementById('ws-status').style.color = 'var(--green)';
+      loadConversations();
     });
 
     socket.on('connected', (data) => {
@@ -1434,12 +1838,41 @@
       if (activeSessionId === data.session_id) updateManualBtn(data.session_id);
     });
 
+    // Broadcast progress
+    socket.on('broadcast:progress', ({ sent, failed, total }) => {
+      const pct = total ? Math.round(sent / total * 100) : 0;
+      document.getElementById('bc-prog-bar').style.width = pct + '%';
+      document.getElementById('bc-prog-sub').textContent = `${sent} / ${total} enviados${failed ? ` · ${failed} fallidos` : ''}`;
+    });
+    socket.on('broadcast:done', ({ sent, failed }) => {
+      document.getElementById('bc-prog-label').textContent = `✓ Campaña completada`;
+      document.getElementById('bc-prog-bar').style.width = '100%';
+      document.getElementById('bc-prog-sub').textContent = `${sent} enviados con éxito${failed ? ` · ${failed} fallidos` : ''}`;
+      loadBroadcastHistory();
+    });
+
     // Sugerencia co-pilot — solo mostrar si la conversación está abierta
     socket.on('copilot:suggestion', (data) => {
       if (activeSessionId !== data.session_id) return;
       const bar = document.getElementById('copilot-bar');
       document.getElementById('copilot-text').value = data.suggestion;
       bar.classList.add('visible');
+    });
+
+    socket.on('appt:created', (appt) => {
+      if (!calAppts.find(a => a.id === appt.id)) calAppts.push(appt);
+      if (document.getElementById('panel-1')?.classList.contains('active')) renderCal();
+    });
+
+    socket.on('appt:updated', (appt) => {
+      const idx = calAppts.findIndex(a => a.id === appt.id);
+      if (idx >= 0) calAppts[idx] = appt; else calAppts.push(appt);
+      if (document.getElementById('panel-1')?.classList.contains('active')) renderCal();
+    });
+
+    socket.on('appt:deleted', ({ id }) => {
+      calAppts = calAppts.filter(a => a.id !== id);
+      if (document.getElementById('panel-1')?.classList.contains('active')) renderCal();
     });
   }
 
@@ -1462,6 +1895,37 @@
     }).catch(() => {});
     document.getElementById('notes-save-btn').style.display = 'none';
   }
+  async function loadPatientData(phone) {
+    const el = document.getElementById('pp-patient');
+    if (!phone || phone === '—') { el.innerHTML = '—'; return; }
+    el.innerHTML = '<span style="color:var(--text3)">Cargando...</span>';
+    try {
+      const r = await fetch(`/api/patients/${encodeURIComponent(phone)}`);
+      const { appointments, lead } = await r.json();
+      let html = '';
+      if (lead) {
+        html += `<div style="margin-bottom:6px;padding:6px 0;border-bottom:1px solid var(--border)">`;
+        if (lead.nombre) html += `<div style="font-weight:600;color:var(--text);margin-bottom:2px">${esc(lead.nombre)}</div>`;
+        if (lead.ultima_visita) html += `<div>Última visita: <b>${esc(lead.ultima_visita)}</b></div>`;
+        if (lead.servicio) html += `<div>Servicio: ${esc(lead.servicio)}</div>`;
+        const parseDMY = s => { if (!s) return null; const [d,m,y] = s.split('/'); return new Date(+y,+m-1,+d); };
+        const daysSince = lead.ultima_visita ? Math.floor((Date.now() - parseDMY(lead.ultima_visita)) / 86400000) : null;
+        if (daysSince !== null && daysSince > 90) html += `<div style="color:#f59e0b;margin-top:3px">⚠️ En riesgo (${daysSince}d sin visita)</div>`;
+        html += `</div>`;
+      }
+      if (appointments.length) {
+        html += `<div style="color:var(--text2);margin-bottom:4px;font-weight:600">Citas recientes:</div>`;
+        appointments.forEach(a => {
+          html += `<div style="margin-bottom:4px;padding-bottom:4px;border-bottom:1px solid var(--border)">`;
+          html += `<div style="color:var(--text)">${esc(a.service||'Consulta')}</div>`;
+          html += `<div style="color:var(--text3)">${a.scheduled_at ? esc(a.scheduled_at.toString().slice(0,16)) : '—'}</div>`;
+          html += `</div>`;
+        });
+      }
+      el.innerHTML = html || '<span style="color:var(--text3)">Sin historial</span>';
+    } catch { el.innerHTML = '<span style="color:var(--text3)">—</span>'; }
+  }
+
   async function loadNotes(sessionId) {
     const r = await fetch(`/api/conversations/${encodeURIComponent(sessionId)}/notes`).catch(() => null);
     if (!r?.ok) return;
@@ -1495,6 +1959,334 @@
   }
   function arrayBufferToBase64(buf) {
     return btoa(String.fromCharCode(...new Uint8Array(buf))).replace(/\+/g,'-').replace(/\//g,'_');
+  }
+
+  // ── Calendar ──────────────────────────────────────────────────────────────
+  const SLOT = 56; // px per hour
+  const CAL_START = 8, CAL_END = 21;
+  const GRID_H = (CAL_END - CAL_START) * SLOT;
+  const STATUS_COLOR = { pending:'#f59e0b', confirmed:'#16a34a', cancelled:'#94a3b8', attended:'#0ea5e9', no_show:'#ef4444' };
+  const STATUS_LABEL = { pending:'Pendiente', confirmed:'Confirmada', cancelled:'Cancelada', attended:'Asistida', no_show:'No asistió' };
+  const DAYS_ES = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+  const MONTHS_ES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+
+  const calState = { view: 'week', date: new Date() };
+  let calAppts = [];
+  let calEditId = null;
+  let calEditStatus = 'pending';
+
+  function calWeekStart(d) {
+    const r = new Date(d);
+    const day = r.getDay();
+    r.setDate(r.getDate() - (day === 0 ? 6 : day - 1));
+    r.setHours(0,0,0,0);
+    return r;
+  }
+
+  function calRangeForView() {
+    const d = new Date(calState.date);
+    if (calState.view === 'day') {
+      const s = new Date(d); s.setHours(0,0,0,0);
+      const e = new Date(d); e.setHours(23,59,59,999);
+      return { start: s, end: e };
+    }
+    if (calState.view === 'week') {
+      const s = calWeekStart(d);
+      const e = new Date(s); e.setDate(e.getDate() + 7);
+      return { start: s, end: e };
+    }
+    // month
+    const s = new Date(d.getFullYear(), d.getMonth(), 1);
+    const e = new Date(d.getFullYear(), d.getMonth() + 1, 1);
+    return { start: s, end: e };
+  }
+
+  async function loadCalAppts() {
+    const { start, end } = calRangeForView();
+    const s = start.toISOString(), e = end.toISOString();
+    const r = await fetch(`/api/calendar?start=${encodeURIComponent(s)}&end=${encodeURIComponent(e)}`).catch(() => null);
+    calAppts = r?.ok ? await r.json() : [];
+  }
+
+  function calTitle() {
+    const d = calState.date;
+    if (calState.view === 'day') return `${DAYS_ES[d.getDay()]} ${d.getDate()} ${MONTHS_ES[d.getMonth()]} ${d.getFullYear()}`;
+    if (calState.view === 'week') {
+      const ws = calWeekStart(d);
+      const we = new Date(ws); we.setDate(we.getDate() + 6);
+      return ws.getMonth() === we.getMonth()
+        ? `${ws.getDate()} – ${we.getDate()} ${MONTHS_ES[ws.getMonth()]} ${ws.getFullYear()}`
+        : `${ws.getDate()} ${MONTHS_ES[ws.getMonth()]} – ${we.getDate()} ${MONTHS_ES[we.getMonth()]} ${ws.getFullYear()}`;
+    }
+    return `${MONTHS_ES[d.getMonth()]} ${d.getFullYear()}`;
+  }
+
+  async function renderCal() {
+    await loadCalAppts();
+    document.getElementById('cal-title').textContent = calTitle();
+    ['day','week','month'].forEach(v => {
+      document.getElementById(`cal-view-${v}`)?.classList.toggle('active', calState.view === v);
+    });
+    const wrap = document.getElementById('cal-grid-wrap');
+    if (calState.view === 'month') {
+      renderMonthView(wrap);
+    } else {
+      renderTimeGrid(wrap);
+    }
+  }
+
+  function renderTimeGrid(wrap) {
+    const days = calState.view === 'week' ? 7 : 1;
+    const ws = calState.view === 'week' ? calWeekStart(calState.date) : (() => { const d = new Date(calState.date); d.setHours(0,0,0,0); return d; })();
+    const today = new Date(); today.setHours(0,0,0,0);
+
+    // Build date columns
+    const cols = Array.from({ length: days }, (_, i) => {
+      const d = new Date(ws); d.setDate(d.getDate() + i);
+      return d;
+    });
+
+    let html = `<div class="cal-day-cols-hd"><div class="cal-time-col-hd"></div>`;
+    cols.forEach(d => {
+      const isToday = d.getTime() === today.getTime();
+      html += `<div class="cal-day-hd${isToday?' today':''}">
+        <span>${DAYS_ES[d.getDay()]}</span>
+        <span class="cal-day-hd-num">${d.getDate()}</span>
+      </div>`;
+    });
+    html += `</div><div class="cal-scroll" id="cal-scroll">
+      <div class="cal-time-col" style="height:${GRID_H}px">`;
+    for (let h = CAL_START; h <= CAL_END; h++) {
+      const top = (h - CAL_START) * SLOT;
+      if (h < CAL_END) html += `<div class="cal-time-lbl" style="top:${top}px">${String(h).padStart(2,'0')}:00</div>`;
+    }
+    html += `</div><div class="cal-cols" style="height:${GRID_H}px">`;
+
+    cols.forEach((d, ci) => {
+      const dayAppts = calAppts.filter(a => {
+        if (!a.scheduled_ts) return false;
+        const ad = new Date(a.scheduled_ts); ad.setHours(0,0,0,0);
+        return ad.getTime() === d.getTime();
+      });
+
+      html += `<div class="cal-col" data-col="${ci}" onclick="handleSlotClick(event,${ci})">`;
+      for (let h = CAL_START; h < CAL_END; h++) {
+        const top = (h - CAL_START) * SLOT;
+        html += `<div class="cal-hour-line" style="top:${top}px"></div>
+                 <div class="cal-half-line" style="top:${top + SLOT/2}px"></div>`;
+      }
+
+      dayAppts.forEach(a => {
+        const ts = new Date(a.scheduled_ts);
+        const offsetMin = (ts.getHours() - CAL_START) * 60 + ts.getMinutes();
+        const dur = a.duration_min || 60;
+        const top = Math.max(0, (offsetMin / 60) * SLOT);
+        const h = Math.max(20, (dur / 60) * SLOT - 3);
+        const st = a.status || 'pending';
+        html += `<div class="cal-appt ${st}" style="top:${top}px;height:${h}px" onclick="event.stopPropagation();openApptById(${a.id})">
+          <div class="cal-appt-name">${escHtml(a.patient_name || 'Sin nombre')}</div>
+          <div class="cal-appt-svc">${escHtml(a.service || '')}</div>
+        </div>`;
+      });
+
+      html += `</div>`;
+    });
+    html += `</div></div>`;
+    wrap.innerHTML = html;
+
+    // Now-line
+    const now = new Date();
+    const nowMin = (now.getHours() - CAL_START) * 60 + now.getMinutes();
+    if (nowMin >= 0 && nowMin < (CAL_END - CAL_START) * 60) {
+      const todayColIdx = cols.findIndex(d => d.getTime() === today.getTime());
+      if (todayColIdx >= 0) {
+        const col = wrap.querySelectorAll('.cal-col')[todayColIdx];
+        if (col) {
+          const line = document.createElement('div');
+          line.className = 'cal-now-line';
+          line.style.top = `${(nowMin / 60) * SLOT}px`;
+          col.appendChild(line);
+        }
+      }
+    }
+
+    // Scroll to 8am
+    const scroll = wrap.querySelector('#cal-scroll');
+    if (scroll) scroll.scrollTop = Math.max(0, (8 - CAL_START) * SLOT - 20);
+  }
+
+  function renderMonthView(wrap) {
+    const d = calState.date;
+    const y = d.getFullYear(), m = d.getMonth();
+    const firstDay = new Date(y, m, 1);
+    const lastDay = new Date(y, m + 1, 0);
+    const startOffset = (firstDay.getDay() + 6) % 7; // Mon=0
+    const today = new Date(); today.setHours(0,0,0,0);
+
+    let html = `<div class="cal-month-wrap"><div class="cal-month-grid">`;
+    ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'].forEach(l => {
+      html += `<div class="cal-month-hd">${l}</div>`;
+    });
+
+    const totalCells = Math.ceil((startOffset + lastDay.getDate()) / 7) * 7;
+    for (let i = 0; i < totalCells; i++) {
+      const dayNum = i - startOffset + 1;
+      const cellDate = new Date(y, m, dayNum);
+      const isOtherMonth = dayNum < 1 || dayNum > lastDay.getDate();
+      const isToday = !isOtherMonth && cellDate.getTime() === today.getTime();
+      const dayAppts = calAppts.filter(a => {
+        if (!a.scheduled_ts) return false;
+        const ad = new Date(a.scheduled_ts); ad.setHours(0,0,0,0);
+        return ad.getTime() === cellDate.getTime();
+      });
+      html += `<div class="cal-month-cell${isToday?' today':''}${isOtherMonth?' other-month':''}" onclick="handleMonthClick(${cellDate.getTime()})">
+        <div class="cal-month-day-n">${cellDate.getDate()}</div>`;
+      dayAppts.slice(0, 3).forEach(a => {
+        const color = STATUS_COLOR[a.status||'pending'];
+        html += `<div class="cal-month-appt" style="background:${color}" onclick="event.stopPropagation();openApptById(${a.id})">${escHtml(a.patient_name||'Sin nombre')}</div>`;
+      });
+      if (dayAppts.length > 3) html += `<div class="cal-month-more">+${dayAppts.length - 3} más</div>`;
+      html += `</div>`;
+    }
+    html += `</div></div>`;
+    wrap.innerHTML = html;
+  }
+
+  function setCalView(v) {
+    calState.view = v;
+    renderCal();
+  }
+
+  function calNav(dir) {
+    const d = calState.date;
+    if (calState.view === 'day') d.setDate(d.getDate() + dir);
+    else if (calState.view === 'week') d.setDate(d.getDate() + dir * 7);
+    else d.setMonth(d.getMonth() + dir);
+    renderCal();
+  }
+
+  function calGoToday() {
+    calState.date = new Date();
+    renderCal();
+  }
+
+  function handleSlotClick(e, colIdx) {
+    const wrap = document.getElementById('cal-grid-wrap');
+    const scroll = wrap.querySelector('#cal-scroll');
+    const rect = e.currentTarget.getBoundingClientRect();
+    const scrollTop = scroll ? scroll.scrollTop : 0;
+    const relY = e.clientY - rect.top + scrollTop;
+    const mins = Math.round((relY / SLOT) * 60 / 15) * 15;
+    const hour = CAL_START + Math.floor(mins / 60);
+    const min = mins % 60;
+
+    const ws = calState.view === 'week' ? calWeekStart(calState.date) : (() => { const d = new Date(calState.date); d.setHours(0,0,0,0); return d; })();
+    const clickedDay = new Date(ws); clickedDay.setDate(clickedDay.getDate() + colIdx);
+    const dateStr = clickedDay.toISOString().slice(0,10);
+    const timeStr = `${String(hour).padStart(2,'0')}:${String(min).padStart(2,'0')}`;
+    openApptModal(null, dateStr, timeStr);
+  }
+
+  function handleMonthClick(ts) {
+    const d = new Date(ts);
+    calState.date = d;
+    calState.view = 'day';
+    renderCal();
+  }
+
+  function openApptById(id) {
+    const a = calAppts.find(x => x.id === id);
+    if (!a) return;
+    openApptModal(a);
+  }
+
+  function openApptModal(appt, preDate, preTime) {
+    calEditId = appt ? appt.id : null;
+    calEditStatus = appt ? (appt.status || 'pending') : 'pending';
+    document.getElementById('cal-modal-title-txt').textContent = appt ? 'Editar cita' : 'Nueva cita';
+    document.getElementById('cal-btn-del').style.display = appt ? '' : 'none';
+    document.getElementById('cal-status-row').style.display = appt ? '' : 'none';
+
+    if (appt) {
+      document.getElementById('cal-f-name').value = appt.patient_name || '';
+      document.getElementById('cal-f-phone').value = appt.patient_phone || '';
+      document.getElementById('cal-f-service').value = appt.service || '';
+      if (appt.scheduled_ts) {
+        const dt = new Date(appt.scheduled_ts);
+        document.getElementById('cal-f-date').value = dt.toISOString().slice(0,10);
+        document.getElementById('cal-f-time').value = dt.toTimeString().slice(0,5);
+      }
+      document.getElementById('cal-f-dur').value = appt.duration_min || 60;
+      document.getElementById('cal-f-notes').value = appt.notes || '';
+    } else {
+      ['cal-f-name','cal-f-phone','cal-f-service','cal-f-notes'].forEach(id => document.getElementById(id).value = '');
+      document.getElementById('cal-f-date').value = preDate || new Date().toISOString().slice(0,10);
+      document.getElementById('cal-f-time').value = preTime || '09:00';
+      document.getElementById('cal-f-dur').value = '60';
+    }
+    updateStatusBtns();
+    document.getElementById('cal-modal-bg').classList.add('open');
+  }
+
+  function closeApptModal() {
+    document.getElementById('cal-modal-bg').classList.remove('open');
+    calEditId = null;
+  }
+
+  function setApptStatus(s) {
+    calEditStatus = s;
+    updateStatusBtns();
+  }
+
+  function updateStatusBtns() {
+    document.querySelectorAll('.cal-status-btn').forEach(b => {
+      const st = [...b.classList].find(c => STATUS_COLOR[c]);
+      b.classList.toggle('active', st === calEditStatus);
+    });
+  }
+
+  async function saveAppt() {
+    const dateVal = document.getElementById('cal-f-date').value;
+    const timeVal = document.getElementById('cal-f-time').value;
+    if (!dateVal || !timeVal) { alert('Fecha y hora requeridas'); return; }
+    const scheduled_ts = new Date(`${dateVal}T${timeVal}:00`).toISOString();
+    const body = {
+      patient_name: document.getElementById('cal-f-name').value.trim() || null,
+      patient_phone: document.getElementById('cal-f-phone').value.trim() || null,
+      service: document.getElementById('cal-f-service').value.trim() || null,
+      scheduled_ts,
+      duration_min: parseInt(document.getElementById('cal-f-dur').value) || 60,
+      notes: document.getElementById('cal-f-notes').value.trim() || null,
+      notify_whatsapp: document.getElementById('cal-f-notify').checked,
+    };
+    try {
+      let resp;
+      if (calEditId) {
+        body.status = calEditStatus;
+        resp = await fetch(`/api/calendar/${calEditId}`, { method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
+      } else {
+        resp = await fetch('/api/calendar', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
+      }
+      if (!resp.ok) throw new Error(await resp.text());
+      closeApptModal();
+      await renderCal();
+    } catch(e) {
+      alert('Error guardando cita: ' + e.message);
+    }
+  }
+
+  async function deleteAppt() {
+    if (!calEditId) return;
+    if (!confirm('¿Eliminar esta cita?')) return;
+    const notify_whatsapp = document.getElementById('cal-f-notify').checked;
+    const resp = await fetch(`/api/calendar/${calEditId}`, { method:'DELETE', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ notify_whatsapp }) });
+    if (!resp.ok) { alert('Error eliminando'); return; }
+    closeApptModal();
+    await renderCal();
+  }
+
+  function escHtml(s) {
+    return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
 
   loadConversations();

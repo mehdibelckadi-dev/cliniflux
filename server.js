@@ -7,7 +7,7 @@ const PgSession = require('connect-pg-simple')(session);
 const OpenAI = require('openai');
 const crypto = require('crypto');
 const Stripe = require('stripe');
-const { pool, initDb, getAnalytics, getSession, saveSession, saveLead, getClinicByEmail, getClinicByWhatsapp, getClinicBySetupToken, createClinic, updateClinicConfig, buildPromptForClinic, getLeads, getAppointments, saveAppointment, verifyPassword, hashPassword, importLeads, getImportedLeads, updateLeadEstado, incrementConversation, PLAN_LIMITS, saveMessage, getMessages, getRecentConversations, getHistoryFromMessages, setConvState, getManualSessions, getConvNotes, savePushSubscription, getPushSubscriptions, removePushSubscription, closeInactiveConversations } = require('./db');
+const { pool, initDb, getAnalytics, getSession, saveSession, saveLead, getClinicByEmail, getClinicByWhatsapp, getClinicBySetupToken, createClinic, updateClinicConfig, buildPromptForClinic, getLeads, getAppointments, saveAppointment, verifyPassword, hashPassword, importLeads, getImportedLeads, updateLeadEstado, incrementConversation, PLAN_LIMITS, saveMessage, getMessages, getRecentConversations, getHistoryFromMessages, setConvState, getManualSessions, getConvNotes, savePushSubscription, getPushSubscriptions, removePushSubscription, closeInactiveConversations, getPatientData, getAtRiskPatients, scheduleNps, getPendingNps, markNpsSent, saveNpsScore, createBroadcast, getBroadcasts, updateBroadcast, getUpcomingAppointments, markReminderSent, getAtRiskForAutoReact, markLeadsContactado, getAppointmentsByRange, createAppointmentFull, updateAppointmentFull, deleteAppointment } = require('./db');
 const webpush = require('web-push');
 
 // VAPID — claves en env (Railway). Fallback: generadas en dev (no persistentes entre reinicios)
@@ -460,7 +460,11 @@ function buildContextMessages(history, tokenBudget = 1200) {
 
 // Urgency keywords (Spanish) — used for badge detection
 const URGENT_PATTERN = /urgente|emergencia|dolor intenso|sangra|no puedo|crisis|grave|inmediato|ahora mismo/i;
-function isUrgent(text) { return URGENT_PATTERN.test(text || ''); }
+function isUrgent(text, clinic) {
+  if (URGENT_PATTERN.test(text || '')) return true;
+  const custom = (clinic?.config?.urgent_keywords || '').split(',').map(k => k.trim()).filter(Boolean);
+  return custom.some(k => (text || '').toLowerCase().includes(k.toLowerCase()));
+}
 
 // In-memory manual mode per session (cleared on restart — fine for now)
 const manualSessions = new Set();
@@ -938,8 +942,30 @@ app.post('/webhook/whatsapp', async (req, res) => {
       }
     }
 
+    // NPS score detection: si hay NPS pendiente y el mensaje es un número 1-10
+    const scoreMatch = msg.match(/^(\d{1,2})$/);
+    if (scoreMatch) {
+      const score = parseInt(scoreMatch[1]);
+      if (score >= 1 && score <= 10) {
+        const { rows: npsRows } = await pool.query(
+          'SELECT id FROM nps_pending WHERE session_id=$1 AND sent_at IS NOT NULL AND score IS NULL',
+          [sessionId]
+        ).catch(() => ({ rows: [] }));
+        if (npsRows.length) {
+          await saveNpsScore(sessionId, score).catch(() => {});
+          const cfg = clinic?.config || {};
+          let thankMsg = score >= 7 ? '¡Muchas gracias por su valoración! 😊 Nos alegra saber que estuvo satisfecho.' : '¡Gracias por su opinión! Trabajaremos para mejorar su experiencia 💪';
+          if (score >= 8 && cfg.google_review_url) {
+            thankMsg += `\n\nSi tiene un momento, le agradecemos mucho una reseña: ${cfg.google_review_url} ⭐`;
+          }
+          await sendWhatsAppMessage(from, thankMsg).catch(() => {});
+          return;
+        }
+      }
+    }
+
     // Detectar urgencia antes de cualquier espera
-    const urgent = isUrgent(msg);
+    const urgent = isUrgent(msg, clinic);
     const inManual = manualSessions.has(sessionId);
     const io = req.app.get('io');
 
@@ -986,6 +1012,7 @@ app.post('/webhook/whatsapp', async (req, res) => {
       reply = reply.replace(/\nCITA_CONFIRMADA\|.+/, '').trim();
       const parts = Object.fromEntries(match[1].split('|').map(p => p.split('=')));
       await saveAppointment({ clinic_id: clinicId, patient_name: parts.nombre||'Paciente', patient_phone: from, service: parts.tratamiento||null, scheduled_at: `${parts.fecha||''} ${parts.hora||''}`.trim() }).catch(e => console.error('Appt:', e.message));
+      scheduleNps(clinicId, sessionId, from).catch(() => {});
     }
 
     // Persistir + enviar + emitir en paralelo
@@ -1076,10 +1103,14 @@ app.get('/api/settings', requireAuth, async (req, res) => {
 });
 
 app.post('/api/settings', requireAuth, async (req, res) => {
-  const { name, phone, email_clinic, address, hours, services, extra, assistant_name, whatsapp_number } = req.body;
+  const { name, phone, email_clinic, address, hours, services, extra, assistant_name, whatsapp_number, google_review_url, urgent_keywords, auto_reactivacion, reactivacion_msg } = req.body;
   try {
     const { rows } = await pool.query('SELECT config FROM clinics WHERE id=$1', [req.session.clinic.id]);
     const cfg = { ...(rows[0]?.config || {}), phone, email: email_clinic, address, hours, services, extra, assistant_name };
+    if (google_review_url !== undefined) cfg.google_review_url = google_review_url || null;
+    if (urgent_keywords !== undefined) cfg.urgent_keywords = urgent_keywords || null;
+    if (auto_reactivacion !== undefined) cfg.auto_reactivacion = !!auto_reactivacion;
+    if (reactivacion_msg !== undefined) cfg.reactivacion_msg = reactivacion_msg || null;
     const waNum = whatsapp_number ? whatsapp_number.replace(/\D/g,'').slice(-9) : null;
     await pool.query(
       `UPDATE clinics SET config=$1, name=COALESCE($2,name),
@@ -1312,6 +1343,162 @@ app.post('/api/conversations/:sessionId/close', requireAuth, async (req, res) =>
   res.json({ ok: true });
 });
 
+// ── F4: Broadcast ─────────────────────────────────────────────────────────────
+
+async function runBroadcast(broadcast, clinicId, io) {
+  try {
+    const leads = broadcast.segment === 'risk'
+      ? await getAtRiskPatients(clinicId)
+      : await getImportedLeads(clinicId);
+    const phones = [...new Set(leads.map(l => l.telefono).filter(Boolean))];
+    await updateBroadcast(broadcast.id, { status: 'sending', total: phones.length });
+    io?.to(`clinic_${clinicId}`).emit('broadcast:start', { id: broadcast.id, total: phones.length });
+    let sent = 0, failed = 0;
+    for (const phone of phones) {
+      try { await sendWhatsAppMessage(phone, broadcast.message); sent++; } catch(e) { failed++; }
+      await updateBroadcast(broadcast.id, { sent, failed });
+      io?.to(`clinic_${clinicId}`).emit('broadcast:progress', { id: broadcast.id, sent, failed, total: phones.length });
+      await new Promise(r => setTimeout(r, 1200));
+    }
+    await updateBroadcast(broadcast.id, { status: 'done' });
+    io?.to(`clinic_${clinicId}`).emit('broadcast:done', { id: broadcast.id, sent, failed });
+  } catch(e) {
+    await updateBroadcast(broadcast.id, { status: 'failed' }).catch(() => {});
+    console.error('[Broadcast]', e.message);
+  }
+}
+
+app.post('/api/broadcast', requireAuth, requirePlan('pro','clinica'), rateLimit(5, 60000), async (req, res) => {
+  const { name, message, segment } = req.body;
+  if (!message || message.length < 5 || message.length > 1000) return res.status(400).json({ error: 'Mensaje inválido (5-1000 chars)' });
+  const broadcast = await createBroadcast(req.session.clinic.id, { name, message, segment: segment || 'all' });
+  res.json({ ok: true, id: broadcast.id });
+  runBroadcast(broadcast, req.session.clinic.id, req.app.get('io'));
+});
+
+app.get('/api/broadcasts', requireAuth, async (req, res) => {
+  const list = await getBroadcasts(req.session.clinic.id).catch(() => []);
+  res.json(list);
+});
+
+// ── NPS results ───────────────────────────────────────────────────────────────
+
+app.get('/api/nps', requireAuth, async (req, res) => {
+  const { rows } = await pool.query(`
+    SELECT
+      COUNT(*) FILTER (WHERE score IS NOT NULL)  AS scored,
+      ROUND(AVG(score) FILTER (WHERE score IS NOT NULL),1) AS avg_score,
+      COUNT(*) FILTER (WHERE score >= 9)          AS promoters,
+      COUNT(*) FILTER (WHERE score <= 6)          AS detractors,
+      COUNT(*) FILTER (WHERE sent_at IS NOT NULL) AS total_sent
+    FROM nps_pending WHERE clinic_id=$1
+  `, [req.session.clinic.id]);
+  const r = rows[0];
+  const scored = parseInt(r.scored) || 0;
+  const promoters = parseInt(r.promoters) || 0;
+  const detractors = parseInt(r.detractors) || 0;
+  res.json({
+    avg_score   : r.avg_score ? parseFloat(r.avg_score) : null,
+    nps         : scored ? Math.round((promoters - detractors) / scored * 100) : null,
+    scored,
+    total_sent  : parseInt(r.total_sent) || 0,
+  });
+});
+
+// ── F3: CRM endpoints ─────────────────────────────────────────────────────────
+
+app.get('/api/patients/:phone', requireAuth, async (req, res) => {
+  const data = await getPatientData(req.session.clinic.id, decodeURIComponent(req.params.phone)).catch(() => ({ appointments: [], lead: null }));
+  res.json(data);
+});
+
+app.get('/api/crm/at-risk', requireAuth, requirePlan('pro', 'clinica'), async (req, res) => {
+  const patients = await getAtRiskPatients(req.session.clinic.id).catch(() => []);
+  res.json(patients);
+});
+
+// ── Calendar endpoints ────────────────────────────────────────────────────────
+
+app.get('/api/calendar', requireAuth, async (req, res) => {
+  const { start, end } = req.query;
+  if (!start || !end) return res.status(400).json({ error: 'start y end requeridos' });
+  const appts = await getAppointmentsByRange(req.session.clinic.id, start, end).catch(() => []);
+  res.json(appts);
+});
+
+app.post('/api/calendar', requireAuth, async (req, res) => {
+  const { patient_name, patient_phone, service, scheduled_ts, duration_min, notes, patient_id, source, notify_whatsapp } = req.body;
+  if (!scheduled_ts) return res.status(400).json({ error: 'scheduled_ts requerido' });
+  try {
+    const appt = await createAppointmentFull({ clinic_id: req.session.clinic.id, patient_name, patient_phone, service, scheduled_ts, duration_min, notes, patient_id, source });
+    const io = req.app.get('io');
+    io?.to(`clinic_${req.session.clinic.id}`).emit('appt:created', appt);
+    if (notify_whatsapp && patient_phone) {
+      const clinic = await pool.query('SELECT name,config FROM clinics WHERE id=$1', [req.session.clinic.id]);
+      const cfg = clinic.rows[0]?.config || {};
+      const clinicName = clinic.rows[0]?.name || 'la clínica';
+      const dt = new Date(scheduled_ts);
+      const dateStr = dt.toLocaleDateString('es-ES', { weekday:'long', day:'numeric', month:'long' });
+      const timeStr = dt.toLocaleTimeString('es-ES', { hour:'2-digit', minute:'2-digit' });
+      const msg = cfg.appt_confirm_msg ||
+        `Hola 👋 Tu cita en ${clinicName}${service ? ` para ${service}` : ''} está confirmada para el ${dateStr} a las ${timeStr}. ¡Te esperamos!`;
+      sendWhatsAppMessage(patient_phone, msg).catch(() => {});
+    }
+    res.json(appt);
+  } catch(e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+app.put('/api/calendar/:id', requireAuth, async (req, res) => {
+  const { patient_name, patient_phone, service, scheduled_ts, duration_min, notes, status, notify_whatsapp } = req.body;
+  try {
+    const appt = await updateAppointmentFull(req.params.id, req.session.clinic.id, { patient_name, patient_phone, service, scheduled_ts, duration_min, notes, status });
+    if (!appt) return res.status(404).json({ error: 'Cita no encontrada' });
+    const io = req.app.get('io');
+    io?.to(`clinic_${req.session.clinic.id}`).emit('appt:updated', appt);
+    if (notify_whatsapp && appt.patient_phone) {
+      const clinic = await pool.query('SELECT name,config FROM clinics WHERE id=$1', [req.session.clinic.id]);
+      const clinicName = clinic.rows[0]?.name || 'la clínica';
+      let msg;
+      if (status === 'cancelled') {
+        msg = `Hola, tu cita en ${clinicName} ha sido cancelada. Escríbenos para reservar otra.`;
+      } else if (appt.scheduled_ts) {
+        const dt = new Date(appt.scheduled_ts);
+        const dateStr = dt.toLocaleDateString('es-ES', { weekday:'long', day:'numeric', month:'long' });
+        const timeStr = dt.toLocaleTimeString('es-ES', { hour:'2-digit', minute:'2-digit' });
+        msg = `Hola 👋 Tu cita en ${clinicName} ha sido actualizada: ${dateStr} a las ${timeStr}. ¿Alguna duda? Escríbenos.`;
+      }
+      if (msg) sendWhatsAppMessage(appt.patient_phone, msg).catch(() => {});
+    }
+    res.json(appt);
+  } catch(e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+app.delete('/api/calendar/:id', requireAuth, async (req, res) => {
+  const { notify_whatsapp } = req.body || {};
+  try {
+    const [apptRows] = await Promise.all([
+      pool.query('SELECT * FROM appointments WHERE id=$1 AND clinic_id=$2', [req.params.id, req.session.clinic.id])
+    ]);
+    const appt = apptRows.rows[0];
+    if (!appt) return res.status(404).json({ error: 'Cita no encontrada' });
+    await deleteAppointment(req.params.id, req.session.clinic.id);
+    const io = req.app.get('io');
+    io?.to(`clinic_${req.session.clinic.id}`).emit('appt:deleted', { id: parseInt(req.params.id) });
+    if (notify_whatsapp && appt.patient_phone) {
+      const clinic = await pool.query('SELECT name FROM clinics WHERE id=$1', [req.session.clinic.id]);
+      const clinicName = clinic.rows[0]?.name || 'la clínica';
+      sendWhatsAppMessage(appt.patient_phone, `Hola, tu cita en ${clinicName} ha sido cancelada. Escríbenos para reservar otra fecha.`).catch(() => {});
+    }
+    res.json({ ok: true });
+  } catch(e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 // ── Arrancar + WebSocket ─────────────────────────────────────────────────────
 
 const PORT = process.env.PORT || 3000;
@@ -1360,6 +1547,61 @@ initDb()
         });
       } catch(e) { console.error('[Cron] close error:', e.message); }
     }, 5 * 60 * 1000);
+
+    // Cron: envía NPS pendientes cada 5 min
+    setInterval(async () => {
+      try {
+        const pending = await getPendingNps();
+        for (const n of pending) {
+          const name = n.clinic_name || 'la clínica';
+          await sendWhatsAppMessage(n.from_number,
+            `Hola 👋 ¿Cómo fue tu experiencia en ${name}? Del 1 al 10, ¿cómo nos valorarías? 😊`
+          ).catch(() => {});
+          await markNpsSent(n.id).catch(() => {});
+        }
+        if (pending.length) console.log(`[Cron] ${pending.length} NPS enviados`);
+      } catch(e) { console.error('[Cron] NPS:', e.message); }
+    }, 5 * 60 * 1000);
+
+    // Cron: recordatorio 24h pre-cita (cada 30 min)
+    setInterval(async () => {
+      try {
+        const upcoming = await getUpcomingAppointments();
+        for (const a of upcoming) {
+          const cfg = a.config || {};
+          const clinicName = a.clinic_name || 'la clínica';
+          const msg = cfg.reminder_msg ||
+            `Hola 👋 Te recordamos que mañana tienes cita en ${clinicName}${a.service ? ` para ${a.service}` : ''}${a.scheduled_at ? ` a las ${a.scheduled_at.split(' ').pop()}` : ''}. ¿Todo bien? Escríbenos si necesitas cambiarla.`;
+          await sendWhatsAppMessage(a.patient_phone, msg).catch(() => {});
+          await markReminderSent(a.id).catch(() => {});
+        }
+        if (upcoming.length) console.log(`[Cron] ${upcoming.length} recordatorios enviados`);
+      } catch(e) { console.error('[Cron] reminder:', e.message); }
+    }, 30 * 60 * 1000);
+
+    // Cron: auto-reactivación pacientes en riesgo (cada 6h, opt-in por clínica)
+    setInterval(async () => {
+      try {
+        const { rows: clinics } = await pool.query(
+          `SELECT id, name, config FROM clinics WHERE config->>'auto_reactivacion' = 'true'`
+        );
+        for (const clinic of clinics) {
+          const cfg = clinic.config || {};
+          const patients = await getAtRiskForAutoReact(clinic.id);
+          if (!patients.length) continue;
+          const defaultMsg = `Hola 👋 Hace tiempo que no te vemos en ${clinic.name}. Esta semana tenemos disponibilidad — ¿te apuntamos a una revisión?`;
+          const msg = cfg.reactivacion_msg || defaultMsg;
+          const ids = [];
+          for (const p of patients) {
+            await sendWhatsAppMessage(p.telefono, msg.replace('{nombre}', p.nombre?.split(' ')[0] || '')).catch(() => {});
+            ids.push(p.id);
+            await new Promise(r => setTimeout(r, 1200));
+          }
+          if (ids.length) await markLeadsContactado(ids).catch(() => {});
+          console.log(`[Cron] Auto-reactivación: ${ids.length} mensajes para clínica ${clinic.id}`);
+        }
+      } catch(e) { console.error('[Cron] auto-reactivación:', e.message); }
+    }, 6 * 60 * 60 * 1000);
 
     httpServer.listen(PORT, () => console.log(`Cliniflux en http://localhost:${PORT}`));
   })

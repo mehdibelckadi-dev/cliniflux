@@ -108,6 +108,33 @@ async function initDb() {
   `);
 
   await pool.query(`
+    CREATE TABLE IF NOT EXISTS broadcasts (
+      id         SERIAL PRIMARY KEY,
+      clinic_id  INTEGER REFERENCES clinics(id),
+      name       TEXT,
+      message    TEXT NOT NULL,
+      segment    TEXT DEFAULT 'all',
+      status     TEXT DEFAULT 'pending',
+      total      INTEGER DEFAULT 0,
+      sent       INTEGER DEFAULT 0,
+      created_at TIMESTAMP DEFAULT NOW()
+    )
+  `);
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS nps_pending (
+      id           SERIAL PRIMARY KEY,
+      clinic_id    INTEGER REFERENCES clinics(id),
+      session_id   TEXT NOT NULL,
+      from_number  TEXT NOT NULL,
+      scheduled_at TIMESTAMP NOT NULL,
+      sent_at      TIMESTAMP,
+      score        SMALLINT,
+      created_at   TIMESTAMP DEFAULT NOW()
+    )
+  `);
+
+  await pool.query(`
     CREATE TABLE IF NOT EXISTS push_subscriptions (
       id         SERIAL PRIMARY KEY,
       clinic_id  INTEGER REFERENCES clinics(id),
@@ -139,6 +166,16 @@ async function initDb() {
     `CREATE INDEX IF NOT EXISTS idx_imported_leads_clinic ON imported_leads(clinic_id, estado)`,
     `CREATE INDEX IF NOT EXISTS idx_chat_sessions_updated ON chat_sessions(updated_at DESC)`,
     `CREATE INDEX IF NOT EXISTS idx_clinics_whatsapp_norm ON clinics(whatsapp_normalized)`,
+    `CREATE UNIQUE INDEX IF NOT EXISTS idx_nps_session ON nps_pending(session_id)`,
+    `ALTER TABLE broadcasts ADD COLUMN IF NOT EXISTS failed INTEGER DEFAULT 0`,
+    `ALTER TABLE appointments ADD COLUMN IF NOT EXISTS reminder_sent BOOLEAN DEFAULT FALSE`,
+    `ALTER TABLE appointments ADD COLUMN IF NOT EXISTS scheduled_ts TIMESTAMP`,
+    `ALTER TABLE appointments ADD COLUMN IF NOT EXISTS status TEXT DEFAULT 'pending'`,
+    `ALTER TABLE appointments ADD COLUMN IF NOT EXISTS duration_min INTEGER DEFAULT 60`,
+    `ALTER TABLE appointments ADD COLUMN IF NOT EXISTS notes TEXT`,
+    `ALTER TABLE appointments ADD COLUMN IF NOT EXISTS patient_id INTEGER`,
+    `ALTER TABLE appointments ADD COLUMN IF NOT EXISTS source TEXT DEFAULT 'manual'`,
+    `CREATE INDEX IF NOT EXISTS idx_appointments_clinic_ts ON appointments(clinic_id, scheduled_ts)`,
   ];
   for (const sql of migrations) await pool.query(sql);
 
@@ -467,4 +504,168 @@ async function getHistoryFromMessages(clinic_id, session_id, limit = 30) {
   return rows.map(r => ({ role: r.direction === 'inbound' ? 'user' : 'assistant', content: r.content }));
 }
 
-module.exports = { pool, initDb, getAnalytics, getSession, saveSession, saveLead, getClinicByEmail, getClinicByWhatsapp, getClinicBySetupToken, createClinic, updateClinicConfig, buildPromptForClinic, getLeads, saveAppointment, getAppointments, verifyPassword, hashPassword, importLeads, getImportedLeads, updateLeadEstado, incrementConversation, PLAN_LIMITS, saveMessage, getMessages, getRecentConversations, getHistoryFromMessages, setConvState, getManualSessions, getConvNotes, savePushSubscription, getPushSubscriptions, removePushSubscription, closeInactiveConversations };
+// ── F3: CRM / Retención ───────────────────────────────────────────────────────
+
+async function getPatientData(clinic_id, phone) {
+  const clean = (phone || '').replace(/\D/g, '').slice(-9);
+  const [appts, lead] = await Promise.all([
+    pool.query(
+      `SELECT service, scheduled_at, created_at FROM appointments
+       WHERE clinic_id=$1 AND right(regexp_replace(coalesce(patient_phone,''),'\\D','','g'),9)=$2
+       ORDER BY scheduled_at DESC LIMIT 5`,
+      [clinic_id, clean]
+    ),
+    pool.query(
+      `SELECT nombre, email, ultima_visita, servicio, notas, estado FROM imported_leads
+       WHERE clinic_id=$1 AND right(regexp_replace(coalesce(telefono,''),'\\D','','g'),9)=$2 LIMIT 1`,
+      [clinic_id, clean]
+    ),
+  ]);
+  return { appointments: appts.rows, lead: lead.rows[0] || null };
+}
+
+async function getAtRiskPatients(clinic_id) {
+  // ultima_visita stored as DD/MM/YYYY — convert via TO_DATE before comparing
+  const { rows } = await pool.query(`
+    SELECT id, nombre, telefono, email, ultima_visita, servicio
+    FROM imported_leads
+    WHERE clinic_id=$1
+      AND ultima_visita IS NOT NULL AND ultima_visita <> ''
+      AND TO_DATE(ultima_visita, 'DD/MM/YYYY') < NOW() - INTERVAL '90 days'
+      AND estado != 'contactado'
+    ORDER BY TO_DATE(ultima_visita, 'DD/MM/YYYY') ASC LIMIT 100
+  `, [clinic_id]);
+  return rows;
+}
+
+async function scheduleNps(clinic_id, session_id, from_number, delayHours = 24) {
+  await pool.query(`
+    INSERT INTO nps_pending (clinic_id, session_id, from_number, scheduled_at)
+    VALUES ($1, $2, $3, NOW() + ($4 || ' hours')::INTERVAL)
+    ON CONFLICT (session_id) DO NOTHING
+  `, [clinic_id, session_id, from_number, delayHours]);
+}
+
+async function getPendingNps() {
+  const { rows } = await pool.query(`
+    SELECT np.id, np.clinic_id, np.session_id, np.from_number,
+           c.config, c.name AS clinic_name
+    FROM nps_pending np
+    JOIN clinics c ON c.id = np.clinic_id
+    WHERE np.sent_at IS NULL AND np.scheduled_at <= NOW()
+    LIMIT 50
+  `);
+  return rows;
+}
+
+async function markNpsSent(id) {
+  await pool.query('UPDATE nps_pending SET sent_at=NOW() WHERE id=$1', [id]);
+}
+
+async function saveNpsScore(session_id, score) {
+  await pool.query('UPDATE nps_pending SET score=$1 WHERE session_id=$2 AND score IS NULL', [score, session_id]);
+}
+
+// ── F4: Broadcast ─────────────────────────────────────────────────────────────
+
+async function createBroadcast(clinic_id, { name, message, segment }) {
+  const { rows } = await pool.query(
+    'INSERT INTO broadcasts (clinic_id, name, message, segment) VALUES ($1,$2,$3,$4) RETURNING *',
+    [clinic_id, name || null, message, segment || 'all']
+  );
+  return rows[0];
+}
+
+async function getBroadcasts(clinic_id) {
+  const { rows } = await pool.query(
+    'SELECT * FROM broadcasts WHERE clinic_id=$1 ORDER BY created_at DESC LIMIT 20',
+    [clinic_id]
+  );
+  return rows;
+}
+
+async function updateBroadcast(id, { status, sent, total, failed } = {}) {
+  await pool.query(
+    'UPDATE broadcasts SET status=COALESCE($2,status), sent=COALESCE($3,sent), total=COALESCE($4,total), failed=COALESCE($5,failed) WHERE id=$1',
+    [id, status ?? null, sent ?? null, total ?? null, failed ?? null]
+  );
+}
+
+async function getUpcomingAppointments() {
+  const { rows } = await pool.query(`
+    SELECT a.*, c.config, c.name AS clinic_name, c.id AS cid
+    FROM appointments a
+    JOIN clinics c ON c.id = a.clinic_id
+    WHERE a.reminder_sent = FALSE AND a.patient_phone IS NOT NULL
+    ORDER BY a.created_at DESC LIMIT 300
+  `);
+  const now = Date.now();
+  return rows.filter(a => {
+    const d = new Date(a.scheduled_at);
+    if (isNaN(d)) return false;
+    const diff = d - now;
+    return diff > 23 * 3600000 && diff < 25 * 3600000;
+  });
+}
+
+async function markReminderSent(id) {
+  await pool.query('UPDATE appointments SET reminder_sent=TRUE WHERE id=$1', [id]);
+}
+
+async function getAtRiskForAutoReact(clinic_id) {
+  const cutoff = new Date(Date.now() - 90 * 24 * 3600000).toISOString().slice(0, 10);
+  const { rows } = await pool.query(`
+    SELECT id, nombre, telefono, ultima_visita, servicio
+    FROM imported_leads
+    WHERE clinic_id=$1 AND estado='pendiente'
+      AND ultima_visita IS NOT NULL AND ultima_visita < $2
+      AND telefono IS NOT NULL
+    LIMIT 50
+  `, [clinic_id, cutoff]);
+  return rows;
+}
+
+async function markLeadsContactado(ids) {
+  if (!ids.length) return;
+  await pool.query(`UPDATE imported_leads SET estado='contactado' WHERE id = ANY($1)`, [ids]);
+}
+
+// ── Calendar ──────────────────────────────────────────────────────────────────
+
+async function getAppointmentsByRange(clinic_id, start, end) {
+  const { rows } = await pool.query(`
+    SELECT * FROM appointments
+    WHERE clinic_id=$1 AND scheduled_ts >= $2 AND scheduled_ts < $3
+    ORDER BY scheduled_ts ASC
+  `, [clinic_id, start, end]);
+  return rows;
+}
+
+async function createAppointmentFull({ clinic_id, patient_name, patient_phone, service, scheduled_ts, duration_min, notes, patient_id, source }) {
+  const { rows } = await pool.query(
+    `INSERT INTO appointments (clinic_id, patient_name, patient_phone, service, scheduled_ts, duration_min, notes, patient_id, source, status)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,'pending') RETURNING *`,
+    [clinic_id, patient_name||null, patient_phone||null, service||null, scheduled_ts, duration_min||60, notes||null, patient_id||null, source||'manual']
+  );
+  return rows[0];
+}
+
+async function updateAppointmentFull(id, clinic_id, { patient_name, patient_phone, service, scheduled_ts, duration_min, notes, status }) {
+  const { rows } = await pool.query(
+    `UPDATE appointments SET
+       patient_name=COALESCE($3,patient_name), patient_phone=COALESCE($4,patient_phone),
+       service=COALESCE($5,service), scheduled_ts=COALESCE($6,scheduled_ts),
+       duration_min=COALESCE($7,duration_min), notes=COALESCE($8,notes),
+       status=COALESCE($9,status)
+     WHERE id=$1 AND clinic_id=$2 RETURNING *`,
+    [id, clinic_id, patient_name??null, patient_phone??null, service??null, scheduled_ts??null, duration_min??null, notes??null, status??null]
+  );
+  return rows[0] || null;
+}
+
+async function deleteAppointment(id, clinic_id) {
+  const { rowCount } = await pool.query('DELETE FROM appointments WHERE id=$1 AND clinic_id=$2', [id, clinic_id]);
+  return rowCount > 0;
+}
+
+module.exports = { pool, initDb, createBroadcast, getBroadcasts, updateBroadcast, getUpcomingAppointments, markReminderSent, getAtRiskForAutoReact, markLeadsContactado, getAnalytics, getSession, saveSession, saveLead, getClinicByEmail, getClinicByWhatsapp, getClinicBySetupToken, createClinic, updateClinicConfig, buildPromptForClinic, getLeads, saveAppointment, getAppointments, verifyPassword, hashPassword, importLeads, getImportedLeads, updateLeadEstado, incrementConversation, PLAN_LIMITS, saveMessage, getMessages, getRecentConversations, getHistoryFromMessages, setConvState, getManualSessions, getConvNotes, savePushSubscription, getPushSubscriptions, removePushSubscription, closeInactiveConversations, getPatientData, getAtRiskPatients, scheduleNps, getPendingNps, markNpsSent, saveNpsScore, getAppointmentsByRange, createAppointmentFull, updateAppointmentFull, deleteAppointment };
