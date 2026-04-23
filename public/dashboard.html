@@ -1045,8 +1045,6 @@
       // Avatar sidebar
       const ava = document.getElementById('si-ava');
       if (ava) ava.textContent = (me.name||'CF').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
-      // Agenda dinámica
-      initAgenda();
       loadData();
     } catch { window.location.href = '/login'; }
   })();
