@@ -514,6 +514,35 @@
   <main class="main">
 
     <!-- PANEL 0: CONVERSACIONES -->
+    <!-- Banner first-run: visible hasta que WhatsApp esté activo -->
+    <div id="firstrun-banner" style="display:none;background:linear-gradient(135deg,#f0fdf4,#dcfce7);border-bottom:1px solid #bbf7d0;padding:20px 24px">
+      <div style="max-width:680px;margin:0 auto">
+        <div style="font-size:14px;font-weight:700;color:#15803d;margin-bottom:14px">🎉 ¡Bienvenido/a! Tu clínica está configurada. Un paso más para activar Natalia.</div>
+        <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px">
+          <div style="display:flex;align-items:flex-start;gap:10px">
+            <span style="font-size:16px;line-height:1.2">✅</span>
+            <div><div style="font-size:13px;font-weight:600;color:#166534">Clínica configurada</div><div style="font-size:12px;color:#4ade80;margin-top:1px;color:#15803d;opacity:.8">Natalia conoce tu clínica, servicios y horarios</div></div>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:10px">
+            <span style="font-size:16px;line-height:1.2">⏳</span>
+            <div><div style="font-size:13px;font-weight:600;color:#166534">WhatsApp pendiente de activación</div><div style="font-size:12px;color:#166534;opacity:.8;margin-top:1px">Nuestro equipo está configurando tu número. Te avisaremos por email cuando esté activo.</div></div>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:10px">
+            <span style="font-size:16px;line-height:1.2">⬜</span>
+            <div><div style="font-size:13px;font-weight:600;color:#166534;opacity:.6">Primera conversación con Natalia</div></div>
+          </div>
+        </div>
+        <div style="background:#fff;border:1px solid #bbf7d0;border-radius:12px;padding:14px 16px">
+          <div style="font-size:12px;font-weight:700;color:#166534;margin-bottom:6px">📱 ¿Qué cambia cuando se active?</div>
+          <div style="font-size:12px;color:#166534;line-height:1.8">
+            Los mensajes de WhatsApp de tus pacientes llegarán <strong>aquí</strong>, a este panel — ya no en la app del móvil.<br>
+            <strong>Natalia responde automáticamente 24/7.</strong> Si quieres escribir tú, usa el modo manual desde esta pantalla.<br>
+            Para tus pacientes no cambia nada: siguen escribiendo al mismo número de siempre.
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="panel p-conv active" id="panel-0">
       <div class="conv-list" id="conv-list">
         <div class="conv-list-hd">
@@ -1300,6 +1329,8 @@
       // Avatar sidebar
       const ava = document.getElementById('si-ava');
       if (ava) ava.textContent = (me.name||'CF').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+      // First-run banner: mostrar si WhatsApp no está activo
+      if (!me.whatsapp_number) document.getElementById('firstrun-banner').style.display = 'block';
       loadData();
     } catch { window.location.href = '/login'; }
   })();

@@ -849,7 +849,8 @@ app.post('/api/onboarding', async (req, res) => {
     await pool.query(`UPDATE clinics SET ${updates.join(',')} WHERE id=$${vals.length}`, vals);
     // Auto-login
     await new Promise((ok, fail) => req.session.regenerate(e => e ? fail(e) : ok()));
-    req.session.clinic = { id: clinic.id, name: clinic.name, email: clinic.email, plan: clinic.plan, demo_expires_at: config.demo_expires_at || clinic.config?.demo_expires_at || null };
+    const waNum = await pool.query('SELECT whatsapp_number FROM clinics WHERE id=$1', [clinic.id]).then(r => r.rows[0]?.whatsapp_number || null).catch(() => null);
+    req.session.clinic = { id: clinic.id, name: clinic.name, email: clinic.email, plan: clinic.plan, whatsapp_number: waNum, demo_expires_at: config.demo_expires_at || clinic.config?.demo_expires_at || null };
     // Emails en paralelo
     const appBase = (process.env.APP_URL || `${req.protocol}://${req.get('host')}`).replace(/\/$/,'');
     const cfg = { phone, address, hours, services, extra, assistant_name: assistant_name||'Natalia' };
@@ -901,7 +902,7 @@ app.post('/auth/login', rateLimit(10, 60000), async (req, res) => {
     if (!valid) return res.status(401).json({ error: 'Email o contraseña incorrectos' });
     req.session.regenerate((err) => {
       if (err) return res.status(500).json({ error: 'Error de sesión' });
-      req.session.clinic = { id: clinic.id, name: clinic.name, email: clinic.email, plan: clinic.plan, demo_expires_at: clinic.config?.demo_expires_at || null };
+      req.session.clinic = { id: clinic.id, name: clinic.name, email: clinic.email, plan: clinic.plan, whatsapp_number: clinic.whatsapp_number || null, demo_expires_at: clinic.config?.demo_expires_at || null };
       res.json({ ok: true, name: clinic.name });
     });
   } catch (err) {
@@ -1262,6 +1263,7 @@ app.post('/api/settings', requireAuth, async (req, res) => {
       [JSON.stringify(cfg), name || null, whatsapp_number || '', waNum, req.session.clinic.id]
     );
     req.session.clinic.name = name || req.session.clinic.name;
+    if (whatsapp_number) req.session.clinic.whatsapp_number = whatsapp_number.replace(/\D/g,'').slice(-9) || req.session.clinic.whatsapp_number;
     auditLog(req.session.clinic.id, sessionActor(req), 'settings.updated', 'clinic', req.session.clinic.id, {}).catch(() => {});
     res.json({ ok: true });
   } catch(e) { res.status(500).json({ error: e.message }); }
