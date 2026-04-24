@@ -7,7 +7,8 @@ const PgSession = require('connect-pg-simple')(session);
 const OpenAI = require('openai');
 const crypto = require('crypto');
 const Stripe = require('stripe');
-const { pool, initDb, getAnalytics, getSession, saveSession, saveLead, getClinicByEmail, getClinicByWhatsapp, getClinicBySetupToken, createClinic, updateClinicConfig, buildPromptForClinic, getLeads, getAppointments, saveAppointment, verifyPassword, hashPassword, importLeads, getImportedLeads, updateLeadEstado, incrementConversation, PLAN_LIMITS, saveMessage, getMessages, getRecentConversations, getHistoryFromMessages, setConvState, getManualSessions, getConvNotes, savePushSubscription, getPushSubscriptions, removePushSubscription, closeInactiveConversations, getPatientData, getAtRiskPatients, scheduleNps, getPendingNps, markNpsSent, saveNpsScore, createBroadcast, getBroadcasts, updateBroadcast, getUpcomingAppointments, markReminderSent, getAtRiskForAutoReact, markLeadsContactado, getAppointmentsByRange, createAppointmentFull, updateAppointmentFull, deleteAppointment, createStaff, getStaff, getStaffByEmail, updateStaffRole, deactivateStaff, auditLog, getAuditLogs } = require('./db');
+const { pool, initDb, getAnalytics, getSession, saveSession, saveLead, getClinicByEmail, getClinicByWhatsapp, getClinicBySetupToken, createClinic, updateClinicConfig, buildPromptForClinic, getLeads, getAppointments, saveAppointment, verifyPassword, hashPassword, importLeads, getImportedLeads, updateLeadEstado, incrementConversation, PLAN_LIMITS, saveMessage, getMessages, getRecentConversations, getHistoryFromMessages, setConvState, getManualSessions, getConvNotes, savePushSubscription, getPushSubscriptions, removePushSubscription, closeInactiveConversations, getPatientData, getAtRiskPatients, scheduleNps, getPendingNps, markNpsSent, saveNpsScore, createBroadcast, getBroadcasts, updateBroadcast, getUpcomingAppointments, markReminderSent, getAtRiskForAutoReact, markLeadsContactado, getAppointmentsByRange, createAppointmentFull, updateAppointmentFull, deleteAppointment, createStaff, getStaff, getStaffByEmail, updateStaffRole, deactivateStaff, auditLog, getAuditLogs, recordConsent, hasConsent, getConsents, revokeConsent } = require('./db');
+const PDFDocument = require('pdfkit');
 const webpush = require('web-push');
 
 // VAPID — claves en env (Railway). Fallback: generadas en dev (no persistentes entre reinicios)
@@ -428,9 +429,17 @@ app.use(express.static('public', {
 
 // ── Auth middleware ─────────────────────────────────────────────────────────
 
+const SESSION_IDLE_MS = 8 * 60 * 60 * 1000; // 8h
+
 function requireAuth(req, res, next) {
-  if (req.session?.clinic) return next();
-  res.redirect('/login');
+  if (!req.session?.clinic) return res.redirect('/login');
+  // Inactivity check: destroy session if idle > 8h
+  const last = req.session.lastActivity || Date.now();
+  if (Date.now() - last > SESSION_IDLE_MS) {
+    return req.session.destroy(() => res.redirect('/login'));
+  }
+  req.session.lastActivity = Date.now();
+  next();
 }
 
 function requirePlan(...plans) {
@@ -958,6 +967,8 @@ app.post('/webhook/whatsapp', async (req, res) => {
         await sendWhatsAppMessage(from, 'Lo sentimos, la clínica ha alcanzado el límite de conversaciones este mes. Llámenos directamente para ayudarle.');
         return;
       }
+      // RGPD: registrar consentimiento en primer contacto (inbound = opt-in implícito)
+      recordConsent(clinic.id, from, 'inbound').catch(() => {});
     }
 
     // NPS score detection: si hay NPS pendiente y el mensaje es un número 1-10
@@ -1494,6 +1505,83 @@ app.delete('/api/staff/:id', requireAuth, requireRole('admin'), async (req, res)
 app.get('/api/audit', requireAuth, requireRole('admin'), async (req, res) => {
   const logs = await getAuditLogs(req.session.clinic.id, parseInt(req.query.limit) || 50).catch(() => []);
   res.json(logs);
+});
+
+// Audit PDF export
+app.get('/api/audit/export', requireAuth, requireRole('admin'), async (req, res) => {
+  try {
+    const logs = await getAuditLogs(req.session.clinic.id, 200);
+    const { rows: clinic } = await pool.query('SELECT name FROM clinics WHERE id=$1', [req.session.clinic.id]);
+    const clinicName = clinic[0]?.name || 'Clínica';
+    const ACTION_LABEL = { 'appt.created':'Cita creada','appt.updated':'Cita actualizada','appt.deleted':'Cita eliminada','broadcast.started':'Broadcast enviado','settings.updated':'Ajustes guardados','staff.created':'Miembro añadido','staff.deactivated':'Miembro quitado','staff.role_changed':'Rol cambiado' };
+
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="auditoria-${Date.now()}.pdf"`);
+
+    const doc = new PDFDocument({ margin: 50, size: 'A4' });
+    doc.pipe(res);
+
+    // Header
+    doc.fontSize(20).font('Helvetica-Bold').text('Registro de Auditoría', { align: 'center' });
+    doc.fontSize(11).font('Helvetica').text(clinicName, { align: 'center' });
+    doc.fontSize(9).fillColor('#666').text(`Generado: ${new Date().toLocaleString('es-ES')}`, { align: 'center' });
+    doc.moveDown(1.5);
+
+    // Table header
+    doc.fillColor('#000').fontSize(9).font('Helvetica-Bold');
+    doc.text('Fecha', 50, doc.y, { width: 100, continued: true });
+    doc.text('Acción', 155, doc.y, { width: 160, continued: true });
+    doc.text('Actor', 320, doc.y, { width: 120, continued: true });
+    doc.text('Detalle', 445, doc.y, { width: 100 });
+    doc.moveTo(50, doc.y + 2).lineTo(545, doc.y + 2).strokeColor('#ccc').stroke();
+    doc.moveDown(0.3);
+
+    // Rows
+    doc.font('Helvetica').fontSize(8).fillColor('#333');
+    logs.forEach((l, i) => {
+      if (doc.y > 750) { doc.addPage(); }
+      const y = doc.y;
+      const bg = i % 2 === 0 ? '#f9f9f9' : '#ffffff';
+      doc.rect(50, y - 2, 495, 14).fill(bg).fillColor('#333');
+      const dt = new Date(l.created_at).toLocaleString('es-ES', { day:'2-digit', month:'2-digit', year:'2-digit', hour:'2-digit', minute:'2-digit' });
+      doc.text(dt, 50, y, { width: 100, continued: true });
+      doc.text(ACTION_LABEL[l.action] || l.action, 155, y, { width: 160, continued: true });
+      doc.text(l.actor_name || l.actor_type || '—', 320, y, { width: 120, continued: true });
+      const meta = l.meta && Object.keys(l.meta).length ? Object.values(l.meta).filter(Boolean).slice(0,2).join(', ') : '—';
+      doc.text(meta, 445, y, { width: 100 });
+    });
+
+    doc.end();
+  } catch(e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// ── RGPD endpoints ────────────────────────────────────────────────────────────
+
+app.get('/api/gdpr/consents', requireAuth, async (req, res) => {
+  const consents = await getConsents(req.session.clinic.id).catch(() => []);
+  res.json(consents);
+});
+
+app.post('/api/gdpr/consent', requireAuth, async (req, res) => {
+  const { phone } = req.body;
+  if (!phone) return res.status(400).json({ error: 'phone requerido' });
+  await recordConsent(req.session.clinic.id, phone, 'manual', req.ip).catch(() => {});
+  await auditLog(req.session.clinic.id, sessionActor(req), 'gdpr.consent_manual', 'gdpr', phone, { phone }).catch(() => {});
+  res.json({ ok: true });
+});
+
+app.delete('/api/gdpr/consent/:phone', requireAuth, async (req, res) => {
+  await revokeConsent(req.session.clinic.id, decodeURIComponent(req.params.phone)).catch(() => {});
+  await auditLog(req.session.clinic.id, sessionActor(req), 'gdpr.consent_revoked', 'gdpr', req.params.phone, {}).catch(() => {});
+  res.json({ ok: true });
+});
+
+// Session activity touch — resets inactivity timer
+app.post('/api/session/touch', requireAuth, (req, res) => {
+  req.session.lastActivity = Date.now();
+  req.session.save(() => res.json({ ok: true }));
 });
 
 // ── Calendar endpoints ────────────────────────────────────────────────────────

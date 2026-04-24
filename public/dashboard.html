@@ -878,9 +878,31 @@
           </details>
         </div>
 
+        <!-- RGPD Consentimientos -->
+        <div class="set-card">
+          <div class="set-card-title">🔒 RGPD — Consentimientos</div>
+          <div style="font-size:12px;color:var(--text2);margin-bottom:12px">Cada vez que un paciente te escribe por WhatsApp, su consentimiento queda registrado automáticamente.</div>
+          <div id="gdpr-stats" style="display:flex;gap:10px;margin-bottom:14px">
+            <div style="background:var(--green-dim);border-radius:8px;padding:10px 14px;flex:1;text-align:center">
+              <div style="font-size:22px;font-weight:800;color:var(--green)" id="gdpr-count">—</div>
+              <div style="font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.5px">Consentimientos</div>
+            </div>
+          </div>
+          <details style="margin-bottom:10px">
+            <summary style="font-size:12px;font-weight:600;color:var(--green);cursor:pointer;list-style:none;padding:6px 0">+ Registrar consentimiento manual</summary>
+            <div style="margin-top:8px;display:flex;gap:6px">
+              <input class="set-input" id="gdpr-phone" placeholder="Teléfono paciente" style="flex:1">
+              <button class="set-btn" style="white-space:nowrap" onclick="addGdprConsent()">Registrar</button>
+            </div>
+          </details>
+          <div id="gdpr-list" style="font-size:11px;color:var(--text3);max-height:140px;overflow-y:auto;display:flex;flex-direction:column;gap:4px"></div>
+        </div>
+
         <!-- Registro de actividad -->
         <div class="set-card">
-          <div class="set-card-title">📋 Registro de actividad</div>
+          <div class="set-card-title">📋 Registro de actividad
+            <a href="/api/audit/export" target="_blank" style="margin-left:auto;font-size:11px;font-weight:600;color:var(--green);text-decoration:none;float:right">⬇ Exportar PDF</a>
+          </div>
           <div id="audit-list" style="font-size:12px;color:var(--text2);display:flex;flex-direction:column;gap:6px">
             <div style="color:var(--text3);font-style:italic">Cargando...</div>
           </div>
@@ -1019,6 +1041,30 @@
     document.getElementById('s-plan-desc').textContent = plans[d.plan] || plans.starter;
     loadStaff();
     loadAuditLog();
+    loadGdpr();
+  }
+
+  async function loadGdpr() {
+    const r = await fetch('/api/gdpr/consents').catch(() => null);
+    if (!r?.ok) return;
+    const list = await r.json();
+    document.getElementById('gdpr-count').textContent = list.length;
+    const el = document.getElementById('gdpr-list');
+    el.innerHTML = list.slice(0, 20).map(c => {
+      const dt = new Date(c.consented_at).toLocaleDateString('es-ES');
+      return `<div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid var(--border)">
+        <span>+${c.phone} <span style="color:var(--text3)">· ${c.source}</span></span>
+        <span>${dt}</span>
+      </div>`;
+    }).join('') || '<div style="font-style:italic">Sin registros aún</div>';
+  }
+
+  async function addGdprConsent() {
+    const phone = document.getElementById('gdpr-phone').value.trim();
+    if (!phone) return;
+    await fetch('/api/gdpr/consent', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ phone }) });
+    document.getElementById('gdpr-phone').value = '';
+    loadGdpr();
   }
 
   async function loadStaff() {
@@ -2368,6 +2414,27 @@
   function escHtml(s) {
     return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
+
+  // ── Inactividad: aviso a los 25min, logout a los 30min ────────────────────
+  let idleTimer, idleWarnTimer;
+  const IDLE_WARN = 25 * 60 * 1000;
+  const IDLE_LOGOUT = 30 * 60 * 1000;
+
+  function resetIdleTimer() {
+    clearTimeout(idleTimer); clearTimeout(idleWarnTimer);
+    idleWarnTimer = setTimeout(() => {
+      if (confirm('Tu sesión está a punto de cerrarse por inactividad. ¿Continuar?')) {
+        fetch('/api/session/touch', { method: 'POST' }).catch(() => {});
+        resetIdleTimer();
+      } else { logout(); }
+    }, IDLE_WARN);
+    idleTimer = setTimeout(() => logout(), IDLE_LOGOUT);
+  }
+
+  ['mousemove','keydown','click','touchstart'].forEach(e =>
+    document.addEventListener(e, resetIdleTimer, { passive: true })
+  );
+  resetIdleTimer();
 
   loadConversations();
   initPush();

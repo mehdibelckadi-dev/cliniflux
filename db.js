@@ -209,6 +209,22 @@ async function initDb() {
   `);
   await pool.query(`CREATE INDEX IF NOT EXISTS idx_audit_clinic ON audit_logs(clinic_id, created_at DESC)`);
 
+  // RGPD consent
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS gdpr_consents (
+      id           SERIAL PRIMARY KEY,
+      clinic_id    INTEGER REFERENCES clinics(id) ON DELETE CASCADE,
+      phone        TEXT NOT NULL,
+      channel      TEXT DEFAULT 'whatsapp',
+      consented_at TIMESTAMP DEFAULT NOW(),
+      source       TEXT DEFAULT 'inbound',
+      ip           TEXT,
+      UNIQUE(clinic_id, phone)
+    )
+  `);
+  await pool.query(`CREATE INDEX IF NOT EXISTS idx_gdpr_clinic ON gdpr_consents(clinic_id, consented_at DESC)`);
+  await pool.query(`ALTER TABLE imported_leads ADD COLUMN IF NOT EXISTS gdpr_consent BOOLEAN DEFAULT FALSE`);
+
   // Seed demo clinic if not exists
   const { rows } = await pool.query("SELECT id FROM clinics WHERE email = 'demo@cliniflux.com'");
   if (!rows.length) {
@@ -660,6 +676,39 @@ async function markLeadsContactado(ids) {
   await pool.query(`UPDATE imported_leads SET estado='contactado' WHERE id = ANY($1)`, [ids]);
 }
 
+// ── RGPD ──────────────────────────────────────────────────────────────────────
+
+async function recordConsent(clinic_id, phone, source = 'inbound', ip = null) {
+  const clean = (phone || '').replace(/\D/g, '').slice(-9);
+  await pool.query(`
+    INSERT INTO gdpr_consents (clinic_id, phone, source, ip)
+    VALUES ($1,$2,$3,$4)
+    ON CONFLICT (clinic_id, phone) DO NOTHING
+  `, [clinic_id, clean, source, ip]);
+}
+
+async function hasConsent(clinic_id, phone) {
+  const clean = (phone || '').replace(/\D/g, '').slice(-9);
+  const { rows } = await pool.query(
+    `SELECT id FROM gdpr_consents WHERE clinic_id=$1 AND phone=$2 LIMIT 1`,
+    [clinic_id, clean]
+  );
+  return rows.length > 0;
+}
+
+async function getConsents(clinic_id) {
+  const { rows } = await pool.query(
+    `SELECT phone, channel, source, consented_at FROM gdpr_consents WHERE clinic_id=$1 ORDER BY consented_at DESC`,
+    [clinic_id]
+  );
+  return rows;
+}
+
+async function revokeConsent(clinic_id, phone) {
+  const clean = (phone || '').replace(/\D/g, '').slice(-9);
+  await pool.query(`DELETE FROM gdpr_consents WHERE clinic_id=$1 AND phone=$2`, [clinic_id, clean]);
+}
+
 // ── F5: Roles + Audit ─────────────────────────────────────────────────────────
 
 async function createStaff(clinic_id, { name, email, password, role }) {
@@ -749,4 +798,4 @@ async function deleteAppointment(id, clinic_id) {
   return rowCount > 0;
 }
 
-module.exports = { pool, initDb, createBroadcast, getBroadcasts, updateBroadcast, getUpcomingAppointments, markReminderSent, getAtRiskForAutoReact, markLeadsContactado, getAnalytics, getSession, saveSession, saveLead, getClinicByEmail, getClinicByWhatsapp, getClinicBySetupToken, createClinic, updateClinicConfig, buildPromptForClinic, getLeads, saveAppointment, getAppointments, verifyPassword, hashPassword, importLeads, getImportedLeads, updateLeadEstado, incrementConversation, PLAN_LIMITS, saveMessage, getMessages, getRecentConversations, getHistoryFromMessages, setConvState, getManualSessions, getConvNotes, savePushSubscription, getPushSubscriptions, removePushSubscription, closeInactiveConversations, getPatientData, getAtRiskPatients, scheduleNps, getPendingNps, markNpsSent, saveNpsScore, getAppointmentsByRange, createAppointmentFull, updateAppointmentFull, deleteAppointment, createStaff, getStaff, getStaffByEmail, updateStaffRole, deactivateStaff, auditLog, getAuditLogs };
+module.exports = { pool, initDb, createBroadcast, getBroadcasts, updateBroadcast, getUpcomingAppointments, markReminderSent, getAtRiskForAutoReact, markLeadsContactado, getAnalytics, getSession, saveSession, saveLead, getClinicByEmail, getClinicByWhatsapp, getClinicBySetupToken, createClinic, updateClinicConfig, buildPromptForClinic, getLeads, saveAppointment, getAppointments, verifyPassword, hashPassword, importLeads, getImportedLeads, updateLeadEstado, incrementConversation, PLAN_LIMITS, saveMessage, getMessages, getRecentConversations, getHistoryFromMessages, setConvState, getManualSessions, getConvNotes, savePushSubscription, getPushSubscriptions, removePushSubscription, closeInactiveConversations, getPatientData, getAtRiskPatients, scheduleNps, getPendingNps, markNpsSent, saveNpsScore, getAppointmentsByRange, createAppointmentFull, updateAppointmentFull, deleteAppointment, createStaff, getStaff, getStaffByEmail, updateStaffRole, deactivateStaff, auditLog, getAuditLogs, recordConsent, hasConsent, getConsents, revokeConsent };
