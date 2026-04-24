@@ -595,8 +595,22 @@
           <div class="pp-ai-val" id="pp-ai-status">IA activa</div>
           <div class="pp-ai-conf" id="pp-msg-count">0 mensajes</div>
         </div>
-        <div class="pp-sect" style="margin-top:12px">Historial paciente</div>
-        <div id="pp-patient" style="padding:0 12px 4px;font-size:11px;color:var(--text3)">—</div>
+        <div class="pp-sect" style="margin-top:12px">Ficha paciente</div>
+        <div id="pp-stats" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;padding:0 0 6px">
+          <div style="background:var(--bg2);border-radius:8px;padding:8px 6px;text-align:center">
+            <div style="font-size:18px;font-weight:600;color:var(--text)" id="pp-stat-visits">—</div>
+            <div style="font-size:10px;color:var(--text3);margin-top:2px">visitas</div>
+          </div>
+          <div style="background:var(--bg2);border-radius:8px;padding:8px 6px;text-align:center">
+            <div style="font-size:18px;font-weight:600;color:var(--text)" id="pp-stat-ltv">—</div>
+            <div style="font-size:10px;color:var(--text3);margin-top:2px">LTV est.</div>
+          </div>
+          <div style="background:var(--bg2);border-radius:8px;padding:8px 6px;text-align:center">
+            <div style="font-size:13px;font-weight:600" id="pp-stat-churn">—</div>
+            <div style="font-size:10px;color:var(--text3);margin-top:2px">retención</div>
+          </div>
+        </div>
+        <div id="pp-patient" style="padding:0 0 4px;font-size:11px;color:var(--text3)">—</div>
         <div class="pp-sect" style="margin-top:12px">Notas internas</div>
         <textarea id="pp-notes" placeholder="Notas del equipo (solo visibles en el dashboard)..." style="width:100%;font-size:12px;font-family:inherit;color:var(--text);background:var(--bg2);border:1.5px solid var(--border);border-radius:8px;padding:8px 10px;resize:vertical;min-height:72px;outline:none;margin-top:4px" oninput="scheduleNotesSave()"></textarea>
         <button onclick="saveNotes()" id="notes-save-btn" style="margin-top:6px;font-size:11px;font-weight:600;font-family:inherit;background:var(--green);color:#fff;border:none;padding:5px 14px;border-radius:var(--r-pill);cursor:pointer;display:none">Guardar</button>
@@ -864,6 +878,66 @@
           </div>
         </div>
 
+        <!-- Automatizaciones -->
+        <div class="set-card">
+          <div class="set-card-title">⚡ Automatizaciones</div>
+          <div style="display:flex;flex-direction:column;gap:14px">
+
+            <div>
+              <div style="display:flex;align-items:center;justify-content:space-between">
+                <div>
+                  <div style="font-size:12px;font-weight:600;color:var(--text)">Recordatorio de cita</div>
+                  <div style="font-size:11px;color:var(--text3);margin-top:2px">WhatsApp automático antes de la cita</div>
+                </div>
+                <label style="position:relative;display:inline-block;width:36px;height:20px;flex-shrink:0">
+                  <input type="checkbox" id="s-auto-reminders" style="opacity:0;width:0;height:0" onchange="document.getElementById('s-reminder-hours-wrap').style.display=this.checked?'block':'none'">
+                  <span style="position:absolute;inset:0;background:var(--border);border-radius:20px;cursor:pointer;transition:background var(--dur-fast) var(--ease-out)" onclick="this.previousElementSibling.click();this.style.background=this.previousElementSibling.checked?'var(--green)':'var(--border)'"></span>
+                  <span id="s-reminders-knob" style="position:absolute;top:3px;left:3px;width:14px;height:14px;background:#fff;border-radius:50%;transition:transform var(--dur-fast) var(--ease-spring);pointer-events:none"></span>
+                </label>
+              </div>
+              <div id="s-reminder-hours-wrap" style="display:none;margin-top:8px">
+                <span class="set-label" style="margin:0 0 4px">Horas antes de la cita</span>
+                <input class="set-input" id="s-reminder-hours" type="number" min="1" max="72" placeholder="24" style="max-width:100px">
+              </div>
+            </div>
+
+            <div style="border-top:1px solid var(--border);padding-top:14px">
+              <div style="display:flex;align-items:center;justify-content:space-between">
+                <div>
+                  <div style="font-size:12px;font-weight:600;color:var(--text)">Seguimiento post-visita</div>
+                  <div style="font-size:11px;color:var(--text3);margin-top:2px">Mensaje tras la consulta</div>
+                </div>
+                <label style="position:relative;display:inline-block;width:36px;height:20px;flex-shrink:0">
+                  <input type="checkbox" id="s-auto-followup" style="opacity:0;width:0;height:0" onchange="document.getElementById('s-followup-hours-wrap').style.display=this.checked?'block':'none'">
+                  <span style="position:absolute;inset:0;background:var(--border);border-radius:20px;cursor:pointer;transition:background var(--dur-fast) var(--ease-out)" onclick="this.previousElementSibling.click();this.style.background=this.previousElementSibling.checked?'var(--green)':'var(--border)'"></span>
+                  <span id="s-followup-knob" style="position:absolute;top:3px;left:3px;width:14px;height:14px;background:#fff;border-radius:50%;transition:transform var(--dur-fast) var(--ease-spring);pointer-events:none"></span>
+                </label>
+              </div>
+              <div id="s-followup-hours-wrap" style="display:none;margin-top:8px">
+                <span class="set-label" style="margin:0 0 4px">Horas tras la visita</span>
+                <input class="set-input" id="s-followup-hours" type="number" min="1" max="168" placeholder="48" style="max-width:100px">
+              </div>
+            </div>
+
+            <div style="border-top:1px solid var(--border);padding-top:14px">
+              <div style="display:flex;align-items:center;justify-content:space-between">
+                <div>
+                  <div style="font-size:12px;font-weight:600;color:var(--text)">Solicitud de reseña Google</div>
+                  <div style="font-size:11px;color:var(--text3);margin-top:2px">Requiere enlace de reseña configurado</div>
+                </div>
+                <label style="position:relative;display:inline-block;width:36px;height:20px;flex-shrink:0">
+                  <input type="checkbox" id="s-auto-review" style="opacity:0;width:0;height:0">
+                  <span style="position:absolute;inset:0;background:var(--border);border-radius:20px;cursor:pointer;transition:background var(--dur-fast) var(--ease-out)" onclick="this.previousElementSibling.click();this.style.background=this.previousElementSibling.checked?'var(--green)':'var(--border)'"></span>
+                  <span id="s-review-knob" style="position:absolute;top:3px;left:3px;width:14px;height:14px;background:#fff;border-radius:50%;transition:transform var(--dur-fast) var(--ease-spring);pointer-events:none"></span>
+                </label>
+              </div>
+            </div>
+
+          </div>
+          <button class="set-btn" style="margin-top:16px" onclick="saveSettings('automations')">Guardar automatizaciones</button>
+          <div class="set-saved" id="saved-automations">✓ Guardado</div>
+        </div>
+
         <!-- Plan y cuenta -->
         <div class="set-card">
           <div class="set-card-title">💳 Plan y cuenta</div>
@@ -1064,6 +1138,21 @@
     document.getElementById('s-urgent-kw').value = cfg.urgent_keywords || '';
     document.getElementById('s-auto-react').checked = !!cfg.auto_reactivacion;
     document.getElementById('s-react-msg').value = cfg.reactivacion_msg || '';
+    const autoRem = cfg.auto_reminders !== 'false';
+    document.getElementById('s-auto-reminders').checked = autoRem;
+    document.getElementById('s-reminder-hours-wrap').style.display = autoRem ? 'block' : 'none';
+    document.getElementById('s-reminder-hours').value = cfg.reminder_hours || '24';
+    const autoFu = cfg.auto_followup === 'true';
+    document.getElementById('s-auto-followup').checked = autoFu;
+    document.getElementById('s-followup-hours-wrap').style.display = autoFu ? 'block' : 'none';
+    document.getElementById('s-followup-hours').value = cfg.followup_hours || '48';
+    document.getElementById('s-auto-review').checked = cfg.auto_review === 'true';
+    // Sync toggle knob colors
+    ['reminders','followup','review'].forEach(k => {
+      const chk = document.getElementById(`s-auto-${k}`);
+      const span = chk?.nextElementSibling;
+      if (span) span.style.background = chk.checked ? 'var(--green)' : 'var(--border)';
+    });
     document.getElementById('s-wa').value = d.whatsapp_number || '';
     const waConfigured = !!d.whatsapp_number;
     document.getElementById('wa-dot').classList.toggle('active', waConfigured);
@@ -1166,7 +1255,12 @@
       urgent_keywords: document.getElementById('s-urgent-kw').value,
       auto_reactivacion: document.getElementById('s-auto-react').checked,
       reactivacion_msg: document.getElementById('s-react-msg').value,
-      whatsapp_number: document.getElementById('s-wa').value
+      whatsapp_number: document.getElementById('s-wa').value,
+      auto_reminders: document.getElementById('s-auto-reminders').checked,
+      reminder_hours: document.getElementById('s-reminder-hours').value,
+      auto_followup: document.getElementById('s-auto-followup').checked,
+      followup_hours: document.getElementById('s-followup-hours').value,
+      auto_review: document.getElementById('s-auto-review').checked,
     };
     const r = await fetch('/api/settings', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
     if (r.ok) {
@@ -1539,6 +1633,7 @@
   // ── Conversaciones WhatsApp en tiempo real ────────────────────────────────
   let allConvs = [];
   let activeSessionId = null;
+  let activePhone = null;
   const manualSet = new Set();   // sessions in manual mode (client mirror)
   const urgentSet = new Set();   // sessions flagged urgent
   const CONV_COLORS = ['#16a34a,#22c55e','#0ea5e9,#0284c7','#f43f5e,#e11d48','#f97316,#ea580c','#8b5cf6,#7c3aed'];
@@ -1641,6 +1736,7 @@
     document.querySelectorAll('.conv-item').forEach(i => i.classList.remove('active'));
     el.classList.add('active');
     activeSessionId = conv.session_id;
+    activePhone = conv.from_number;
 
     // Update header
     const color = convColor(conv.session_id);
@@ -1672,7 +1768,7 @@
       const msgs = await r.json();
       renderMessages(msgs);
       document.getElementById('pp-msg-count').textContent = `${msgs.length} mensajes`;
-      loadNotes(conv.session_id);
+      loadNotes(conv.from_number);
       loadPatientData(conv.from_number);
     } catch(e) { chatMsgs.innerHTML = '<div style="padding:20px;color:var(--text3);text-align:center">Error cargando mensajes</div>'; }
   }
@@ -2051,46 +2147,60 @@
     notesSaveTimer = setTimeout(saveNotes, 2000);
   }
   async function saveNotes() {
-    if (!activeSessionId) return;
+    if (!activePhone) return;
     const notes = document.getElementById('pp-notes').value;
-    await fetch(`/api/conversations/${encodeURIComponent(activeSessionId)}/notes`, {
+    await fetch(`/api/patient-note/${encodeURIComponent(activePhone)}`, {
       method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ notes })
     }).catch(() => {});
     document.getElementById('notes-save-btn').style.display = 'none';
   }
+
+  const churnColors = { low:'var(--green)', medium:'#f59e0b', high:'#dc2626', none:'var(--text3)' };
+  const churnLabels = { low:'✓ bajo', medium:'⚠ medio', high:'🔴 alto', none:'—' };
+
   async function loadPatientData(phone) {
     const el = document.getElementById('pp-patient');
-    if (!phone || phone === '—') { el.innerHTML = '—'; return; }
+    const statVisits = document.getElementById('pp-stat-visits');
+    const statLtv    = document.getElementById('pp-stat-ltv');
+    const statChurn  = document.getElementById('pp-stat-churn');
+    if (!phone || phone === '—') {
+      el.innerHTML = '—';
+      statVisits.textContent = statLtv.textContent = statChurn.textContent = '—';
+      return;
+    }
     el.innerHTML = '<span style="color:var(--text3)">Cargando...</span>';
     try {
-      const r = await fetch(`/api/patients/${encodeURIComponent(phone)}`);
-      const { appointments, lead } = await r.json();
+      const r = await fetch(`/api/patient-profile/${encodeURIComponent(phone)}`);
+      const p = await r.json();
+      statVisits.textContent = p.totalVisits ?? '0';
+      statLtv.textContent    = p.ltv != null ? `${p.ltv}€` : '—';
+      const risk = p.churnRisk || 'none';
+      statChurn.textContent  = churnLabels[risk] || '—';
+      statChurn.style.color  = churnColors[risk] || 'var(--text3)';
       let html = '';
-      if (lead) {
-        html += `<div style="margin-bottom:6px;padding:6px 0;border-bottom:1px solid var(--border)">`;
-        if (lead.nombre) html += `<div style="font-weight:600;color:var(--text);margin-bottom:2px">${esc(lead.nombre)}</div>`;
-        if (lead.ultima_visita) html += `<div>Última visita: <b>${esc(lead.ultima_visita)}</b></div>`;
-        if (lead.servicio) html += `<div>Servicio: ${esc(lead.servicio)}</div>`;
-        const parseDMY = s => { if (!s) return null; const [d,m,y] = s.split('/'); return new Date(+y,+m-1,+d); };
-        const daysSince = lead.ultima_visita ? Math.floor((Date.now() - parseDMY(lead.ultima_visita)) / 86400000) : null;
-        if (daysSince !== null && daysSince > 90) html += `<div style="color:#f59e0b;margin-top:3px">⚠️ En riesgo (${daysSince}d sin visita)</div>`;
-        html += `</div>`;
+      if (p.lead?.nombre) html += `<div style="font-weight:600;color:var(--text);margin-bottom:4px">${esc(p.lead.nombre)}</div>`;
+      if (p.daysSinceLast != null) {
+        html += `<div style="margin-bottom:4px">Última visita: <b>${p.daysSinceLast}d</b> atrás</div>`;
       }
-      if (appointments.length) {
-        html += `<div style="color:var(--text2);margin-bottom:4px;font-weight:600">Citas recientes:</div>`;
-        appointments.forEach(a => {
-          html += `<div style="margin-bottom:4px;padding-bottom:4px;border-bottom:1px solid var(--border)">`;
-          html += `<div style="color:var(--text)">${esc(a.service||'Consulta')}</div>`;
-          html += `<div style="color:var(--text3)">${a.scheduled_at ? esc(a.scheduled_at.toString().slice(0,16)) : '—'}</div>`;
-          html += `</div>`;
+      if (p.appointments?.length) {
+        html += `<div style="font-weight:600;color:var(--text2);margin:6px 0 4px">Historial:</div>`;
+        p.appointments.slice(0, 5).forEach(a => {
+          const dt = a.scheduled_ts
+            ? new Date(a.scheduled_ts).toLocaleDateString('es-ES', { day:'2-digit', month:'short', year:'2-digit' })
+            : (a.scheduled_at || '').slice(0, 10);
+          html += `<div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid var(--border)">
+            <span style="color:var(--text)">${esc(a.service||'Consulta')}</span>
+            <span style="color:var(--text3)">${dt}</span>
+          </div>`;
         });
       }
       el.innerHTML = html || '<span style="color:var(--text3)">Sin historial</span>';
     } catch { el.innerHTML = '<span style="color:var(--text3)">—</span>'; }
   }
 
-  async function loadNotes(sessionId) {
-    const r = await fetch(`/api/conversations/${encodeURIComponent(sessionId)}/notes`).catch(() => null);
+  async function loadNotes(phone) {
+    if (!phone) return;
+    const r = await fetch(`/api/patient-note/${encodeURIComponent(phone)}`).catch(() => null);
     if (!r?.ok) return;
     const { notes } = await r.json();
     document.getElementById('pp-notes').value = notes || '';

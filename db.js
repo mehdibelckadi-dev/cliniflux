@@ -176,6 +176,9 @@ async function initDb() {
     `ALTER TABLE appointments ADD COLUMN IF NOT EXISTS patient_id INTEGER`,
     `ALTER TABLE appointments ADD COLUMN IF NOT EXISTS source TEXT DEFAULT 'manual'`,
     `CREATE INDEX IF NOT EXISTS idx_appointments_clinic_ts ON appointments(clinic_id, scheduled_ts)`,
+    `ALTER TABLE appointments ADD COLUMN IF NOT EXISTS followup_sent_at TIMESTAMP`,
+    `ALTER TABLE appointments ADD COLUMN IF NOT EXISTS review_sent_at TIMESTAMP`,
+    `ALTER TABLE appointments ADD COLUMN IF NOT EXISTS bot_booked BOOLEAN DEFAULT FALSE`,
   ];
   for (const sql of migrations) await pool.query(sql);
 
@@ -208,6 +211,19 @@ async function initDb() {
     )
   `);
   await pool.query(`CREATE INDEX IF NOT EXISTS idx_audit_clinic ON audit_logs(clinic_id, created_at DESC)`);
+
+  // Patient notes (per-phone, persistent across sessions)
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS patient_notes (
+      id         SERIAL PRIMARY KEY,
+      clinic_id  INTEGER REFERENCES clinics(id) ON DELETE CASCADE,
+      phone      TEXT NOT NULL,
+      notes      TEXT DEFAULT '',
+      updated_at TIMESTAMP DEFAULT NOW(),
+      UNIQUE(clinic_id, phone)
+    )
+  `);
+  await pool.query(`CREATE INDEX IF NOT EXISTS idx_patient_notes_clinic ON patient_notes(clinic_id, phone)`);
 
   // RGPD consent
   await pool.query(`
@@ -642,16 +658,20 @@ async function getUpcomingAppointments() {
     SELECT a.*, c.config, c.name AS clinic_name, c.id AS cid
     FROM appointments a
     JOIN clinics c ON c.id = a.clinic_id
-    WHERE a.reminder_sent = FALSE AND a.patient_phone IS NOT NULL
-    ORDER BY a.created_at DESC LIMIT 300
+    WHERE a.reminder_sent = FALSE
+      AND a.patient_phone IS NOT NULL
+      AND a.scheduled_ts IS NOT NULL
+      AND a.status NOT IN ('cancelled','attended','no_show')
+      AND (c.config->>'auto_reminders' IS NULL OR c.config->>'auto_reminders' != 'false')
+      AND a.scheduled_ts BETWEEN
+        NOW() + (COALESCE(NULLIF(c.config->>'reminder_hours',''), '24')::int || ' hours')::INTERVAL
+          - INTERVAL '20 minutes'
+        AND NOW() + (COALESCE(NULLIF(c.config->>'reminder_hours',''), '24')::int || ' hours')::INTERVAL
+          + INTERVAL '20 minutes'
+    ORDER BY a.scheduled_ts
+    LIMIT 300
   `);
-  const now = Date.now();
-  return rows.filter(a => {
-    const d = new Date(a.scheduled_at);
-    if (isNaN(d)) return false;
-    const diff = d - now;
-    return diff > 23 * 3600000 && diff < 25 * 3600000;
-  });
+  return rows;
 }
 
 async function markReminderSent(id) {
@@ -798,4 +818,181 @@ async function deleteAppointment(id, clinic_id) {
   return rowCount > 0;
 }
 
-module.exports = { pool, initDb, createBroadcast, getBroadcasts, updateBroadcast, getUpcomingAppointments, markReminderSent, getAtRiskForAutoReact, markLeadsContactado, getAnalytics, getSession, saveSession, saveLead, getClinicByEmail, getClinicByWhatsapp, getClinicBySetupToken, createClinic, updateClinicConfig, buildPromptForClinic, getLeads, saveAppointment, getAppointments, verifyPassword, hashPassword, importLeads, getImportedLeads, updateLeadEstado, incrementConversation, PLAN_LIMITS, saveMessage, getMessages, getRecentConversations, getHistoryFromMessages, setConvState, getManualSessions, getConvNotes, savePushSubscription, getPushSubscriptions, removePushSubscription, closeInactiveConversations, getPatientData, getAtRiskPatients, scheduleNps, getPendingNps, markNpsSent, saveNpsScore, getAppointmentsByRange, createAppointmentFull, updateAppointmentFull, deleteAppointment, createStaff, getStaff, getStaffByEmail, updateStaffRole, deactivateStaff, auditLog, getAuditLogs, recordConsent, hasConsent, getConsents, revokeConsent };
+async function getAppointmentsForFollowup() {
+  const { rows } = await pool.query(`
+    SELECT a.*, c.config, c.name AS clinic_name
+    FROM appointments a
+    JOIN clinics c ON c.id = a.clinic_id
+    WHERE a.status = 'attended'
+      AND a.followup_sent_at IS NULL
+      AND a.patient_phone IS NOT NULL
+      AND a.scheduled_ts IS NOT NULL
+      AND (c.config->>'auto_followup' IS NULL OR c.config->>'auto_followup' != 'false')
+      AND a.scheduled_ts < NOW() - (COALESCE(NULLIF(c.config->>'followup_hours',''), '48')::int || ' hours')::INTERVAL
+      AND a.scheduled_ts > NOW() - INTERVAL '30 days'
+    ORDER BY a.scheduled_ts DESC LIMIT 100
+  `);
+  return rows;
+}
+
+async function getAppointmentsForReview() {
+  const { rows } = await pool.query(`
+    SELECT a.*, c.config, c.name AS clinic_name
+    FROM appointments a
+    JOIN clinics c ON c.id = a.clinic_id
+    WHERE a.status = 'attended'
+      AND a.review_sent_at IS NULL
+      AND a.patient_phone IS NOT NULL
+      AND a.scheduled_ts IS NOT NULL
+      AND c.config->>'auto_review' = 'true'
+      AND c.config->>'google_review_url' IS NOT NULL
+      AND c.config->>'google_review_url' != ''
+      AND a.scheduled_ts < NOW() - INTERVAL '2 hours'
+      AND a.scheduled_ts > NOW() - INTERVAL '30 days'
+    ORDER BY a.scheduled_ts DESC LIMIT 100
+  `);
+  return rows;
+}
+
+async function markFollowupSent(id) {
+  await pool.query('UPDATE appointments SET followup_sent_at=NOW() WHERE id=$1', [id]);
+}
+
+async function markReviewSent(id) {
+  await pool.query('UPDATE appointments SET review_sent_at=NOW() WHERE id=$1', [id]);
+}
+
+async function getAvailableSlotsForBot(clinicId, daysAhead = 5) {
+  const { rows: cr } = await pool.query('SELECT config FROM clinics WHERE id=$1', [clinicId]);
+  const cfg = cr[0]?.config || {};
+  const hoursStr = cfg.hours || '';
+  const m = hoursStr.match(/(\d{1,2})(?::\d{2})?\s*[-–]\s*(\d{1,2})(?::\d{2})?/);
+  const startH = m ? parseInt(m[1]) : 9;
+  const endH   = m ? parseInt(m[2]) : 19;
+  const slotMin = 60;
+
+  const now   = new Date();
+  const start = new Date(now); start.setHours(0,0,0,0);
+  const end   = new Date(start); end.setDate(end.getDate() + daysAhead);
+
+  const { rows: booked } = await pool.query(`
+    SELECT scheduled_ts, duration_min FROM appointments
+    WHERE clinic_id=$1 AND scheduled_ts >= $2 AND scheduled_ts < $3
+      AND status NOT IN ('cancelled')
+  `, [clinicId, start.toISOString(), end.toISOString()]);
+
+  const dayNames = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+  const slots = {};
+
+  for (let d = 0; d < daysAhead; d++) {
+    const date = new Date(start);
+    date.setDate(date.getDate() + d);
+    if (date.getDay() === 0) continue; // Skip Sundays
+    const label = `${dayNames[date.getDay()]} ${date.getDate()}/${String(date.getMonth()+1).padStart(2,'0')}`;
+    const daySlots = [];
+
+    for (let h = startH; h < endH; h++) {
+      const slotTime = new Date(date); slotTime.setHours(h, 0, 0, 0);
+      if (slotTime <= new Date(now.getTime() + 3600000)) continue; // skip past + 1h buffer
+      const slotEnd = new Date(slotTime.getTime() + slotMin * 60000);
+      const busy = booked.some(b => {
+        const bs = new Date(b.scheduled_ts);
+        const be = new Date(bs.getTime() + (b.duration_min || slotMin) * 60000);
+        return slotTime < be && slotEnd > bs;
+      });
+      if (!busy) daySlots.push(`${String(h).padStart(2,'0')}:00`);
+    }
+    if (daySlots.length) slots[label] = daySlots.slice(0, 6);
+  }
+  return slots;
+}
+
+async function getEnrichedPatientProfile(clinicId, phone) {
+  const clean = (phone || '').replace(/\D/g, '').slice(-9);
+  const [appts, lead, noteRow, msgs] = await Promise.all([
+    pool.query(`
+      SELECT id, service, scheduled_ts, scheduled_at, status, notes, created_at
+      FROM appointments
+      WHERE clinic_id=$1
+        AND right(regexp_replace(coalesce(patient_phone,''),'\\D','','g'),9)=$2
+      ORDER BY scheduled_ts DESC NULLS LAST, created_at DESC LIMIT 20
+    `, [clinicId, clean]),
+    pool.query(`
+      SELECT nombre, email, ultima_visita, servicio, notas, estado
+      FROM imported_leads
+      WHERE clinic_id=$1
+        AND right(regexp_replace(coalesce(telefono,''),'\\D','','g'),9)=$2
+      LIMIT 1
+    `, [clinicId, clean]),
+    pool.query(`SELECT notes, updated_at FROM patient_notes WHERE clinic_id=$1 AND phone=$2 LIMIT 1`, [clinicId, clean]),
+    pool.query(`
+      SELECT COUNT(*) AS total, MAX(created_at) AS last_msg_at
+      FROM messages WHERE clinic_id=$1 AND session_id LIKE $2
+    `, [clinicId, `%${clean}`]),
+  ]);
+
+  const appointments = appts.rows;
+  const attended = appointments.filter(a => a.status === 'attended');
+  const upcoming = appointments.find(a => {
+    const ts = a.scheduled_ts ? new Date(a.scheduled_ts) : null;
+    return ts && ts > new Date() && a.status !== 'cancelled';
+  });
+
+  const AVG_TICKET = 80;
+  const ltv = attended.length * AVG_TICKET;
+
+  let avgGapDays = null;
+  if (attended.length >= 2) {
+    const sorted = attended.map(a => new Date(a.scheduled_ts || a.created_at)).sort((a,b) => a-b);
+    let total = 0;
+    for (let i = 1; i < sorted.length; i++) total += (sorted[i] - sorted[i-1]) / 86400000;
+    avgGapDays = Math.round(total / (sorted.length - 1));
+  }
+
+  const lastTs = attended[0]?.scheduled_ts;
+  const daysSinceLast = lastTs ? Math.floor((Date.now() - new Date(lastTs)) / 86400000) : null;
+  let churnRisk = 'none';
+  if (daysSinceLast !== null) {
+    const threshold = avgGapDays ? avgGapDays * 1.5 : 90;
+    const highThreshold = avgGapDays ? avgGapDays * 2.5 : 180;
+    if (daysSinceLast > highThreshold) churnRisk = 'high';
+    else if (daysSinceLast > threshold) churnRisk = 'medium';
+    else churnRisk = 'low';
+  }
+
+  return {
+    lead: lead.rows[0] || null,
+    appointments,
+    note: noteRow.rows[0]?.notes || '',
+    stats: {
+      total_visits: appointments.length,
+      attended_visits: attended.length,
+      ltv,
+      avg_gap_days: avgGapDays,
+      days_since_last: daysSinceLast,
+      churn_risk: churnRisk,
+      upcoming_appointment: upcoming || null,
+      last_msg_at: msgs.rows[0]?.last_msg_at || null,
+    },
+  };
+}
+
+async function savePatientNote(clinicId, phone, notes) {
+  const clean = (phone || '').replace(/\D/g, '').slice(-9);
+  await pool.query(`
+    INSERT INTO patient_notes (clinic_id, phone, notes, updated_at)
+    VALUES ($1,$2,$3,NOW())
+    ON CONFLICT (clinic_id, phone) DO UPDATE SET notes=$3, updated_at=NOW()
+  `, [clinicId, clean, notes || '']);
+}
+
+async function getPatientNote(clinicId, phone) {
+  const clean = (phone || '').replace(/\D/g, '').slice(-9);
+  const { rows } = await pool.query(
+    `SELECT notes FROM patient_notes WHERE clinic_id=$1 AND phone=$2 LIMIT 1`,
+    [clinicId, clean]
+  );
+  return rows[0]?.notes || '';
+}
+
+module.exports = { pool, initDb, createBroadcast, getBroadcasts, updateBroadcast, getUpcomingAppointments, markReminderSent, getAtRiskForAutoReact, markLeadsContactado, getAnalytics, getSession, saveSession, saveLead, getClinicByEmail, getClinicByWhatsapp, getClinicBySetupToken, createClinic, updateClinicConfig, buildPromptForClinic, getLeads, saveAppointment, getAppointments, verifyPassword, hashPassword, importLeads, getImportedLeads, updateLeadEstado, incrementConversation, PLAN_LIMITS, saveMessage, getMessages, getRecentConversations, getHistoryFromMessages, setConvState, getManualSessions, getConvNotes, savePushSubscription, getPushSubscriptions, removePushSubscription, closeInactiveConversations, getPatientData, getAtRiskPatients, scheduleNps, getPendingNps, markNpsSent, saveNpsScore, getAppointmentsByRange, createAppointmentFull, updateAppointmentFull, deleteAppointment, createStaff, getStaff, getStaffByEmail, updateStaffRole, deactivateStaff, auditLog, getAuditLogs, recordConsent, hasConsent, getConsents, revokeConsent, getAppointmentsForFollowup, getAppointmentsForReview, markFollowupSent, markReviewSent, getAvailableSlotsForBot, getEnrichedPatientProfile, savePatientNote, getPatientNote };

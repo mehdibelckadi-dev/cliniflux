@@ -7,7 +7,7 @@ const PgSession = require('connect-pg-simple')(session);
 const OpenAI = require('openai');
 const crypto = require('crypto');
 const Stripe = require('stripe');
-const { pool, initDb, getAnalytics, getSession, saveSession, saveLead, getClinicByEmail, getClinicByWhatsapp, getClinicBySetupToken, createClinic, updateClinicConfig, buildPromptForClinic, getLeads, getAppointments, saveAppointment, verifyPassword, hashPassword, importLeads, getImportedLeads, updateLeadEstado, incrementConversation, PLAN_LIMITS, saveMessage, getMessages, getRecentConversations, getHistoryFromMessages, setConvState, getManualSessions, getConvNotes, savePushSubscription, getPushSubscriptions, removePushSubscription, closeInactiveConversations, getPatientData, getAtRiskPatients, scheduleNps, getPendingNps, markNpsSent, saveNpsScore, createBroadcast, getBroadcasts, updateBroadcast, getUpcomingAppointments, markReminderSent, getAtRiskForAutoReact, markLeadsContactado, getAppointmentsByRange, createAppointmentFull, updateAppointmentFull, deleteAppointment, createStaff, getStaff, getStaffByEmail, updateStaffRole, deactivateStaff, auditLog, getAuditLogs, recordConsent, hasConsent, getConsents, revokeConsent } = require('./db');
+const { pool, initDb, getAnalytics, getSession, saveSession, saveLead, getClinicByEmail, getClinicByWhatsapp, getClinicBySetupToken, createClinic, updateClinicConfig, buildPromptForClinic, getLeads, getAppointments, saveAppointment, verifyPassword, hashPassword, importLeads, getImportedLeads, updateLeadEstado, incrementConversation, PLAN_LIMITS, saveMessage, getMessages, getRecentConversations, getHistoryFromMessages, setConvState, getManualSessions, getConvNotes, savePushSubscription, getPushSubscriptions, removePushSubscription, closeInactiveConversations, getPatientData, getAtRiskPatients, scheduleNps, getPendingNps, markNpsSent, saveNpsScore, createBroadcast, getBroadcasts, updateBroadcast, getUpcomingAppointments, markReminderSent, getAtRiskForAutoReact, markLeadsContactado, getAppointmentsByRange, createAppointmentFull, updateAppointmentFull, deleteAppointment, createStaff, getStaff, getStaffByEmail, updateStaffRole, deactivateStaff, auditLog, getAuditLogs, recordConsent, hasConsent, getConsents, revokeConsent, getAppointmentsForFollowup, getAppointmentsForReview, markFollowupSent, markReviewSent, getAvailableSlotsForBot, getEnrichedPatientProfile, savePatientNote, getPatientNote } = require('./db');
 const PDFDocument = require('pdfkit');
 const webpush = require('web-push');
 
@@ -512,6 +512,38 @@ Desconocido: "Llámenos al +34 932 123 456, le atendemos encantados." No confirm
 Con nombre+servicio+franja: CITA_CONFIRMADA|tratamiento=...|fecha=...|hora=...|nombre=...|email=...`;
 }
 
+// Convierte "Lun 23/01" + "10:00" → Date ISO para scheduled_ts
+function parseApptTimestamp(fechaStr = '', horaStr = '') {
+  if (!fechaStr || !horaStr) return null;
+  try {
+    const monthMap = { ene:0, feb:1, mar:2, abr:3, may:4, jun:5, jul:6, ago:7, sep:8, oct:9, nov:10, dic:11 };
+    // Accepts "Lun 23/01", "23/01", "23/01/2025", or ISO date
+    const dateClean = fechaStr.replace(/^[A-Za-záéíóúÁÉÍÓÚ]+\s+/, '').trim();
+    let d;
+    if (/^\d{4}-\d{2}-\d{2}/.test(dateClean)) {
+      d = new Date(`${dateClean}T${horaStr}:00`);
+    } else {
+      const parts = dateClean.split('/');
+      const day = parseInt(parts[0]);
+      const month = parseInt(parts[1]) - 1;
+      const year = parts[2] ? parseInt(parts[2]) : new Date().getFullYear();
+      const [hh, mm] = horaStr.split(':').map(Number);
+      d = new Date(year, month, day, hh, mm || 0);
+    }
+    return isNaN(d.getTime()) ? null : d;
+  } catch { return null; }
+}
+
+async function buildPromptWithSlots(clinic) {
+  const base = buildPromptForClinic(clinic);
+  try {
+    const slots = await getAvailableSlotsForBot(clinic.id, 5);
+    const lines = Object.entries(slots).map(([day, times]) => `  ${day}: ${times.join(', ')}`).join('\n');
+    if (!lines) return base;
+    return base + `\n\nDISPONIBILIDAD REAL (próximos 5 días — usa estos huecos al proponer citas):\n${lines}`;
+  } catch { return base; }
+}
+
 // ── Sitemap dinámico ────────────────────────────────────────────────────────
 
 app.get('/sitemap.xml', (req, res) => {
@@ -956,7 +988,7 @@ app.post('/webhook/whatsapp', async (req, res) => {
     if (!from || !msg) return;
 
     const clinic   = to ? await getClinicByWhatsapp(to).catch(() => null) : null;
-    const prompt   = clinic ? buildPromptForClinic(clinic) : buildDemoPrompt();
+    const prompt   = clinic ? await buildPromptWithSlots(clinic) : buildDemoPrompt();
     const clinicId = clinic?.id || 1;
     const sessionId = `wa_${clinicId}_` + from.slice(-10);
 
@@ -1040,7 +1072,21 @@ app.post('/webhook/whatsapp', async (req, res) => {
     if (match) {
       reply = reply.replace(/\nCITA_CONFIRMADA\|.+/, '').trim();
       const parts = Object.fromEntries(match[1].split('|').map(p => p.split('=')));
-      await saveAppointment({ clinic_id: clinicId, patient_name: parts.nombre||'Paciente', patient_phone: from, service: parts.tratamiento||null, scheduled_at: `${parts.fecha||''} ${parts.hora||''}`.trim() }).catch(e => console.error('Appt:', e.message));
+      const scheduledTs = parseApptTimestamp(parts.fecha, parts.hora);
+      createAppointmentFull({
+        clinic_id: clinicId,
+        patient_name: parts.nombre || 'Paciente',
+        patient_phone: from,
+        service: parts.tratamiento || null,
+        scheduled_ts: scheduledTs,
+        scheduled_at: `${parts.fecha||''} ${parts.hora||''}`.trim(),
+        bot_booked: true,
+        status: 'confirmed',
+      }).then(appt => {
+        auditLog(clinicId, null, 'bot_booking', { appt_id: appt?.id, phone: from, service: parts.tratamiento }).catch(() => {});
+        const io = req.app.get('io');
+        if (appt) io?.to(`clinic_${clinicId}`).emit('appt:created', appt);
+      }).catch(e => console.error('[Bot] appt create:', e.message));
       scheduleNps(clinicId, sessionId, from).catch(() => {});
     }
 
@@ -1132,7 +1178,7 @@ app.get('/api/settings', requireAuth, async (req, res) => {
 });
 
 app.post('/api/settings', requireAuth, async (req, res) => {
-  const { name, phone, email_clinic, address, hours, services, extra, assistant_name, whatsapp_number, google_review_url, urgent_keywords, auto_reactivacion, reactivacion_msg } = req.body;
+  const { name, phone, email_clinic, address, hours, services, extra, assistant_name, whatsapp_number, google_review_url, urgent_keywords, auto_reactivacion, reactivacion_msg, auto_reminders, reminder_hours, auto_followup, followup_hours, auto_review } = req.body;
   try {
     const { rows } = await pool.query('SELECT config FROM clinics WHERE id=$1', [req.session.clinic.id]);
     const cfg = { ...(rows[0]?.config || {}), phone, email: email_clinic, address, hours, services, extra, assistant_name };
@@ -1140,6 +1186,11 @@ app.post('/api/settings', requireAuth, async (req, res) => {
     if (urgent_keywords !== undefined) cfg.urgent_keywords = urgent_keywords || null;
     if (auto_reactivacion !== undefined) cfg.auto_reactivacion = !!auto_reactivacion;
     if (reactivacion_msg !== undefined) cfg.reactivacion_msg = reactivacion_msg || null;
+    if (auto_reminders !== undefined) cfg.auto_reminders = String(!!auto_reminders);
+    if (reminder_hours !== undefined) cfg.reminder_hours = String(parseInt(reminder_hours) || 24);
+    if (auto_followup !== undefined) cfg.auto_followup = String(!!auto_followup);
+    if (followup_hours !== undefined) cfg.followup_hours = String(parseInt(followup_hours) || 48);
+    if (auto_review !== undefined) cfg.auto_review = String(!!auto_review);
     const waNum = whatsapp_number ? whatsapp_number.replace(/\D/g,'').slice(-9) : null;
     await pool.query(
       `UPDATE clinics SET config=$1, name=COALESCE($2,name),
@@ -1441,6 +1492,29 @@ app.get('/api/nps', requireAuth, async (req, res) => {
 app.get('/api/patients/:phone', requireAuth, async (req, res) => {
   const data = await getPatientData(req.session.clinic.id, decodeURIComponent(req.params.phone)).catch(() => ({ appointments: [], lead: null }));
   res.json(data);
+});
+
+app.get('/api/patient-profile/:phone', requireAuth, async (req, res) => {
+  try {
+    const profile = await getEnrichedPatientProfile(req.session.clinic.id, decodeURIComponent(req.params.phone));
+    res.json(profile);
+  } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+app.get('/api/patient-note/:phone', requireAuth, async (req, res) => {
+  try {
+    const notes = await getPatientNote(req.session.clinic.id, decodeURIComponent(req.params.phone));
+    res.json({ notes });
+  } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+app.post('/api/patient-note/:phone', requireAuth, async (req, res) => {
+  try {
+    const { notes } = req.body;
+    if (typeof notes !== 'string') return res.status(400).json({ error: 'notes requerido' });
+    await savePatientNote(req.session.clinic.id, decodeURIComponent(req.params.phone), notes.slice(0, 2000));
+    res.json({ ok: true });
+  } catch(e) { res.status(500).json({ error: e.message }); }
 });
 
 app.get('/api/crm/at-risk', requireAuth, requirePlan('pro', 'clinica'), async (req, res) => {
@@ -1747,6 +1821,37 @@ initDb()
         }
         if (upcoming.length) console.log(`[Cron] ${upcoming.length} recordatorios enviados`);
       } catch(e) { console.error('[Cron] reminder:', e.message); }
+    }, 30 * 60 * 1000);
+
+    // Cron: post-visita follow-up (cada 30 min, opt-in por clínica)
+    setInterval(async () => {
+      try {
+        const appts = await getAppointmentsForFollowup();
+        for (const a of appts) {
+          const cfg = a.config || {};
+          const clinicName = a.clinic_name || 'la clínica';
+          const msg = cfg.followup_msg ||
+            `Hola ${a.patient_name?.split(' ')[0] || ''}👋 Esperamos que tu visita en ${clinicName} haya ido bien. ¿Tienes alguna duda o consulta? Estamos aquí para ayudarte 😊`;
+          await sendWhatsAppMessage(a.patient_phone, msg).catch(() => {});
+          await markFollowupSent(a.id).catch(() => {});
+        }
+        if (appts.length) console.log(`[Cron] ${appts.length} follow-ups post-visita enviados`);
+      } catch(e) { console.error('[Cron] followup:', e.message); }
+    }, 30 * 60 * 1000);
+
+    // Cron: solicitud de reseña Google (cada 30 min, opt-in explícito + google_review_url)
+    setInterval(async () => {
+      try {
+        const appts = await getAppointmentsForReview();
+        for (const a of appts) {
+          const cfg = a.config || {};
+          const firstName = a.patient_name?.split(' ')[0] || '';
+          const msg = `¡Hola ${firstName}! 😊 Gracias por confiar en nosotros. Si tienes un momento, nos ayudaría muchísimo que dejaras una reseña:\n${cfg.google_review_url}\n¡Gracias de corazón! ⭐`;
+          await sendWhatsAppMessage(a.patient_phone, msg).catch(() => {});
+          await markReviewSent(a.id).catch(() => {});
+        }
+        if (appts.length) console.log(`[Cron] ${appts.length} solicitudes de reseña enviadas`);
+      } catch(e) { console.error('[Cron] review:', e.message); }
     }, 30 * 60 * 1000);
 
     // Cron: auto-reactivación pacientes en riesgo (cada 6h, opt-in por clínica)
