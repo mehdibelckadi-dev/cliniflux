@@ -7,7 +7,7 @@ const PgSession = require('connect-pg-simple')(session);
 const OpenAI = require('openai');
 const crypto = require('crypto');
 const Stripe = require('stripe');
-const { pool, initDb, getAnalytics, getSession, saveSession, saveLead, getClinicByEmail, getClinicByWhatsapp, getClinicBySetupToken, createClinic, updateClinicConfig, buildPromptForClinic, getLeads, getAppointments, saveAppointment, verifyPassword, hashPassword, importLeads, getImportedLeads, updateLeadEstado, incrementConversation, PLAN_LIMITS, saveMessage, getMessages, getRecentConversations, getHistoryFromMessages, setConvState, getManualSessions, getConvNotes, savePushSubscription, getPushSubscriptions, removePushSubscription, closeInactiveConversations, getPatientData, getAtRiskPatients, scheduleNps, getPendingNps, markNpsSent, saveNpsScore, createBroadcast, getBroadcasts, updateBroadcast, getUpcomingAppointments, markReminderSent, getAtRiskForAutoReact, markLeadsContactado, getAppointmentsByRange, createAppointmentFull, updateAppointmentFull, deleteAppointment } = require('./db');
+const { pool, initDb, getAnalytics, getSession, saveSession, saveLead, getClinicByEmail, getClinicByWhatsapp, getClinicBySetupToken, createClinic, updateClinicConfig, buildPromptForClinic, getLeads, getAppointments, saveAppointment, verifyPassword, hashPassword, importLeads, getImportedLeads, updateLeadEstado, incrementConversation, PLAN_LIMITS, saveMessage, getMessages, getRecentConversations, getHistoryFromMessages, setConvState, getManualSessions, getConvNotes, savePushSubscription, getPushSubscriptions, removePushSubscription, closeInactiveConversations, getPatientData, getAtRiskPatients, scheduleNps, getPendingNps, markNpsSent, saveNpsScore, createBroadcast, getBroadcasts, updateBroadcast, getUpcomingAppointments, markReminderSent, getAtRiskForAutoReact, markLeadsContactado, getAppointmentsByRange, createAppointmentFull, updateAppointmentFull, deleteAppointment, createStaff, getStaff, getStaffByEmail, updateStaffRole, deactivateStaff, auditLog, getAuditLogs } = require('./db');
 const webpush = require('web-push');
 
 // VAPID — claves en env (Railway). Fallback: generadas en dev (no persistentes entre reinicios)
@@ -438,6 +438,24 @@ function requirePlan(...plans) {
     if (plans.includes(req.session?.clinic?.plan)) return next();
     res.status(403).json({ error: 'Esta función requiere el plan Pro o Clínica.', upgrade: true });
   };
+}
+
+// Role: owner > admin > staff. Owner = the clinic account itself.
+const ROLE_RANK = { owner: 3, admin: 2, staff: 1 };
+function requireRole(minRole) {
+  return (req, res, next) => {
+    const role = req.session?.staffRole || (req.session?.clinic ? 'owner' : null);
+    if (!role || (ROLE_RANK[role] || 0) < (ROLE_RANK[minRole] || 0)) {
+      return res.status(403).json({ error: 'Permisos insuficientes' });
+    }
+    next();
+  };
+}
+
+// Helper: actor object from current session
+function sessionActor(req) {
+  if (req.session.staffId) return { id: req.session.staffId, type: 'staff', name: req.session.staffName };
+  return { id: req.session.clinic?.id, type: 'owner', name: req.session.clinic?.name };
 }
 
 // ── Token helpers ────────────────────────────────────────────────────────────
@@ -1120,6 +1138,7 @@ app.post('/api/settings', requireAuth, async (req, res) => {
       [JSON.stringify(cfg), name || null, whatsapp_number || '', waNum, req.session.clinic.id]
     );
     req.session.clinic.name = name || req.session.clinic.name;
+    auditLog(req.session.clinic.id, sessionActor(req), 'settings.updated', 'clinic', req.session.clinic.id, {}).catch(() => {});
     res.json({ ok: true });
   } catch(e) { res.status(500).json({ error: e.message }); }
 });
@@ -1372,6 +1391,7 @@ app.post('/api/broadcast', requireAuth, requirePlan('pro','clinica'), rateLimit(
   const { name, message, segment } = req.body;
   if (!message || message.length < 5 || message.length > 1000) return res.status(400).json({ error: 'Mensaje inválido (5-1000 chars)' });
   const broadcast = await createBroadcast(req.session.clinic.id, { name, message, segment: segment || 'all' });
+  auditLog(req.session.clinic.id, sessionActor(req), 'broadcast.started', 'broadcast', broadcast.id, { name, segment }).catch(() => {});
   res.json({ ok: true, id: broadcast.id });
   runBroadcast(broadcast, req.session.clinic.id, req.app.get('io'));
 });
@@ -1417,6 +1437,65 @@ app.get('/api/crm/at-risk', requireAuth, requirePlan('pro', 'clinica'), async (r
   res.json(patients);
 });
 
+// ── F5: Staff auth + CRUD + Audit ────────────────────────────────────────────
+
+app.post('/auth/staff-login', rateLimit(10, 60000), async (req, res) => {
+  const { clinic_id, email, password } = req.body;
+  if (!clinic_id || !email || !password) return res.status(400).json({ error: 'Faltan campos' });
+  try {
+    const staff = await getStaffByEmail(clinic_id, email);
+    if (!staff || !verifyPassword(password, staff.password_hash)) {
+      return res.status(401).json({ error: 'Credenciales incorrectas' });
+    }
+    req.session.regenerate((err) => {
+      if (err) return res.status(500).json({ error: 'Error de sesión' });
+      req.session.clinic = { id: clinic_id };
+      req.session.staffId = staff.id;
+      req.session.staffName = staff.name;
+      req.session.staffRole = staff.role;
+      res.json({ ok: true, name: staff.name, role: staff.role });
+    });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.get('/api/staff', requireAuth, async (req, res) => {
+  const staff = await getStaff(req.session.clinic.id).catch(() => []);
+  res.json(staff);
+});
+
+app.post('/api/staff', requireAuth, requireRole('admin'), async (req, res) => {
+  const { name, email, password, role } = req.body;
+  if (!name || !email || !password) return res.status(400).json({ error: 'name, email y password requeridos' });
+  if (!['admin','staff'].includes(role)) return res.status(400).json({ error: 'Rol inválido' });
+  try {
+    const member = await createStaff(req.session.clinic.id, { name, email, password, role });
+    await auditLog(req.session.clinic.id, sessionActor(req), 'staff.created', 'staff', member.id, { email, role });
+    res.json(member);
+  } catch (e) {
+    if (e.code === '23505') return res.status(409).json({ error: 'Email ya registrado en esta clínica' });
+    res.status(500).json({ error: e.message });
+  }
+});
+
+app.put('/api/staff/:id/role', requireAuth, requireRole('admin'), async (req, res) => {
+  const { role } = req.body;
+  if (!['admin','staff'].includes(role)) return res.status(400).json({ error: 'Rol inválido' });
+  await updateStaffRole(req.params.id, req.session.clinic.id, role);
+  await auditLog(req.session.clinic.id, sessionActor(req), 'staff.role_changed', 'staff', req.params.id, { role });
+  res.json({ ok: true });
+});
+
+app.delete('/api/staff/:id', requireAuth, requireRole('admin'), async (req, res) => {
+  await deactivateStaff(req.params.id, req.session.clinic.id);
+  await auditLog(req.session.clinic.id, sessionActor(req), 'staff.deactivated', 'staff', req.params.id, {});
+  res.json({ ok: true });
+});
+
+app.get('/api/audit', requireAuth, requireRole('admin'), async (req, res) => {
+  const logs = await getAuditLogs(req.session.clinic.id, parseInt(req.query.limit) || 50).catch(() => []);
+  res.json(logs);
+});
+
 // ── Calendar endpoints ────────────────────────────────────────────────────────
 
 app.get('/api/calendar', requireAuth, async (req, res) => {
@@ -1433,6 +1512,7 @@ app.post('/api/calendar', requireAuth, async (req, res) => {
     const appt = await createAppointmentFull({ clinic_id: req.session.clinic.id, patient_name, patient_phone, service, scheduled_ts, duration_min, notes, patient_id, source });
     const io = req.app.get('io');
     io?.to(`clinic_${req.session.clinic.id}`).emit('appt:created', appt);
+    auditLog(req.session.clinic.id, sessionActor(req), 'appt.created', 'appointment', appt.id, { patient_name, service, scheduled_ts }).catch(() => {});
     if (notify_whatsapp && patient_phone) {
       const clinic = await pool.query('SELECT name,config FROM clinics WHERE id=$1', [req.session.clinic.id]);
       const cfg = clinic.rows[0]?.config || {};
@@ -1457,6 +1537,7 @@ app.put('/api/calendar/:id', requireAuth, async (req, res) => {
     if (!appt) return res.status(404).json({ error: 'Cita no encontrada' });
     const io = req.app.get('io');
     io?.to(`clinic_${req.session.clinic.id}`).emit('appt:updated', appt);
+    auditLog(req.session.clinic.id, sessionActor(req), 'appt.updated', 'appointment', appt.id, { status, service }).catch(() => {});
     if (notify_whatsapp && appt.patient_phone) {
       const clinic = await pool.query('SELECT name,config FROM clinics WHERE id=$1', [req.session.clinic.id]);
       const clinicName = clinic.rows[0]?.name || 'la clínica';
@@ -1488,6 +1569,7 @@ app.delete('/api/calendar/:id', requireAuth, async (req, res) => {
     await deleteAppointment(req.params.id, req.session.clinic.id);
     const io = req.app.get('io');
     io?.to(`clinic_${req.session.clinic.id}`).emit('appt:deleted', { id: parseInt(req.params.id) });
+    auditLog(req.session.clinic.id, sessionActor(req), 'appt.deleted', 'appointment', req.params.id, { patient_name: appt.patient_name }).catch(() => {});
     if (notify_whatsapp && appt.patient_phone) {
       const clinic = await pool.query('SELECT name FROM clinics WHERE id=$1', [req.session.clinic.id]);
       const clinicName = clinic.rows[0]?.name || 'la clínica';

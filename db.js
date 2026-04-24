@@ -179,6 +179,36 @@ async function initDb() {
   ];
   for (const sql of migrations) await pool.query(sql);
 
+  // F5: Roles + Audit
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS staff_members (
+      id           SERIAL PRIMARY KEY,
+      clinic_id    INTEGER REFERENCES clinics(id) ON DELETE CASCADE,
+      name         TEXT NOT NULL,
+      email        TEXT NOT NULL,
+      password_hash TEXT NOT NULL,
+      role         TEXT NOT NULL DEFAULT 'staff',
+      active       BOOLEAN DEFAULT TRUE,
+      created_at   TIMESTAMP DEFAULT NOW(),
+      UNIQUE(clinic_id, email)
+    )
+  `);
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS audit_logs (
+      id         SERIAL PRIMARY KEY,
+      clinic_id  INTEGER REFERENCES clinics(id) ON DELETE CASCADE,
+      actor_id   INTEGER,
+      actor_type TEXT DEFAULT 'owner',
+      actor_name TEXT,
+      action     TEXT NOT NULL,
+      entity     TEXT,
+      entity_id  TEXT,
+      meta       JSONB DEFAULT '{}',
+      created_at TIMESTAMP DEFAULT NOW()
+    )
+  `);
+  await pool.query(`CREATE INDEX IF NOT EXISTS idx_audit_clinic ON audit_logs(clinic_id, created_at DESC)`);
+
   // Seed demo clinic if not exists
   const { rows } = await pool.query("SELECT id FROM clinics WHERE email = 'demo@cliniflux.com'");
   if (!rows.length) {
@@ -630,6 +660,57 @@ async function markLeadsContactado(ids) {
   await pool.query(`UPDATE imported_leads SET estado='contactado' WHERE id = ANY($1)`, [ids]);
 }
 
+// ── F5: Roles + Audit ─────────────────────────────────────────────────────────
+
+async function createStaff(clinic_id, { name, email, password, role }) {
+  const { rows } = await pool.query(
+    `INSERT INTO staff_members (clinic_id, name, email, password_hash, role)
+     VALUES ($1,$2,$3,$4,$5) RETURNING id,name,email,role,active,created_at`,
+    [clinic_id, name, email, hashPassword(password), role || 'staff']
+  );
+  return rows[0];
+}
+
+async function getStaff(clinic_id) {
+  const { rows } = await pool.query(
+    `SELECT id,name,email,role,active,created_at FROM staff_members WHERE clinic_id=$1 ORDER BY created_at ASC`,
+    [clinic_id]
+  );
+  return rows;
+}
+
+async function getStaffByEmail(clinic_id, email) {
+  const { rows } = await pool.query(
+    `SELECT * FROM staff_members WHERE clinic_id=$1 AND email=$2 AND active=TRUE LIMIT 1`,
+    [clinic_id, email.toLowerCase().trim()]
+  );
+  return rows[0] || null;
+}
+
+async function updateStaffRole(id, clinic_id, role) {
+  await pool.query(`UPDATE staff_members SET role=$1 WHERE id=$2 AND clinic_id=$3`, [role, id, clinic_id]);
+}
+
+async function deactivateStaff(id, clinic_id) {
+  await pool.query(`UPDATE staff_members SET active=FALSE WHERE id=$1 AND clinic_id=$2`, [id, clinic_id]);
+}
+
+async function auditLog(clinic_id, actor, action, entity, entity_id, meta = {}) {
+  await pool.query(
+    `INSERT INTO audit_logs (clinic_id, actor_id, actor_type, actor_name, action, entity, entity_id, meta)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8)`,
+    [clinic_id, actor?.id || null, actor?.type || 'owner', actor?.name || null, action, entity || null, entity_id ? String(entity_id) : null, JSON.stringify(meta)]
+  );
+}
+
+async function getAuditLogs(clinic_id, limit = 50) {
+  const { rows } = await pool.query(
+    `SELECT * FROM audit_logs WHERE clinic_id=$1 ORDER BY created_at DESC LIMIT $2`,
+    [clinic_id, limit]
+  );
+  return rows;
+}
+
 // ── Calendar ──────────────────────────────────────────────────────────────────
 
 async function getAppointmentsByRange(clinic_id, start, end) {
@@ -668,4 +749,4 @@ async function deleteAppointment(id, clinic_id) {
   return rowCount > 0;
 }
 
-module.exports = { pool, initDb, createBroadcast, getBroadcasts, updateBroadcast, getUpcomingAppointments, markReminderSent, getAtRiskForAutoReact, markLeadsContactado, getAnalytics, getSession, saveSession, saveLead, getClinicByEmail, getClinicByWhatsapp, getClinicBySetupToken, createClinic, updateClinicConfig, buildPromptForClinic, getLeads, saveAppointment, getAppointments, verifyPassword, hashPassword, importLeads, getImportedLeads, updateLeadEstado, incrementConversation, PLAN_LIMITS, saveMessage, getMessages, getRecentConversations, getHistoryFromMessages, setConvState, getManualSessions, getConvNotes, savePushSubscription, getPushSubscriptions, removePushSubscription, closeInactiveConversations, getPatientData, getAtRiskPatients, scheduleNps, getPendingNps, markNpsSent, saveNpsScore, getAppointmentsByRange, createAppointmentFull, updateAppointmentFull, deleteAppointment };
+module.exports = { pool, initDb, createBroadcast, getBroadcasts, updateBroadcast, getUpcomingAppointments, markReminderSent, getAtRiskForAutoReact, markLeadsContactado, getAnalytics, getSession, saveSession, saveLead, getClinicByEmail, getClinicByWhatsapp, getClinicBySetupToken, createClinic, updateClinicConfig, buildPromptForClinic, getLeads, saveAppointment, getAppointments, verifyPassword, hashPassword, importLeads, getImportedLeads, updateLeadEstado, incrementConversation, PLAN_LIMITS, saveMessage, getMessages, getRecentConversations, getHistoryFromMessages, setConvState, getManualSessions, getConvNotes, savePushSubscription, getPushSubscriptions, removePushSubscription, closeInactiveConversations, getPatientData, getAtRiskPatients, scheduleNps, getPendingNps, markNpsSent, saveNpsScore, getAppointmentsByRange, createAppointmentFull, updateAppointmentFull, deleteAppointment, createStaff, getStaff, getStaffByEmail, updateStaffRole, deactivateStaff, auditLog, getAuditLogs };

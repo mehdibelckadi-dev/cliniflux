@@ -858,6 +858,34 @@
           </div>
         </div>
 
+        <!-- Equipo -->
+        <div class="set-card" id="staff-card">
+          <div class="set-card-title">👥 Equipo</div>
+          <div id="staff-list" style="margin-bottom:14px;display:flex;flex-direction:column;gap:8px"></div>
+          <details style="margin-top:4px">
+            <summary style="font-size:12px;font-weight:600;color:var(--green);cursor:pointer;list-style:none;padding:6px 0">+ Añadir miembro</summary>
+            <div style="margin-top:10px;display:flex;flex-direction:column;gap:6px">
+              <input class="set-input" id="sf-name" placeholder="Nombre completo">
+              <input class="set-input" id="sf-email" type="email" placeholder="Email">
+              <input class="set-input" id="sf-pass" type="password" placeholder="Contraseña inicial">
+              <select class="set-input" id="sf-role">
+                <option value="staff">Staff — sólo lectura + respuesta manual</option>
+                <option value="admin">Admin — acceso completo excepto facturación</option>
+              </select>
+              <button class="set-btn" onclick="addStaff()">Añadir al equipo</button>
+              <div class="set-saved" id="saved-staff" style="display:none">✓ Miembro añadido</div>
+            </div>
+          </details>
+        </div>
+
+        <!-- Registro de actividad -->
+        <div class="set-card">
+          <div class="set-card-title">📋 Registro de actividad</div>
+          <div id="audit-list" style="font-size:12px;color:var(--text2);display:flex;flex-direction:column;gap:6px">
+            <div style="color:var(--text3);font-style:italic">Cargando...</div>
+          </div>
+        </div>
+
       </div>
     </div>
   </main>
@@ -989,6 +1017,60 @@
     const plans = { starter:'Starter — WhatsApp 24/7, hasta 300 conversaciones/mes', pro:'Pro — WhatsApp + reactivación de pacientes, 2.000 conversaciones/mes', clinica:'Clínica — Todo incluido, multi-sede, reactivación y soporte 24/7' };
     document.getElementById('s-plan-badge').textContent = (d.plan || 'starter').charAt(0).toUpperCase() + (d.plan||'starter').slice(1);
     document.getElementById('s-plan-desc').textContent = plans[d.plan] || plans.starter;
+    loadStaff();
+    loadAuditLog();
+  }
+
+  async function loadStaff() {
+    const r = await fetch('/api/staff').catch(() => null);
+    if (!r?.ok) return;
+    const staff = await r.json();
+    const el = document.getElementById('staff-list');
+    if (!staff.length) { el.innerHTML = '<div style="font-size:12px;color:var(--text3);font-style:italic">Sin miembros de equipo aún</div>'; return; }
+    el.innerHTML = staff.map(s => `
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:var(--bg2);border-radius:8px;border:1px solid var(--border)">
+        <div>
+          <div style="font-size:13px;font-weight:600;color:var(--text)">${escHtml(s.name)}</div>
+          <div style="font-size:11px;color:var(--text3)">${escHtml(s.email)} · <span style="color:${s.role==='admin'?'var(--green)':'var(--text2)'}">${s.role}</span></div>
+        </div>
+        <button onclick="removeStaff(${s.id})" style="font-size:11px;color:#dc2626;background:none;border:none;cursor:pointer;padding:4px 8px">Quitar</button>
+      </div>`).join('');
+  }
+
+  async function addStaff() {
+    const name = document.getElementById('sf-name').value.trim();
+    const email = document.getElementById('sf-email').value.trim();
+    const password = document.getElementById('sf-pass').value;
+    const role = document.getElementById('sf-role').value;
+    if (!name || !email || !password) return alert('Completa todos los campos');
+    const r = await fetch('/api/staff', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ name, email, password, role }) });
+    if (!r.ok) { const e = await r.json(); return alert(e.error || 'Error'); }
+    ['sf-name','sf-email','sf-pass'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('saved-staff').style.display = '';
+    setTimeout(() => document.getElementById('saved-staff').style.display = 'none', 2500);
+    loadStaff();
+  }
+
+  async function removeStaff(id) {
+    if (!confirm('¿Quitar este miembro del equipo?')) return;
+    await fetch(`/api/staff/${id}`, { method:'DELETE' });
+    loadStaff();
+  }
+
+  async function loadAuditLog() {
+    const r = await fetch('/api/audit?limit=30').catch(() => null);
+    if (!r?.ok) { document.getElementById('audit-list').innerHTML = '<div style="color:var(--text3);font-style:italic">No disponible</div>'; return; }
+    const logs = await r.json();
+    const ACTION_LABEL = { 'appt.created':'Cita creada','appt.updated':'Cita actualizada','appt.deleted':'Cita eliminada','broadcast.started':'Broadcast enviado','settings.updated':'Ajustes guardados','staff.created':'Miembro añadido','staff.deactivated':'Miembro quitado','staff.role_changed':'Rol cambiado' };
+    const el = document.getElementById('audit-list');
+    if (!logs.length) { el.innerHTML = '<div style="color:var(--text3);font-style:italic">Sin actividad registrada</div>'; return; }
+    el.innerHTML = logs.map(l => {
+      const dt = new Date(l.created_at).toLocaleString('es-ES',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
+      return `<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border)">
+        <span>${ACTION_LABEL[l.action] || l.action} <span style="color:var(--text3)">· ${escHtml(l.actor_name || l.actor_type)}</span></span>
+        <span style="color:var(--text3);white-space:nowrap;margin-left:8px">${dt}</span>
+      </div>`;
+    }).join('');
   }
 
   async function saveSettings(section) {
