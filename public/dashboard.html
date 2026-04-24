@@ -39,8 +39,9 @@
 
     /* ── TOPBAR ── */
     .topbar{position:fixed;top:0;left:0;right:0;height:56px;background:rgba(255,255,255,0.95);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--border);display:flex;align-items:center;z-index:200;padding:0 16px 0 0}
-    .tb-logo-zone{width:56px;height:56px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-    .tb-logo{font-size:13px;font-weight:800;color:#fff;background:var(--green);width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;letter-spacing:-.3px;box-shadow:0 2px 8px rgba(22,163,74,0.35)}
+    .tb-logo-zone{width:200px;height:56px;display:flex;align-items:center;flex-shrink:0;padding:0 18px;gap:10px;border-right:1px solid var(--border)}
+    .tb-logo{font-size:13px;font-weight:800;color:#fff;background:var(--green);width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;letter-spacing:-.3px;box-shadow:0 2px 8px rgba(22,163,74,0.35);flex-shrink:0}
+    .tb-wordmark{font-size:16px;font-weight:800;color:var(--text);letter-spacing:-.5px}.tb-wordmark span{color:var(--green)}
     .tb-clinic{flex:1;padding:0 12px;display:flex;align-items:center;gap:8px;min-width:0}
     .tb-clinic-name{font-size:13px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .tb-clinic-tag{font-size:10px;font-weight:600;color:var(--green);background:var(--green-dim);padding:2px 8px;border-radius:var(--r-pill);flex-shrink:0}
@@ -60,19 +61,22 @@
     .app-layout{display:flex;height:calc(100vh - 56px);margin-top:56px}
 
     /* ── SIDEBAR (desktop) ── */
-    .sidebar{width:58px;background:#0f172a;display:flex;flex-direction:column;align-items:center;padding:10px 0;flex-shrink:0;gap:2px}
-    .si{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all var(--dur-fast);position:relative;flex-shrink:0}
-    .si:hover{background:rgba(255,255,255,0.09)}
-    .si.active{background:rgba(255,255,255,0.14)}
-    .si.active::before{content:'';position:absolute;left:-1px;top:50%;transform:translateY(-50%);width:3px;height:20px;background:var(--green);border-radius:0 3px 3px 0}
-    .si svg{width:17px;height:17px;stroke:rgba(255,255,255,0.4);transition:stroke var(--dur-fast)}
-    .si.active svg{stroke:#fff}
-    .si-badge{position:absolute;top:5px;right:5px;width:14px;height:14px;border-radius:50%;background:#ef4444;font-size:8px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center;border:2px solid #0f172a}
-    .si-divider{width:22px;height:1px;background:rgba(255,255,255,0.08);margin:6px 0}
-    .si-bottom{margin-top:auto;display:flex;flex-direction:column;align-items:center;gap:8px;padding-bottom:4px}
-    .si-ava{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#16a34a,#22c55e);font-size:9px;font-weight:800;color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 0 0 2px rgba(255,255,255,0.15)}
-    .si-tooltip{position:absolute;left:calc(100% + 12px);top:50%;transform:translateY(-50%);background:#1e293b;color:#fff;font-size:11px;font-weight:600;padding:5px 10px;border-radius:6px;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity var(--dur-fast);z-index:300;box-shadow:var(--shadow-sm)}
-    .si:hover .si-tooltip{opacity:1}
+    .sidebar{width:200px;background:#fff;border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:stretch;padding:8px 6px;flex-shrink:0;gap:1px}
+    .si{height:38px;border-radius:8px;display:flex;align-items:center;justify-content:flex-start;padding:0 12px;gap:10px;cursor:pointer;transition:all var(--dur-fast);position:relative;flex-shrink:0}
+    .si:hover{background:var(--bg2)}
+    .si.active{background:var(--green-dim)}
+    .si svg{width:17px;height:17px;stroke:var(--text3);transition:stroke var(--dur-fast);flex-shrink:0}
+    .si.active svg{stroke:var(--green)}
+    .si-label{font-size:13px;font-weight:600;color:var(--text2);transition:color var(--dur-fast)}
+    .si.active .si-label{color:var(--green)}
+    .si-badge{position:absolute;top:7px;right:9px;min-width:16px;height:16px;padding:0 4px;border-radius:8px;background:#ef4444;font-size:8px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center;border:2px solid #fff}
+    .si-divider{height:1px;background:var(--border);margin:6px 4px}
+    .si-bottom{margin-top:auto;padding:4px 2px}
+    .si-ava-row{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:8px;cursor:pointer;transition:background var(--dur-fast)}
+    .si-ava-row:hover{background:var(--bg2)}
+    .si-ava{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#16a34a,#22c55e);font-size:9px;font-weight:800;color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .si-ava-name{font-size:12px;font-weight:600;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .si-tooltip{display:none}
 
     /* ── MAIN ── */
     .main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
@@ -410,9 +414,17 @@
     .import-actions{display:flex;gap:8px;margin-top:12px;justify-content:flex-end}
 
     /* ── PANEL 4: AJUSTES ── */
-    .p-settings{flex-direction:column;background:var(--bg2);overflow-y:auto;padding:24px 24px}
-    .set-title{font-size:19px;font-weight:800;letter-spacing:-0.03em;margin-bottom:4px}
-    .set-sub{font-size:13px;color:var(--text2);margin-bottom:22px}
+    .p-settings{flex-direction:row;background:var(--bg2);overflow:hidden;padding:0}
+    .set-nav{width:220px;background:#fff;border-right:1px solid var(--border);display:flex;flex-direction:column;padding:20px 8px;flex-shrink:0;overflow-y:auto;gap:1px}
+    .set-nav-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--text3);padding:4px 12px 10px}
+    .set-nav-item{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--text2);padding:9px 12px;border-radius:8px;cursor:pointer;transition:all var(--dur-fast)}
+    .set-nav-item:hover{background:var(--bg2)}
+    .set-nav-item.active{background:var(--green-dim);color:var(--green)}
+    .set-content{flex:1;overflow-y:auto;padding:28px 32px}
+    .set-section{display:none;max-width:640px}
+    .set-section.active{display:block}
+    .set-section-title{font-size:18px;font-weight:800;letter-spacing:-0.03em;color:var(--text);margin-bottom:4px}
+    .set-section-sub{font-size:13px;color:var(--text2);margin-bottom:22px}
     .set-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
     .set-card{background:#fff;border:1px solid var(--border);border-radius:var(--r);padding:20px;box-shadow:var(--shadow-xs)}
     .set-card-full{grid-column:1/-1}
@@ -456,6 +468,8 @@
 
       /* Topbar móvil */
       .topbar{height:56px}
+      .tb-logo-zone{width:56px;border-right:none;padding:0 12px;justify-content:center}
+      .tb-wordmark{display:none}
       .tb-ia span{display:none}
       .tb-clinic-tag{display:none}
       #tb-clinic-name{display:none}
@@ -524,8 +538,14 @@
       #leads-cards{display:flex;flex-direction:column;gap:8px;margin-top:4px}
 
       /* Ajustes */
+      .p-settings{flex-direction:column;overflow-y:auto}
+      .set-nav{width:100%;border-right:none;border-bottom:1px solid var(--border);flex-direction:row;flex-wrap:nowrap;padding:6px;overflow-x:auto;overflow-y:unset;flex-shrink:0;-webkit-overflow-scrolling:touch}
+      .set-nav::-webkit-scrollbar{display:none}
+      .set-nav-title{display:none}
+      .set-nav-item{padding:6px 11px;font-size:11px;gap:5px;white-space:nowrap;flex-shrink:0;border-radius:var(--r-pill)}
+      .set-content{padding:14px 12px 80px;overflow-y:auto}
+      .set-section{max-width:none}
       .set-grid{grid-template-columns:1fr}
-      .p-settings{padding:16px 12px 80px;overflow-y:auto}
       .set-card{padding:16px}
 
       /* Modales */
@@ -559,6 +579,7 @@
   </button>
   <div class="tb-logo-zone">
     <div class="tb-logo">CF</div>
+    <span class="tb-wordmark">clini<span>flux</span></span>
   </div>
   <div id="mob-chat-title" style="flex:1;flex-direction:column;min-width:0;padding:0 8px">
     <span id="mob-chat-title-name" style="font-size:14px;font-weight:700;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">—</span>
@@ -580,30 +601,33 @@
 <div class="app-layout">
   <!-- SIDEBAR -->
   <nav class="sidebar">
-    <div class="si active" data-panel="0" onclick="switchPanel(0)" title="">
+    <div class="si active" data-panel="0" onclick="switchPanel(0)">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      <span class="si-label">Conversaciones</span>
       <span class="si-badge" id="si-badge-msgs" style="display:none">0</span>
-      <div class="si-tooltip">Conversaciones</div>
     </div>
     <div class="si" data-panel="1" onclick="switchPanel(1)">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-      <div class="si-tooltip">Agenda</div>
+      <span class="si-label">Agenda</span>
     </div>
     <div class="si" data-panel="2" onclick="switchPanel(2)">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-      <div class="si-tooltip">Métricas</div>
+      <span class="si-label">Métricas</span>
     </div>
     <div class="si" data-panel="3" onclick="switchPanel(3)">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-      <div class="si-tooltip">Reactivación</div>
+      <span class="si-label">Reactivación</span>
     </div>
     <div class="si-divider"></div>
     <div class="si" data-panel="4" onclick="switchPanel(4)">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-      <div class="si-tooltip">Ajustes</div>
+      <span class="si-label">Ajustes</span>
     </div>
     <div class="si-bottom">
-      <div class="si-ava" id="si-ava">CF</div>
+      <div class="si-ava-row">
+        <div class="si-ava" id="si-ava">CF</div>
+        <span class="si-ava-name" id="si-ava-name">Mi cuenta</span>
+      </div>
     </div>
   </nav>
 
@@ -984,199 +1008,256 @@
       </div><!-- /leads-main-panel -->
     <!-- PANEL 4: AJUSTES -->
     <div class="panel p-settings" id="panel-4">
-      <div class="set-title">Ajustes</div>
-      <div class="set-sub">Configura tu clínica y tu asistente virtual</div>
-      <div class="set-grid">
 
-        <!-- Info clínica -->
-        <div class="set-card">
-          <div class="set-card-title">🏥 Información de la clínica</div>
-          <span class="set-label">Nombre de la clínica</span>
-          <input class="set-input" id="s-name" placeholder="BarnaDental">
-          <span class="set-label">Teléfono</span>
-          <input class="set-input" id="s-phone" type="tel" placeholder="+34 932 123 456">
-          <span class="set-label">Email</span>
-          <input class="set-input" id="s-email" type="email" placeholder="info@clinica.com">
-          <span class="set-label">Dirección</span>
-          <input class="set-input" id="s-address" placeholder="Calle, número, ciudad">
-          <span class="set-label">Horario de atención</span>
-          <input class="set-input" id="s-hours" placeholder="L-V 9:00-20:00, Sáb 10:00-14:00">
-          <button class="set-btn" onclick="saveSettings('clinic')">Guardar cambios</button>
-          <div class="set-saved" id="saved-clinic">✓ Guardado</div>
+      <!-- Settings left nav -->
+      <div class="set-nav">
+        <div class="set-nav-title">Ajustes</div>
+        <div class="set-nav-item active" data-sec="clinic" onclick="setSection('clinic')">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          Clínica
+        </div>
+        <div class="set-nav-item" data-sec="assistant" onclick="setSection('assistant')">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+          Asistente IA
+        </div>
+        <div class="set-nav-item" data-sec="automations" onclick="setSection('automations')">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          Automatizaciones
+        </div>
+        <div class="set-nav-item" data-sec="whatsapp" onclick="setSection('whatsapp')">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          WhatsApp
+        </div>
+        <div class="set-nav-item" data-sec="account" onclick="setSection('account')">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+          Plan y cuenta
+        </div>
+        <div class="set-nav-item" data-sec="team" onclick="setSection('team')">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          Equipo
+        </div>
+        <div class="set-nav-item" data-sec="rgpd" onclick="setSection('rgpd')">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          RGPD
+        </div>
+        <div class="set-nav-item" data-sec="activity" onclick="setSection('activity')">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          Actividad
+        </div>
+      </div>
+
+      <!-- Settings content -->
+      <div class="set-content">
+
+        <!-- Clínica -->
+        <div class="set-section active" id="ss-clinic">
+          <div class="set-section-title">Información de la clínica</div>
+          <div class="set-section-sub">Datos que Natalia usará para responder a los pacientes.</div>
+          <div class="set-card">
+            <span class="set-label">Nombre de la clínica</span>
+            <input class="set-input" id="s-name" placeholder="BarnaDental">
+            <span class="set-label">Teléfono</span>
+            <input class="set-input" id="s-phone" type="tel" placeholder="+34 932 123 456">
+            <span class="set-label">Email</span>
+            <input class="set-input" id="s-email" type="email" placeholder="info@clinica.com">
+            <span class="set-label">Dirección</span>
+            <input class="set-input" id="s-address" placeholder="Calle, número, ciudad">
+            <span class="set-label">Horario de atención</span>
+            <input class="set-input" id="s-hours" placeholder="L-V 9:00-20:00, Sáb 10:00-14:00">
+            <button class="set-btn" onclick="saveSettings('clinic')">Guardar cambios</button>
+            <div class="set-saved" id="saved-clinic">✓ Guardado</div>
+          </div>
         </div>
 
         <!-- Asistente IA -->
-        <div class="set-card">
-          <div class="set-card-title">🤖 Asistente virtual</div>
-          <span class="set-label">Nombre del asistente</span>
-          <input class="set-input" id="s-assistant" placeholder="Natalia">
-          <span class="set-label">Servicios y precios</span>
-          <textarea class="set-textarea" id="s-services" placeholder="Higiene dental: 55€&#10;Blanqueamiento: 280€&#10;..."></textarea>
-          <span class="set-label">Información adicional (seguros, parking, FAQ…)</span>
-          <textarea class="set-textarea" id="s-extra" placeholder="Aceptamos Adeslas y Sanitas. Parking 1h gratis..."></textarea>
-          <span class="set-label" style="margin-top:10px">Enlace reseña Google (NPS automático)</span>
-          <input class="set-input" id="s-review-url" type="url" placeholder="https://g.page/r/...">
-          <span class="set-label" style="margin-top:10px">Palabras clave de escalado urgente</span>
-          <input class="set-input" id="s-urgent-kw" placeholder="dolor fuerte, sangrado, alergia (separadas por coma)">
-          <div style="font-size:11px;color:var(--text3);margin-top:-8px">Se suman a las palabras por defecto del sistema.</div>
-          <div style="display:flex;align-items:center;gap:10px;margin-top:10px">
-            <input type="checkbox" id="s-auto-react" style="width:16px;height:16px;accent-color:var(--green)">
-            <span class="set-label" style="margin:0">Reactivación automática de pacientes en riesgo (cada 6h)</span>
-          </div>
-          <span class="set-label" style="margin-top:8px">Mensaje de reactivación (opcional)</span>
-          <textarea class="set-textarea" id="s-react-msg" placeholder="Hola {nombre}, hace tiempo que no te vemos..."></textarea>
-          <button class="set-btn" onclick="saveSettings('assistant')">Guardar cambios</button>
-          <div class="set-saved" id="saved-assistant">✓ Guardado</div>
-        </div>
-
-        <!-- WhatsApp -->
-        <div class="set-card">
-          <div class="set-card-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="#25d366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M11.9 0C5.336 0 0 5.291 0 11.8c0 2.085.548 4.04 1.503 5.73L0 24l6.639-1.737A11.91 11.91 0 0 0 11.9 23.6C18.464 23.6 24 18.309 24 11.8 24 5.291 18.464 0 11.9 0zm0 21.6a9.9 9.9 0 0 1-5.035-1.374l-.361-.214-3.742.978.999-3.629-.235-.374A9.737 9.737 0 0 1 2 11.8C2 6.395 6.44 2 11.9 2 17.36 2 21.8 6.395 21.8 11.8c0 5.405-4.44 9.8-9.9 9.8z"/></svg> WhatsApp Business</div>
-          <span class="set-label">Número de WhatsApp</span>
-          <input class="set-input" id="s-wa" placeholder="+34 612 345 678">
-          <div class="set-wa-status"><div class="set-wa-dot" id="wa-dot"></div><span id="wa-status-txt">Sin configurar</span></div>
-          <button class="set-btn" onclick="saveSettings('wa')">Guardar número</button>
-          <div class="set-saved" id="saved-wa">✓ Guardado</div>
-          <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border)">
-            <div style="font-size:11px;font-weight:700;color:var(--text2);margin-bottom:6px">URL del webhook (Meta Cloud API)</div>
-            <div style="font-size:11px;font-family:monospace;background:var(--bg2);padding:7px 10px;border-radius:6px;color:var(--text);word-break:break-all" id="webhook-url"></div>
+        <div class="set-section" id="ss-assistant">
+          <div class="set-section-title">Asistente virtual</div>
+          <div class="set-section-sub">Personaliza cómo Natalia habla con tus pacientes.</div>
+          <div class="set-card">
+            <span class="set-label">Nombre del asistente</span>
+            <input class="set-input" id="s-assistant" placeholder="Natalia">
+            <span class="set-label">Servicios y precios</span>
+            <textarea class="set-textarea" id="s-services" placeholder="Higiene dental: 55€&#10;Blanqueamiento: 280€&#10;..."></textarea>
+            <span class="set-label">Información adicional (seguros, parking, FAQ…)</span>
+            <textarea class="set-textarea" id="s-extra" placeholder="Aceptamos Adeslas y Sanitas. Parking 1h gratis..."></textarea>
+            <span class="set-label" style="margin-top:10px">Enlace reseña Google (NPS automático)</span>
+            <input class="set-input" id="s-review-url" type="url" placeholder="https://g.page/r/...">
+            <span class="set-label" style="margin-top:10px">Palabras clave de escalado urgente</span>
+            <input class="set-input" id="s-urgent-kw" placeholder="dolor fuerte, sangrado, alergia (separadas por coma)">
+            <div style="font-size:11px;color:var(--text3);margin-top:-8px">Se suman a las palabras por defecto del sistema.</div>
+            <div style="display:flex;align-items:center;gap:10px;margin-top:10px">
+              <input type="checkbox" id="s-auto-react" style="width:16px;height:16px;accent-color:var(--green)">
+              <span class="set-label" style="margin:0">Reactivación automática de pacientes en riesgo (cada 6h)</span>
+            </div>
+            <span class="set-label" style="margin-top:8px">Mensaje de reactivación (opcional)</span>
+            <textarea class="set-textarea" id="s-react-msg" placeholder="Hola {nombre}, hace tiempo que no te vemos..."></textarea>
+            <button class="set-btn" onclick="saveSettings('assistant')">Guardar cambios</button>
+            <div class="set-saved" id="saved-assistant">✓ Guardado</div>
           </div>
         </div>
 
         <!-- Automatizaciones -->
-        <div class="set-card">
-          <div class="set-card-title">⚡ Automatizaciones</div>
-          <div style="display:flex;flex-direction:column;gap:14px">
-
-            <div>
-              <div style="display:flex;align-items:center;justify-content:space-between">
-                <div>
-                  <div style="font-size:12px;font-weight:600;color:var(--text)">Recordatorio de cita</div>
-                  <div style="font-size:11px;color:var(--text3);margin-top:2px">WhatsApp automático antes de la cita</div>
+        <div class="set-section" id="ss-automations">
+          <div class="set-section-title">Automatizaciones</div>
+          <div class="set-section-sub">Mensajes que Natalia envía automáticamente sin que tengas que hacer nada.</div>
+          <div class="set-card">
+            <div style="display:flex;flex-direction:column;gap:14px">
+              <div>
+                <div style="display:flex;align-items:center;justify-content:space-between">
+                  <div>
+                    <div style="font-size:13px;font-weight:600;color:var(--text)">Recordatorio de cita</div>
+                    <div style="font-size:11px;color:var(--text3);margin-top:2px">WhatsApp automático antes de la cita</div>
+                  </div>
+                  <label style="position:relative;display:inline-block;width:36px;height:20px;flex-shrink:0">
+                    <input type="checkbox" id="s-auto-reminders" style="opacity:0;width:0;height:0" onchange="document.getElementById('s-reminder-hours-wrap').style.display=this.checked?'block':'none'">
+                    <span style="position:absolute;inset:0;background:var(--border);border-radius:20px;cursor:pointer;transition:background var(--dur-fast) var(--ease-out)" onclick="this.previousElementSibling.click();this.style.background=this.previousElementSibling.checked?'var(--green)':'var(--border)'"></span>
+                    <span id="s-reminders-knob" style="position:absolute;top:3px;left:3px;width:14px;height:14px;background:#fff;border-radius:50%;transition:transform var(--dur-fast) var(--ease-spring);pointer-events:none"></span>
+                  </label>
                 </div>
-                <label style="position:relative;display:inline-block;width:36px;height:20px;flex-shrink:0">
-                  <input type="checkbox" id="s-auto-reminders" style="opacity:0;width:0;height:0" onchange="document.getElementById('s-reminder-hours-wrap').style.display=this.checked?'block':'none'">
-                  <span style="position:absolute;inset:0;background:var(--border);border-radius:20px;cursor:pointer;transition:background var(--dur-fast) var(--ease-out)" onclick="this.previousElementSibling.click();this.style.background=this.previousElementSibling.checked?'var(--green)':'var(--border)'"></span>
-                  <span id="s-reminders-knob" style="position:absolute;top:3px;left:3px;width:14px;height:14px;background:#fff;border-radius:50%;transition:transform var(--dur-fast) var(--ease-spring);pointer-events:none"></span>
-                </label>
+                <div id="s-reminder-hours-wrap" style="display:none;margin-top:8px">
+                  <span class="set-label" style="margin:0 0 4px">Horas antes de la cita</span>
+                  <input class="set-input" id="s-reminder-hours" type="number" min="1" max="72" placeholder="24" style="max-width:100px">
+                </div>
               </div>
-              <div id="s-reminder-hours-wrap" style="display:none;margin-top:8px">
-                <span class="set-label" style="margin:0 0 4px">Horas antes de la cita</span>
-                <input class="set-input" id="s-reminder-hours" type="number" min="1" max="72" placeholder="24" style="max-width:100px">
+              <div style="border-top:1px solid var(--border);padding-top:14px">
+                <div style="display:flex;align-items:center;justify-content:space-between">
+                  <div>
+                    <div style="font-size:13px;font-weight:600;color:var(--text)">Seguimiento post-visita</div>
+                    <div style="font-size:11px;color:var(--text3);margin-top:2px">Mensaje tras la consulta</div>
+                  </div>
+                  <label style="position:relative;display:inline-block;width:36px;height:20px;flex-shrink:0">
+                    <input type="checkbox" id="s-auto-followup" style="opacity:0;width:0;height:0" onchange="document.getElementById('s-followup-hours-wrap').style.display=this.checked?'block':'none'">
+                    <span style="position:absolute;inset:0;background:var(--border);border-radius:20px;cursor:pointer;transition:background var(--dur-fast) var(--ease-out)" onclick="this.previousElementSibling.click();this.style.background=this.previousElementSibling.checked?'var(--green)':'var(--border)'"></span>
+                    <span id="s-followup-knob" style="position:absolute;top:3px;left:3px;width:14px;height:14px;background:#fff;border-radius:50%;transition:transform var(--dur-fast) var(--ease-spring);pointer-events:none"></span>
+                  </label>
+                </div>
+                <div id="s-followup-hours-wrap" style="display:none;margin-top:8px">
+                  <span class="set-label" style="margin:0 0 4px">Horas tras la visita</span>
+                  <input class="set-input" id="s-followup-hours" type="number" min="1" max="168" placeholder="48" style="max-width:100px">
+                </div>
+              </div>
+              <div style="border-top:1px solid var(--border);padding-top:14px">
+                <div style="display:flex;align-items:center;justify-content:space-between">
+                  <div>
+                    <div style="font-size:13px;font-weight:600;color:var(--text)">Solicitud de reseña Google</div>
+                    <div style="font-size:11px;color:var(--text3);margin-top:2px">Requiere enlace de reseña configurado</div>
+                  </div>
+                  <label style="position:relative;display:inline-block;width:36px;height:20px;flex-shrink:0">
+                    <input type="checkbox" id="s-auto-review" style="opacity:0;width:0;height:0">
+                    <span style="position:absolute;inset:0;background:var(--border);border-radius:20px;cursor:pointer;transition:background var(--dur-fast) var(--ease-out)" onclick="this.previousElementSibling.click();this.style.background=this.previousElementSibling.checked?'var(--green)':'var(--border)'"></span>
+                    <span id="s-review-knob" style="position:absolute;top:3px;left:3px;width:14px;height:14px;background:#fff;border-radius:50%;transition:transform var(--dur-fast) var(--ease-spring);pointer-events:none"></span>
+                  </label>
+                </div>
               </div>
             </div>
-
-            <div style="border-top:1px solid var(--border);padding-top:14px">
-              <div style="display:flex;align-items:center;justify-content:space-between">
-                <div>
-                  <div style="font-size:12px;font-weight:600;color:var(--text)">Seguimiento post-visita</div>
-                  <div style="font-size:11px;color:var(--text3);margin-top:2px">Mensaje tras la consulta</div>
-                </div>
-                <label style="position:relative;display:inline-block;width:36px;height:20px;flex-shrink:0">
-                  <input type="checkbox" id="s-auto-followup" style="opacity:0;width:0;height:0" onchange="document.getElementById('s-followup-hours-wrap').style.display=this.checked?'block':'none'">
-                  <span style="position:absolute;inset:0;background:var(--border);border-radius:20px;cursor:pointer;transition:background var(--dur-fast) var(--ease-out)" onclick="this.previousElementSibling.click();this.style.background=this.previousElementSibling.checked?'var(--green)':'var(--border)'"></span>
-                  <span id="s-followup-knob" style="position:absolute;top:3px;left:3px;width:14px;height:14px;background:#fff;border-radius:50%;transition:transform var(--dur-fast) var(--ease-spring);pointer-events:none"></span>
-                </label>
-              </div>
-              <div id="s-followup-hours-wrap" style="display:none;margin-top:8px">
-                <span class="set-label" style="margin:0 0 4px">Horas tras la visita</span>
-                <input class="set-input" id="s-followup-hours" type="number" min="1" max="168" placeholder="48" style="max-width:100px">
-              </div>
-            </div>
-
-            <div style="border-top:1px solid var(--border);padding-top:14px">
-              <div style="display:flex;align-items:center;justify-content:space-between">
-                <div>
-                  <div style="font-size:12px;font-weight:600;color:var(--text)">Solicitud de reseña Google</div>
-                  <div style="font-size:11px;color:var(--text3);margin-top:2px">Requiere enlace de reseña configurado</div>
-                </div>
-                <label style="position:relative;display:inline-block;width:36px;height:20px;flex-shrink:0">
-                  <input type="checkbox" id="s-auto-review" style="opacity:0;width:0;height:0">
-                  <span style="position:absolute;inset:0;background:var(--border);border-radius:20px;cursor:pointer;transition:background var(--dur-fast) var(--ease-out)" onclick="this.previousElementSibling.click();this.style.background=this.previousElementSibling.checked?'var(--green)':'var(--border)'"></span>
-                  <span id="s-review-knob" style="position:absolute;top:3px;left:3px;width:14px;height:14px;background:#fff;border-radius:50%;transition:transform var(--dur-fast) var(--ease-spring);pointer-events:none"></span>
-                </label>
-              </div>
-            </div>
-
+            <button class="set-btn" style="margin-top:16px" onclick="saveSettings('automations')">Guardar automatizaciones</button>
+            <div class="set-saved" id="saved-automations">✓ Guardado</div>
           </div>
-          <button class="set-btn" style="margin-top:16px" onclick="saveSettings('automations')">Guardar automatizaciones</button>
-          <div class="set-saved" id="saved-automations">✓ Guardado</div>
         </div>
 
-        <!-- Plan y cuenta -->
-        <div class="set-card">
-          <div class="set-card-title">💳 Plan y cuenta</div>
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-            <span style="font-size:13px;color:var(--text2)">Plan activo</span>
-            <span class="set-plan-badge" id="s-plan-badge">—</span>
-          </div>
-          <div style="font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:16px" id="s-plan-desc"></div>
-          <div id="s-usage-wrap" style="margin-bottom:16px;display:none">
-            <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px">
-              <span style="font-size:11px;font-weight:600;color:var(--text2)">Conversaciones este mes</span>
-              <span style="font-size:12px;font-weight:700;color:var(--text)" id="s-usage-label"></span>
-            </div>
-            <div style="height:6px;background:rgba(0,0,0,0.08);border-radius:100px;overflow:hidden">
-              <div id="s-usage-bar" style="height:100%;border-radius:100px;transition:width var(--dur-slow) var(--ease-out)"></div>
+        <!-- WhatsApp -->
+        <div class="set-section" id="ss-whatsapp">
+          <div class="set-section-title">WhatsApp Business</div>
+          <div class="set-section-sub">Conecta el número de WhatsApp de tu clínica para que Natalia responda.</div>
+          <div class="set-card">
+            <span class="set-label">Número de WhatsApp</span>
+            <input class="set-input" id="s-wa" placeholder="+34 612 345 678">
+            <div class="set-wa-status"><div class="set-wa-dot" id="wa-dot"></div><span id="wa-status-txt">Sin configurar</span></div>
+            <button class="set-btn" onclick="saveSettings('wa')">Guardar número</button>
+            <div class="set-saved" id="saved-wa">✓ Guardado</div>
+            <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border)">
+              <div style="font-size:11px;font-weight:700;color:var(--text2);margin-bottom:6px">URL del webhook (Meta Cloud API)</div>
+              <div style="font-size:11px;font-family:monospace;background:var(--bg2);padding:7px 10px;border-radius:6px;color:var(--text);word-break:break-all" id="webhook-url"></div>
             </div>
           </div>
-          <button class="set-btn" onclick="openBillingPortal()">Gestionar suscripción →</button>
-          <div style="border-top:1px solid var(--border);margin-top:16px;padding-top:16px">
-            <span class="set-label" style="margin-top:0">Cambiar contraseña</span>
-            <input class="set-input" id="s-pass1" type="password" placeholder="Nueva contraseña">
-            <input class="set-input" id="s-pass2" type="password" placeholder="Repetir contraseña" style="margin-top:6px">
-            <button class="set-btn-ghost" onclick="changePassword()">Actualizar contraseña</button>
-            <div class="set-saved" id="saved-pass">✓ Contraseña actualizada</div>
+        </div>
+
+        <!-- Cuenta -->
+        <div class="set-section" id="ss-account">
+          <div class="set-section-title">Plan y cuenta</div>
+          <div class="set-section-sub">Gestiona tu suscripción y credenciales de acceso.</div>
+          <div class="set-card">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+              <span style="font-size:13px;color:var(--text2)">Plan activo</span>
+              <span class="set-plan-badge" id="s-plan-badge">—</span>
+            </div>
+            <div style="font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:16px" id="s-plan-desc"></div>
+            <div id="s-usage-wrap" style="margin-bottom:16px;display:none">
+              <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px">
+                <span style="font-size:11px;font-weight:600;color:var(--text2)">Conversaciones este mes</span>
+                <span style="font-size:12px;font-weight:700;color:var(--text)" id="s-usage-label"></span>
+              </div>
+              <div style="height:6px;background:rgba(0,0,0,0.08);border-radius:100px;overflow:hidden">
+                <div id="s-usage-bar" style="height:100%;border-radius:100px;transition:width var(--dur-slow) var(--ease-out)"></div>
+              </div>
+            </div>
+            <button class="set-btn" onclick="openBillingPortal()">Gestionar suscripción →</button>
+            <div style="border-top:1px solid var(--border);margin-top:16px;padding-top:16px">
+              <span class="set-label" style="margin-top:0">Cambiar contraseña</span>
+              <input class="set-input" id="s-pass1" type="password" placeholder="Nueva contraseña">
+              <input class="set-input" id="s-pass2" type="password" placeholder="Repetir contraseña" style="margin-top:6px">
+              <button class="set-btn-ghost" onclick="changePassword()">Actualizar contraseña</button>
+              <div class="set-saved" id="saved-pass">✓ Contraseña actualizada</div>
+            </div>
           </div>
         </div>
 
         <!-- Equipo -->
-        <div class="set-card" id="staff-card">
-          <div class="set-card-title">👥 Equipo</div>
-          <div id="staff-list" style="margin-bottom:14px;display:flex;flex-direction:column;gap:8px"></div>
-          <details style="margin-top:4px">
-            <summary style="font-size:12px;font-weight:600;color:var(--green);cursor:pointer;list-style:none;padding:6px 0">+ Añadir miembro</summary>
-            <div style="margin-top:10px;display:flex;flex-direction:column;gap:6px">
-              <input class="set-input" id="sf-name" placeholder="Nombre completo">
-              <input class="set-input" id="sf-email" type="email" placeholder="Email">
-              <input class="set-input" id="sf-pass" type="password" placeholder="Contraseña inicial">
-              <select class="set-input" id="sf-role">
-                <option value="staff">Staff — sólo lectura + respuesta manual</option>
-                <option value="admin">Admin — acceso completo excepto facturación</option>
-              </select>
-              <button class="set-btn" onclick="addStaff()">Añadir al equipo</button>
-              <div class="set-saved" id="saved-staff" style="display:none">✓ Miembro añadido</div>
-            </div>
-          </details>
+        <div class="set-section" id="ss-team">
+          <div class="set-section-title">Equipo</div>
+          <div class="set-section-sub">Añade miembros del equipo con acceso al panel.</div>
+          <div class="set-card" id="staff-card">
+            <div id="staff-list" style="margin-bottom:14px;display:flex;flex-direction:column;gap:8px"></div>
+            <details style="margin-top:4px">
+              <summary style="font-size:12px;font-weight:600;color:var(--green);cursor:pointer;list-style:none;padding:6px 0">+ Añadir miembro</summary>
+              <div style="margin-top:10px;display:flex;flex-direction:column;gap:6px">
+                <input class="set-input" id="sf-name" placeholder="Nombre completo">
+                <input class="set-input" id="sf-email" type="email" placeholder="Email">
+                <input class="set-input" id="sf-pass" type="password" placeholder="Contraseña inicial">
+                <select class="set-input" id="sf-role">
+                  <option value="staff">Staff — sólo lectura + respuesta manual</option>
+                  <option value="admin">Admin — acceso completo excepto facturación</option>
+                </select>
+                <button class="set-btn" onclick="addStaff()">Añadir al equipo</button>
+                <div class="set-saved" id="saved-staff" style="display:none">✓ Miembro añadido</div>
+              </div>
+            </details>
+          </div>
         </div>
 
-        <!-- RGPD Consentimientos -->
-        <div class="set-card">
-          <div class="set-card-title">🔒 RGPD — Consentimientos</div>
-          <div style="font-size:12px;color:var(--text2);margin-bottom:12px">Cada vez que un paciente te escribe por WhatsApp, su consentimiento queda registrado automáticamente.</div>
-          <div id="gdpr-stats" style="display:flex;gap:10px;margin-bottom:14px">
-            <div style="background:var(--green-dim);border-radius:8px;padding:10px 14px;flex:1;text-align:center">
-              <div style="font-size:22px;font-weight:800;color:var(--green)" id="gdpr-count">—</div>
-              <div style="font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.5px">Consentimientos</div>
+        <!-- RGPD -->
+        <div class="set-section" id="ss-rgpd">
+          <div class="set-section-title">RGPD — Consentimientos</div>
+          <div class="set-section-sub">Cada vez que un paciente escribe por WhatsApp, su consentimiento queda registrado automáticamente.</div>
+          <div class="set-card">
+            <div id="gdpr-stats" style="display:flex;gap:10px;margin-bottom:14px">
+              <div style="background:var(--green-dim);border-radius:8px;padding:10px 14px;flex:1;text-align:center">
+                <div style="font-size:22px;font-weight:800;color:var(--green)" id="gdpr-count">—</div>
+                <div style="font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.5px">Consentimientos</div>
+              </div>
             </div>
+            <details style="margin-bottom:10px">
+              <summary style="font-size:12px;font-weight:600;color:var(--green);cursor:pointer;list-style:none;padding:6px 0">+ Registrar consentimiento manual</summary>
+              <div style="margin-top:8px;display:flex;gap:6px">
+                <input class="set-input" id="gdpr-phone" placeholder="Teléfono paciente" style="flex:1">
+                <button class="set-btn" style="white-space:nowrap" onclick="addGdprConsent()">Registrar</button>
+              </div>
+            </details>
+            <div id="gdpr-list" style="font-size:11px;color:var(--text3);max-height:140px;overflow-y:auto;display:flex;flex-direction:column;gap:4px"></div>
           </div>
-          <details style="margin-bottom:10px">
-            <summary style="font-size:12px;font-weight:600;color:var(--green);cursor:pointer;list-style:none;padding:6px 0">+ Registrar consentimiento manual</summary>
-            <div style="margin-top:8px;display:flex;gap:6px">
-              <input class="set-input" id="gdpr-phone" placeholder="Teléfono paciente" style="flex:1">
-              <button class="set-btn" style="white-space:nowrap" onclick="addGdprConsent()">Registrar</button>
-            </div>
-          </details>
-          <div id="gdpr-list" style="font-size:11px;color:var(--text3);max-height:140px;overflow-y:auto;display:flex;flex-direction:column;gap:4px"></div>
         </div>
 
-        <!-- Registro de actividad -->
-        <div class="set-card">
-          <div class="set-card-title">📋 Registro de actividad
-            <a href="/api/audit/export" target="_blank" style="margin-left:auto;font-size:11px;font-weight:600;color:var(--green);text-decoration:none;float:right">⬇ Exportar PDF</a>
-          </div>
-          <div id="audit-list" style="font-size:12px;color:var(--text2);display:flex;flex-direction:column;gap:6px">
-            <div style="color:var(--text3);font-style:italic">Cargando...</div>
+        <!-- Actividad -->
+        <div class="set-section" id="ss-activity">
+          <div class="set-section-title">Registro de actividad</div>
+          <div class="set-section-sub">Historial de acciones del sistema y el equipo.</div>
+          <div class="set-card">
+            <div style="display:flex;justify-content:flex-end;margin-bottom:12px">
+              <a href="/api/audit/export" target="_blank" style="font-size:12px;font-weight:600;color:var(--green);text-decoration:none">⬇ Exportar PDF</a>
+            </div>
+            <div id="audit-list" style="font-size:12px;color:var(--text2);display:flex;flex-direction:column;gap:6px">
+              <div style="color:var(--text3);font-style:italic">Cargando...</div>
+            </div>
           </div>
         </div>
 
@@ -1324,6 +1405,12 @@
 </div>
 
 <script>
+  // ── Settings sub-nav ─────────────────────────────────────────────────────
+  function setSection(name) {
+    document.querySelectorAll('.set-nav-item').forEach(el => el.classList.toggle('active', el.dataset.sec === name));
+    document.querySelectorAll('.set-section').forEach(el => el.classList.toggle('active', el.id === 'ss-' + name));
+  }
+
   // ── Ajustes ───────────────────────────────────────────────────────────────
   async function loadSettings() {
     const r = await fetch('/api/settings');
@@ -1503,6 +1590,8 @@
       // Avatar sidebar
       const ava = document.getElementById('si-ava');
       if (ava) ava.textContent = (me.name||'CF').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+      const avaName = document.getElementById('si-ava-name');
+      if (avaName) avaName.textContent = me.name || 'Mi cuenta';
       // First-run banner: mostrar si WhatsApp no está activo
       if (!me.whatsapp_number) document.getElementById('firstrun-banner').style.display = 'block';
       loadData();
