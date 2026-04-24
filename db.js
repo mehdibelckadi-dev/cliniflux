@@ -538,47 +538,47 @@ async function removePushSubscription(endpoint) {
 }
 
 async function getAnalytics(clinic_id) {
-  const [msgs, appts, resolution, daily, avgResp] = await Promise.all([
-    // Mensajes este mes + semana pasada (para trend)
+  const [msgs, appts, resolution, daily, avgResp, hourly, sparkAppts] = await Promise.all([
     pool.query(`
       SELECT
-        COUNT(*) FILTER (WHERE created_at >= date_trunc('month', NOW()))                      AS month_total,
-        COUNT(*) FILTER (WHERE created_at >= NOW() - INTERVAL '7 days')                       AS week_total,
+        COUNT(*) FILTER (WHERE created_at >= date_trunc('month', NOW()))    AS month_total,
+        COUNT(*) FILTER (WHERE created_at >= NOW() - INTERVAL '7 days')     AS week_total,
         COUNT(*) FILTER (WHERE created_at >= NOW() - INTERVAL '14 days'
-                           AND created_at <  NOW() - INTERVAL '7 days')                       AS prev_week
+                           AND created_at <  NOW() - INTERVAL '7 days')     AS prev_week
       FROM messages WHERE clinic_id=$1 AND direction='inbound'
     `, [clinic_id]),
 
-    // Citas este mes
-    pool.query(`
-      SELECT COUNT(*) AS total FROM appointments
-      WHERE clinic_id=$1 AND created_at >= date_trunc('month', NOW())
-    `, [clinic_id]),
-
-    // Resolución IA: sesiones sin manual este mes / total sesiones este mes
     pool.query(`
       SELECT
-        COUNT(DISTINCT session_id)                                                              AS total_sessions,
+        COUNT(*) FILTER (WHERE created_at >= date_trunc('month', NOW()))    AS total,
+        COUNT(*) FILTER (WHERE created_at >= NOW() - INTERVAL '7 days')     AS week_total,
+        COUNT(*) FILTER (WHERE created_at >= NOW() - INTERVAL '14 days'
+                           AND created_at <  NOW() - INTERVAL '7 days')     AS prev_week
+      FROM appointments WHERE clinic_id=$1
+    `, [clinic_id]),
+
+    pool.query(`
+      SELECT
+        COUNT(DISTINCT session_id)                                           AS total_sessions,
         COUNT(DISTINCT session_id) FILTER (
           WHERE session_id NOT IN (
             SELECT session_id FROM conv_states WHERE clinic_id=$1 AND manual_mode=TRUE
           )
-        )                                                                                       AS ia_sessions
+        )                                                                    AS ia_sessions
       FROM messages WHERE clinic_id=$1 AND created_at >= date_trunc('month', NOW())
     `, [clinic_id]),
 
-    // Mensajes por día últimos 7 días
+    // Últimos 14 días para sparklines (7 por semana)
     pool.query(`
       SELECT
-        TO_CHAR(DATE_TRUNC('day', created_at), 'Dy') AS day,
-        COUNT(*)                                       AS cnt
+        DATE_TRUNC('day', created_at)::date                                 AS date,
+        TO_CHAR(DATE_TRUNC('day', created_at), 'Dy')                        AS day,
+        COUNT(*)                                                             AS cnt
       FROM messages
-      WHERE clinic_id=$1 AND direction='inbound' AND created_at >= NOW() - INTERVAL '7 days'
-      GROUP BY DATE_TRUNC('day', created_at), day
-      ORDER BY DATE_TRUNC('day', created_at)
+      WHERE clinic_id=$1 AND direction='inbound' AND created_at >= NOW() - INTERVAL '14 days'
+      GROUP BY 1, 2 ORDER BY 1
     `, [clinic_id]),
 
-    // Tiempo medio respuesta IA (segundos)
     pool.query(`
       SELECT ROUND(AVG(EXTRACT(EPOCH FROM (o.created_at - i.created_at))))::INT AS avg_secs
       FROM messages i
@@ -591,24 +591,69 @@ async function getAnalytics(clinic_id) {
       WHERE i.clinic_id=$1 AND i.direction='inbound'
         AND i.created_at >= date_trunc('month', NOW())
     `, [clinic_id]),
+
+    // Heatmap: mensajes por hora del día (últimos 30 días)
+    pool.query(`
+      SELECT EXTRACT(HOUR FROM created_at)::int AS hour, COUNT(*) AS cnt
+      FROM messages
+      WHERE clinic_id=$1 AND direction='inbound' AND created_at >= NOW() - INTERVAL '30 days'
+      GROUP BY 1 ORDER BY 1
+    `, [clinic_id]),
+
+    // Sparkline citas últimos 14 días
+    pool.query(`
+      SELECT DATE_TRUNC('day', created_at)::date AS date, COUNT(*) AS cnt
+      FROM appointments
+      WHERE clinic_id=$1 AND created_at >= NOW() - INTERVAL '14 days'
+      GROUP BY 1 ORDER BY 1
+    `, [clinic_id]),
   ]);
 
   const m = msgs.rows[0];
   const r = resolution.rows[0];
-  const totalSess = parseInt(r.total_sessions) || 0;
-  const iaSess   = parseInt(r.ia_sessions)    || 0;
-  const weekTotal = parseInt(m.week_total)    || 0;
-  const prevWeek  = parseInt(m.prev_week)     || 1;
-  const weekTrend = prevWeek ? Math.round((weekTotal - prevWeek) / prevWeek * 100) : 0;
+  const a = appts.rows[0];
+  const totalSess  = parseInt(r.total_sessions) || 0;
+  const iaSess     = parseInt(r.ia_sessions)    || 0;
+  const weekTotal  = parseInt(m.week_total)     || 0;
+  const prevWeek   = parseInt(m.prev_week)      || 1;
+  const weekTrend  = Math.round((weekTotal - prevWeek) / prevWeek * 100);
+  const apptWeek   = parseInt(a.week_total)     || 0;
+  const apptPrev   = parseInt(a.prev_week)      || 1;
+  const apptTrend  = Math.round((apptWeek - apptPrev) / apptPrev * 100);
+
+  // Build hourly map 0-23
+  const hourMap = {};
+  hourly.rows.forEach(h => { hourMap[parseInt(h.hour)] = parseInt(h.cnt); });
+  const hourlyData = Array.from({length:24}, (_,i) => hourMap[i] || 0);
+
+  // Split daily into last 7 and prev 7 for sparklines
+  const allDays = daily.rows;
+  const last7 = allDays.slice(-7);
+  const prev7 = allDays.slice(0, 7);
+
+  // Appt sparkline (last 7 days aligned to dates)
+  const apptMap = {};
+  sparkAppts.rows.forEach(r => { apptMap[r.date] = parseInt(r.cnt); });
 
   return {
     month_messages : parseInt(m.month_total) || 0,
     week_messages  : weekTotal,
     week_trend_pct : weekTrend,
     ia_resolution  : totalSess ? Math.round(iaSess / totalSess * 100) : 0,
-    citas_mes      : parseInt(appts.rows[0].total) || 0,
+    total_sessions : totalSess,
+    citas_mes      : parseInt(a.total) || 0,
+    citas_week     : apptWeek,
+    citas_trend    : apptTrend,
     avg_response_s : parseInt(avgResp.rows[0]?.avg_secs) || 0,
-    daily          : daily.rows, // [{day, cnt}]
+    daily          : last7,
+    spark_msgs     : last7.map(d => parseInt(d.cnt)),
+    spark_appts    : last7.map(d => apptMap[d.date] || 0),
+    hourly         : hourlyData,
+    funnel         : {
+      messages   : parseInt(m.month_total) || 0,
+      sessions   : totalSess,
+      citas      : parseInt(a.total) || 0,
+    },
   };
 }
 

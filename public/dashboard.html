@@ -301,35 +301,61 @@
     .cal-notify-row{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text2);margin-top:10px}
 
     /* ── PANEL 2: MÉTRICAS ── */
-    .p-metrics{flex-direction:column;background:var(--bg2);overflow-y:auto;padding:20px}
-    .met-title{font-size:19px;font-weight:800;letter-spacing:-0.03em;color:var(--text);margin-bottom:4px}
-    .met-sub{font-size:13px;color:var(--text2);margin-bottom:20px}
-    .met-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
-    .kpi{background:#fff;border-radius:var(--r);padding:16px 18px;border:1px solid var(--border);box-shadow:var(--shadow-md)}
-    .kpi-l{font-size:11px;color:var(--text3);margin-bottom:6px;font-weight:500}
-    .kpi-n{font-size:30px;font-weight:900;letter-spacing:-2px;color:var(--text);line-height:1}
-    .kpi-spark{display:flex;align-items:flex-end;gap:3px;height:28px;margin-top:8px}
-    .sp-b{width:6px;border-radius:2px 2px 0 0;background:var(--green-dim2)}
+    .p-metrics{flex-direction:column;background:var(--bg2);overflow-y:auto;padding:20px 24px 40px}
+    .met-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px}
+    .met-title{font-size:19px;font-weight:800;letter-spacing:-0.03em;color:var(--text)}
+    .met-sub{font-size:12px;color:var(--text3);margin-top:2px}
+    .met-period{display:flex;gap:2px;background:var(--bg3);border-radius:var(--r-sm);padding:3px}
+    .mp-btn{font-size:11px;font-weight:600;color:var(--text3);padding:4px 12px;border-radius:6px;cursor:pointer;border:none;background:none;font-family:inherit;transition:all var(--dur-fast)}
+    .mp-btn.active{background:#fff;color:var(--text);box-shadow:var(--shadow-xs)}
+    .met-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+    .kpi{background:#fff;border-radius:var(--r);padding:16px 18px;border:1px solid var(--border);box-shadow:var(--shadow-xs);position:relative;overflow:hidden}
+    .kpi-l{font-size:11px;color:var(--text3);margin-bottom:4px;font-weight:600;text-transform:uppercase;letter-spacing:.4px}
+    .kpi-n{font-size:32px;font-weight:900;letter-spacing:-2px;color:var(--text);line-height:1;margin-bottom:2px}
+    .kpi-trend{font-size:11px;font-weight:700;margin-bottom:8px}
+    .kpi-trend.up{color:var(--green)}.kpi-trend.dn{color:#ef4444}.kpi-trend.neu{color:var(--text3)}
+    .kpi-spark{display:flex;align-items:flex-end;gap:2px;height:24px}
+    .sp-b{flex:1;border-radius:2px 2px 0 0;background:var(--green-dim2);min-width:4px;transition:background var(--dur-fast)}
     .sp-b.hi{background:var(--green)}
-    .kpi-trend{font-size:11px;font-weight:700;margin-top:6px}
-    .kpi-trend.up{color:var(--green)}.kpi-trend.down{color:var(--green)}
-    .met-row{display:grid;grid-template-columns:2fr 1fr;gap:12px;margin-bottom:12px}
-    .met-card{background:#fff;border-radius:var(--r);padding:18px;border:1px solid var(--border);box-shadow:var(--shadow-xs)}
-    .met-card-title{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:14px}
-    .met-chart{display:flex;align-items:flex-end;gap:8px;height:140px}
-    .met-bar-wrap{display:flex;flex-direction:column;align-items:center;gap:5px;flex:1}
-    .met-bar-val{font-size:10px;font-weight:700;color:var(--text2)}
-    .met-bar{width:100%;border-radius:5px 5px 0 0;background:var(--green-dim2)}
-    .met-bar.hi{background:var(--green)}
-    .met-bar-lbl{font-size:10px;color:var(--text3);font-weight:600}
-    .met-sources{display:flex;flex-direction:column;gap:10px}
-    .met-src{display:flex;align-items:center;gap:10px}
-    .met-src-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-    .met-src-name{font-size:12px;color:var(--text2);width:70px;flex-shrink:0;font-weight:500}
-    .met-src-bar{flex:1;height:6px;background:rgba(0,0,0,0.06);border-radius:3px;overflow:hidden}
-    .met-src-fill{height:100%;border-radius:3px}
-    .met-src-pct{font-size:12px;font-weight:700;color:var(--text);width:34px;text-align:right}
-    @media(max-width:1100px){.met-kpis{grid-template-columns:repeat(2,1fr)}.patient-panel{display:none}.met-row{grid-template-columns:1fr}}
+    .met-grid{display:grid;grid-template-columns:2fr 1fr;gap:12px;margin-bottom:12px}
+    .met-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px}
+    .met-card{background:#fff;border-radius:var(--r);padding:18px 20px;border:1px solid var(--border);box-shadow:var(--shadow-xs)}
+    .met-card-title{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:14px}
+    /* Bar chart */
+    .met-chart{display:flex;align-items:flex-end;gap:6px;height:120px;padding-bottom:20px;position:relative}
+    .met-bar-wrap{display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;height:100%;justify-content:flex-end;cursor:pointer;position:relative}
+    .met-bar-wrap:hover .met-bar{background:var(--green)}
+    .met-bar-wrap:hover .met-tip{opacity:1;transform:translateY(0)}
+    .met-tip{position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%) translateY(4px);background:#1e293b;color:#fff;font-size:10px;font-weight:700;padding:4px 8px;border-radius:6px;white-space:nowrap;opacity:0;transition:all var(--dur-fast);pointer-events:none;z-index:10}
+    .met-tip::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:4px solid transparent;border-top-color:#1e293b}
+    .met-bar{width:100%;border-radius:4px 4px 0 0;background:var(--green-dim2);transition:background var(--dur-fast)}
+    .met-bar.today{background:var(--green)}
+    .met-bar-lbl{font-size:9px;color:var(--text3);font-weight:600;position:absolute;bottom:0}
+    /* Funnel */
+    .funnel-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+    .funnel-bar-wrap{flex:1;height:10px;background:var(--bg2);border-radius:5px;overflow:hidden}
+    .funnel-bar{height:100%;border-radius:5px;transition:width .6s var(--ease-out)}
+    .funnel-label{font-size:12px;color:var(--text2);width:120px;flex-shrink:0}
+    .funnel-val{font-size:13px;font-weight:700;color:var(--text);width:36px;text-align:right;flex-shrink:0}
+    .funnel-pct{font-size:10px;font-weight:700;width:36px;text-align:right;flex-shrink:0}
+    /* Heatmap */
+    .heatmap{display:flex;gap:3px;flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px}
+    .heatmap::-webkit-scrollbar{display:none}
+    .hm-cell{flex-shrink:0;width:22px;height:22px;border-radius:4px;position:relative;cursor:default}
+    .hm-cell:hover .met-tip{opacity:1;transform:translateX(-50%) translateY(0)}
+    .hm-lbl-row{display:flex;gap:3px;margin-top:4px}
+    .hm-lbl{flex-shrink:0;width:22px;font-size:8px;color:var(--text3);text-align:center}
+    /* NPS redesign */
+    .nps-funnel{display:flex;height:8px;border-radius:6px;overflow:hidden;margin:10px 0 6px;gap:2px}
+    .nps-seg{transition:flex var(--dur-slow) var(--ease-out)}
+    .nps-legend{display:flex;gap:16px}
+    .nps-leg-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text2)}
+    .nps-leg-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+    /* Summary rows */
+    .sum-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border)}
+    .sum-row:last-child{border-bottom:none}
+    @media(max-width:1100px){.met-kpis{grid-template-columns:repeat(2,1fr)}.patient-panel{display:none}.met-grid{grid-template-columns:1fr}.met-grid-3{grid-template-columns:1fr 1fr}}
+    @media(max-width:700px){.met-grid-3{grid-template-columns:1fr}}
 
     /* ── PANEL 3: REACTIVACIÓN ── */
     .p-leads{flex-direction:column;background:var(--bg2);overflow:hidden}
@@ -788,72 +814,124 @@
 
     <!-- PANEL 2: MÉTRICAS -->
     <div class="panel p-metrics" id="panel-2">
-      <div class="met-title">Métricas de rendimiento</div>
-      <div class="met-sub" id="met-sub">Este mes</div>
+
+      <!-- Header -->
+      <div class="met-hd">
+        <div>
+          <div class="met-title">Métricas</div>
+          <div class="met-sub" id="met-sub">—</div>
+        </div>
+        <div class="met-period">
+          <button class="mp-btn active" data-days="30" onclick="setMetPeriod(30,this)">Este mes</button>
+          <button class="mp-btn" data-days="7" onclick="setMetPeriod(7,this)">7 días</button>
+          <button class="mp-btn" data-days="90" onclick="setMetPeriod(90,this)">3 meses</button>
+        </div>
+      </div>
+
+      <!-- KPIs -->
       <div class="met-kpis">
         <div class="kpi">
-          <div class="kpi-l">Mensajes / semana</div>
+          <div class="kpi-l">Mensajes recibidos</div>
           <div class="kpi-n" id="kpi-msgs">—</div>
-          <div class="kpi-spark" id="kpi-spark"></div>
-          <div class="kpi-trend up" id="kpi-msgs-trend"></div>
+          <div class="kpi-trend neu" id="kpi-msgs-trend"></div>
+          <div class="kpi-spark" id="kpi-spark-msgs"></div>
         </div>
         <div class="kpi">
           <div class="kpi-l">Resolución IA</div>
           <div class="kpi-n" id="kpi-res" style="color:var(--green)">—</div>
-          <div class="kpi-spark"></div>
-          <div class="kpi-trend up" id="kpi-res-sub"></div>
+          <div class="kpi-trend neu" id="kpi-res-sub"></div>
+          <div class="kpi-spark" id="kpi-spark-res"></div>
         </div>
         <div class="kpi">
-          <div class="kpi-l">Tiempo respuesta IA</div>
+          <div class="kpi-l">Respuesta media</div>
           <div class="kpi-n" id="kpi-resp">—</div>
-          <div class="kpi-spark"></div>
-          <div class="kpi-trend" id="kpi-resp-sub"></div>
+          <div class="kpi-trend neu" id="kpi-resp-sub"></div>
+          <div class="kpi-spark" id="kpi-spark-resp"></div>
         </div>
         <div class="kpi">
           <div class="kpi-l">Citas confirmadas</div>
           <div class="kpi-n" id="kpi-appts">—</div>
-          <div class="kpi-spark"></div>
-          <div class="kpi-trend up" id="kpi-revenue"></div>
+          <div class="kpi-trend neu" id="kpi-appts-trend"></div>
+          <div class="kpi-spark" id="kpi-spark-appts"></div>
         </div>
       </div>
-      <div class="met-row">
+
+      <!-- Chart + Funnel -->
+      <div class="met-grid">
         <div class="met-card">
-          <div class="met-card-title">Actividad — últimos 7 días</div>
+          <div class="met-card-title">Actividad — últimos 14 días</div>
           <div class="met-chart" id="met-chart"></div>
         </div>
         <div class="met-card">
-          <div class="met-card-title">Resumen del mes</div>
-          <div id="met-summary" style="padding:12px 0;display:flex;flex-direction:column;gap:10px"></div>
+          <div class="met-card-title">Embudo de conversión</div>
+          <div id="met-funnel" style="padding-top:4px"></div>
         </div>
       </div>
-      <div class="met-row" style="margin-top:0">
-        <div class="nps-card">
+
+      <!-- Heatmap + Summary -->
+      <div class="met-grid">
+        <div class="met-card">
+          <div class="met-card-title">Horario de actividad — últimos 30 días</div>
+          <div class="heatmap" id="met-heatmap"></div>
+          <div class="hm-lbl-row" id="met-heatmap-lbls"></div>
+          <div style="display:flex;align-items:center;gap:6px;margin-top:10px">
+            <div style="font-size:10px;color:var(--text3)">Menos</div>
+            <div style="width:12px;height:12px;border-radius:3px;background:var(--green-dim2)"></div>
+            <div style="width:12px;height:12px;border-radius:3px;background:rgba(22,163,74,0.25)"></div>
+            <div style="width:12px;height:12px;border-radius:3px;background:rgba(22,163,74,0.5)"></div>
+            <div style="width:12px;height:12px;border-radius:3px;background:var(--green)"></div>
+            <div style="font-size:10px;color:var(--text3)">Más</div>
+          </div>
+        </div>
+        <div class="met-card">
+          <div class="met-card-title">Resumen del período</div>
+          <div id="met-summary"></div>
+        </div>
+      </div>
+
+      <!-- NPS -->
+      <div class="met-grid-3">
+        <div class="met-card" style="grid-column:span 2">
           <div class="met-card-title">Satisfacción del paciente (NPS)</div>
-          <div style="display:flex;align-items:flex-end;gap:24px;margin-top:10px">
+          <div style="display:flex;align-items:center;gap:32px;margin-top:4px">
             <div>
-              <div class="nps-score" id="nps-avg">—</div>
-              <div class="nps-label">Valoración media /10</div>
-              <div class="nps-stars" id="nps-stars"></div>
+              <div style="font-size:42px;font-weight:900;letter-spacing:-3px;color:var(--text);line-height:1" id="nps-avg">—</div>
+              <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);margin-top:2px">Valoración /10</div>
+              <div id="nps-stars" style="display:flex;gap:2px;margin-top:6px"></div>
             </div>
-            <div>
-              <div class="nps-score" id="nps-index" style="font-size:24px">—</div>
-              <div class="nps-label">NPS Score</div>
+            <div style="flex:1">
+              <div style="display:flex;justify-content:space-between;font-size:11px;font-weight:600;color:var(--text2);margin-bottom:4px">
+                <span id="nps-prom-lbl">Promotores</span>
+                <span id="nps-pas-lbl">Pasivos</span>
+                <span id="nps-det-lbl">Detractores</span>
+              </div>
+              <div class="nps-funnel" id="nps-funnel">
+                <div class="nps-seg" id="nps-seg-prom" style="background:#16a34a;border-radius:6px 0 0 6px;flex:0"></div>
+                <div class="nps-seg" id="nps-seg-pas" style="background:#f59e0b;flex:0"></div>
+                <div class="nps-seg" id="nps-seg-det" style="background:#ef4444;border-radius:0 6px 6px 0;flex:0"></div>
+              </div>
+              <div class="nps-legend">
+                <div class="nps-leg-item"><div class="nps-leg-dot" style="background:#16a34a"></div><span id="nps-prom-pct">—%</span> promotores</div>
+                <div class="nps-leg-item"><div class="nps-leg-dot" style="background:#f59e0b"></div><span id="nps-pas-pct">—%</span> pasivos</div>
+                <div class="nps-leg-item"><div class="nps-leg-dot" style="background:#ef4444"></div><span id="nps-det-pct">—%</span> detractores</div>
+              </div>
             </div>
-            <div style="margin-left:auto;text-align:right">
-              <div style="font-size:20px;font-weight:800;color:var(--text)" id="nps-total">—</div>
-              <div class="nps-label">Encuestas enviadas</div>
-              <div style="font-size:20px;font-weight:800;color:var(--green);margin-top:8px" id="nps-scored">—</div>
-              <div class="nps-label">Respondidas</div>
+            <div style="text-align:center;padding:12px 16px;background:var(--bg2);border-radius:var(--r-sm)">
+              <div style="font-size:28px;font-weight:900;color:var(--text);letter-spacing:-2px" id="nps-index">—</div>
+              <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--text3)">NPS Score</div>
+              <div style="margin-top:10px;font-size:20px;font-weight:800;color:var(--text)" id="nps-total">—</div>
+              <div style="font-size:10px;color:var(--text3)">enviadas</div>
             </div>
           </div>
-          <div style="font-size:11px;color:var(--text3);margin-top:10px">El NPS se envía automáticamente 24h tras confirmar una cita vía WhatsApp.</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:12px">NPS se envía automáticamente 24h tras cada cita. Promotores (9-10) reciben el enlace de reseña Google.</div>
         </div>
-        <div class="met-card" id="nps-tip-card" style="display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;color:var(--text3)">
-          <div style="font-size:28px;margin-bottom:8px">⭐</div>
-          <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px">Reseñas Google</div>
-          <div style="font-size:12px;line-height:1.6">Pacientes con nota ≥ 8 reciben el enlace de reseña automáticamente.<br>Configura el enlace en <b>Ajustes → Asistente virtual</b>.</div>
+        <div class="met-card" style="display:flex;flex-direction:column;gap:10px;justify-content:center">
+          <div style="font-size:28px">⭐</div>
+          <div style="font-size:13px;font-weight:700;color:var(--text)">Reseñas Google</div>
+          <div style="font-size:12px;color:var(--text3);line-height:1.6">Pacientes con nota ≥ 8 reciben el enlace automáticamente.<br>Configura el enlace en <b>Ajustes → Asistente virtual</b>.</div>
         </div>
       </div>
+
     </div>
 
     <!-- PANEL 3: REACTIVACIÓN DE LEADS -->
@@ -1695,59 +1773,137 @@
     if (n === 1) renderCal();
   }
 
+  let _analyticsData = null;
+  let _metPeriodDays = 30;
+
+  function setMetPeriod(days, btn) {
+    _metPeriodDays = days;
+    document.querySelectorAll('.mp-btn').forEach(b => b.classList.toggle('active', b === btn));
+    if (_analyticsData) renderAnalytics(_analyticsData);
+  }
+
+  function spark(containerId, values, color) {
+    const el = document.getElementById(containerId);
+    if (!el) return;
+    const max = Math.max(...values, 1);
+    el.innerHTML = values.map((v,i) => {
+      const h = Math.max(Math.round(v / max * 100), 4);
+      const isHi = i === values.length - 1;
+      return `<div class="sp-b${isHi?' hi':''}" style="height:${h}%;${color&&isHi?'background:'+color:''}"></div>`;
+    }).join('');
+  }
+
+  function trendEl(elId, pct, suffix='% vs anterior') {
+    const el = document.getElementById(elId);
+    if (!el) return;
+    if (pct === 0) { el.className='kpi-trend neu'; el.textContent='→ sin cambio'; return; }
+    el.className = 'kpi-trend ' + (pct > 0 ? 'up' : 'dn');
+    el.textContent = (pct > 0 ? '↑ +' : '↓ ') + pct + suffix;
+  }
+
+  function renderAnalytics(d) {
+    const avg_ticket = 80;
+    const msgs = _metPeriodDays <= 7 ? d.week_messages : d.month_messages;
+    const citas = d.citas_mes;
+    const revenue = citas * avg_ticket;
+
+    // Period label
+    const now = new Date();
+    const periodLabel = _metPeriodDays === 7 ? 'Últimos 7 días'
+      : _metPeriodDays === 90 ? 'Últimos 3 meses'
+      : now.toLocaleDateString('es-ES',{month:'long',year:'numeric'}).replace(/^\w/,c=>c.toUpperCase());
+    document.getElementById('met-sub').textContent = periodLabel;
+
+    // KPIs
+    document.getElementById('kpi-msgs').textContent = msgs;
+    trendEl('kpi-msgs-trend', d.week_trend_pct);
+    spark('kpi-spark-msgs', d.spark_msgs);
+
+    document.getElementById('kpi-res').textContent = d.ia_resolution + '%';
+    const resEl = document.getElementById('kpi-res-sub');
+    resEl.className = 'kpi-trend ' + (d.ia_resolution >= 80 ? 'up' : d.ia_resolution >= 60 ? 'neu' : 'dn');
+    resEl.textContent = d.ia_resolution >= 80 ? '✓ Excelente' : d.ia_resolution >= 60 ? 'Buena' : 'Mejorable';
+    spark('kpi-spark-res', d.spark_msgs.map((_,i) => i === d.spark_msgs.length-1 ? d.ia_resolution : 0).map((v,i) => d.spark_msgs[i] ? d.ia_resolution : 0));
+
+    const secs = d.avg_response_s;
+    document.getElementById('kpi-resp').textContent = !secs ? '—' : secs < 60 ? secs+'s' : (secs/60).toFixed(1)+'min';
+    const respEl = document.getElementById('kpi-resp-sub');
+    respEl.className = 'kpi-trend ' + (secs < 5 ? 'up' : secs < 30 ? 'up' : 'neu');
+    respEl.textContent = !secs ? '' : secs < 5 ? '⚡ Instantáneo' : secs < 30 ? 'Muy rápido' : 'Normal';
+
+    document.getElementById('kpi-appts').textContent = citas;
+    trendEl('kpi-appts-trend', d.citas_trend, '% vs semana ant.');
+    spark('kpi-spark-appts', d.spark_appts);
+
+    // Bar chart (last 14 days)
+    const chart = document.getElementById('met-chart');
+    chart.innerHTML = '';
+    const todayStr = now.toDateString();
+    if (d.daily.length) {
+      const maxVal = Math.max(...d.daily.map(x => parseInt(x.cnt)), 1);
+      d.daily.forEach(x => {
+        const cnt = parseInt(x.cnt);
+        const hPct = Math.max(Math.round(cnt / maxVal * 100), 4);
+        const isToday = new Date(x.date).toDateString() === todayStr;
+        const wrap = document.createElement('div');
+        wrap.className = 'met-bar-wrap';
+        wrap.innerHTML = `<div class="met-tip">${x.day} · ${cnt}</div><div class="met-bar${isToday?' today':''}" style="height:${hPct}%"></div><div class="met-bar-lbl">${x.day}</div>`;
+        chart.appendChild(wrap);
+      });
+    } else {
+      chart.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:20px">Sin datos aún</div>';
+    }
+
+    // Funnel
+    const f = d.funnel;
+    const fMax = Math.max(f.messages, 1);
+    document.getElementById('met-funnel').innerHTML = [
+      ['💬 Mensajes recibidos', f.messages, f.messages/fMax*100, '#16a34a'],
+      ['🗣 Conversaciones únicas', f.sessions, f.sessions/fMax*100, '#0ea5e9'],
+      ['📅 Citas confirmadas', f.citas, f.citas/fMax*100, '#8b5cf6'],
+    ].map(([label, val, pct, color]) => `
+      <div class="funnel-row">
+        <div class="funnel-label">${label}</div>
+        <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:${Math.max(pct,2).toFixed(1)}%;background:${color}"></div></div>
+        <div class="funnel-val">${val}</div>
+        <div class="funnel-pct" style="color:${color}">${pct>=1?Math.round(pct)+'%':'<1%'}</div>
+      </div>`).join('');
+
+    // Heatmap
+    const hm = document.getElementById('met-heatmap');
+    const hmLbls = document.getElementById('met-heatmap-lbls');
+    const hmMax = Math.max(...d.hourly, 1);
+    hm.innerHTML = d.hourly.map((cnt, h) => {
+      const intensity = cnt / hmMax;
+      const bg = intensity < 0.01 ? 'var(--bg3)'
+        : intensity < 0.25 ? 'var(--green-dim2)'
+        : intensity < 0.5  ? 'rgba(22,163,74,0.25)'
+        : intensity < 0.75 ? 'rgba(22,163,74,0.5)'
+        : 'var(--green)';
+      return `<div class="hm-cell" style="background:${bg}"><div class="met-tip" style="left:50%;transform:translateX(-50%) translateY(4px)">${h}:00 · ${cnt} msgs</div></div>`;
+    }).join('');
+    hmLbls.innerHTML = d.hourly.map((_,h) => `<div class="hm-lbl">${h%4===0?h+':00':''}</div>`).join('');
+
+    // Summary
+    document.getElementById('met-summary').innerHTML = [
+      ['💬', 'Mensajes recibidos', msgs],
+      ['🤖', 'Resueltos por IA', Math.round(msgs * d.ia_resolution / 100)],
+      ['👤', 'Conversaciones únicas', f.sessions],
+      ['📅', 'Citas confirmadas', citas],
+      ['💶', 'Valor estimado', revenue.toLocaleString('es-ES') + '€'],
+    ].map(([icon, label, val]) => `
+      <div class="sum-row">
+        <span style="font-size:12px;color:var(--text2)">${icon} ${label}</span>
+        <strong style="font-size:13px;color:var(--text)">${val}</strong>
+      </div>`).join('');
+  }
+
   async function loadAnalytics() {
     try {
       const r = await fetch('/api/analytics');
       if (!r.ok) return;
-      const d = await r.json();
-      const avg_ticket = 80; // €  — configurable en settings más adelante
-
-      // KPIs
-      document.getElementById('kpi-msgs').textContent = d.week_messages;
-      const trend = d.week_trend_pct;
-      document.getElementById('kpi-msgs-trend').textContent = (trend >= 0 ? '↑ ' : '↓ ') + Math.abs(trend) + '% vs semana anterior';
-
-      document.getElementById('kpi-res').textContent = d.ia_resolution + '%';
-      document.getElementById('kpi-res-sub').textContent = d.ia_resolution >= 80 ? '✓ Excelente' : d.ia_resolution >= 60 ? 'Buena resolución' : 'Mejorable';
-
-      const secs = d.avg_response_s;
-      document.getElementById('kpi-resp').textContent = secs < 60 ? secs + 's' : (secs/60).toFixed(1) + 'min';
-      document.getElementById('kpi-resp-sub').textContent = secs < 5 ? '⚡ Instantáneo' : secs < 30 ? 'Muy rápido' : 'Normal';
-
-      document.getElementById('kpi-appts').textContent = d.citas_mes;
-      const revenue = d.citas_mes * avg_ticket;
-      document.getElementById('kpi-revenue').textContent = `≈ ${revenue.toLocaleString('es-ES')}€ valor estimado`;
-
-      // Gráfico barras 7 días
-      const chart = document.getElementById('met-chart');
-      chart.innerHTML = '';
-      if (d.daily.length) {
-        const maxVal = Math.max(...d.daily.map(x => parseInt(x.cnt)), 1);
-        d.daily.forEach(x => {
-          const h = Math.round(parseInt(x.cnt) / maxVal * 100);
-          const wrap = document.createElement('div');
-          wrap.className = 'met-bar-wrap';
-          wrap.innerHTML = `<div class="met-bar-val">${x.cnt}</div><div class="met-bar${h===100?' hi':''}" style="height:${Math.max(h,6)}%"></div><div class="met-bar-lbl">${x.day}</div>`;
-          chart.appendChild(wrap);
-        });
-      } else {
-        chart.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:20px">Sin datos esta semana</div>';
-      }
-
-      // Resumen mes
-      const now = new Date();
-      const mes = now.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' });
-      document.getElementById('met-sub').textContent = mes.charAt(0).toUpperCase() + mes.slice(1);
-      document.getElementById('met-summary').innerHTML = [
-        ['💬', 'Mensajes recibidos', d.month_messages],
-        ['🤖', 'Resueltos por IA', Math.round(d.month_messages * d.ia_resolution / 100)],
-        ['📅', 'Citas confirmadas', d.citas_mes],
-        ['💶', 'Valor estimado', revenue.toLocaleString('es-ES') + '€'],
-      ].map(([icon, label, val]) => `
-        <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border)">
-          <span style="font-size:13px;color:var(--text2)">${icon} ${label}</span>
-          <strong style="font-size:14px;color:var(--text)">${val}</strong>
-        </div>`).join('');
+      _analyticsData = await r.json();
+      renderAnalytics(_analyticsData);
     } catch(e) { console.error('analytics:', e); }
   }
   function selectConv(el){
