@@ -395,6 +395,7 @@
 
     /* ── MOBILE ── */
     .bottom-nav{display:none}
+    .mob-back,.mob-patient-btn,#mob-chat-title{display:none}
     @media(max-width:700px){
       .app-layout{flex-direction:column;height:calc(100vh - 56px - 60px)}
       .sidebar{display:none}
@@ -418,17 +419,44 @@
       .tb-btn{font-size:11px;padding:4px 10px}
 
       /* Conversaciones */
-      .conv-list{width:100%}
-      .chat-area{display:none}
-      .p-conv.chat-open .conv-list{display:none}
-      .p-conv.chat-open .chat-area{display:flex}
-      .conv-stats{grid-template-columns:1fr 1fr}
-      .quick-chips{gap:4px;padding:6px 8px}
-      .qc{font-size:10px;padding:5px 10px}
-      .chat-msgs{padding:12px}
-      .msg{max-width:86%;font-size:13px}
+      .conv-list{width:100%;flex-shrink:0}
+      .chat-area{
+        position:fixed;inset:56px 0 60px 0;
+        background:var(--bg);z-index:150;
+        display:flex;flex-direction:column;
+        transform:translateX(100%);
+        transition:transform var(--dur-base) var(--ease-out);
+        will-change:transform;
+      }
+      .p-conv.chat-open .chat-area{transform:translateX(0)}
+      .patient-panel{display:none}
 
-      /* Agenda */
+      /* Back button + patient sheet button (mobile only) */
+      .mob-back{display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:var(--r-sm);background:none;border:none;cursor:pointer;color:var(--green);flex-shrink:0;-webkit-tap-highlight-color:transparent}
+      .mob-back svg{width:20px;height:20px;stroke:var(--green);stroke-width:2.5}
+      .mob-patient-btn{display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:var(--r-sm);background:var(--ai-dim);border:none;cursor:pointer;flex-shrink:0;-webkit-tap-highlight-color:transparent}
+      .mob-patient-btn svg{width:18px;height:18px;stroke:var(--ai-text);stroke-width:2}
+
+      /* Patient bottom sheet */
+      .pp-sheet-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:300;backdrop-filter:blur(2px)}
+      .pp-sheet-overlay.open{display:block;animation:fadeIn var(--dur-base) ease both}
+      .pp-sheet{position:fixed;bottom:0;left:0;right:0;background:#fff;border-radius:20px 20px 0 0;z-index:301;max-height:80vh;overflow-y:auto;padding:0 16px calc(env(safe-area-inset-bottom,0px) + 20px);transform:translateY(100%);transition:transform var(--dur-base) var(--ease-out)}
+      .pp-sheet.open{transform:translateY(0)}
+      .pp-sheet-handle{width:36px;height:4px;background:var(--border-strong);border-radius:2px;margin:12px auto 16px}
+
+      /* Touch feedback */
+      .conv-item:active{background:var(--bg2);transform:scale(0.99)}
+      .bn-item:active{opacity:.7}
+      .qc:active{transform:scale(0.96)}
+
+      /* Conv stats / chips */
+      .conv-stats{grid-template-columns:1fr 1fr}
+      .quick-chips{gap:4px;padding:6px 8px;overflow-x:auto;flex-wrap:nowrap;-webkit-overflow-scrolling:touch}
+      .qc{font-size:10px;padding:5px 10px;white-space:nowrap;flex-shrink:0}
+      .chat-msgs{padding:12px}
+      .msg{max-width:88%;font-size:13px}
+
+      /* Agenda → día por defecto */
       .ag-side{display:none}
       .ag-body{overflow-y:auto}
       .ag-slot{padding:11px 16px}
@@ -436,11 +464,12 @@
       .ag-hd{padding:12px 16px 10px}
 
       /* Métricas */
-      .p-metrics{padding:14px 12px 80px}
+      .p-metrics{padding:14px 12px 80px;overflow-y:auto}
       .met-kpis{grid-template-columns:1fr 1fr;gap:8px}
       .kpi{padding:13px 14px}
       .kpi-n{font-size:24px}
       .met-row{grid-template-columns:1fr}
+      .nps-card{padding:16px}
 
       /* Leads */
       .leads-table{display:none}
@@ -453,21 +482,44 @@
 
       /* Ajustes */
       .set-grid{grid-template-columns:1fr}
-      .p-settings{padding:16px 12px 80px}
+      .p-settings{padding:16px 12px 80px;overflow-y:auto}
       .set-card{padding:16px}
 
       /* Modales */
       .import-modal{align-items:flex-end}
       .import-box{border-radius:20px 20px 0 0;max-height:90vh}
+
+      /* First-run banner */
+      #firstrun-banner{max-height:50vh;overflow-y:auto}
+
+      /* Topbar mobile: back mode */
+      .topbar.chat-mode .tb-logo-zone{display:none}
+      .topbar.chat-mode .tb-clinic{display:none}
+      .topbar.chat-mode .tb-ia{display:none}
+      .topbar.chat-mode .tb-right .tb-btn:not(#mob-logout){display:none}
+      .mob-back,.mob-patient-btn{display:none}
+      .topbar.chat-mode .mob-back{display:flex}
+      .topbar.chat-mode .mob-patient-btn{display:flex}
+      .topbar.chat-mode #mob-chat-title{display:flex}
+      #mob-chat-title{display:none;flex:1;flex-direction:column;min-width:0}
+      #mob-chat-title span:first-child{font-size:14px;font-weight:700;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+      #mob-chat-title span:last-child{font-size:10px;color:var(--text3)}
     }
   </style>
 </head>
 <body>
 
 <!-- TOP BAR -->
-<header class="topbar">
+<header class="topbar" id="topbar">
+  <button class="mob-back" id="mob-back-btn" onclick="mobileChatBack()" style="margin-left:8px">
+    <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+  </button>
   <div class="tb-logo-zone">
     <div class="tb-logo">CF</div>
+  </div>
+  <div id="mob-chat-title" style="flex:1;flex-direction:column;min-width:0;padding:0 8px">
+    <span id="mob-chat-title-name" style="font-size:14px;font-weight:700;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">—</span>
+    <span style="font-size:10px;color:var(--text3)">WhatsApp · IA activa</span>
   </div>
   <div class="tb-clinic">
     <span class="tb-clinic-name" id="tb-clinic-name-main"></span>
@@ -476,7 +528,10 @@
   <div class="tb-right">
     <div class="tb-ia"><div class="tb-ia-dot"></div>IA activa</div>
     <span id="tb-clinic-name" style="font-size:13px;font-weight:500;color:var(--text2)"></span>
-    <button class="tb-btn" onclick="logout()">Cerrar sesión</button>
+    <button class="mob-patient-btn" id="mob-patient-btn" onclick="openPatientSheet()" title="Ver ficha paciente">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    </button>
+    <button class="tb-btn" id="mob-logout" onclick="logout()">Cerrar sesión</button>
   </div>
 </header>
 
@@ -1072,6 +1127,45 @@
       <span>Ajustes</span>
     </div>
   </nav>
+
+  <!-- PATIENT BOTTOM SHEET (mobile) -->
+  <div class="pp-sheet-overlay" id="pp-sheet-overlay" onclick="closePatientSheet()"></div>
+  <div class="pp-sheet" id="pp-sheet">
+    <div class="pp-sheet-handle"></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <div style="font-size:15px;font-weight:800;color:var(--text)">Ficha paciente</div>
+      <button onclick="closePatientSheet()" style="background:none;border:none;font-size:20px;color:var(--text3);cursor:pointer;padding:4px;line-height:1">×</button>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;padding:14px;background:var(--bg2);border-radius:var(--r);margin-bottom:16px">
+      <div class="pp-ava" id="pp-sheet-ava" style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#16a34a,#22c55e);font-size:14px;font-weight:800;color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0">?</div>
+      <div>
+        <div style="font-size:14px;font-weight:700;color:var(--text)" id="pp-sheet-name">—</div>
+        <div style="font-size:12px;color:var(--text3)" id="pp-sheet-phone">—</div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px">
+      <div style="background:var(--bg2);border-radius:var(--r-sm);padding:10px 8px;text-align:center">
+        <div style="font-size:20px;font-weight:700;color:var(--text)" id="pp-sheet-visits">—</div>
+        <div style="font-size:10px;color:var(--text3);margin-top:2px">visitas</div>
+      </div>
+      <div style="background:var(--bg2);border-radius:var(--r-sm);padding:10px 8px;text-align:center">
+        <div style="font-size:20px;font-weight:700;color:var(--text)" id="pp-sheet-ltv">—</div>
+        <div style="font-size:10px;color:var(--text3);margin-top:2px">LTV est.</div>
+      </div>
+      <div style="background:var(--bg2);border-radius:var(--r-sm);padding:10px 8px;text-align:center">
+        <div style="font-size:14px;font-weight:700" id="pp-sheet-churn">—</div>
+        <div style="font-size:10px;color:var(--text3);margin-top:2px">retención</div>
+      </div>
+    </div>
+    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text3);margin-bottom:8px">Estado IA</div>
+    <div style="background:var(--ai-bg);border:1px solid var(--ai-dim);border-radius:var(--r-sm);padding:10px 12px;margin-bottom:16px">
+      <div style="font-size:9px;font-weight:700;color:var(--ai);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px">⚡ Respondiendo automáticamente</div>
+      <div style="font-size:12px;color:var(--ai-text);font-weight:700" id="pp-sheet-ai-status">IA activa</div>
+    </div>
+    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text3);margin-bottom:8px">Notas internas</div>
+    <textarea id="pp-sheet-notes" placeholder="Notas del equipo..." style="width:100%;font-size:13px;font-family:inherit;color:var(--text);background:var(--bg2);border:1.5px solid var(--border);border-radius:var(--r-sm);padding:10px 12px;resize:none;min-height:80px;outline:none;transition:border-color var(--dur-base)" oninput="scheduleNotesSave()"></textarea>
+    <button onclick="document.getElementById('pp-notes').value=document.getElementById('pp-sheet-notes').value;saveNotes()" style="margin-top:8px;width:100%;font-size:13px;font-weight:700;font-family:inherit;background:var(--green);color:#fff;border:none;padding:11px;border-radius:var(--r-pill);cursor:pointer">Guardar notas</button>
+  </div>
 
   <!-- IMPORT MODAL -->
   <div class="import-modal" id="importModal">
@@ -1762,12 +1856,46 @@
     });
   }
 
+  function mobileChatBack() {
+    document.getElementById('panel-0').classList.remove('chat-open');
+    document.getElementById('topbar').classList.remove('chat-mode');
+  }
+
+  function openPatientSheet() {
+    if (!activePhone) return;
+    // Sync data from sidebar into sheet
+    document.getElementById('pp-sheet-ava').textContent = document.getElementById('pp-ava').textContent;
+    document.getElementById('pp-sheet-ava').style.background = document.getElementById('pp-ava').style.background;
+    document.getElementById('pp-sheet-name').textContent = document.getElementById('pp-name').textContent;
+    document.getElementById('pp-sheet-phone').textContent = document.getElementById('pp-phone').textContent;
+    document.getElementById('pp-sheet-visits').textContent = document.getElementById('pp-stat-visits').textContent;
+    document.getElementById('pp-sheet-ltv').textContent = document.getElementById('pp-stat-ltv').textContent;
+    document.getElementById('pp-sheet-churn').textContent = document.getElementById('pp-stat-churn').textContent;
+    document.getElementById('pp-sheet-notes').value = document.getElementById('pp-notes').value;
+    document.getElementById('pp-sheet-overlay').classList.add('open');
+    document.getElementById('pp-sheet').classList.add('open');
+  }
+
+  function closePatientSheet() {
+    document.getElementById('pp-sheet-overlay').classList.remove('open');
+    document.getElementById('pp-sheet').classList.remove('open');
+  }
+
   async function openConversation(conv, el) {
     // Mark active in list
     document.querySelectorAll('.conv-item').forEach(i => i.classList.remove('active'));
     el.classList.add('active');
     activeSessionId = conv.session_id;
     activePhone = conv.from_number;
+
+    // Mobile: slide to chat
+    const isMobile = window.innerWidth <= 700;
+    if (isMobile) {
+      document.getElementById('panel-0').classList.add('chat-open');
+      const topbar = document.getElementById('topbar');
+      topbar.classList.add('chat-mode');
+      document.getElementById('mob-chat-title-name').textContent = phoneDisplay(conv.from_number);
+    }
 
     // Update header
     const color = convColor(conv.session_id);
@@ -2173,6 +2301,11 @@
   // ── Paso 8: Notas internas ─────────────────────────────────────────────────
   let notesSaveTimer = null;
   function scheduleNotesSave() {
+    // Sync both textareas
+    const mainNotes = document.getElementById('pp-notes');
+    const sheetNotes = document.getElementById('pp-sheet-notes');
+    if (document.activeElement === sheetNotes) mainNotes.value = sheetNotes.value;
+    else sheetNotes.value = mainNotes.value;
     document.getElementById('notes-save-btn').style.display = '';
     clearTimeout(notesSaveTimer);
     notesSaveTimer = setTimeout(saveNotes, 2000);
@@ -2180,6 +2313,7 @@
   async function saveNotes() {
     if (!activePhone) return;
     const notes = document.getElementById('pp-notes').value;
+    document.getElementById('pp-sheet-notes').value = notes;
     await fetch(`/api/patient-note/${encodeURIComponent(activePhone)}`, {
       method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ notes })
     }).catch(() => {});
