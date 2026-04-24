@@ -159,7 +159,24 @@
     .chat-input:focus{border-color:var(--green);background:#fff;box-shadow:var(--shadow-focus)}
     .send-btn{width:34px;height:34px;background:var(--green);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;cursor:pointer;border:none;transition:all var(--dur-fast);box-shadow:0 2px 8px rgba(22,163,74,0.35)}
     .send-btn:hover{background:#15803d;transform:scale(1.05)}
-    .patient-panel{width:220px;border-left:1px solid var(--border);background:#fafbfc;display:flex;flex-direction:column;overflow-y:auto;flex-shrink:0}
+    .patient-panel{width:220px;border-left:1px solid var(--border);background:#fafbfc;flex-direction:column;overflow-y:auto;flex-shrink:0;display:none}
+    .p-conv.conv-active .patient-panel{display:flex}
+    /* Chat empty state */
+    #chat-empty-state{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;background:#f8fafc;padding:40px;text-align:center}
+    .p-conv.conv-active #chat-empty-state{display:none}
+    /* Hide chat chrome until conv selected */
+    .p-conv:not(.conv-active) .chat-hd{display:none}
+    .p-conv:not(.conv-active) .chat-msgs{display:none}
+    .p-conv:not(.conv-active) .quick-chips{display:none}
+    .p-conv:not(.conv-active) .chat-input-row{display:none}
+    .p-conv:not(.conv-active) .copilot-bar{display:none!important}
+    /* Compact first-run bar */
+    .fr-bar{display:flex;align-items:center;gap:10px;padding:9px 20px;background:#fefce8;border-bottom:1px solid rgba(234,179,8,.2);font-size:12px;color:#713f12}
+    .fr-dot{width:7px;height:7px;border-radius:50%;background:#f59e0b;flex-shrink:0;animation:pulse 2s ease-in-out infinite}
+    .fr-close{background:none;border:none;color:#713f12;cursor:pointer;font-size:18px;margin-left:auto;padding:0 4px;opacity:.5;line-height:1;font-family:inherit}
+    .fr-close:hover{opacity:1}
+    /* Hide pp-sheet on desktop */
+    @media(min-width:701px){.pp-sheet,.pp-sheet-overlay{display:none!important}}
     .pp-hd{padding:12px 14px 8px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--text3);border-bottom:1px solid var(--border)}
     .pp-profile{padding:18px 14px 14px;display:flex;flex-direction:column;align-items:center;text-align:center;border-bottom:1px solid var(--border)}
     .pp-ava{width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#16a34a,#22c55e);font-size:16px;font-weight:800;color:#fff;display:flex;align-items:center;justify-content:center;margin-bottom:10px;box-shadow:0 4px 12px rgba(22,163,74,0.3)}
@@ -553,7 +570,6 @@
   </div>
   <div class="tb-right">
     <div class="tb-ia"><div class="tb-ia-dot"></div>IA activa</div>
-    <span id="tb-clinic-name" style="font-size:13px;font-weight:500;color:var(--text2)"></span>
     <button class="mob-patient-btn" id="mob-patient-btn" onclick="openPatientSheet()" title="Ver ficha paciente">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
     </button>
@@ -566,7 +582,7 @@
   <nav class="sidebar">
     <div class="si active" data-panel="0" onclick="switchPanel(0)" title="">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-      <span class="si-badge">4</span>
+      <span class="si-badge" id="si-badge-msgs" style="display:none">0</span>
       <div class="si-tooltip">Conversaciones</div>
     </div>
     <div class="si" data-panel="1" onclick="switchPanel(1)">
@@ -594,33 +610,12 @@
   <!-- MAIN -->
   <main class="main">
 
-    <!-- PANEL 0: CONVERSACIONES -->
-    <!-- Banner first-run: visible hasta que WhatsApp esté activo -->
-    <div id="firstrun-banner" style="display:none;background:linear-gradient(135deg,#f0fdf4,#dcfce7);border-bottom:1px solid #bbf7d0;padding:20px 24px">
-      <div style="max-width:680px;margin:0 auto">
-        <div style="font-size:14px;font-weight:700;color:#15803d;margin-bottom:14px">🎉 ¡Bienvenido/a! Tu clínica está configurada. Un paso más para activar Natalia.</div>
-        <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px">
-          <div style="display:flex;align-items:flex-start;gap:10px">
-            <span style="font-size:16px;line-height:1.2">✅</span>
-            <div><div style="font-size:13px;font-weight:600;color:#166534">Clínica configurada</div><div style="font-size:12px;color:#4ade80;margin-top:1px;color:#15803d;opacity:.8">Natalia conoce tu clínica, servicios y horarios</div></div>
-          </div>
-          <div style="display:flex;align-items:flex-start;gap:10px">
-            <span style="font-size:16px;line-height:1.2">⏳</span>
-            <div><div style="font-size:13px;font-weight:600;color:#166534">WhatsApp pendiente de activación</div><div style="font-size:12px;color:#166534;opacity:.8;margin-top:1px">Nuestro equipo está configurando tu número. Te avisaremos por email cuando esté activo.</div></div>
-          </div>
-          <div style="display:flex;align-items:flex-start;gap:10px">
-            <span style="font-size:16px;line-height:1.2">⬜</span>
-            <div><div style="font-size:13px;font-weight:600;color:#166534;opacity:.6">Primera conversación con Natalia</div></div>
-          </div>
-        </div>
-        <div style="background:#fff;border:1px solid #bbf7d0;border-radius:12px;padding:14px 16px">
-          <div style="font-size:12px;font-weight:700;color:#166534;margin-bottom:6px">📱 ¿Qué cambia cuando se active?</div>
-          <div style="font-size:12px;color:#166534;line-height:1.8">
-            Los mensajes de WhatsApp de tus pacientes llegarán <strong>aquí</strong>, a este panel — ya no en la app del móvil.<br>
-            <strong>Natalia responde automáticamente 24/7.</strong> Si quieres escribir tú, usa el modo manual desde esta pantalla.<br>
-            Para tus pacientes no cambia nada: siguen escribiendo al mismo número de siempre.
-          </div>
-        </div>
+    <!-- Banner first-run (compact) -->
+    <div id="firstrun-banner" style="display:none">
+      <div class="fr-bar">
+        <div class="fr-dot"></div>
+        <span><strong>WhatsApp pendiente de activación</strong> — Nuestro equipo está configurando tu número. Te avisamos por email cuando esté activo.</span>
+        <button class="fr-close" onclick="this.closest('#firstrun-banner').style.display='none'" title="Cerrar">✕</button>
       </div>
     </div>
 
@@ -650,6 +645,14 @@
         </div>
       </div>
       <div class="chat-area">
+        <!-- Empty state: visible until conversation selected -->
+        <div id="chat-empty-state">
+          <div style="width:68px;height:68px;border-radius:50%;background:var(--green-dim);display:flex;align-items:center;justify-content:center">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          </div>
+          <div style="font-size:16px;font-weight:700;color:var(--text);letter-spacing:-.3px">Natalia está lista</div>
+          <div style="font-size:13px;color:var(--text3);max-width:280px;line-height:1.7">Selecciona una conversación de la lista para ver el hilo y responder al paciente.</div>
+        </div>
         <div class="chat-hd" id="chat-hd">
           <div class="chat-hd-av" id="chat-hd-av" style="background:linear-gradient(135deg,#94a3b8,#64748b)">?</div>
           <div style="flex:1;min-width:0">
@@ -1186,7 +1189,7 @@
     <div class="bn-item active" data-panel="0" onclick="switchPanel(0)" style="position:relative">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
       <span>Chats</span>
-      <div class="bn-badge" id="bn-badge">4</div>
+      <div class="bn-badge" id="bn-badge" style="display:none">0</div>
     </div>
     <div class="bn-item" data-panel="1" onclick="switchPanel(1)">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
@@ -1494,7 +1497,6 @@
       if (!r.ok) { window.location.href = '/login'; return; }
       const me = await r.json();
       // Topbar
-      document.getElementById('tb-clinic-name').textContent = me.name;
       document.getElementById('tb-clinic-name-main').textContent = me.name;
       const planTag = document.getElementById('tb-plan-tag');
       if (planTag) { planTag.textContent = (me.plan||'starter').charAt(0).toUpperCase()+(me.plan||'starter').slice(1); }
@@ -1963,6 +1965,11 @@
     empty.style.display = 'none';
     cnt.textContent = convs.length;
     cnt.style.display = '';
+    // Sidebar + bottom nav badge
+    const badge = document.getElementById('si-badge-msgs');
+    const bnBadge = document.getElementById('bn-badge');
+    if (badge) { badge.textContent = convs.length; badge.style.display = convs.length ? '' : 'none'; }
+    if (bnBadge) { bnBadge.textContent = convs.length; bnBadge.style.display = convs.length ? '' : 'none'; }
 
     const today = new Date().toDateString();
     const todayCount = convs.filter(c => new Date(c.created_at).toDateString() === today).length;
@@ -2043,6 +2050,9 @@
     el.classList.add('active');
     activeSessionId = conv.session_id;
     activePhone = conv.from_number;
+
+    // Activate conv panel state
+    document.getElementById('panel-0').classList.add('conv-active');
 
     // Mobile: slide to chat
     const isMobile = window.innerWidth <= 700;
@@ -2180,7 +2190,11 @@
 
   async function closeConversation() {
     if (!activeSessionId) return;
-    await fetch(`/api/conversations/${encodeURIComponent(activeSessionId)}/close`, { method: 'POST' }).catch(() => {});
+    const sid = activeSessionId;
+    document.getElementById('panel-0').classList.remove('conv-active');
+    document.querySelectorAll('.conv-item').forEach(i => i.classList.remove('active'));
+    activeSessionId = null; activePhone = null;
+    await fetch(`/api/conversations/${encodeURIComponent(sid)}/close`, { method: 'POST' }).catch(() => {});
   }
 
   async function toggleManualMode() {
