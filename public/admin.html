@@ -64,6 +64,10 @@
     .plan-pro{background:#dbeafe;color:#1d4ed8}
     .plan-clinica{background:#dcfce7;color:#15803d}
     .empty-clinics{text-align:center;padding:40px;color:var(--t2);font-size:13px}
+    .act-btn{font-family:inherit;font-size:11px;font-weight:600;padding:4px 10px;border-radius:6px;border:none;cursor:pointer;transition:background .15s}
+    .act-activate{background:#dcfce7;color:#15803d}.act-activate:hover{background:#bbf7d0}
+    .act-resend{background:#f1f5f9;color:var(--t2)}.act-resend:hover{background:#e2e8f0}
+    .inline-wa{display:none;margin-top:6px;display:flex;gap:6px;align-items:center}
     @media(max-width:600px){.nc-grid{grid-template-columns:1fr}.content{padding:16px}}
   </style>
 </head>
@@ -142,9 +146,9 @@
     <div class="section-title" style="font-size:15px;margin-bottom:12px">Clínicas activas</div>
     <table class="clinics-table" id="clinicsTable">
       <thead><tr>
-        <th>Clínica</th><th>Email</th><th>Plan</th><th>WhatsApp</th><th>Creada</th>
+        <th>Clínica</th><th>Email</th><th>Plan</th><th>WhatsApp</th><th>Creada</th><th>Acciones</th>
       </tr></thead>
-      <tbody id="clinicsTbody"><tr><td colspan="5" class="empty-clinics">Cargando...</td></tr></tbody>
+      <tbody id="clinicsTbody"><tr><td colspan="6" class="empty-clinics">Cargando...</td></tr></tbody>
     </table>
   </div>
 </div>
@@ -177,15 +181,51 @@
 
   function renderClinics(clinics) {
     const tbody = document.getElementById('clinicsTbody');
-    if (!clinics.length) { tbody.innerHTML = '<tr><td colspan="5" class="empty-clinics">Sin clínicas aún. Crea la primera arriba.</td></tr>'; return; }
+    if (!clinics.length) { tbody.innerHTML = '<tr><td colspan="6" class="empty-clinics">Sin clínicas aún. Crea la primera arriba.</td></tr>'; return; }
     tbody.innerHTML = clinics.map(c => `
       <tr>
         <td><strong>${esc(c.name)}</strong></td>
         <td>${esc(c.email)}</td>
         <td><span class="plan-badge plan-${c.plan||'starter'}">${(c.plan||'starter').charAt(0).toUpperCase()+(c.plan||'starter').slice(1)}</span></td>
-        <td>${c.whatsapp_number ? `<span style="color:#25d366;font-weight:600">${esc(c.whatsapp_number)}</span>` : '<span style="color:var(--t3)">No configurado</span>'}</td>
+        <td>${c.whatsapp_number ? `<span style="color:#25d366;font-weight:600">${esc(c.whatsapp_number)}</span>` : '<span style="color:var(--t3)">Pendiente</span>'}</td>
         <td style="color:var(--t2)">${new Date(c.created_at).toLocaleDateString('es-ES')}</td>
+        <td>
+          <div>
+            <button class="act-btn act-activate" onclick="toggleActivate(${c.id})">⚡ Activar WA</button>
+            <button class="act-btn act-resend" style="margin-left:4px" onclick="resendSetup(${c.id},'${esc(c.email)}','${esc(c.name)}')">📧 Reenviar</button>
+          </div>
+          <div id="wa-form-${c.id}" style="display:none;margin-top:6px;display:flex;gap:6px;align-items:center">
+            <input placeholder="+34 612 345 678" style="font-size:12px;border:1.5px solid var(--border);border-radius:6px;padding:5px 8px;font-family:inherit;outline:none;flex:1" id="wa-input-${c.id}" onkeydown="if(event.key==='Enter')activateWA(${c.id})">
+            <button class="act-btn act-activate" onclick="activateWA(${c.id})">✓</button>
+            <button class="act-btn" style="background:#f1f5f9;color:var(--t2)" onclick="document.getElementById('wa-form-${c.id}').style.display='none'">✕</button>
+          </div>
+        </td>
       </tr>`).join('');
+  }
+
+  function toggleActivate(id) {
+    const f = document.getElementById(`wa-form-${id}`);
+    f.style.display = f.style.display === 'none' ? 'flex' : 'none';
+    if (f.style.display === 'flex') document.getElementById(`wa-input-${id}`).focus();
+  }
+
+  async function activateWA(id) {
+    const input = document.getElementById(`wa-input-${id}`);
+    const wa = input.value.trim();
+    if (!wa) return;
+    const r = await fetch(`/api/admin/activate/${id}?secret=${encodeURIComponent(adminSecret)}`, {
+      method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ whatsapp_number: wa })
+    });
+    const d = await r.json();
+    if (r.ok) { alert(`✅ WhatsApp activado para ${d.name}. Email de confirmación enviado.`); loadClinics(); }
+    else alert(`Error: ${d.error}`);
+  }
+
+  async function resendSetup(id, email, name) {
+    const r = await fetch(`/admin/resend-setup?secret=${encodeURIComponent(adminSecret)}&id=${id}`);
+    const d = await r.json();
+    if (r.ok) alert(`📧 Email de setup reenviado a ${email}`);
+    else alert(`Error: ${d.error}`);
   }
 
   async function createClinic() {

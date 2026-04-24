@@ -174,6 +174,22 @@ function emailWelcomeOnboarding(clinicName, loginUrl) {
 `, `${clinicName} está configurada. Natalia ya puede atender a tus pacientes.`);
 }
 
+function emailWhatsAppActivated(clinicName, loginUrl) {
+  return EMAIL_BASE(`
+<p style="margin:0 0 20px"><span style="display:inline-block;background:#dcfce7;color:#15803d;font-size:11px;font-weight:700;letter-spacing:0.6px;padding:5px 14px;border-radius:100px;text-transform:uppercase;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif">🟢 WhatsApp activo</span></p>
+<h1 style="margin:0 0 8px;font-size:26px;font-weight:800;color:#0f172a;letter-spacing:-0.6px;line-height:1.2;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif">¡Natalia ya está respondiendo en WhatsApp!</h1>
+<p style="margin:0 0 24px;font-size:15px;color:#475569;line-height:1.8;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif">Tu asistente virtual de <strong style="color:#0f172a">${clinicName}</strong> está activa y lista para atender a tus pacientes 24/7. A partir de ahora responderá automáticamente en WhatsApp.</p>
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:32px 0 24px">
+  <tr><td align="center">
+    <a href="${loginUrl}" style="display:inline-block;background:#16a34a;color:#ffffff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:16px;font-weight:700;text-decoration:none;padding:16px 40px;border-radius:40px" target="_blank">
+      <span style="color:#ffffff;text-decoration:none">Ver mi panel →</span>
+    </a>
+  </td></tr>
+</table>
+<p style="margin:0;font-size:13px;color:#94a3b8;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif">¿Dudas? Escríbenos a <strong>contacto@cliniflux.es</strong> — respondemos en menos de 2h.</p>
+`, `Tu WhatsApp ya está activo — Natalia empieza a atender pacientes ahora mismo.`);
+}
+
 function emailOnboardingSetup({ clinic, cfg, whatsapp_number }) {
   const ts = new Date().toLocaleString('es-ES', { dateStyle: 'short', timeStyle: 'short' });
   const waNum = whatsapp_number || '— (no proporcionado)';
@@ -309,6 +325,14 @@ app.get('/health', (_req, res) => res.json({ status: 'ok', ts: Date.now() }));
 // ── Seguridad: headers HTTP ─────────────────────────────────────────────────
 app.disable('x-powered-by');
 app.set('trust proxy', 1); // Railway / proxies: detectar HTTPS correctamente
+
+// Forzar HTTPS en producción (Railway termina TLS en el proxy)
+app.use((req, res, next) => {
+  if (process.env.NODE_ENV === 'production' && req.headers['x-forwarded-proto'] !== 'https') {
+    return res.redirect(301, `https://${req.headers.host}${req.url}`);
+  }
+  next();
+});
 
 app.use((req, res, next) => {
   res.setHeader('X-Content-Type-Options', 'nosniff');
@@ -516,7 +540,6 @@ Con nombre+servicio+franja: CITA_CONFIRMADA|tratamiento=...|fecha=...|hora=...|n
 function parseApptTimestamp(fechaStr = '', horaStr = '') {
   if (!fechaStr || !horaStr) return null;
   try {
-    const monthMap = { ene:0, feb:1, mar:2, abr:3, may:4, jun:5, jul:6, ago:7, sep:8, oct:9, nov:10, dic:11 };
     // Accepts "Lun 23/01", "23/01", "23/01/2025", or ISO date
     const dateClean = fechaStr.replace(/^[A-Za-záéíóúÁÉÍÓÚ]+\s+/, '').trim();
     let d;
@@ -726,6 +749,10 @@ app.get('/login', (req, res) => {
   if (req.session?.clinic) return res.redirect('/dashboard');
   res.sendFile('login.html', { root: 'public' });
 });
+app.get('/registro', (req, res) => {
+  if (req.session?.clinic) return res.redirect('/dashboard');
+  res.sendFile('registro.html', { root: 'public' });
+});
 app.get('/legal/privacidad', (req, res) => res.sendFile('legal/privacidad.html', { root: 'public' }));
 app.get('/legal/terminos', (req, res) => res.sendFile('legal/terminos.html', { root: 'public' }));
 app.get('/legal/cookies', (req, res) => res.sendFile('legal/cookies.html', { root: 'public' }));
@@ -764,6 +791,20 @@ app.get('/admin/clinics', async (req, res) => {
   res.json(rows);
 });
 
+app.get('/admin/resend-setup', async (req, res) => {
+  if (req.query.secret !== (process.env.ADMIN_SECRET || 'cliniflux-admin')) return res.status(403).json({ error: 'Forbidden' });
+  try {
+    const { rows } = await pool.query('SELECT id,name,email,plan,setup_token FROM clinics WHERE id=$1', [req.query.id]);
+    if (!rows.length) return res.status(404).json({ error: 'No encontrada' });
+    const c = rows[0];
+    let token = c.setup_token;
+    if (!token) { token = crypto.randomBytes(16).toString('hex'); await pool.query('UPDATE clinics SET setup_token=$1 WHERE id=$2', [token, c.id]); }
+    const appBase = (process.env.APP_URL || `${req.protocol}://${req.get('host')}`).replace(/\/$/,'');
+    await sendEmail({ to: c.email, subject: `Configura tu asistente Cliniflux`, html: emailSetupLink(c.name, c.plan||'starter', `${appBase}/onboarding?token=${token}`) });
+    res.json({ ok: true });
+  } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
 // ── Onboarding ──────────────────────────────────────────────────────────────
 
 // Tú creas el token: GET /admin/new-clinic?secret=ADMIN_SECRET&email=x&name=y&plan=pro
@@ -790,39 +831,72 @@ app.get('/onboarding', async (req, res) => {
 });
 
 app.post('/api/onboarding', async (req, res) => {
-  const { token, phone, address, hours, services, extra, assistant_name, whatsapp_number, new_password } = req.body;
+  const { token, phone, address, hours, services, extra, assistant_name, whatsapp_number, new_password, google_review_url } = req.body;
   if (!token) return res.status(400).json({ error: 'Token requerido' });
   try {
     const clinic = await getClinicBySetupToken(token);
     if (!clinic) return res.status(404).json({ error: 'Token inválido o ya usado' });
     const config = { phone, address, hours, services, extra, assistant_name: assistant_name||'Natalia', email: clinic.email };
+    if (google_review_url) config.google_review_url = google_review_url;
     await updateClinicConfig(clinic.id, config);
-    if (whatsapp_number) {
-      await pool.query('UPDATE clinics SET whatsapp_number=$1 WHERE id=$2', [whatsapp_number, clinic.id]);
-    }
-    if (new_password) {
-      await pool.query('UPDATE clinics SET password_hash=$1 WHERE id=$2', [hashPassword(new_password), clinic.id]);
-    }
-    const loginUrl = (process.env.APP_URL || `${req.protocol}://${req.get('host')}`).replace(/\/$/, '') + '/login';
-    // Email al cliente
-    await sendEmail({
-      to: clinic.email,
-      subject: `Tu asistente Cliniflux estará activo en menos de 24h`,
-      html: emailWelcomeOnboarding(clinic.name || 'Tu clínica', loginUrl)
-    });
-    // Email interno para activar en Meta Cloud API
+    const updates = ['setup_token=NULL'];
+    const vals = [];
+    if (whatsapp_number) { vals.push(whatsapp_number.replace(/\D/g,'')); updates.push(`whatsapp_number=$${vals.length}`); vals.push(whatsapp_number.replace(/\D/g,'').slice(-9)); updates.push(`whatsapp_normalized=$${vals.length}`); }
+    if (new_password) { vals.push(hashPassword(new_password)); updates.push(`password_hash=$${vals.length}`); }
+    vals.push(clinic.id);
+    await pool.query(`UPDATE clinics SET ${updates.join(',')} WHERE id=$${vals.length}`, vals);
+    // Auto-login
+    await new Promise((ok, fail) => req.session.regenerate(e => e ? fail(e) : ok()));
+    req.session.clinic = { id: clinic.id, name: clinic.name, email: clinic.email };
+    // Emails en paralelo
+    const appBase = (process.env.APP_URL || `${req.protocol}://${req.get('host')}`).replace(/\/$/,'');
     const cfg = { phone, address, hours, services, extra, assistant_name: assistant_name||'Natalia' };
     const notify = process.env.EMAIL_NOTIFY || process.env.EMAIL_FROM || 'contacto@cliniflux.es';
-    await sendEmail({
-      to: notify,
-      subject: `🔧 Nuevo cliente listo para activar — ${clinic.name}`,
-      html: emailOnboardingSetup({ clinic, cfg, whatsapp_number })
-    }).catch(e => console.error('notify email:', e.message));
-    res.json({ ok: true });
+    await Promise.allSettled([
+      sendEmail({ to: clinic.email, subject: `Configuración recibida — activaremos tu WhatsApp hoy`, html: emailWelcomeOnboarding(clinic.name || 'Tu clínica', appBase + '/login') }),
+      sendEmail({ to: notify, subject: `🔧 Nuevo cliente — ${clinic.name}`, html: emailOnboardingSetup({ clinic, cfg, whatsapp_number }) }),
+    ]);
+    res.json({ ok: true, redirect: '/dashboard' });
   } catch(e) {
     console.error('Onboarding:', e.message);
     res.status(500).json({ error: 'Error guardando configuración' });
   }
+});
+
+// Registro libre (plan starter, sin Stripe)
+app.post('/api/register', rateLimit(5, 60000), async (req, res) => {
+  const { name, email, password } = req.body;
+  if (!name || !email || typeof password !== 'string' || password.length < 8)
+    return res.status(400).json({ error: 'Nombre, email y contraseña (mín. 8 chars) requeridos' });
+  try {
+    const { rows } = await pool.query('SELECT id FROM clinics WHERE email=$1', [email.toLowerCase().trim()]);
+    if (rows.length) return res.status(409).json({ error: 'Email ya registrado' });
+    const token = crypto.randomBytes(16).toString('hex');
+    await createClinic({ email: email.toLowerCase().trim(), password_hash: hashPassword(password), name, plan: 'starter', setup_token: token });
+    const appBase = (process.env.APP_URL || `${req.protocol}://${req.get('host')}`).replace(/\/$/,'');
+    await sendEmail({ to: email, subject: `Configura tu asistente Cliniflux`, html: emailSetupLink(name, 'starter', `${appBase}/onboarding?token=${token}`) }).catch(e => console.error('register email:', e.message));
+    res.json({ ok: true });
+  } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+// Admin: activar WhatsApp de una clínica en un clic
+app.post('/api/admin/activate/:id', async (req, res) => {
+  if (req.query.secret !== (process.env.ADMIN_SECRET || 'cliniflux-admin')) return res.status(403).json({ error: 'Forbidden' });
+  const { whatsapp_number } = req.body;
+  if (!whatsapp_number) return res.status(400).json({ error: 'whatsapp_number requerido' });
+  try {
+    const waFull = whatsapp_number.replace(/\D/g,'');
+    const waShort = waFull.slice(-9);
+    const { rows } = await pool.query(
+      'UPDATE clinics SET whatsapp_number=$1, whatsapp_normalized=$2 WHERE id=$3 RETURNING name,email',
+      [waFull, waShort, req.params.id]
+    );
+    if (!rows.length) return res.status(404).json({ error: 'Clínica no encontrada' });
+    const { name, email } = rows[0];
+    const loginUrl = (process.env.APP_URL || `${req.protocol}://${req.get('host')}`).replace(/\/$/,'') + '/login';
+    sendEmail({ to: email, subject: `¡Tu WhatsApp ya está activo en Cliniflux!`, html: emailWhatsAppActivated(name, loginUrl) }).catch(() => {});
+    res.json({ ok: true, name });
+  } catch(e) { res.status(500).json({ error: e.message }); }
 });
 
 // ── Auth routes ─────────────────────────────────────────────────────────────

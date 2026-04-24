@@ -67,14 +67,26 @@
     </div>
 
     <div class="step">
+      <div class="step-n">Paso 2 · extra</div>
+      <div class="step-title">Reseñas y seguimiento</div>
+      <label>Enlace de reseña Google <span style="color:var(--text2);font-weight:400">(opcional)</span></label>
+      <input id="review-url" type="url" placeholder="https://g.page/r/...">
+      <div class="hint">Si lo añades, Natalia pedirá reseñas automáticamente tras cada visita.</div>
+    </div>
+
+    <div class="step">
       <div class="step-n">Paso 3</div>
       <div class="step-title">Tu asistente y acceso</div>
       <label>Nombre del asistente virtual</label>
       <input id="assistant-name" type="text" placeholder="Natalia" value="Natalia">
       <label>Número WhatsApp Business (con prefijo país)</label>
       <input id="wa-number" type="tel" placeholder="+34 612 345 678">
-      <div class="hint">Tu número de WhatsApp Business. Puedes dejarlo vacío y añadirlo después.</div>
-      <label>Nueva contraseña para tu panel *</label>
+      <div class="hint">Nuestro equipo lo activará en tu cuenta de Meta. Puedes dejarlo vacío y añadirlo después desde Ajustes.</div>
+      <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:12px 14px;margin-top:12px">
+        <div style="font-size:11px;font-weight:700;color:#166534;margin-bottom:4px">URL del webhook (para Meta Cloud API)</div>
+        <div style="font-size:11px;font-family:monospace;color:#15803d;word-break:break-all" id="webhook-display">https://cliniflux.es/webhook/whatsapp</div>
+      </div>
+      <label style="margin-top:14px">Nueva contraseña para tu panel *</label>
       <input id="new-pass" type="password" placeholder="Mínimo 8 caracteres">
       <label>Repetir contraseña *</label>
       <input id="new-pass2" type="password" placeholder="Repite la contraseña">
@@ -85,15 +97,8 @@
 
   <div class="success" id="success">
     <div style="font-size:48px;margin-bottom:12px">🎉</div>
-    <h2>¡Configuración completada!</h2>
-    <p>Hemos recibido toda la información de tu clínica.<br>Nuestro equipo activará tu asistente de WhatsApp en <strong>menos de 24 horas</strong>.</p>
-    <div style="background:#fef3c7;border:1px solid rgba(245,158,11,0.3);border-radius:12px;padding:16px 20px;margin:20px 0;text-align:left;font-size:13px;color:#78350f;line-height:1.7">
-      <strong>¿Qué pasa ahora?</strong><br>
-      1. Nuestro equipo configura tu número de WhatsApp Business<br>
-      2. Recibirás un email de confirmación cuando esté activo<br>
-      3. Accede a tu panel para ajustar lo que necesites
-    </div>
-    <a href="/login" style="display:inline-block;font-size:14px;font-weight:700;color:#fff;background:var(--green);padding:12px 28px;border-radius:40px;text-decoration:none">Ver mi panel →</a>
+    <h2>¡Todo listo!</h2>
+    <p>Redirigiendo a tu panel<span id="dots">...</span></p>
   </div>
 </div>
 
@@ -132,6 +137,7 @@
           extra: document.getElementById('extra').value,
           assistant_name: document.getElementById('assistant-name').value || 'Natalia',
           whatsapp_number: document.getElementById('wa-number').value,
+          google_review_url: document.getElementById('review-url').value,
           new_password: pass
         })
       });
@@ -139,6 +145,7 @@
       if (r.ok) {
         document.getElementById('form-area').style.display = 'none';
         document.getElementById('success').style.display = 'block';
+        setTimeout(() => { window.location.href = d.redirect || '/dashboard'; }, 1800);
       } else {
         err.textContent = d.error || 'Error al guardar.';
         err.style.display = 'block';

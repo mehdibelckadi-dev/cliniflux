@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Prueba Cliniflux gratis — Empieza hoy</title>
+  <meta name="description" content="Crea tu cuenta gratuita y configura tu asistente de WhatsApp en 5 minutos.">
+  <link rel="canonical" href="https://cliniflux.es/registro">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800&display=swap" rel="stylesheet">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    :root{--green:#16a34a;--gdim:rgba(22,163,74,0.08);--text:#0f172a;--t2:rgba(15,23,42,0.6);--t3:rgba(15,23,42,0.35);--border:rgba(0,0,0,0.1)}
+    body{font-family:'Inter',sans-serif;background:#f4f5f7;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px 16px;-webkit-font-smoothing:antialiased}
+    .wrap{width:100%;max-width:420px}
+    .logo{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-.8px;margin-bottom:2px}
+    .logo span{color:var(--green)}
+    .tagline{font-size:13px;color:var(--t2);margin-bottom:32px}
+    .card{background:#fff;border-radius:20px;padding:32px;border:1px solid rgba(0,0,0,0.07);box-shadow:0 4px 40px rgba(0,0,0,0.06)}
+    .card-title{font-size:20px;font-weight:800;letter-spacing:-.5px;margin-bottom:4px}
+    .card-sub{font-size:13px;color:var(--t2);margin-bottom:24px}
+    label{display:block;font-size:12px;font-weight:600;color:var(--text);margin-bottom:4px;margin-top:14px}
+    label:first-of-type{margin-top:0}
+    input{width:100%;font-family:inherit;font-size:13px;color:var(--text);background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:10px 12px;outline:none;transition:border-color .15s,box-shadow .15s}
+    input:focus{border-color:var(--green);box-shadow:0 0 0 3px var(--gdim)}
+    .btn{width:100%;font-family:inherit;font-size:15px;font-weight:700;color:#fff;background:var(--green);border:none;padding:13px;border-radius:40px;cursor:pointer;margin-top:20px;transition:background .15s}
+    .btn:hover{background:#15803d}
+    .btn:disabled{opacity:.6;cursor:not-allowed}
+    .err{font-size:12px;color:#dc2626;background:#fef2f2;border:1px solid rgba(220,38,38,.2);border-radius:8px;padding:9px 12px;margin-bottom:14px;display:none}
+    .login-link{text-align:center;font-size:12px;color:var(--t2);margin-top:18px}
+    .login-link a{color:var(--green);font-weight:600;text-decoration:none}
+    .trust{display:flex;gap:16px;justify-content:center;margin-top:20px;flex-wrap:wrap}
+    .trust-item{font-size:11px;color:var(--t3);display:flex;align-items:center;gap:4px}
+    .success-state{display:none;text-align:center;padding:8px 0 4px}
+    .success-state .icon{font-size:44px;margin-bottom:12px}
+    .success-state h2{font-size:20px;font-weight:800;letter-spacing:-.4px;margin-bottom:8px}
+    .success-state p{font-size:13px;color:var(--t2);line-height:1.7}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <div class="logo">clini<span>flux</span></div>
+  <div class="tagline">Asistente de WhatsApp para clínicas</div>
+
+  <div class="card">
+    <div id="form-state">
+      <div class="card-title">Empieza gratis hoy</div>
+      <div class="card-sub">Sin tarjeta de crédito. Configura tu clínica en 5 minutos.</div>
+      <div class="err" id="err"></div>
+      <label>Nombre de la clínica *</label>
+      <input id="name" type="text" placeholder="Clínica Dental Martínez" autocomplete="organization">
+      <label>Email *</label>
+      <input id="email" type="email" placeholder="info@tuclinica.com" autocomplete="email">
+      <label>Contraseña *</label>
+      <input id="pass" type="password" placeholder="Mínimo 8 caracteres" autocomplete="new-password">
+      <label>Repetir contraseña *</label>
+      <input id="pass2" type="password" placeholder="Repite la contraseña" autocomplete="new-password" onkeydown="if(event.key==='Enter')submit()">
+      <button class="btn" id="btn" onclick="submit()">Crear mi cuenta →</button>
+      <div class="login-link">¿Ya tienes cuenta? <a href="/login">Inicia sesión</a></div>
+    </div>
+
+    <div class="success-state" id="success-state">
+      <div class="icon">📬</div>
+      <h2>¡Revisa tu email!</h2>
+      <p>Te hemos enviado un enlace para configurar tu clínica y poner en marcha a Natalia.<br><br>
+      <strong>Revisa también la carpeta de spam</strong> por si acaso.</p>
+    </div>
+  </div>
+
+  <div class="trust">
+    <div class="trust-item">✓ Sin permanencia</div>
+    <div class="trust-item">✓ Configura en 5 min</div>
+    <div class="trust-item">✓ Soporte humano</div>
+  </div>
+</div>
+
+<script>
+  async function submit() {
+    const err = document.getElementById('err');
+    err.style.display = 'none';
+    const name = document.getElementById('name').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const pass = document.getElementById('pass').value;
+    const pass2 = document.getElementById('pass2').value;
+    if (!name) { err.textContent = 'El nombre de la clínica es obligatorio.'; err.style.display = 'block'; return; }
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { err.textContent = 'Email inválido.'; err.style.display = 'block'; return; }
+    if (pass.length < 8) { err.textContent = 'La contraseña debe tener al menos 8 caracteres.'; err.style.display = 'block'; return; }
+    if (pass !== pass2) { err.textContent = 'Las contraseñas no coinciden.'; err.style.display = 'block'; return; }
+    const btn = document.getElementById('btn');
+    btn.disabled = true; btn.textContent = 'Creando cuenta...';
+    try {
+      const r = await fetch('/api/register', {
+        method: 'POST', headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ name, email, password: pass })
+      });
+      const d = await r.json();
+      if (r.ok) {
+        document.getElementById('form-state').style.display = 'none';
+        document.getElementById('success-state').style.display = 'block';
+      } else {
+        err.textContent = d.error || 'Error al crear la cuenta.';
+        err.style.display = 'block';
+        btn.disabled = false; btn.textContent = 'Crear mi cuenta →';
+      }
+    } catch {
+      err.textContent = 'Error de conexión. Inténtalo de nuevo.';
+      err.style.display = 'block';
+      btn.disabled = false; btn.textContent = 'Crear mi cuenta →';
+    }
+  }
+</script>
+</body>
+</html>
