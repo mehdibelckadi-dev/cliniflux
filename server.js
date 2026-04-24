@@ -1128,7 +1128,7 @@ app.post('/webhook/whatsapp', async (req, res) => {
     const completion = await openai.chat.completions.create({
       model: process.env.AI_MODEL || 'gpt-4o-mini',
       messages: [{ role:'system', content: prompt }, ...contextMsgs, { role:'user', content: msg }],
-      max_tokens: 300, temperature: 0.4
+      max_tokens: 320, temperature: 0.6
     });
     let reply = completion.choices[0].message.content;
     const match = reply.match(/CITA_CONFIRMADA\|(.+)/);
