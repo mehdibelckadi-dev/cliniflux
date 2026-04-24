@@ -118,7 +118,11 @@
             <option value="clinica">Clínica — 349€/mes</option>
           </select>
         </div>
-        <div style="display:flex;align-items:flex-end">
+        <div>
+          <div class="nc-label">Demo (días) <span style="color:var(--t3);font-weight:400">— 0 = cliente real</span></div>
+          <input class="nc-input" id="nc-demo" type="number" min="0" max="90" placeholder="0" value="0">
+        </div>
+        <div style="display:flex;align-items:flex-end;grid-column:1/-1">
           <button class="nc-btn" id="nc-btn" onclick="createClinic()" style="width:100%">Generar acceso →</button>
         </div>
       </div>
@@ -188,7 +192,7 @@
         <td>${esc(c.email)}</td>
         <td><span class="plan-badge plan-${c.plan||'starter'}">${(c.plan||'starter').charAt(0).toUpperCase()+(c.plan||'starter').slice(1)}</span></td>
         <td>${c.whatsapp_number ? `<span style="color:#25d366;font-weight:600">${esc(c.whatsapp_number)}</span>` : '<span style="color:var(--t3)">Pendiente</span>'}</td>
-        <td style="color:var(--t2)">${new Date(c.created_at).toLocaleDateString('es-ES')}</td>
+        <td style="color:var(--t2)">${new Date(c.created_at).toLocaleDateString('es-ES')}${c.demo_expires_at ? `<br><span style="font-size:10px;color:#f59e0b;font-weight:600">DEMO · exp. ${new Date(c.demo_expires_at).toLocaleDateString('es-ES')}</span>` : ''}</td>
         <td>
           <div>
             <button class="act-btn act-activate" onclick="toggleActivate(${c.id})">⚡ Activar WA</button>
@@ -236,16 +240,19 @@
     const btn = document.getElementById('nc-btn');
     btn.disabled = true; btn.textContent = 'Creando...';
     try {
-      const r = await fetch(`/admin/new-clinic?secret=${encodeURIComponent(adminSecret)}&email=${encodeURIComponent(email)}&name=${encodeURIComponent(name)}&plan=${plan}`);
+      const demoDays = parseInt(document.getElementById('nc-demo').value) || 0;
+      const url = `/admin/new-clinic?secret=${encodeURIComponent(adminSecret)}&email=${encodeURIComponent(email)}&name=${encodeURIComponent(name)}&plan=${plan}${demoDays>0?'&demo_days='+demoDays:''}`;
+      const r = await fetch(url);
       const d = await r.json();
       if (r.ok) {
         const base = location.origin;
         document.getElementById('res-url').textContent = base + d.setup_url;
         document.getElementById('res-pass').textContent = d.temp_password;
-        document.getElementById('res-email').textContent = email;
+        document.getElementById('res-email').textContent = email + (d.demo_expires_at ? ` · Demo hasta ${new Date(d.demo_expires_at).toLocaleDateString('es-ES')}` : '');
         document.getElementById('resultBox').style.display = 'block';
         document.getElementById('nc-name').value = '';
         document.getElementById('nc-email').value = '';
+        document.getElementById('nc-demo').value = '0';
         loadClinics();
       } else { alert(d.error || d || 'Error'); }
     } catch { alert('Error de conexión'); }

@@ -457,11 +457,10 @@ const SESSION_IDLE_MS = 8 * 60 * 60 * 1000; // 8h
 
 function requireAuth(req, res, next) {
   if (!req.session?.clinic) return res.redirect('/login');
-  // Inactivity check: destroy session if idle > 8h
   const last = req.session.lastActivity || Date.now();
-  if (Date.now() - last > SESSION_IDLE_MS) {
-    return req.session.destroy(() => res.redirect('/login'));
-  }
+  if (Date.now() - last > SESSION_IDLE_MS) return req.session.destroy(() => res.redirect('/login'));
+  const exp = req.session.clinic.demo_expires_at;
+  if (exp && new Date(exp) < new Date()) return res.redirect('/demo-expirada');
   req.session.lastActivity = Date.now();
   next();
 }
@@ -749,10 +748,7 @@ app.get('/login', (req, res) => {
   if (req.session?.clinic) return res.redirect('/dashboard');
   res.sendFile('login.html', { root: 'public' });
 });
-app.get('/registro', (req, res) => {
-  if (req.session?.clinic) return res.redirect('/dashboard');
-  res.sendFile('registro.html', { root: 'public' });
-});
+app.get('/demo-expirada', (req, res) => res.sendFile('demo-expirada.html', { root: 'public' }));
 app.get('/legal/privacidad', (req, res) => res.sendFile('legal/privacidad.html', { root: 'public' }));
 app.get('/legal/terminos', (req, res) => res.sendFile('legal/terminos.html', { root: 'public' }));
 app.get('/legal/cookies', (req, res) => res.sendFile('legal/cookies.html', { root: 'public' }));
@@ -787,7 +783,7 @@ app.get('/admin', (req, res) => res.sendFile('admin.html', { root: 'public' }));
 
 app.get('/admin/clinics', async (req, res) => {
   if (req.query.secret !== (process.env.ADMIN_SECRET || 'cliniflux-admin')) return res.status(403).json({ error: 'Forbidden' });
-  const { rows } = await pool.query('SELECT id,name,email,plan,whatsapp_number,created_at FROM clinics ORDER BY created_at DESC');
+  const { rows } = await pool.query(`SELECT id,name,email,plan,whatsapp_number,created_at,config->>'demo_expires_at' AS demo_expires_at FROM clinics ORDER BY created_at DESC`);
   res.json(rows);
 });
 
@@ -812,13 +808,19 @@ app.get('/admin/new-clinic', async (req, res) => {
   if (req.query.secret !== (process.env.ADMIN_SECRET || 'cliniflux-admin')) {
     return res.status(403).send('Forbidden');
   }
-  const { email, name, plan } = req.query;
+  const { email, name, plan, demo_days } = req.query;
   if (!email || !name) return res.status(400).send('email y name requeridos');
   try {
     const token = crypto.randomBytes(16).toString('hex');
     const tempPass = crypto.randomBytes(8).toString('hex');
-    await createClinic({ email, password_hash: hashPassword(tempPass), name, plan: plan||'starter', setup_token: token });
-    res.json({ ok: true, setup_url: `/onboarding?token=${token}`, temp_password: tempPass });
+    const config = {};
+    if (demo_days && parseInt(demo_days) > 0) {
+      const exp = new Date(); exp.setDate(exp.getDate() + parseInt(demo_days));
+      config.demo_expires_at = exp.toISOString();
+      config.is_demo = 'true';
+    }
+    await createClinic({ email, password_hash: hashPassword(tempPass), name, plan: plan||'starter', setup_token: token, config: Object.keys(config).length ? config : undefined });
+    res.json({ ok: true, setup_url: `/onboarding?token=${token}`, temp_password: tempPass, demo_expires_at: config.demo_expires_at || null });
   } catch(e) {
     res.status(500).send(e.message);
   }
@@ -847,7 +849,7 @@ app.post('/api/onboarding', async (req, res) => {
     await pool.query(`UPDATE clinics SET ${updates.join(',')} WHERE id=$${vals.length}`, vals);
     // Auto-login
     await new Promise((ok, fail) => req.session.regenerate(e => e ? fail(e) : ok()));
-    req.session.clinic = { id: clinic.id, name: clinic.name, email: clinic.email };
+    req.session.clinic = { id: clinic.id, name: clinic.name, email: clinic.email, plan: clinic.plan, demo_expires_at: config.demo_expires_at || clinic.config?.demo_expires_at || null };
     // Emails en paralelo
     const appBase = (process.env.APP_URL || `${req.protocol}://${req.get('host')}`).replace(/\/$/,'');
     const cfg = { phone, address, hours, services, extra, assistant_name: assistant_name||'Natalia' };
@@ -864,20 +866,6 @@ app.post('/api/onboarding', async (req, res) => {
 });
 
 // Registro libre (plan starter, sin Stripe)
-app.post('/api/register', rateLimit(5, 60000), async (req, res) => {
-  const { name, email, password } = req.body;
-  if (!name || !email || typeof password !== 'string' || password.length < 8)
-    return res.status(400).json({ error: 'Nombre, email y contraseña (mín. 8 chars) requeridos' });
-  try {
-    const { rows } = await pool.query('SELECT id FROM clinics WHERE email=$1', [email.toLowerCase().trim()]);
-    if (rows.length) return res.status(409).json({ error: 'Email ya registrado' });
-    const token = crypto.randomBytes(16).toString('hex');
-    await createClinic({ email: email.toLowerCase().trim(), password_hash: hashPassword(password), name, plan: 'starter', setup_token: token });
-    const appBase = (process.env.APP_URL || `${req.protocol}://${req.get('host')}`).replace(/\/$/,'');
-    await sendEmail({ to: email, subject: `Configura tu asistente Cliniflux`, html: emailSetupLink(name, 'starter', `${appBase}/onboarding?token=${token}`) }).catch(e => console.error('register email:', e.message));
-    res.json({ ok: true });
-  } catch(e) { res.status(500).json({ error: e.message }); }
-});
 
 // Admin: activar WhatsApp de una clínica en un clic
 app.post('/api/admin/activate/:id', async (req, res) => {
@@ -913,7 +901,7 @@ app.post('/auth/login', rateLimit(10, 60000), async (req, res) => {
     if (!valid) return res.status(401).json({ error: 'Email o contraseña incorrectos' });
     req.session.regenerate((err) => {
       if (err) return res.status(500).json({ error: 'Error de sesión' });
-      req.session.clinic = { id: clinic.id, name: clinic.name, email: clinic.email };
+      req.session.clinic = { id: clinic.id, name: clinic.name, email: clinic.email, plan: clinic.plan, demo_expires_at: clinic.config?.demo_expires_at || null };
       res.json({ ok: true, name: clinic.name });
     });
   } catch (err) {
