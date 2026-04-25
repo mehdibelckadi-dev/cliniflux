@@ -321,6 +321,45 @@
     .cal-btn-cancel{font-size:12px;font-weight:600;padding:8px 14px;border:1.5px solid var(--border);color:var(--text2);background:#fff;border-radius:8px;cursor:pointer}
     .cal-notify-row{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text2);margin-top:10px}
 
+    /* ── Citas list view ── */
+    .citas-wrap{display:none;flex:1;flex-direction:column;overflow:hidden;background:var(--bg2)}
+    .citas-wrap.active{display:flex}
+    .cal-grid-wrap.list-hidden{display:none}
+    .citas-filter-bar{padding:10px 16px;background:#fff;border-bottom:1px solid var(--border);display:flex;gap:7px;flex-wrap:wrap;align-items:center;flex-shrink:0}
+    .citas-filter-input{font-family:inherit;font-size:12px;color:var(--text);background:var(--bg2);border:1.5px solid var(--border);border-radius:8px;padding:6px 12px;outline:none;width:180px;transition:border-color var(--dur-fast)}
+    .citas-filter-input:focus{border-color:var(--green);background:#fff}
+    .citas-filter-sel{font-family:inherit;font-size:12px;color:var(--text);background:#fff;border:1.5px solid var(--border);border-radius:8px;padding:6px 10px;outline:none;cursor:pointer;transition:border-color var(--dur-fast)}
+    .citas-filter-sel:focus{border-color:var(--green)}
+    .citas-table-wrap{flex:1;overflow-y:auto;padding:16px}
+    .citas-count{font-size:11px;color:var(--text3);margin-bottom:10px;font-weight:600}
+    .citas-table{width:100%;border-collapse:collapse;background:#fff;border-radius:var(--r);overflow:hidden;border:1px solid var(--border);box-shadow:var(--shadow-xs)}
+    .citas-table th{background:var(--bg2);font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;padding:9px 14px;text-align:left;border-bottom:1px solid var(--border);cursor:pointer;user-select:none;white-space:nowrap}
+    .citas-table th:hover{color:var(--text)}
+    .citas-table th.sort-asc::after{content:' ↑'}
+    .citas-table th.sort-desc::after{content:' ↓'}
+    .citas-table td{padding:11px 14px;font-size:12px;color:var(--text);border-bottom:1px solid rgba(0,0,0,0.04)}
+    .citas-table tr:last-child td{border-bottom:none}
+    .citas-table tbody tr:hover td{background:#f8fafc;cursor:pointer}
+    .citas-empty{text-align:center;padding:40px;color:var(--text3);font-size:13px}
+    @media(max-width:700px){.citas-filter-bar{gap:5px;padding:8px 12px}.citas-filter-input{width:130px}.citas-table-wrap{padding:10px 12px 80px}}
+    /* ── Ranking charts (analytics) ── */
+    .rank-row{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--border)}
+    .rank-row:last-child{border-bottom:none}
+    .rank-num{font-size:11px;font-weight:700;color:var(--text3);width:16px;flex-shrink:0;text-align:center}
+    .rank-name{font-size:12px;font-weight:600;color:var(--text);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .rank-bar-wrap{width:80px;height:5px;background:var(--bg2);border-radius:3px;overflow:hidden;flex-shrink:0}
+    .rank-bar{height:100%;border-radius:3px;background:var(--green);transition:width .6s var(--ease-out)}
+    .rank-val{font-size:11px;font-weight:700;color:var(--text);width:24px;text-align:right;flex-shrink:0}
+    .rank-pct{font-size:10px;color:var(--text3);width:36px;text-align:right;flex-shrink:0}
+    .status-dist-row{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--border)}
+    .status-dist-row:last-child{border-bottom:none}
+    .status-dist-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+    .status-dist-name{font-size:12px;color:var(--text2);flex:1}
+    .status-dist-bar-wrap{width:80px;height:5px;background:var(--bg2);border-radius:3px;overflow:hidden;flex-shrink:0}
+    .status-dist-bar{height:100%;border-radius:3px;transition:width .6s var(--ease-out)}
+    .status-dist-val{font-size:11px;font-weight:700;color:var(--text);width:24px;text-align:right;flex-shrink:0}
+    .status-dist-pct{font-size:10px;color:var(--text3);width:36px;text-align:right;flex-shrink:0}
+
     /* ── PANEL 2: MÉTRICAS ── */
     .p-metrics{flex-direction:column;background:var(--bg2);overflow-y:auto;padding:20px 24px 40px}
     .met-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px}
@@ -824,10 +863,50 @@
           <button class="cal-view-btn" onclick="setCalView('day')" id="cal-view-day">Día</button>
           <button class="cal-view-btn active" onclick="setCalView('week')" id="cal-view-week">Semana</button>
           <button class="cal-view-btn" onclick="setCalView('month')" id="cal-view-month">Mes</button>
+          <button class="cal-view-btn" onclick="setCalView('list')" id="cal-view-list">Lista</button>
         </div>
         <button class="cal-add-btn" onclick="openApptModal(null)">+ Nueva cita</button>
       </div>
       <div class="cal-grid-wrap" id="cal-grid-wrap"></div>
+      <!-- Citas list view -->
+      <div class="citas-wrap" id="citas-wrap">
+        <div class="citas-filter-bar">
+          <input class="citas-filter-input" id="citas-search" placeholder="🔍 Buscar paciente o servicio..." oninput="renderCitasList()">
+          <select class="citas-filter-sel" id="citas-status" onchange="renderCitasList()">
+            <option value="">Todos los estados</option>
+            <option value="pending">Pendiente</option>
+            <option value="confirmed">Confirmada</option>
+            <option value="completed">Completada</option>
+            <option value="cancelled">Cancelada</option>
+            <option value="no_show">No asistió</option>
+          </select>
+          <select class="citas-filter-sel" id="citas-prof" onchange="renderCitasList()">
+            <option value="">Todos los profesionales</option>
+          </select>
+          <select class="citas-filter-sel" id="citas-svc" onchange="renderCitasList()">
+            <option value="">Todos los servicios</option>
+          </select>
+          <input class="citas-filter-sel" id="citas-date-from" type="date" onchange="loadCitasList()" title="Desde">
+          <input class="citas-filter-sel" id="citas-date-to" type="date" onchange="loadCitasList()" title="Hasta">
+        </div>
+        <div class="citas-table-wrap">
+          <div class="citas-count" id="citas-count">—</div>
+          <table class="citas-table" id="citas-table">
+            <thead>
+              <tr>
+                <th onclick="sortCitas('scheduled_ts')" data-col="scheduled_ts">Fecha / Hora</th>
+                <th onclick="sortCitas('patient_name')" data-col="patient_name">Paciente</th>
+                <th onclick="sortCitas('service')" data-col="service">Servicio</th>
+                <th onclick="sortCitas('professional')" data-col="professional">Profesional</th>
+                <th onclick="sortCitas('price')" data-col="price">Precio</th>
+                <th onclick="sortCitas('status')" data-col="status">Estado</th>
+              </tr>
+            </thead>
+            <tbody id="citas-tbody"></tbody>
+          </table>
+          <div class="citas-empty" id="citas-empty" style="display:none">Sin citas para los filtros seleccionados.</div>
+        </div>
+      </div>
     </div>
 
     <!-- Modal Cita -->
@@ -1013,6 +1092,28 @@
           <div style="font-size:28px">⭐</div>
           <div style="font-size:13px;font-weight:700;color:var(--text)">Reseñas Google</div>
           <div style="font-size:12px;color:var(--text3);line-height:1.6">Pacientes con nota ≥ 8 reciben el enlace automáticamente.<br>Configura el enlace en <b>Ajustes → Asistente virtual</b>.</div>
+        </div>
+      </div>
+
+      <!-- Top services + professionals + status -->
+      <div class="met-grid">
+        <div class="met-card">
+          <div class="met-card-title">Servicios más solicitados</div>
+          <div id="met-top-svcs"><div style="font-size:12px;color:var(--text3);font-style:italic">Cargando...</div></div>
+        </div>
+        <div class="met-card">
+          <div class="met-card-title">Estado de citas</div>
+          <div id="met-status-dist"><div style="font-size:12px;color:var(--text3);font-style:italic">Cargando...</div></div>
+        </div>
+      </div>
+      <div class="met-grid" style="margin-bottom:0">
+        <div class="met-card">
+          <div class="met-card-title">Profesionales más activos</div>
+          <div id="met-top-profs"><div style="font-size:12px;color:var(--text3);font-style:italic">Cargando...</div></div>
+        </div>
+        <div class="met-card">
+          <div class="met-card-title">Ingresos por servicio</div>
+          <div id="met-revenue-svcs"><div style="font-size:12px;color:var(--text3);font-style:italic">Cargando...</div></div>
         </div>
       </div>
 
@@ -2271,11 +2372,79 @@
 
   async function loadAnalytics() {
     try {
-      const r = await fetch('/api/analytics');
+      const now = new Date();
+      const start = new Date(now.getFullYear(), now.getMonth() - 2, 1);
+      const end   = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+      const [r, rAppts] = await Promise.all([
+        fetch('/api/analytics'),
+        fetch(`/api/calendar?start=${start.toISOString()}&end=${end.toISOString()}`)
+      ]);
       if (!r.ok) return;
       _analyticsData = await r.json();
       renderAnalytics(_analyticsData);
+      if (rAppts.ok) renderApptRankings(await rAppts.json());
     } catch(e) { console.error('analytics:', e); }
+  }
+
+  function renderApptRankings(appts) {
+    const STATUS_COLORS = { pending:'#f59e0b', confirmed:'#16a34a', completed:'#0ea5e9', cancelled:'#94a3b8', no_show:'#ef4444', attended:'#0ea5e9' };
+    const STATUS_LABELS = { pending:'Pendiente', confirmed:'Confirmada', completed:'Completada', cancelled:'Cancelada', no_show:'No asistió', attended:'Asistida' };
+    const total = appts.length || 1;
+
+    // Top services by count
+    const svcMap = {}; appts.forEach(a => { if(a.service){ svcMap[a.service]=(svcMap[a.service]||0)+1; } });
+    const topSvcs = Object.entries(svcMap).sort((a,b)=>b[1]-a[1]).slice(0,6);
+    const maxSvc = topSvcs[0]?.[1] || 1;
+    document.getElementById('met-top-svcs').innerHTML = topSvcs.length
+      ? topSvcs.map(([name,cnt],i) => `<div class="rank-row">
+          <span class="rank-num">${i+1}</span>
+          <span class="rank-name" title="${escHtml(name)}">${escHtml(name)}</span>
+          <div class="rank-bar-wrap"><div class="rank-bar" style="width:${Math.round(cnt/maxSvc*100)}%"></div></div>
+          <span class="rank-val">${cnt}</span>
+          <span class="rank-pct">${Math.round(cnt/total*100)}%</span>
+        </div>`).join('')
+      : '<div style="font-size:12px;color:var(--text3);font-style:italic">Sin datos de servicios aún.</div>';
+
+    // Top professionals by count
+    const profMap = {}; appts.forEach(a => { if(a.professional){ profMap[a.professional]=(profMap[a.professional]||0)+1; } });
+    const topProfs = Object.entries(profMap).sort((a,b)=>b[1]-a[1]).slice(0,5);
+    const maxProf = topProfs[0]?.[1] || 1;
+    document.getElementById('met-top-profs').innerHTML = topProfs.length
+      ? topProfs.map(([name,cnt],i) => `<div class="rank-row">
+          <span class="rank-num">${i+1}</span>
+          <span class="rank-name" title="${escHtml(name)}">${escHtml(name)}</span>
+          <div class="rank-bar-wrap"><div class="rank-bar" style="width:${Math.round(cnt/maxProf*100)}%;background:#8b5cf6"></div></div>
+          <span class="rank-val">${cnt}</span>
+          <span class="rank-pct">${Math.round(cnt/total*100)}%</span>
+        </div>`).join('')
+      : '<div style="font-size:12px;color:var(--text3);font-style:italic">Sin datos de profesionales aún.</div>';
+
+    // Status distribution
+    const stMap = {}; appts.forEach(a => { const s=a.status||'pending'; stMap[s]=(stMap[s]||0)+1; });
+    const stEntries = Object.entries(stMap).sort((a,b)=>b[1]-a[1]);
+    const maxSt = stEntries[0]?.[1] || 1;
+    document.getElementById('met-status-dist').innerHTML = stEntries.length
+      ? stEntries.map(([st,cnt]) => `<div class="status-dist-row">
+          <div class="status-dist-dot" style="background:${STATUS_COLORS[st]||'#94a3b8'}"></div>
+          <span class="status-dist-name">${STATUS_LABELS[st]||st}</span>
+          <div class="status-dist-bar-wrap"><div class="status-dist-bar" style="width:${Math.round(cnt/maxSt*100)}%;background:${STATUS_COLORS[st]||'#94a3b8'}"></div></div>
+          <span class="status-dist-val">${cnt}</span>
+          <span class="status-dist-pct">${Math.round(cnt/total*100)}%</span>
+        </div>`).join('')
+      : '<div style="font-size:12px;color:var(--text3);font-style:italic">Sin citas aún.</div>';
+
+    // Revenue by service
+    const revMap = {}; appts.filter(a=>a.price&&a.service).forEach(a => { revMap[a.service]=(revMap[a.service]||0)+parseFloat(a.price||0); });
+    const topRev = Object.entries(revMap).sort((a,b)=>b[1]-a[1]).slice(0,5);
+    const maxRev = topRev[0]?.[1] || 1;
+    document.getElementById('met-revenue-svcs').innerHTML = topRev.length
+      ? topRev.map(([name,rev],i) => `<div class="rank-row">
+          <span class="rank-num">${i+1}</span>
+          <span class="rank-name" title="${escHtml(name)}">${escHtml(name)}</span>
+          <div class="rank-bar-wrap"><div class="rank-bar" style="width:${Math.round(rev/maxRev*100)}%;background:#0ea5e9"></div></div>
+          <span class="rank-val" style="width:44px">${rev.toFixed(0)}€</span>
+        </div>`).join('')
+      : '<div style="font-size:12px;color:var(--text3);font-style:italic">Sin ingresos registrados aún.</div>';
   }
   function selectConv(el){
     document.querySelectorAll('.conv-item').forEach(i => i.classList.remove('active'));
@@ -3126,8 +3295,94 @@
   }
 
   function setCalView(v) {
+    const isList = v === 'list';
+    document.getElementById('citas-wrap').classList.toggle('active', isList);
+    document.getElementById('cal-grid-wrap').classList.toggle('list-hidden', isList);
+    document.querySelectorAll('.cal-view-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(`cal-view-${v}`)?.classList.add('active');
+    if (isList) { loadCitasList(); return; }
     calState.view = v;
     renderCal();
+  }
+
+  // ── Citas List View ────────────────────────────────────────────────────────
+  let _citasData = [], _citasSort = { col: 'scheduled_ts', asc: true };
+
+  async function loadCitasList() {
+    const from = document.getElementById('citas-date-from').value;
+    const to   = document.getElementById('citas-date-to').value;
+    const now  = new Date();
+    const start = from ? new Date(from) : new Date(now.getFullYear(), now.getMonth() - 1, 1);
+    const end   = to   ? new Date(to)   : new Date(now.getFullYear(), now.getMonth() + 2, 1);
+    const r = await fetch(`/api/calendar?start=${start.toISOString()}&end=${end.toISOString()}`).catch(()=>null);
+    if (!r?.ok) return;
+    _citasData = await r.json();
+    // Populate filter dropdowns
+    const profs = [...new Set(_citasData.map(a=>a.professional).filter(Boolean))];
+    const svcs  = [...new Set(_citasData.map(a=>a.service).filter(Boolean))];
+    const pSel = document.getElementById('citas-prof'), sSel = document.getElementById('citas-svc');
+    const cp = pSel.value, cs = sSel.value;
+    pSel.innerHTML = '<option value="">Todos los profesionales</option>' + profs.map(p=>`<option>${escHtml(p)}</option>`).join('');
+    sSel.innerHTML = '<option value="">Todos los servicios</option>'    + svcs.map(s=>`<option>${escHtml(s)}</option>`).join('');
+    pSel.value = cp; sSel.value = cs;
+    renderCitasList();
+  }
+
+  function sortCitas(col) {
+    if (_citasSort.col === col) _citasSort.asc = !_citasSort.asc;
+    else { _citasSort.col = col; _citasSort.asc = true; }
+    document.querySelectorAll('.citas-table th').forEach(th => {
+      th.classList.remove('sort-asc','sort-desc');
+      if (th.dataset.col === col) th.classList.add(_citasSort.asc ? 'sort-asc' : 'sort-desc');
+    });
+    renderCitasList();
+  }
+
+  function renderCitasList() {
+    const search = (document.getElementById('citas-search')?.value||'').toLowerCase();
+    const st = document.getElementById('citas-status')?.value||'';
+    const pr = document.getElementById('citas-prof')?.value||'';
+    const sv = document.getElementById('citas-svc')?.value||'';
+    const STATUS_LABELS = { pending:'Pendiente', confirmed:'Confirmada', completed:'Completada', cancelled:'Cancelada', no_show:'No asistió', attended:'Asistida' };
+    const STATUS_CSS    = { pending:'sb sb-pending', confirmed:'sb sb-confirmed', completed:'sb sb-attended', cancelled:'sb sb-cancelled', no_show:'sb sb-no_show', attended:'sb sb-attended' };
+
+    let rows = _citasData.filter(a => {
+      if (search && !(a.patient_name||'').toLowerCase().includes(search) && !(a.service||'').toLowerCase().includes(search)) return false;
+      if (st && (a.status||'pending') !== st) return false;
+      if (pr && a.professional !== pr) return false;
+      if (sv && a.service !== sv) return false;
+      return true;
+    });
+
+    // sort
+    const { col, asc } = _citasSort;
+    rows.sort((a,b) => {
+      let va = a[col]??'', vb = b[col]??'';
+      if (col === 'scheduled_ts') { va = new Date(va||0); vb = new Date(vb||0); }
+      else if (col === 'price') { va = parseFloat(va)||0; vb = parseFloat(vb)||0; }
+      else { va = String(va).toLowerCase(); vb = String(vb).toLowerCase(); }
+      return asc ? (va > vb ? 1 : -1) : (va < vb ? 1 : -1);
+    });
+
+    document.getElementById('citas-count').textContent = `${rows.length} cita${rows.length!==1?'s':''}`;
+    const tbody = document.getElementById('citas-tbody');
+    const empty = document.getElementById('citas-empty');
+    if (!rows.length) { tbody.innerHTML=''; empty.style.display=''; return; }
+    empty.style.display = 'none';
+    tbody.innerHTML = rows.map(a => {
+      const ts = a.scheduled_ts ? new Date(a.scheduled_ts) : null;
+      const dateStr = ts ? ts.toLocaleDateString('es-ES',{day:'numeric',month:'short',year:'numeric'}) : '—';
+      const timeStr = ts ? ts.toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'}) : '';
+      const status = a.status||'pending';
+      return `<tr onclick="openApptModal(${JSON.stringify(a).replace(/"/g,'&quot;')})">
+        <td><div style="font-weight:600">${dateStr}</div><div style="font-size:10px;color:var(--text3)">${timeStr}</div></td>
+        <td><div style="font-weight:600">${escHtml(a.patient_name||'—')}</div><div style="font-size:10px;color:var(--text3)">${escHtml(a.patient_phone||'')}</div></td>
+        <td>${escHtml(a.service||'—')}<div style="font-size:10px;color:var(--text3)">${a.duration_min?a.duration_min+'min':''}</div></td>
+        <td>${escHtml(a.professional||'—')}</td>
+        <td>${a.price?'<strong>'+parseFloat(a.price).toFixed(0)+'€</strong>':'—'}</td>
+        <td><span class="${STATUS_CSS[status]||'sb'}">${STATUS_LABELS[status]||status}</span></td>
+      </tr>`;
+    }).join('');
   }
 
   function calNav(dir) {
