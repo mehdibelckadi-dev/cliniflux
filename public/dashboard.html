@@ -1642,22 +1642,30 @@
     e.preventDefault();
     e.currentTarget.closest('.pipe-col').classList.remove('drag-target');
     if (!_pipeDragId || _pipeDragSrcStatus === newStatus) return;
-    await pipeUpdateStatus(_pipeDragId, newStatus);
+    const id = _pipeDragId;
     _pipeDragId = null; _pipeDragSrcStatus = null;
+    pipeUpdateStatus(id, newStatus);
   }
 
   async function pipeUpdateStatus(id, newStatus) {
+    const appt = _pipeAppts.find(a => a.id == id);
+    const prevStatus = appt?.status;
+    // Optimistic update — instant UI
+    if (appt) appt.status = newStatus;
+    renderPipeline();
+    const col = PIPE_COLS.find(c => c.status === newStatus);
+    pipeToast(`Cita movida a ${col?.label || newStatus} ✓`);
+    // Sync to server in background
     const r = await fetch(`/api/calendar/${id}`, {
       method: 'PUT',
       headers: {'Content-Type':'application/json'},
       body: JSON.stringify({ status: newStatus })
     });
-    if (r.ok) {
-      const appt = _pipeAppts.find(a => a.id == id);
-      if (appt) appt.status = newStatus;
+    if (!r.ok && appt) {
+      // Revert on failure
+      appt.status = prevStatus;
       renderPipeline();
-      const col = PIPE_COLS.find(c => c.status === newStatus);
-      pipeToast(`Cita movida a ${col?.label || newStatus} ✓`);
+      pipeToast('Error al guardar — revertido');
     }
   }
 
