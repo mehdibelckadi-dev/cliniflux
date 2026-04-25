@@ -505,6 +505,90 @@
     #pipe-toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#1e293b;color:#fff;font-size:13px;font-weight:600;padding:10px 20px;border-radius:var(--r-pill);z-index:1000;box-shadow:var(--shadow-lg);opacity:0;transition:opacity .25s;pointer-events:none}
     @media(max-width:700px){.p-pipeline{overflow-y:auto}.pipe-topbar{flex-wrap:wrap;padding:10px 12px}.pipe-board{padding:10px 8px 80px;gap:8px}.pipe-col{flex:0 0 220px}.pipe-filters{flex-wrap:nowrap;overflow-x:auto;padding-bottom:2px}.pipe-search{width:130px}}
 
+    /* ── PANEL 6: CLIENTES ── */
+    .p-clientes{flex-direction:row;background:var(--bg2);overflow:hidden;position:relative}
+    .cl-main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+    .cl-topbar{padding:12px 20px;background:#fff;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;flex-shrink:0;flex-wrap:wrap}
+    .cl-title{font-size:17px;font-weight:800;letter-spacing:-.03em;color:var(--text)}
+    .cl-count-badge{font-size:11px;font-weight:700;background:var(--green-dim);color:var(--green);padding:3px 10px;border-radius:var(--r-pill)}
+    .cl-search{font-family:inherit;font-size:12px;color:var(--text);background:var(--bg2);border:1.5px solid var(--border);border-radius:8px;padding:6px 12px;outline:none;width:200px;transition:border-color var(--dur-fast)}
+    .cl-search:focus{border-color:var(--green);background:#fff}
+    .cl-filter-sel{font-family:inherit;font-size:12px;color:var(--text);background:#fff;border:1.5px solid var(--border);border-radius:8px;padding:6px 10px;outline:none;cursor:pointer}
+    .cl-filter-sel:focus{border-color:var(--green)}
+    .cl-topbar-right{display:flex;gap:7px;margin-left:auto;align-items:center}
+    .cl-btn{font-family:inherit;font-size:12px;font-weight:600;padding:7px 14px;border-radius:8px;cursor:pointer;border:1.5px solid var(--border);background:#fff;color:var(--text2);transition:all var(--dur-fast)}
+    .cl-btn:hover{border-color:var(--text2);color:var(--text)}
+    .cl-btn-primary{background:var(--green);color:#fff;border-color:var(--green);font-weight:700}
+    .cl-btn-primary:hover{background:var(--green-hover);border-color:var(--green-hover);color:#fff}
+    .cl-stats-row{display:flex;gap:10px;padding:12px 20px;background:#fff;border-bottom:1px solid var(--border);flex-shrink:0}
+    .cl-stat{flex:1;background:var(--bg2);border-radius:var(--r-sm);padding:10px 14px;border:1px solid var(--border)}
+    .cl-stat-n{font-size:22px;font-weight:900;letter-spacing:-1px;color:var(--text);line-height:1}
+    .cl-stat-l{font-size:10px;font-weight:600;color:var(--text3);margin-top:2px;text-transform:uppercase;letter-spacing:.4px}
+    .cl-stat-sub{font-size:10px;font-weight:600;color:var(--green);margin-top:3px}
+    .cl-table-wrap{flex:1;overflow-y:auto;padding:16px}
+    .cl-table{width:100%;border-collapse:collapse;background:#fff;border-radius:var(--r);overflow:hidden;border:1px solid var(--border);box-shadow:var(--shadow-xs)}
+    .cl-table th{background:var(--bg2);font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;padding:9px 14px;text-align:left;border-bottom:1px solid var(--border);cursor:pointer;user-select:none;white-space:nowrap}
+    .cl-table th:hover{color:var(--text)}
+    .cl-table th.sort-asc::after{content:' ↑'}.cl-table th.sort-desc::after{content:' ↓'}
+    .cl-table td{padding:11px 14px;font-size:12px;color:var(--text);border-bottom:1px solid rgba(0,0,0,0.04);vertical-align:middle}
+    .cl-table tr:last-child td{border-bottom:none}
+    .cl-table tbody tr{cursor:pointer;transition:background var(--dur-fast)}
+    .cl-table tbody tr:hover td{background:#f8fafc}
+    .cl-table tbody tr.selected td{background:var(--green-light)}
+    .cl-table tbody tr.at-risk td:first-child{border-left:3px solid #ef4444}
+    .cl-ava{width:30px;height:30px;border-radius:50%;font-size:11px;font-weight:800;color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .cl-name-cell{display:flex;align-items:center;gap:9px}
+    .cl-name-info{display:flex;flex-direction:column;gap:1px}
+    .cl-name-main{font-size:13px;font-weight:600;color:var(--text)}
+    .cl-name-phone{font-size:10px;color:var(--text3)}
+    .cl-origin-wa{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;background:#dcfce7;color:#15803d;padding:3px 8px;border-radius:var(--r-pill)}
+    .cl-origin-manual{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;background:#eff6ff;color:#1d4ed8;padding:3px 8px;border-radius:var(--r-pill)}
+    .cl-origin-sim{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;background:var(--bg2);color:var(--text3);padding:3px 8px;border-radius:var(--r-pill)}
+    .cl-risk-pill{font-size:10px;font-weight:700;padding:3px 8px;border-radius:var(--r-pill)}
+    .cl-risk-high{background:#fef2f2;color:#dc2626}
+    .cl-risk-mid{background:#fef3c7;color:#92400e}
+    .cl-risk-low{background:#f0fdf4;color:#15803d}
+    .cl-empty{text-align:center;padding:60px 20px;color:var(--text3);font-size:13px}
+    /* Detail panel */
+    .cl-detail{width:340px;background:#fff;border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;flex-shrink:0;transform:translateX(100%);transition:transform var(--dur-slow) var(--ease-out);position:absolute;right:0;top:0;bottom:0;z-index:50;box-shadow:-4px 0 20px rgba(0,0,0,0.06)}
+    .cl-detail.open{transform:translateX(0)}
+    .cl-detail-hd{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;flex-shrink:0}
+    .cl-detail-title{font-size:14px;font-weight:800;color:var(--text);flex:1}
+    .cl-detail-close{background:none;border:none;font-size:18px;color:var(--text3);cursor:pointer;padding:0 4px;line-height:1}
+    .cl-detail-close:hover{color:var(--text)}
+    .cl-detail-body{flex:1;overflow-y:auto;padding:16px}
+    .cl-detail-profile{display:flex;flex-direction:column;align-items:center;text-align:center;padding-bottom:16px;border-bottom:1px solid var(--border);margin-bottom:16px}
+    .cl-detail-ava{width:56px;height:56px;border-radius:50%;font-size:18px;font-weight:800;color:#fff;display:flex;align-items:center;justify-content:center;margin-bottom:10px;box-shadow:0 4px 14px rgba(0,0,0,0.12)}
+    .cl-detail-name{font-size:16px;font-weight:800;color:var(--text);letter-spacing:-.3px;margin-bottom:2px}
+    .cl-detail-phone{font-size:12px;color:var(--text3);margin-bottom:8px}
+    .cl-detail-kpis{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px}
+    .cl-dkpi{background:var(--bg2);border-radius:var(--r-sm);padding:10px 8px;text-align:center;border:1px solid var(--border)}
+    .cl-dkpi-n{font-size:20px;font-weight:900;color:var(--text);letter-spacing:-1px;line-height:1}
+    .cl-dkpi-l{font-size:9px;font-weight:600;color:var(--text3);margin-top:2px;text-transform:uppercase;letter-spacing:.4px}
+    .cl-timeline-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text3);margin-bottom:8px}
+    .cl-timeline{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
+    .cl-timeline-item{display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--bg2);border-radius:var(--r-sm);border:1px solid var(--border)}
+    .cl-timeline-item.upcoming{border-color:rgba(22,163,74,0.3);background:var(--green-light)}
+    .cl-timeline-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+    .cl-timeline-info{flex:1;min-width:0}
+    .cl-timeline-svc{font-size:12px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .cl-timeline-date{font-size:10px;color:var(--text3);margin-top:1px}
+    .cl-timeline-price{font-size:11px;font-weight:700;color:var(--green);flex-shrink:0}
+    .cl-notes-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text3);margin-bottom:6px}
+    .cl-notes-ta{width:100%;font-family:inherit;font-size:12px;color:var(--text);background:var(--bg2);border:1.5px solid var(--border);border-radius:var(--r-sm);padding:8px 10px;resize:vertical;min-height:70px;outline:none;transition:border-color var(--dur-fast)}
+    .cl-notes-ta:focus{border-color:var(--green);background:#fff}
+    .cl-detail-footer{padding:12px 16px;border-top:1px solid var(--border);display:flex;gap:8px;flex-shrink:0}
+    .cl-action-btn{flex:1;font-family:inherit;font-size:12px;font-weight:700;padding:9px;border-radius:8px;cursor:pointer;border:none;transition:all var(--dur-fast)}
+    .cl-action-wa{background:#25d366;color:#fff}.cl-action-wa:hover{background:#22c55e}
+    .cl-action-cita{background:var(--green);color:#fff}.cl-action-cita:hover{background:var(--green-hover)}
+    @media(max-width:700px){
+      .cl-stats-row{display:none}
+      .cl-topbar{padding:8px 12px;gap:5px}
+      .cl-search{width:130px}
+      .cl-table-wrap{padding:10px 12px 80px}
+      .cl-detail{width:100%;left:0;right:0;box-shadow:none}
+    }
+
     /* ── PANEL 4: AJUSTES ── */
     .p-settings{flex-direction:row;background:var(--bg2);overflow:hidden;padding:0}
     .set-nav{width:220px;background:#fff;border-right:1px solid var(--border);display:flex;flex-direction:column;padding:20px 8px;flex-shrink:0;overflow-y:auto;gap:1px}
@@ -713,6 +797,11 @@
     <div class="si" data-panel="5" onclick="switchPanel(5)">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="5" height="18" rx="1"/><rect x="10" y="3" width="5" height="12" rx="1"/><rect x="17" y="3" width="5" height="8" rx="1"/></svg>
       <span class="si-label">Pipeline</span>
+    </div>
+    <div class="si" data-panel="6" onclick="switchPanel(6)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      <span class="si-label">Clientes</span>
+      <span class="si-badge" id="si-badge-clientes" style="display:none">0</span>
     </div>
     <div class="si-divider"></div>
     <div class="si" data-panel="4" onclick="switchPanel(4)">
@@ -1450,6 +1539,90 @@
         </div>
       </div>
       <div class="pipe-board" id="pipe-board"></div>
+    </div>
+
+    <!-- PANEL 6: CLIENTES -->
+    <div class="panel p-clientes" id="panel-6">
+      <div class="cl-main">
+        <div class="cl-topbar">
+          <span class="cl-title">Pacientes</span>
+          <span class="cl-count-badge" id="cl-count-badge">—</span>
+          <input class="cl-search" id="cl-search" placeholder="🔍 Buscar nombre o teléfono..." oninput="renderClientes()">
+          <select class="cl-filter-sel" id="cl-filter-origin" onchange="renderClientes()">
+            <option value="">Todos los orígenes</option>
+            <option value="whatsapp">WhatsApp</option>
+            <option value="manual">Manual</option>
+          </select>
+          <select class="cl-filter-sel" id="cl-filter-status" onchange="renderClientes()">
+            <option value="">Todos</option>
+            <option value="active">Activos (≤90 días)</option>
+            <option value="inactive">Inactivos (&gt;90 días)</option>
+            <option value="risk">En riesgo</option>
+          </select>
+          <div class="cl-topbar-right">
+            <button class="cl-btn" onclick="exportClientesCSV()">⬇ Exportar CSV</button>
+            <button class="cl-btn cl-btn-primary" onclick="openApptModal(null)">+ Nuevo paciente</button>
+          </div>
+        </div>
+        <div class="cl-stats-row">
+          <div class="cl-stat">
+            <div class="cl-stat-n" id="cl-stat-total">—</div>
+            <div class="cl-stat-l">Total pacientes</div>
+          </div>
+          <div class="cl-stat">
+            <div class="cl-stat-n" id="cl-stat-new" style="color:var(--green)">—</div>
+            <div class="cl-stat-l">Nuevos este mes</div>
+          </div>
+          <div class="cl-stat">
+            <div class="cl-stat-n" id="cl-stat-active">—</div>
+            <div class="cl-stat-l">Activos (≤90 días)</div>
+            <div class="cl-stat-sub" id="cl-stat-active-pct"></div>
+          </div>
+          <div class="cl-stat">
+            <div class="cl-stat-n" id="cl-stat-ltv">—</div>
+            <div class="cl-stat-l">LTV total estimado</div>
+          </div>
+          <div class="cl-stat">
+            <div class="cl-stat-n" id="cl-stat-risk" style="color:#ef4444">—</div>
+            <div class="cl-stat-l">En riesgo de fuga</div>
+          </div>
+        </div>
+        <div class="cl-table-wrap">
+          <table class="cl-table" id="cl-table">
+            <thead>
+              <tr>
+                <th onclick="sortClientes('name')" data-col="name">Paciente</th>
+                <th onclick="sortClientes('origin')" data-col="origin">Origen</th>
+                <th onclick="sortClientes('citas')" data-col="citas" style="text-align:center">Citas</th>
+                <th onclick="sortClientes('last_contact')" data-col="last_contact">Última visita</th>
+                <th onclick="sortClientes('ltv')" data-col="ltv">LTV est.</th>
+                <th onclick="sortClientes('risk')" data-col="risk">Riesgo</th>
+                <th style="text-align:right">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="cl-tbody"></tbody>
+          </table>
+          <div class="cl-empty" id="cl-empty" style="display:none">
+            <div style="font-size:32px;margin-bottom:10px">👤</div>
+            <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px">Sin pacientes aún</div>
+            <div>Cuando registres citas o lleguen mensajes por WhatsApp, aparecerán aquí.</div>
+          </div>
+        </div>
+      </div>
+      <!-- Detail slide-in panel -->
+      <div class="cl-detail" id="cl-detail">
+        <div class="cl-detail-hd">
+          <span class="cl-detail-title">Ficha del paciente</span>
+          <button class="cl-detail-close" onclick="closeClienteDetail()">✕</button>
+        </div>
+        <div class="cl-detail-body" id="cl-detail-body">
+          <div style="text-align:center;padding:40px;color:var(--text3)">Selecciona un paciente</div>
+        </div>
+        <div class="cl-detail-footer">
+          <button class="cl-action-btn cl-action-wa" id="cl-detail-wa-btn" onclick="openWhatsAppForClient()">💬 WhatsApp</button>
+          <button class="cl-action-btn cl-action-cita" onclick="openNewApptForClient()">+ Nueva cita</button>
+        </div>
+      </div>
     </div>
 
   </main>
@@ -2240,6 +2413,7 @@
     document.querySelectorAll('.si[data-panel],.bn-item[data-panel]').forEach(s => s.classList.toggle('active', parseInt(s.dataset.panel)===n));
     if (n === 4) { loadSettings(); loadUsage(); }
     if (n === 5) loadPipeline();
+    if (n === 6) loadClientes();
     if (n === 3) loadImportedLeads();
     if (n === 2) { loadAnalytics(); loadNpsResults(); }
     if (n === 1) renderCal();
@@ -3539,6 +3713,329 @@
     document.addEventListener(e, resetIdleTimer, { passive: true })
   );
   resetIdleTimer();
+
+  // ── Clientes ──────────────────────────────────────────────────────────────
+  let _clientes = [];
+  let _clSort = { col: 'last_contact', dir: 'desc' };
+  let _clSelected = null;
+
+  const CL_AVATAR_COLORS = ['#16a34a','#0ea5e9','#8b5cf6','#f59e0b','#ef4444','#ec4899','#14b8a6','#f97316'];
+  function clAvatarColor(name) {
+    let h = 0;
+    for (let i = 0; i < (name||'').length; i++) h = (h * 31 + name.charCodeAt(i)) & 0xffff;
+    return CL_AVATAR_COLORS[h % CL_AVATAR_COLORS.length];
+  }
+  function clInitials(name) {
+    const p = (name||'?').trim().split(/\s+/);
+    return p.length >= 2 ? (p[0][0] + p[p.length-1][0]).toUpperCase() : (p[0].slice(0,2)).toUpperCase();
+  }
+
+  async function loadClientes() {
+    const tbody = document.getElementById('cl-tbody');
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:32px;color:var(--text3)">Cargando...</td></tr>`;
+    try {
+      const now = new Date();
+      const start = new Date(now); start.setFullYear(start.getFullYear() - 3);
+      const end = new Date(now); end.setMonth(end.getMonth() + 6);
+      const fmt = d => d.toISOString().slice(0,10);
+
+      const [rAppts, rConvs] = await Promise.all([
+        fetch(`/api/calendar?start=${fmt(start)}&end=${fmt(end)}`),
+        fetch('/api/conversations')
+      ]);
+      const appts = rAppts.ok ? await rAppts.json() : [];
+      const convs = rConvs.ok ? await rConvs.json() : [];
+
+      // Build whatsapp phone set from conversations
+      const waPhones = new Set(convs.map(c => (c.patient_phone || c.phone || '').replace(/\s/g,'')).filter(Boolean));
+
+      // Group by phone (fallback: by name)
+      const map = new Map();
+      appts.forEach(a => {
+        const phone = (a.patient_phone || '').replace(/\s/g,'') || '';
+        const key = phone || a.patient_name || 'unknown';
+        if (!map.has(key)) {
+          map.set(key, {
+            name: a.patient_name || 'Sin nombre',
+            phone: phone || a.patient_phone || '—',
+            origin: waPhones.has(phone) ? 'whatsapp' : 'manual',
+            appts: [],
+            notes: ''
+          });
+        }
+        map.get(key).appts.push(a);
+        // If any entry matches WA, mark as whatsapp
+        if (phone && waPhones.has(phone)) map.get(key).origin = 'whatsapp';
+      });
+
+      // Also add WA contacts not in appointments
+      convs.forEach(c => {
+        const phone = (c.patient_phone || c.phone || '').replace(/\s/g,'');
+        if (!phone) return;
+        if (!map.has(phone)) {
+          map.set(phone, {
+            name: c.patient_name || c.name || phone,
+            phone,
+            origin: 'whatsapp',
+            appts: [],
+            notes: ''
+          });
+        }
+      });
+
+      const now2 = new Date();
+      const thisMonthStart = new Date(now2.getFullYear(), now2.getMonth(), 1);
+
+      _clientes = Array.from(map.values()).map(p => {
+        const sorted = [...p.appts].sort((a,b) => new Date(b.scheduled_ts||0) - new Date(a.scheduled_ts||0));
+        const lastAppt = sorted[0];
+        const lastDate = lastAppt ? new Date(lastAppt.scheduled_ts) : null;
+        const daysSince = lastDate ? Math.floor((now2 - lastDate) / 86400000) : 9999;
+        const ltv = p.appts.reduce((s,a) => s + parseFloat(a.price||0), 0);
+        const firstDate = sorted.length ? new Date(sorted[sorted.length-1].scheduled_ts) : null;
+        const isNew = firstDate && firstDate >= thisMonthStart;
+        return {
+          name: p.name,
+          phone: p.phone,
+          origin: p.origin,
+          citas: p.appts.length,
+          last_contact: lastDate,
+          days_since: daysSince,
+          ltv,
+          risk: daysSince > 120 ? 'high' : daysSince > 60 ? 'mid' : 'low',
+          appts: sorted,
+          is_new: isNew
+        };
+      });
+
+      // Update sidebar badge
+      const atRisk = _clientes.filter(c => c.risk === 'high').length;
+      const badge = document.getElementById('si-badge-clientes');
+      if (badge) { badge.textContent = atRisk; badge.style.display = atRisk ? '' : 'none'; }
+
+      renderClientes();
+    } catch(e) {
+      console.error('loadClientes', e);
+      document.getElementById('cl-tbody').innerHTML = `<tr><td colspan="7" style="text-align:center;padding:32px;color:#ef4444">Error al cargar</td></tr>`;
+    }
+  }
+
+  function sortClientes(col) {
+    if (_clSort.col === col) _clSort.dir = _clSort.dir === 'asc' ? 'desc' : 'asc';
+    else { _clSort.col = col; _clSort.dir = col === 'last_contact' ? 'desc' : col === 'citas' || col === 'ltv' ? 'desc' : 'asc'; }
+    renderClientes();
+  }
+
+  function renderClientes() {
+    const q = (document.getElementById('cl-search')?.value || '').toLowerCase();
+    const originF = document.getElementById('cl-filter-origin')?.value || '';
+    const statusF = document.getElementById('cl-filter-status')?.value || '';
+
+    let list = _clientes.filter(c => {
+      if (q && !c.name.toLowerCase().includes(q) && !c.phone.includes(q)) return false;
+      if (originF && c.origin !== originF) return false;
+      if (statusF === 'active' && c.days_since > 90) return false;
+      if (statusF === 'inactive' && c.days_since <= 90) return false;
+      if (statusF === 'risk' && c.risk !== 'high') return false;
+      return true;
+    });
+
+    const { col, dir } = _clSort;
+    list.sort((a, b) => {
+      let va = a[col], vb = b[col];
+      if (col === 'last_contact') { va = a.last_contact?.getTime() || 0; vb = b.last_contact?.getTime() || 0; }
+      if (col === 'name') { va = va?.toLowerCase(); vb = vb?.toLowerCase(); }
+      if (col === 'risk') { const o = {low:0,mid:1,high:2}; va = o[va]||0; vb = o[vb]||0; }
+      const cmp = va < vb ? -1 : va > vb ? 1 : 0;
+      return dir === 'asc' ? cmp : -cmp;
+    });
+
+    // Stats
+    const total = _clientes.length;
+    const newM = _clientes.filter(c => c.is_new).length;
+    const active = _clientes.filter(c => c.days_since <= 90).length;
+    const ltvTotal = _clientes.reduce((s,c) => s + c.ltv, 0);
+    const risk = _clientes.filter(c => c.risk === 'high').length;
+    document.getElementById('cl-stat-total').textContent = total;
+    document.getElementById('cl-stat-new').textContent = '+' + newM;
+    document.getElementById('cl-stat-active').textContent = active;
+    document.getElementById('cl-stat-active-pct').textContent = total ? Math.round(active/total*100)+'% retención' : '';
+    document.getElementById('cl-stat-ltv').textContent = ltvTotal >= 1000 ? (ltvTotal/1000).toFixed(1)+'k€' : ltvTotal.toFixed(0)+'€';
+    document.getElementById('cl-stat-risk').textContent = risk;
+    document.getElementById('cl-count-badge').textContent = list.length + (list.length !== total ? ' / '+total : '') + ' pacientes';
+
+    // Sort headers
+    document.querySelectorAll('.cl-table th[data-col]').forEach(th => {
+      th.classList.remove('sort-asc','sort-desc');
+      if (th.dataset.col === col) th.classList.add(_clSort.dir === 'asc' ? 'sort-asc' : 'sort-desc');
+    });
+
+    const tbody = document.getElementById('cl-tbody');
+    const empty = document.getElementById('cl-empty');
+    if (!list.length) { tbody.innerHTML = ''; empty.style.display = ''; return; }
+    empty.style.display = 'none';
+
+    tbody.innerHTML = list.map(c => {
+      const color = clAvatarColor(c.name);
+      const initials = clInitials(c.name);
+      const originBadge = c.origin === 'whatsapp'
+        ? `<span class="cl-origin-wa">●&nbsp;WhatsApp</span>`
+        : `<span class="cl-origin-manual">●&nbsp;Manual</span>`;
+      const lastStr = c.last_contact
+        ? c.last_contact.toLocaleDateString('es-ES',{day:'2-digit',month:'short',year:'2-digit'})
+        : '—';
+      const riskClass = c.risk === 'high' ? 'cl-risk-high' : c.risk === 'mid' ? 'cl-risk-mid' : 'cl-risk-low';
+      const riskLabel = c.risk === 'high' ? '🔴 Alto' : c.risk === 'mid' ? '🟡 Medio' : '🟢 OK';
+      const ltvStr = c.ltv > 0 ? (c.ltv >= 1000 ? (c.ltv/1000).toFixed(1)+'k€' : c.ltv.toFixed(0)+'€') : '—';
+      const sel = _clSelected?.phone === c.phone ? ' selected' : '';
+      const atRiskRow = c.risk === 'high' ? ' at-risk' : '';
+      return `<tr class="${sel}${atRiskRow}" onclick="openClienteDetail('${escHtml(c.phone)}')">
+        <td><div class="cl-name-cell">
+          <div class="cl-ava" style="background:${color}">${initials}</div>
+          <div class="cl-name-info">
+            <div class="cl-name-main">${escHtml(c.name)}</div>
+            <div class="cl-name-phone">${escHtml(c.phone)}</div>
+          </div>
+        </div></td>
+        <td>${originBadge}</td>
+        <td style="text-align:center;font-weight:700">${c.citas}</td>
+        <td>${lastStr}</td>
+        <td style="font-weight:700;color:var(--green)">${ltvStr}</td>
+        <td><span class="cl-risk-pill ${riskClass}">${riskLabel}</span></td>
+        <td style="text-align:right">
+          <button class="cl-btn" style="font-size:11px;padding:4px 10px" onclick="event.stopPropagation();openClienteDetail('${escHtml(c.phone)}')">Ver →</button>
+        </td>
+      </tr>`;
+    }).join('');
+  }
+
+  function openClienteDetail(phone) {
+    const c = _clientes.find(p => p.phone === phone);
+    if (!c) return;
+    _clSelected = c;
+    renderClientes(); // update selected row
+
+    const color = clAvatarColor(c.name);
+    const initials = clInitials(c.name);
+    const originBadge = c.origin === 'whatsapp'
+      ? `<span class="cl-origin-wa">●&nbsp;WhatsApp</span>`
+      : `<span class="cl-origin-manual">●&nbsp;Manual</span>`;
+    const riskClass = c.risk === 'high' ? 'cl-risk-high' : c.risk === 'mid' ? 'cl-risk-mid' : 'cl-risk-low';
+    const riskLabel = c.risk === 'high' ? '🔴 Alto riesgo' : c.risk === 'mid' ? '🟡 Riesgo medio' : '🟢 Activo';
+    const ltvStr = c.ltv > 0 ? c.ltv.toFixed(0)+'€' : '—';
+    const daysSinceStr = c.days_since === 9999 ? '—' : c.days_since === 0 ? 'Hoy' : c.days_since + 'd';
+
+    const timelineHtml = c.appts.length === 0
+      ? `<div style="text-align:center;padding:16px;color:var(--text3);font-size:12px">Sin citas registradas</div>`
+      : c.appts.slice(0,8).map(a => {
+          const d = new Date(a.scheduled_ts);
+          const upcoming = d > new Date();
+          const st = a.status || 'pending';
+          const stColors = {confirmed:'#16a34a',pending:'#f59e0b',completed:'#0ea5e9',cancelled:'#94a3b8',no_show:'#ef4444'};
+          const dotColor = stColors[st] || '#94a3b8';
+          const priceStr = a.price > 0 ? a.price+'€' : '';
+          return `<div class="cl-timeline-item${upcoming?' upcoming':''}">
+            <div class="cl-timeline-dot" style="background:${dotColor}"></div>
+            <div class="cl-timeline-info">
+              <div class="cl-timeline-svc">${escHtml(a.service||'Sin servicio')}</div>
+              <div class="cl-timeline-date">${d.toLocaleDateString('es-ES',{day:'2-digit',month:'short',year:'2-digit'})}${a.professional?` · ${escHtml(a.professional)}`:''}${upcoming?' · Próxima':''}</div>
+            </div>
+            ${priceStr?`<div class="cl-timeline-price">${priceStr}</div>`:''}
+          </div>`;
+        }).join('');
+
+    document.getElementById('cl-detail-body').innerHTML = `
+      <div class="cl-detail-profile">
+        <div class="cl-detail-ava" style="background:${color}">${initials}</div>
+        <div class="cl-detail-name">${escHtml(c.name)}</div>
+        <div class="cl-detail-phone">${escHtml(c.phone)}</div>
+        <div style="margin-top:6px;display:flex;gap:6px;align-items:center">${originBadge}<span class="cl-risk-pill ${riskClass}">${riskLabel}</span></div>
+      </div>
+      <div class="cl-detail-kpis">
+        <div class="cl-dkpi"><div class="cl-dkpi-n">${c.citas}</div><div class="cl-dkpi-l">Citas</div></div>
+        <div class="cl-dkpi"><div class="cl-dkpi-n" style="color:var(--green)">${ltvStr}</div><div class="cl-dkpi-l">LTV est.</div></div>
+        <div class="cl-dkpi"><div class="cl-dkpi-n">${daysSinceStr}</div><div class="cl-dkpi-l">Última vis.</div></div>
+      </div>
+      <div class="cl-timeline-title">Historial de citas</div>
+      <div class="cl-timeline">${timelineHtml}</div>
+      <div class="cl-notes-title">Notas internas</div>
+      <textarea class="cl-notes-ta" id="cl-notes-ta" placeholder="Notas del equipo (solo visibles en el panel)..." onchange="saveClienteNotes('${escHtml(c.phone)}')">${escHtml(c.notes||'')}</textarea>
+      <button onclick="saveClienteNotes('${escHtml(c.phone)}')" style="margin-top:6px;font-size:11px;font-weight:600;font-family:inherit;background:var(--green);color:#fff;border:none;padding:5px 14px;border-radius:var(--r-pill);cursor:pointer">Guardar notas</button>
+    `;
+
+    document.getElementById('cl-detail').classList.add('open');
+
+    // Load notes from server
+    fetch(`/api/patient-note/${encodeURIComponent(phone)}`)
+      .then(r => r.json()).then(d => {
+        const ta = document.getElementById('cl-notes-ta');
+        if (ta && d.notes) ta.value = d.notes;
+      }).catch(()=>{});
+  }
+
+  function closeClienteDetail() {
+    document.getElementById('cl-detail').classList.remove('open');
+    _clSelected = null;
+    renderClientes();
+  }
+
+  async function saveClienteNotes(phone) {
+    const ta = document.getElementById('cl-notes-ta');
+    if (!ta) return;
+    try {
+      await fetch(`/api/patient-note/${encodeURIComponent(phone)}`, {
+        method: 'POST', headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ notes: ta.value })
+      });
+      // tiny visual feedback
+      const prev = ta.style.borderColor;
+      ta.style.borderColor = 'var(--green)';
+      setTimeout(() => { ta.style.borderColor = prev; }, 800);
+    } catch(e) { console.error(e); }
+  }
+
+  function openWhatsAppForClient() {
+    if (!_clSelected) return;
+    // Switch to conversations panel and open that patient's conversation
+    const phone = _clSelected.phone;
+    switchPanel(0);
+    setTimeout(() => {
+      const item = document.querySelector(`.conv-item[data-phone="${CSS.escape(phone)}"]`);
+      if (item) item.click();
+    }, 300);
+  }
+
+  function openNewApptForClient() {
+    if (!_clSelected) return;
+    const c = _clSelected;
+    openApptModal(null);
+    setTimeout(() => {
+      const nameEl = document.getElementById('cal-f-name');
+      const phoneEl = document.getElementById('cal-f-phone');
+      if (nameEl) nameEl.value = c.name;
+      if (phoneEl) phoneEl.value = c.phone;
+    }, 50);
+  }
+
+  function exportClientesCSV() {
+    const headers = ['Nombre','Teléfono','Origen','Citas','Última visita','LTV estimado €','Riesgo'];
+    const rows = _clientes.map(c => [
+      `"${(c.name||'').replace(/"/g,'""')}"`,
+      `"${c.phone}"`,
+      c.origin,
+      c.citas,
+      c.last_contact ? c.last_contact.toISOString().slice(0,10) : '',
+      c.ltv.toFixed(2),
+      c.risk
+    ]);
+    const csv = [headers, ...rows].map(r => r.join(',')).join('\n');
+    const blob = new Blob(['\uFEFF'+csv], {type:'text/csv;charset=utf-8;'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `clientes_${new Date().toISOString().slice(0,10)}.csv`;
+    a.click();
+  }
+  // ── end Clientes ───────────────────────────────────────────────────────────
 
   loadConversations();
   initPush();
