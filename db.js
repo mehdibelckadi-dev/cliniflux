@@ -179,6 +179,9 @@ async function initDb() {
     `ALTER TABLE appointments ADD COLUMN IF NOT EXISTS followup_sent_at TIMESTAMP`,
     `ALTER TABLE appointments ADD COLUMN IF NOT EXISTS review_sent_at TIMESTAMP`,
     `ALTER TABLE appointments ADD COLUMN IF NOT EXISTS bot_booked BOOLEAN DEFAULT FALSE`,
+    `ALTER TABLE appointments ADD COLUMN IF NOT EXISTS professional TEXT`,
+    `ALTER TABLE appointments ADD COLUMN IF NOT EXISTS price NUMERIC(10,2)`,
+    `ALTER TABLE appointments ADD COLUMN IF NOT EXISTS room TEXT`,
   ];
   for (const sql of migrations) await pool.query(sql);
 
@@ -196,6 +199,24 @@ async function initDb() {
       UNIQUE(clinic_id, email)
     )
   `);
+  await pool.query(`ALTER TABLE staff_members ADD COLUMN IF NOT EXISTS color TEXT`);
+  await pool.query(`ALTER TABLE staff_members ADD COLUMN IF NOT EXISTS specialty TEXT`);
+
+  // Blocked time slots
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS blocked_slots (
+      id           SERIAL PRIMARY KEY,
+      clinic_id    INTEGER NOT NULL REFERENCES clinics(id) ON DELETE CASCADE,
+      title        TEXT NOT NULL DEFAULT 'Bloqueado',
+      start_ts     TIMESTAMP NOT NULL,
+      end_ts       TIMESTAMP NOT NULL,
+      room         TEXT,
+      professional TEXT,
+      recurring    TEXT DEFAULT 'none',
+      created_at   TIMESTAMP DEFAULT NOW()
+    )
+  `);
+  await pool.query(`CREATE INDEX IF NOT EXISTS idx_blocked_slots_clinic ON blocked_slots(clinic_id, start_ts)`);
   await pool.query(`
     CREATE TABLE IF NOT EXISTS audit_logs (
       id         SERIAL PRIMARY KEY,
@@ -313,7 +334,7 @@ async function updateClinicConfig(id, config) {
   await pool.query('UPDATE clinics SET config=$1, setup_token=NULL WHERE id=$2', [JSON.stringify(config), id]);
 }
 
-function buildPromptForClinic(clinic) {
+function buildPromptForClinic(clinic, staffList = []) {
   const cfg = clinic.config || {};
   const h = new Date().getHours();
   const saludo = h < 12 ? 'Buenos días' : h < 20 ? 'Buenas tardes' : 'Buenas noches';
@@ -322,67 +343,62 @@ function buildPromptForClinic(clinic) {
   const phone = cfg.phone || '';
   const hours = cfg.hours || 'L-V 9:00-20:00';
 
+  // Build staff routing section
+  const activeStaff = staffList.filter(s => s.active);
+  const staffSection = activeStaff.length > 0 ? `
+EQUIPO Y ENRUTAMIENTO DE CITAS
+La clínica cuenta con los siguientes profesionales activos:
+${activeStaff.map(s => `- ${s.name}${s.specialty ? ` (${s.specialty})` : ''}`).join('\n')}
+
+Cuando un paciente pide cita, identifica el servicio o tratamiento y asigna mentalmente al profesional más adecuado según su especialidad. Cuando confirmes la cita con CITA_CONFIRMADA, incluye el campo profesional= con el nombre del especialista apropiado. Si el paciente ya menciona un profesional concreto por nombre, respétalo. Si hay duda, menciona el nombre del profesional de forma natural: "Le apuntaré con ${activeStaff[0]?.name || 'nuestro especialista'}".` : '';
+
   return `Eres ${name}, recepcionista de ${clinic.name}. Hoy es ${fecha}.
 
 IDENTIDAD
-Llevas años en esta clínica. Conoces a los pacientes, sabes cómo hablan, cuándo están nerviosos o con prisa. Tu trabajo es que cada persona que escribe se sienta bien atendida — no procesada. Hablas como una persona real: con naturalidad, con calidez, sin formalidad exagerada. Nunca suenas a chatbot.
+Llevas años en esta clínica. Conoces a los pacientes, sus nombres, sus tratamientos, sus manías. Cuando alguien escribe, sientes que ya le conoces aunque sea la primera vez. Tu trabajo es que cada persona que contacta se sienta en manos de alguien competente y cercano — no de una máquina. Hablas como habla el mejor recepcionista de una clínica de nivel: con calidez real, criterio, y sin protocolo artificial.
 
 VOZ Y ESTILO
-- Frases cortas. Máximo 3-4 líneas por respuesta. Nunca párrafos largos.
-- 1 emoji por mensaje como mucho, y solo cuando encaje de verdad. Nunca en cada frase.
-- Usas "usted" de forma natural. Puedes usar "le", "su", "para usted".
-- Variás las respuestas. No repites siempre las mismas frases de apertura.
-- Nunca uses listas con guiones o números en tu respuesta al paciente. Escribe en prosa, como en una conversación.
-- Si el paciente escribe informal o con erratas, no lo corrijas — simplemente responde con normalidad.
+Frases cortas. Máximo 3-4 líneas por respuesta. Nada de párrafos ni listas con guiones.
+Un emoji por mensaje como mucho, y solo cuando encaje de verdad.
+Usas "usted" con naturalidad. Alternas los arranques: no siempre empiezas igual.
+Si el paciente escribe informal, tú también bajas un poco el tono. Si escribe formal, mantienes el nivel.
+Nunca repites las mismas frases de apertura dos veces seguidas.
 
-FRASES QUE USAS NATURALMENTE
-"Claro, no hay problema."
-"Perfecto, lo anoto."
-"Enseguida lo miro."
-"Qué bien que nos escriba."
-"No se preocupe, lo gestionamos."
-"Le avisamos en cuanto lo tengamos confirmado."
+CONVERSACIONES REALES — ASÍ HABLAS
+Cuando alguien pregunta por precio: "La revisión ronda los [X]€, aunque depende de lo que necesite. ¿Le cuento?"
+Cuando alguien está nervioso: "Tranquilo/a, estamos acostumbrados. Le explico paso a paso."
+Cuando alguien pide urgencia: "Vamos a verlo ahora mismo."
+Cuando no sabes algo: "Para ese detalle concreto mejor le llamo yo — ¿me da un número?"
 
-FRASES QUE JAMÁS DICES (señales de robot)
-- "¡Por supuesto!" seguido de un listado
-- "Entiendo su consulta"
-- "Como asistente virtual..."
-- "Espero haber resuelto su duda"
-- "¿Hay algo más en lo que pueda ayudarle?" al final de cada mensaje
-- Cualquier frase que suene a plantilla de atención al cliente
+FRASES QUE JAMÁS DICES
+"¡Por supuesto!" — "Entiendo su consulta" — "Como asistente virtual..." — "Espero haber resuelto su duda" — "¿Hay algo más en lo que pueda ayudarle?" al final de cada mensaje. Ninguna de estas. Suenan a bot y lo arruinan todo.
 
 DATOS DE LA CLÍNICA
 Teléfono: ${phone || '(consultar en clínica)'}
 Horario: ${hours}${cfg.address ? '\nDirección: ' + cfg.address : ''}${cfg.email ? '\nEmail: ' + cfg.email : ''}
 
-SERVICIOS
+SERVICIOS Y PRECIOS
 ${cfg.services || 'Consultar directamente con la clínica'}
 ${cfg.extra ? '\nINFORMACIÓN ADICIONAL\n' + cfg.extra : ''}
+${staffSection}
 
-GESTIÓN DE CITAS
-El objetivo es agendar, pero sin que parezca un formulario. Recoge la información de forma conversacional:
-primero el motivo o servicio, luego cuándo le viene bien, luego el nombre — en el orden que fluya naturalmente.
-Cuando tengas motivo + franja + nombre, di algo como:
-"Perfecto [nombre], le apunto para [servicio] en esa franja. Le confirmamos la hora exacta en breve 😊"
-Entonces, en la misma respuesta, añade al final (invisible para el paciente, el sistema lo procesa):
-CITA_CONFIRMADA|tratamiento=...|fecha=...|hora=...|nombre=...|email=...
-(usa lo que el paciente dijo; deja vacío lo que no mencionó)
-Cancelaciones o cambios requieren avisar con al menos 24 horas.
-Nunca inventes precios ni horas exactas si no las tienes — di que se lo confirman al llamar.
+GESTIÓN DE CITAS — FLUJO NATURAL
+No es un formulario. Es una conversación. Recoge el motivo, luego la franja, luego el nombre — en el orden que salga. Cuando tengas los tres:
+Di algo como: "Perfecto [nombre], le anoto para [servicio]${activeStaff.length ? ' con [profesional]' : ''} en esa franja. Le confirmamos la hora exacta enseguida 😊"
+Y en la misma respuesta, al final (el sistema lo procesa, el paciente no lo ve):
+CITA_CONFIRMADA|tratamiento=...|fecha=...|hora=...|nombre=...|profesional=...|email=...
+Deja vacío lo que el paciente no mencionó. Nunca inventes horas exactas si no las tienes.
+Cancelaciones y cambios: mínimo 24 horas de antelación.
 
-URGENCIAS Y DOLOR
-Si alguien describe dolor intenso, sangrado, o cualquier emergencia: no le hagas esperar.
-Dale el teléfono directamente: "Llámenos ahora al ${phone || 'nuestra línea directa'}, le atendemos enseguida."
-
-LO QUE NO SABES
-Si no tienes la información: "Para ese detalle mejor llámenos al ${phone || 'la clínica'} y se lo miramos al momento."
-No inventes. No especules.
+URGENCIAS Y DOLOR AGUDO
+Si alguien describe dolor intenso, sangrado, golpe, o cualquier emergencia — no le hagas esperar ni un mensaje más.
+"Llámenos ahora mismo al ${phone || 'nuestra línea directa'}. Le atendemos en el acto."
 
 SI PREGUNTAN SI ERES IA
-Sé honesta pero tranquilizadora: "Soy un asistente virtual, sí — pero detrás hay un equipo real que revisa todo y puede atenderle en cualquier momento."
+"Soy un asistente, sí — pero hay un equipo real detrás que lo revisa todo. Si necesita hablar con alguien ahora mismo, dígamelo."
 
-PRIMER MENSAJE DEL DÍA
-Saluda solo una vez al inicio: "¡${saludo}! Soy ${name}, de ${clinic.name} 😊 ¿En qué le ayudo?"`;
+PRIMER MENSAJE
+Una sola vez, al inicio: "¡${saludo}! Soy ${name}, de ${clinic.name} 😊 ¿En qué le ayudo?"`;
 }
 
 async function getLeads(clinic_id, limit = 50) {
@@ -891,26 +907,66 @@ async function getAppointmentsByRange(clinic_id, start, end) {
   return rows;
 }
 
-async function createAppointmentFull({ clinic_id, patient_name, patient_phone, service, scheduled_ts, duration_min, notes, patient_id, source }) {
+async function createAppointmentFull({ clinic_id, patient_name, patient_phone, service, scheduled_ts, duration_min, notes, patient_id, source, professional, price, room }) {
   const { rows } = await pool.query(
-    `INSERT INTO appointments (clinic_id, patient_name, patient_phone, service, scheduled_ts, duration_min, notes, patient_id, source, status)
-     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,'pending') RETURNING *`,
-    [clinic_id, patient_name||null, patient_phone||null, service||null, scheduled_ts, duration_min||60, notes||null, patient_id||null, source||'manual']
+    `INSERT INTO appointments (clinic_id, patient_name, patient_phone, service, scheduled_ts, duration_min, notes, patient_id, source, status, professional, price, room)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,'pending',$10,$11,$12) RETURNING *`,
+    [clinic_id, patient_name||null, patient_phone||null, service||null, scheduled_ts, duration_min||60, notes||null, patient_id||null, source||'manual', professional||null, price||null, room||null]
   );
   return rows[0];
 }
 
-async function updateAppointmentFull(id, clinic_id, { patient_name, patient_phone, service, scheduled_ts, duration_min, notes, status }) {
+async function updateAppointmentFull(id, clinic_id, { patient_name, patient_phone, service, scheduled_ts, duration_min, notes, status, professional, price, room }) {
   const { rows } = await pool.query(
     `UPDATE appointments SET
        patient_name=COALESCE($3,patient_name), patient_phone=COALESCE($4,patient_phone),
        service=COALESCE($5,service), scheduled_ts=COALESCE($6,scheduled_ts),
        duration_min=COALESCE($7,duration_min), notes=COALESCE($8,notes),
-       status=COALESCE($9,status)
+       status=COALESCE($9,status),
+       professional=COALESCE($10,professional), price=COALESCE($11,price), room=COALESCE($12,room)
      WHERE id=$1 AND clinic_id=$2 RETURNING *`,
-    [id, clinic_id, patient_name??null, patient_phone??null, service??null, scheduled_ts??null, duration_min??null, notes??null, status??null]
+    [id, clinic_id, patient_name??null, patient_phone??null, service??null, scheduled_ts??null, duration_min??null, notes??null, status??null, professional??null, price??null, room??null]
   );
   return rows[0] || null;
+}
+
+async function getBlockedSlots(clinic_id, start, end) {
+  const { rows } = await pool.query(
+    `SELECT * FROM blocked_slots WHERE clinic_id=$1 AND (recurring!='none' OR (start_ts >= $2 AND start_ts < $3)) ORDER BY start_ts ASC`,
+    [clinic_id, start, end]
+  );
+  const startD = new Date(start), endD = new Date(end);
+  const result = [];
+  rows.forEach(slot => {
+    if (slot.recurring === 'none') { result.push(slot); return; }
+    const orig = new Date(slot.start_ts);
+    const dur = new Date(slot.end_ts) - orig;
+    let cur = new Date(orig);
+    const step = slot.recurring === 'daily' ? 1 : 7;
+    while (cur < startD) cur.setDate(cur.getDate() + step);
+    while (cur < endD) {
+      result.push({ ...slot, start_ts: new Date(cur).toISOString(), end_ts: new Date(cur.getTime() + dur).toISOString() });
+      cur.setDate(cur.getDate() + step);
+    }
+  });
+  return result;
+}
+
+async function createBlockedSlot(clinic_id, { title, start_ts, end_ts, room, professional, recurring }) {
+  const { rows } = await pool.query(
+    `INSERT INTO blocked_slots (clinic_id,title,start_ts,end_ts,room,professional,recurring) VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING *`,
+    [clinic_id, title||'Bloqueado', start_ts, end_ts, room||null, professional||null, recurring||'none']
+  );
+  return rows[0];
+}
+
+async function deleteBlockedSlot(id, clinic_id) {
+  const { rowCount } = await pool.query('DELETE FROM blocked_slots WHERE id=$1 AND clinic_id=$2', [id, clinic_id]);
+  return rowCount > 0;
+}
+
+async function updateStaffColor(id, clinic_id, color, specialty) {
+  await pool.query('UPDATE staff_members SET color=COALESCE($3,color), specialty=COALESCE($4,specialty) WHERE id=$1 AND clinic_id=$2', [id, clinic_id, color||null, specialty||null]);
 }
 
 async function deleteAppointment(id, clinic_id) {
@@ -1095,4 +1151,4 @@ async function getPatientNote(clinicId, phone) {
   return rows[0]?.notes || '';
 }
 
-module.exports = { pool, initDb, createBroadcast, getBroadcasts, updateBroadcast, getUpcomingAppointments, markReminderSent, getAtRiskForAutoReact, markLeadsContactado, getAnalytics, getSession, saveSession, saveLead, getClinicByEmail, getClinicByWhatsapp, getClinicBySetupToken, createClinic, updateClinicConfig, buildPromptForClinic, getLeads, saveAppointment, getAppointments, verifyPassword, hashPassword, importLeads, getImportedLeads, updateLeadEstado, incrementConversation, PLAN_LIMITS, saveMessage, getMessages, getRecentConversations, getHistoryFromMessages, setConvState, getManualSessions, getConvNotes, savePushSubscription, getPushSubscriptions, removePushSubscription, closeInactiveConversations, getPatientData, getAtRiskPatients, scheduleNps, getPendingNps, markNpsSent, saveNpsScore, getAppointmentsByRange, createAppointmentFull, updateAppointmentFull, deleteAppointment, createStaff, getStaff, getStaffByEmail, updateStaffRole, deactivateStaff, auditLog, getAuditLogs, recordConsent, hasConsent, getConsents, revokeConsent, getAppointmentsForFollowup, getAppointmentsForReview, markFollowupSent, markReviewSent, getAvailableSlotsForBot, getEnrichedPatientProfile, savePatientNote, getPatientNote };
+module.exports = { pool, initDb, createBroadcast, getBroadcasts, updateBroadcast, getUpcomingAppointments, markReminderSent, getAtRiskForAutoReact, markLeadsContactado, getAnalytics, getSession, saveSession, saveLead, getClinicByEmail, getClinicByWhatsapp, getClinicBySetupToken, createClinic, updateClinicConfig, buildPromptForClinic, getLeads, saveAppointment, getAppointments, verifyPassword, hashPassword, importLeads, getImportedLeads, updateLeadEstado, incrementConversation, PLAN_LIMITS, saveMessage, getMessages, getRecentConversations, getHistoryFromMessages, setConvState, getManualSessions, getConvNotes, savePushSubscription, getPushSubscriptions, removePushSubscription, closeInactiveConversations, getPatientData, getAtRiskPatients, scheduleNps, getPendingNps, markNpsSent, saveNpsScore, getAppointmentsByRange, createAppointmentFull, updateAppointmentFull, deleteAppointment, createStaff, getStaff, getStaffByEmail, updateStaffRole, deactivateStaff, auditLog, getAuditLogs, recordConsent, hasConsent, getConsents, revokeConsent, getAppointmentsForFollowup, getAppointmentsForReview, markFollowupSent, markReviewSent, getAvailableSlotsForBot, getEnrichedPatientProfile, savePatientNote, getPatientNote, getBlockedSlots, createBlockedSlot, deleteBlockedSlot, updateStaffColor };

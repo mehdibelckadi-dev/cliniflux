@@ -321,6 +321,48 @@
     .cal-btn-cancel{font-size:12px;font-weight:600;padding:8px 14px;border:1.5px solid var(--border);color:var(--text2);background:#fff;border-radius:8px;cursor:pointer}
     .cal-notify-row{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text2);margin-top:10px}
 
+    /* ── Calendar enhancements ── */
+    .cal-summary-bar{display:flex;align-items:center;gap:8px;padding:7px 16px;background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0;overflow-x:auto;flex-wrap:nowrap}
+    .cal-summary-bar::-webkit-scrollbar{display:none}
+    .cal-ssum{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--text2);padding:4px 10px;background:#fff;border:1px solid var(--border);border-radius:var(--r-pill);white-space:nowrap;flex-shrink:0}
+    .cal-ssum-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+    .cal-ssum-n{font-weight:800;color:var(--text)}
+    .cal-prof-bar{display:flex;align-items:center;gap:6px;padding:6px 16px;background:#fff;border-bottom:1px solid var(--border);flex-shrink:0;overflow-x:auto;flex-wrap:nowrap}
+    .cal-prof-bar::-webkit-scrollbar{display:none}
+    .cal-prof-pill{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:4px 11px;border-radius:var(--r-pill);border:1.5px solid transparent;cursor:pointer;transition:all var(--dur-fast);white-space:nowrap;flex-shrink:0}
+    .cal-prof-pill.active{border-color:currentColor!important}
+    .cal-prof-pill:not(.active){opacity:.55;background:var(--bg2)!important;color:var(--text2)!important}
+    .cal-prof-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+    .cal-room-sel{font-family:inherit;font-size:11px;font-weight:600;color:var(--text);background:#fff;border:1.5px solid var(--border);border-radius:var(--r-pill);padding:4px 10px;outline:none;cursor:pointer;flex-shrink:0}
+    .cal-room-sel:focus{border-color:var(--green)}
+    /* Appointment block — professional-colored */
+    .cal-appt-prof{position:absolute;left:3px;right:3px;border-radius:7px;padding:4px 7px;cursor:pointer;z-index:2;overflow:hidden;transition:opacity var(--dur-fast),filter var(--dur-fast);box-shadow:0 1px 4px rgba(0,0,0,0.12)}
+    .cal-appt-prof:hover{filter:brightness(.92);transform:scaleX(1.01)}
+    .cal-appt-prof-name{font-size:11px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .cal-appt-prof-svc{font-size:9.5px;color:rgba(255,255,255,.82);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .cal-appt-prof-meta{display:flex;align-items:center;gap:4px;margin-top:2px}
+    .cal-appt-status-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
+    .cal-appt-room-lbl{font-size:9px;color:rgba(255,255,255,.7);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    /* Blocked slot */
+    .cal-blocked{position:absolute;left:1px;right:1px;z-index:1;border-radius:4px;cursor:pointer;background:repeating-linear-gradient(45deg,rgba(0,0,0,0.05),rgba(0,0,0,0.05) 4px,transparent 4px,transparent 12px);border-left:3px solid #94a3b8;display:flex;align-items:flex-start;padding:3px 5px;overflow:hidden}
+    .cal-blocked:hover{background:repeating-linear-gradient(45deg,rgba(0,0,0,0.09),rgba(0,0,0,0.09) 4px,transparent 4px,transparent 12px)}
+    .cal-blocked-title{font-size:10px;font-weight:600;color:#475569;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    /* Block time modal */
+    .block-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:1100;align-items:center;justify-content:center}
+    .block-modal.open{display:flex}
+    .block-box{background:#fff;border-radius:var(--r);padding:24px;width:400px;max-width:95vw;box-shadow:0 20px 60px rgba(0,0,0,.2)}
+    .block-box-title{font-size:16px;font-weight:800;color:var(--text);margin-bottom:16px;display:flex;align-items:center;justify-content:space-between}
+    .block-close{background:none;border:none;font-size:18px;cursor:pointer;color:var(--text3);padding:0 4px;line-height:1}
+    .block-row{margin-bottom:11px}
+    .block-label{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;display:block}
+    .block-input{width:100%;font-family:inherit;font-size:13px;color:var(--text);background:var(--bg2);border:1.5px solid var(--border);border-radius:8px;padding:8px 10px;outline:none;transition:border-color var(--dur-fast)}
+    .block-input:focus{border-color:var(--green);background:#fff}
+    .block-actions{display:flex;gap:8px;margin-top:16px;justify-content:flex-end}
+    .block-btn-save{font-family:inherit;font-size:13px;font-weight:700;background:var(--green);color:#fff;border:none;padding:9px 20px;border-radius:8px;cursor:pointer}
+    .block-btn-cancel{font-family:inherit;font-size:13px;font-weight:600;background:#fff;color:var(--text2);border:1.5px solid var(--border);padding:9px 14px;border-radius:8px;cursor:pointer}
+    /* Staff color chip */
+    .staff-color-chip{width:20px;height:20px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1.5px rgba(0,0,0,0.15);cursor:pointer;flex-shrink:0}
+
     /* ── Citas list view ── */
     .citas-wrap{display:none;flex:1;flex-direction:column;overflow:hidden;background:var(--bg2)}
     .citas-wrap.active{display:flex}
@@ -895,7 +937,7 @@
     </div>
     <div class="si" data-panel="1" onclick="switchPanel(1)">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-      <span class="si-label">Agenda</span>
+      <span class="si-label">Calendario</span>
     </div>
     <div class="si" data-panel="2" onclick="switchPanel(2)">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
@@ -1066,6 +1108,17 @@
           <button class="cal-view-btn" onclick="setCalView('list')" id="cal-view-list">Lista</button>
         </div>
         <button class="cal-add-btn" onclick="openApptModal(null)">+ Nueva cita</button>
+        <button class="cal-add-btn" style="background:#475569" onclick="openBlockModal()">🔒 Bloquear</button>
+      </div>
+      <!-- Summary bar -->
+      <div class="cal-summary-bar" id="cal-summary-bar"></div>
+      <!-- Professional filter pills -->
+      <div class="cal-prof-bar" id="cal-prof-bar" style="display:none">
+        <span style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;flex-shrink:0">Profesional:</span>
+        <div id="cal-prof-pills"></div>
+        <select class="cal-room-sel" id="cal-room-filter" onchange="applyCalFilters()" style="margin-left:8px">
+          <option value="">Todos los gabinetes</option>
+        </select>
       </div>
       <div class="cal-grid-wrap" id="cal-grid-wrap"></div>
       <!-- Citas list view -->
@@ -1138,16 +1191,36 @@
             <input class="cal-form-input" id="cal-f-time" type="time">
           </div>
         </div>
-        <div class="cal-form-row">
-          <label class="cal-form-label">Duración</label>
-          <select class="cal-form-input" id="cal-f-dur">
-            <option value="15">15 min</option>
-            <option value="30">30 min</option>
-            <option value="45">45 min</option>
-            <option value="60" selected>1 hora</option>
-            <option value="90">1h 30min</option>
-            <option value="120">2 horas</option>
-          </select>
+        <div style="display:flex;gap:10px">
+          <div class="cal-form-row" style="flex:1">
+            <label class="cal-form-label">Profesional</label>
+            <select class="cal-form-input" id="cal-f-prof">
+              <option value="">Sin asignar</option>
+            </select>
+          </div>
+          <div class="cal-form-row" style="flex:1">
+            <label class="cal-form-label">Gabinete</label>
+            <select class="cal-form-input" id="cal-f-room">
+              <option value="">—</option>
+            </select>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px">
+          <div class="cal-form-row" style="flex:1">
+            <label class="cal-form-label">Duración</label>
+            <select class="cal-form-input" id="cal-f-dur">
+              <option value="15">15 min</option>
+              <option value="30">30 min</option>
+              <option value="45">45 min</option>
+              <option value="60" selected>1 hora</option>
+              <option value="90">1h 30min</option>
+              <option value="120">2 horas</option>
+            </select>
+          </div>
+          <div class="cal-form-row" style="flex:1">
+            <label class="cal-form-label">Precio (€)</label>
+            <input class="cal-form-input" id="cal-f-price" type="number" min="0" step="0.5" placeholder="0">
+          </div>
         </div>
         <div class="cal-form-row" id="cal-status-row" style="display:none">
           <label class="cal-form-label">Estado</label>
@@ -1171,6 +1244,68 @@
           <button class="cal-btn-del" id="cal-btn-del" style="display:none" onclick="deleteAppt()">Eliminar</button>
           <button class="cal-btn-cancel" onclick="closeApptModal()">Cancelar</button>
           <button class="cal-btn-save" onclick="saveAppt()">Guardar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Block time modal -->
+    <div class="block-modal" id="block-modal" onclick="if(event.target===this)closeBlockModal()">
+      <div class="block-box modal-box">
+        <div class="block-box-title">
+          <span>🔒 Bloquear tiempo</span>
+          <button class="block-close" onclick="closeBlockModal()">✕</button>
+        </div>
+        <div class="block-row">
+          <label class="block-label">Motivo</label>
+          <input class="block-input" id="bl-title" placeholder="Vacaciones, formación, cierre…">
+        </div>
+        <div style="display:flex;gap:10px">
+          <div class="block-row" style="flex:1">
+            <label class="block-label">Fecha inicio</label>
+            <input class="block-input" id="bl-date-start" type="date">
+          </div>
+          <div class="block-row" style="flex:1">
+            <label class="block-label">Hora inicio</label>
+            <input class="block-input" id="bl-time-start" type="time" value="09:00">
+          </div>
+        </div>
+        <div style="display:flex;gap:10px">
+          <div class="block-row" style="flex:1">
+            <label class="block-label">Fecha fin</label>
+            <input class="block-input" id="bl-date-end" type="date">
+          </div>
+          <div class="block-row" style="flex:1">
+            <label class="block-label">Hora fin</label>
+            <input class="block-input" id="bl-time-end" type="time" value="18:00">
+          </div>
+        </div>
+        <div style="display:flex;gap:10px">
+          <div class="block-row" style="flex:1">
+            <label class="block-label">Profesional (opcional)</label>
+            <select class="block-input" id="bl-prof">
+              <option value="">Todos / clínica entera</option>
+            </select>
+          </div>
+          <div class="block-row" style="flex:1">
+            <label class="block-label">Gabinete (opcional)</label>
+            <select class="block-input" id="bl-room">
+              <option value="">—</option>
+            </select>
+          </div>
+        </div>
+        <div class="block-row">
+          <label class="block-label">Repetición</label>
+          <select class="block-input" id="bl-recurring">
+            <option value="none">Sin repetición</option>
+            <option value="daily">Diaria</option>
+            <option value="weekly">Semanal</option>
+          </select>
+        </div>
+        <div id="bl-edit-id" style="display:none"></div>
+        <div class="block-actions">
+          <button class="block-btn-cancel" id="bl-btn-del" style="display:none;color:#dc2626;border-color:#dc2626" onclick="deleteBlock()">Eliminar</button>
+          <button class="block-btn-cancel" onclick="closeBlockModal()">Cancelar</button>
+          <button class="block-btn-save" onclick="saveBlock()">Guardar</button>
         </div>
       </div>
     </div>
@@ -1394,6 +1529,10 @@
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
           Equipo
         </div>
+        <div class="set-nav-item" data-sec="gabinetes" onclick="setSection('gabinetes')">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+          Gabinetes
+        </div>
         <div class="set-nav-item" data-sec="rgpd" onclick="setSection('rgpd')">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
           RGPD
@@ -1563,14 +1702,15 @@
         <!-- Equipo -->
         <div class="set-section" id="ss-team">
           <div class="set-section-title">Equipo</div>
-          <div class="set-section-sub">Añade miembros del equipo con acceso al panel.</div>
+          <div class="set-section-sub">Añade profesionales y staff. El color y la especialidad se usan en el Calendario para filtrar citas.</div>
           <div class="set-card" id="staff-card">
-            <div id="staff-list" style="margin-bottom:14px;display:flex;flex-direction:column;gap:8px"></div>
+            <div id="staff-list" style="margin-bottom:14px;display:flex;flex-direction:column;gap:10px"></div>
             <details style="margin-top:4px">
               <summary style="font-size:12px;font-weight:600;color:var(--green);cursor:pointer;list-style:none;padding:6px 0">+ Añadir miembro</summary>
               <div style="margin-top:10px;display:flex;flex-direction:column;gap:6px">
                 <input class="set-input" id="sf-name" placeholder="Nombre completo">
                 <input class="set-input" id="sf-email" type="email" placeholder="Email">
+                <input class="set-input" id="sf-specialty" placeholder="Especialidad (ej: Ortodoncia, Fisioterapia…)">
                 <input class="set-input" id="sf-pass" type="password" placeholder="Contraseña inicial">
                 <select class="set-input" id="sf-role">
                   <option value="staff">Staff — sólo lectura + respuesta manual</option>
@@ -1580,6 +1720,20 @@
                 <div class="set-saved" id="saved-staff" style="display:none">✓ Miembro añadido</div>
               </div>
             </details>
+          </div>
+        </div>
+
+        <!-- Gabinetes -->
+        <div class="set-section" id="ss-gabinetes">
+          <div class="set-section-title">Gabinetes y espacios</div>
+          <div class="set-section-sub">Los gabinetes configurados aquí aparecen como filtro en el Calendario y al crear/editar citas.</div>
+          <div class="set-card">
+            <div id="gabinetes-list" style="margin-bottom:14px;display:flex;flex-direction:column;gap:6px"></div>
+            <div style="display:flex;gap:8px;align-items:center">
+              <input class="set-input" id="gab-new-name" placeholder="Nombre del gabinete (ej: Gabinete 1)" style="flex:1">
+              <button class="set-btn" style="white-space:nowrap;padding:8px 16px" onclick="addGabinete()">+ Añadir</button>
+            </div>
+            <div class="set-saved" id="saved-gabinetes" style="display:none;margin-top:8px">✓ Guardado</div>
           </div>
         </div>
 
@@ -1878,7 +2032,7 @@
     </div>
     <div class="bn-item" data-panel="1" onclick="switchPanel(1)">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-      <span>Agenda</span>
+      <span>Calendario</span>
     </div>
     <div class="bn-item" data-panel="2" onclick="switchPanel(2)">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
@@ -2200,6 +2354,7 @@
   function setSection(name) {
     document.querySelectorAll('.set-nav-item').forEach(el => el.classList.toggle('active', el.dataset.sec === name));
     document.querySelectorAll('.set-section').forEach(el => el.classList.toggle('active', el.id === 'ss-' + name));
+    if (name === 'gabinetes') loadGabinetes();
   }
 
   // ── Ajustes ───────────────────────────────────────────────────────────────
@@ -2243,6 +2398,9 @@
     const plans = { starter:'Starter — WhatsApp 24/7, hasta 300 conversaciones/mes', pro:'Pro — WhatsApp + reactivación de pacientes, 2.000 conversaciones/mes', clinica:'Clínica — Todo incluido, multi-sede, reactivación y soporte 24/7' };
     document.getElementById('s-plan-badge').textContent = (d.plan || 'starter').charAt(0).toUpperCase() + (d.plan||'starter').slice(1);
     document.getElementById('s-plan-desc').textContent = plans[d.plan] || plans.starter;
+    // Cache rooms for calendar
+    const rooms = cfg.rooms || [];
+    sessionStorage.setItem('cl_rooms', JSON.stringify(rooms));
     loadStaff();
     loadAuditLog();
     loadGdpr();
@@ -2277,14 +2435,47 @@
     const staff = await r.json();
     const el = document.getElementById('staff-list');
     if (!staff.length) { el.innerHTML = '<div style="font-size:12px;color:var(--text3);font-style:italic">Sin miembros de equipo aún</div>'; return; }
-    el.innerHTML = staff.map(s => `
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:var(--bg2);border-radius:8px;border:1px solid var(--border)">
-        <div>
-          <div style="font-size:13px;font-weight:600;color:var(--text)">${escHtml(s.name)}</div>
-          <div style="font-size:11px;color:var(--text3)">${escHtml(s.email)} · <span style="color:${s.role==='admin'?'var(--green)':'var(--text2)'}">${s.role}</span></div>
+    el.innerHTML = staff.map((s, i) => {
+      const color = s.color || PROF_COLORS[i % PROF_COLORS.length];
+      return `<div style="background:var(--bg2);border-radius:10px;border:1px solid var(--border);padding:10px 12px">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+          <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0">
+            <div class="staff-color-chip" id="color-chip-${s.id}" style="background:${color}" title="Color en calendario" onclick="pickStaffColor(${s.id})"></div>
+            <div style="min-width:0">
+              <div style="font-size:13px;font-weight:600;color:var(--text)">${escHtml(s.name)}</div>
+              <div style="font-size:11px;color:var(--text3)">${escHtml(s.email)} · <span style="color:${s.role==='admin'?'var(--green)':'var(--text2)'}">${s.role}</span></div>
+            </div>
+          </div>
+          <button onclick="removeStaff(${s.id})" style="font-size:11px;color:#dc2626;background:none;border:none;cursor:pointer;padding:4px 8px;flex-shrink:0">Quitar</button>
         </div>
-        <button onclick="removeStaff(${s.id})" style="font-size:11px;color:#dc2626;background:none;border:none;cursor:pointer;padding:4px 8px">Quitar</button>
-      </div>`).join('');
+        <div style="display:flex;gap:8px;margin-top:8px;align-items:center">
+          <input class="set-input" id="spec-${s.id}" placeholder="Especialidad (ej: Ortodoncia)" value="${escHtml(s.specialty||'')}" style="flex:1;font-size:12px;padding:5px 8px">
+          <button onclick="saveStaffProfile(${s.id})" style="font-family:inherit;font-size:11px;font-weight:700;background:var(--green);color:#fff;border:none;padding:5px 12px;border-radius:6px;cursor:pointer;white-space:nowrap">Guardar</button>
+        </div>
+        <input type="color" id="color-picker-${s.id}" style="opacity:0;width:0;height:0;position:absolute" onchange="applyStaffColor(${s.id},this.value)">
+      </div>`;
+    }).join('');
+  }
+
+  function pickStaffColor(id) {
+    const picker = document.getElementById(`color-picker-${id}`);
+    if (picker) picker.click();
+  }
+
+  function applyStaffColor(id, color) {
+    const chip = document.getElementById(`color-chip-${id}`);
+    if (chip) chip.style.background = color;
+  }
+
+  async function saveStaffProfile(id) {
+    const color = document.getElementById(`color-chip-${id}`)?.style.background || '';
+    const specialty = document.getElementById(`spec-${id}`)?.value.trim() || '';
+    const r = await fetch(`/api/staff/${id}/profile`, { method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ color, specialty }) }).catch(()=>null);
+    if (r?.ok) {
+      // Refresh calProfs cache
+      await loadCalProfs();
+      renderCalProfBar();
+    }
   }
 
   async function addStaff() {
@@ -2292,10 +2483,11 @@
     const email = document.getElementById('sf-email').value.trim();
     const password = document.getElementById('sf-pass').value;
     const role = document.getElementById('sf-role').value;
+    const specialty = document.getElementById('sf-specialty')?.value.trim() || '';
     if (!name || !email || !password) return alert('Completa todos los campos');
-    const r = await fetch('/api/staff', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ name, email, password, role }) });
+    const r = await fetch('/api/staff', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ name, email, password, role, specialty }) });
     if (!r.ok) { const e = await r.json(); return alert(e.error || 'Error'); }
-    ['sf-name','sf-email','sf-pass'].forEach(id => document.getElementById(id).value = '');
+    ['sf-name','sf-email','sf-pass','sf-specialty'].forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
     document.getElementById('saved-staff').style.display = '';
     setTimeout(() => document.getElementById('saved-staff').style.display = 'none', 2500);
     loadStaff();
@@ -2305,6 +2497,59 @@
     if (!confirm('¿Quitar este miembro del equipo?')) return;
     await fetch(`/api/staff/${id}`, { method:'DELETE' });
     loadStaff();
+  }
+
+  // ── Gabinetes ─────────────────────────────────────────────────────────────
+  async function loadGabinetes() {
+    const r = await fetch('/api/settings').catch(() => null);
+    if (!r?.ok) return;
+    const d = await r.json();
+    const rooms = d.config?.rooms || [];
+    sessionStorage.setItem('cl_rooms', JSON.stringify(rooms));
+    renderGabinetsList(rooms);
+  }
+
+  function renderGabinetsList(rooms) {
+    const el = document.getElementById('gabinetes-list');
+    if (!el) return;
+    if (!rooms.length) { el.innerHTML = '<div style="font-size:12px;color:var(--text3);font-style:italic">Sin gabinetes configurados</div>'; return; }
+    el.innerHTML = rooms.map((r, i) => `
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border)">
+        <span style="font-size:13px;font-weight:600;color:var(--text)">${escHtml(r)}</span>
+        <button onclick="removeGabinete(${i})" style="font-size:11px;color:#dc2626;background:none;border:none;cursor:pointer;padding:2px 8px">✕</button>
+      </div>`).join('');
+  }
+
+  async function addGabinete() {
+    const name = document.getElementById('gab-new-name')?.value.trim();
+    if (!name) return;
+    const r = await fetch('/api/settings').catch(()=>null);
+    if (!r?.ok) return;
+    const d = await r.json();
+    const rooms = [...(d.config?.rooms || [])];
+    if (rooms.includes(name)) { alert('Ese gabinete ya existe'); return; }
+    rooms.push(name);
+    await saveRooms(rooms);
+    document.getElementById('gab-new-name').value = '';
+  }
+
+  async function removeGabinete(idx) {
+    const r = await fetch('/api/settings').catch(()=>null);
+    if (!r?.ok) return;
+    const d = await r.json();
+    const rooms = [...(d.config?.rooms || [])];
+    rooms.splice(idx, 1);
+    await saveRooms(rooms);
+  }
+
+  async function saveRooms(rooms) {
+    const r = await fetch('/api/settings/rooms', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ rooms }) }).catch(()=>null);
+    if (r?.ok) {
+      sessionStorage.setItem('cl_rooms', JSON.stringify(rooms));
+      renderGabinetsList(rooms);
+      const el = document.getElementById('saved-gabinetes');
+      if (el) { el.style.display=''; setTimeout(()=>el.style.display='none',2000); }
+    }
   }
 
   async function loadAuditLog() {
@@ -2390,6 +2635,10 @@
       if (iniName) iniName.textContent = me.name || 'clínica';
       loadData();
       loadInicio();
+      // Pre-cache rooms for calendar
+      fetch('/api/settings').then(r=>r.ok?r.json():null).then(d=>{
+        if (d?.config?.rooms) sessionStorage.setItem('cl_rooms', JSON.stringify(d.config.rooms));
+      }).catch(()=>{});
     } catch { window.location.href = '/login'; }
   })();
 
@@ -3530,6 +3779,18 @@
   const MONTHS_ES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
 
   const calState = { view: 'week', date: new Date() };
+  let calBlocked = [];
+  let calProfs = []; // [{id, name, color, specialty}]
+  let calFilterProf = null; // null = all
+  let calFilterRoom = '';
+  const PROF_COLORS = ['#16a34a','#0ea5e9','#8b5cf6','#f59e0b','#ef4444','#ec4899','#14b8a6','#f97316','#6366f1','#84cc16'];
+  function profColor(name) {
+    if (!name) return '#94a3b8';
+    const p = calProfs.find(x => x.name === name);
+    if (p?.color) return p.color;
+    let h = 0; for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) >>> 0;
+    return PROF_COLORS[h % PROF_COLORS.length];
+  }
   let calAppts = [];
   let calEditId = null;
   let calEditStatus = 'pending';
@@ -3581,11 +3842,13 @@
   }
 
   async function renderCal() {
-    await loadCalAppts();
+    await Promise.all([loadCalAppts(), loadCalProfs(), loadBlockedSlots()]);
     document.getElementById('cal-title').textContent = calTitle();
     ['day','week','month'].forEach(v => {
       document.getElementById(`cal-view-${v}`)?.classList.toggle('active', calState.view === v);
     });
+    renderCalSummaryBar();
+    renderCalProfBar();
     const wrap = document.getElementById('cal-grid-wrap');
     if (calState.view === 'month') {
       renderMonthView(wrap);
@@ -3594,27 +3857,135 @@
     }
   }
 
+  async function loadCalProfs() {
+    const r = await fetch('/api/staff').catch(() => null);
+    if (!r?.ok) return;
+    const staff = await r.json();
+    calProfs = staff.map((s, i) => ({
+      id: s.id, name: s.name,
+      color: s.color || PROF_COLORS[i % PROF_COLORS.length],
+      specialty: s.specialty || ''
+    }));
+  }
+
+  async function loadBlockedSlots() {
+    const { start, end } = calDateRange();
+    const r = await fetch(`/api/calendar/blocked?start=${start.toISOString()}&end=${end.toISOString()}`).catch(() => null);
+    calBlocked = r?.ok ? await r.json() : [];
+  }
+
+  function calDateRange() {
+    const d = calState.date;
+    if (calState.view === 'day') {
+      const s = new Date(d); s.setHours(0,0,0,0);
+      const e = new Date(d); e.setHours(23,59,59,999);
+      return { start: s, end: e };
+    }
+    if (calState.view === 'week') {
+      const s = calWeekStart(d);
+      const e = new Date(s); e.setDate(e.getDate() + 7);
+      return { start: s, end: e };
+    }
+    const s = new Date(d.getFullYear(), d.getMonth(), 1);
+    const e = new Date(d.getFullYear(), d.getMonth() + 1, 1);
+    return { start: s, end: e };
+  }
+
+  function renderCalSummaryBar() {
+    const bar = document.getElementById('cal-summary-bar');
+    if (!bar) return;
+    const { start, end } = calDateRange();
+    const inRange = calAppts.filter(a => {
+      if (!a.scheduled_ts) return false;
+      const t = new Date(a.scheduled_ts);
+      return t >= start && t <= end;
+    });
+    const total = inRange.length;
+    const confirmed = inRange.filter(a => (a.status||'pending') === 'confirmed').length;
+    const pending = inRange.filter(a => (a.status||'pending') === 'pending').length;
+    const revenue = inRange.reduce((s, a) => s + (parseFloat(a.price)||0), 0);
+    bar.innerHTML = `
+      <div class="cal-ssum"><span class="cal-ssum-dot" style="background:#94a3b8"></span><span class="cal-ssum-n">${total}</span> citas</div>
+      <div class="cal-ssum"><span class="cal-ssum-dot" style="background:#16a34a"></span><span class="cal-ssum-n">${confirmed}</span> confirmadas</div>
+      <div class="cal-ssum"><span class="cal-ssum-dot" style="background:#f59e0b"></span><span class="cal-ssum-n">${pending}</span> pendientes</div>
+      ${revenue > 0 ? `<div class="cal-ssum"><span class="cal-ssum-dot" style="background:#0ea5e9"></span><span class="cal-ssum-n">${revenue.toFixed(0)}€</span> estimado</div>` : ''}
+    `;
+  }
+
+  function renderCalProfBar() {
+    const bar = document.getElementById('cal-prof-bar');
+    if (!bar) return;
+    // Also populate rooms
+    const rooms = getConfigRooms();
+    const roomSel = document.getElementById('cal-room-filter');
+    if (roomSel) {
+      const cur = roomSel.value;
+      roomSel.innerHTML = '<option value="">Todos los gabinetes</option>' +
+        rooms.map(r => `<option value="${escHtml(r)}" ${cur===r?'selected':''}>${escHtml(r)}</option>`).join('');
+    }
+    // Collect professionals from appointments in view
+    const { start, end } = calDateRange();
+    const inRange = calAppts.filter(a => {
+      if (!a.scheduled_ts) return false;
+      const t = new Date(a.scheduled_ts);
+      return t >= start && t <= end;
+    });
+    const profNames = [...new Set(inRange.map(a => a.professional).filter(Boolean))];
+    if (!profNames.length && !calProfs.length) { bar.style.display = 'none'; return; }
+    bar.style.display = '';
+    const allNames = [...new Set([...calProfs.map(p => p.name), ...profNames])];
+    document.getElementById('cal-prof-pills').innerHTML = allNames.map(name => {
+      const color = profColor(name);
+      const active = calFilterProf === null || calFilterProf === name;
+      return `<span class="cal-prof-pill ${active?'active':''}" style="background:${color}20;color:${color};border-color:${color}" onclick="toggleCalProf('${escHtml(name)}')" title="${escHtml(name)}">
+        <span class="cal-prof-dot" style="background:${color}"></span>${escHtml(name.split(' ')[0])}
+      </span>`;
+    }).join('');
+    // Populate prof selects in modals
+    const profOpts = '<option value="">Sin asignar</option>' + allNames.map(n => `<option value="${escHtml(n)}">${escHtml(n)}</option>`).join('');
+    ['cal-f-prof','bl-prof'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) { const v = el.value; el.innerHTML = profOpts; el.value = v; }
+    });
+    // Room options in modals
+    const roomOpts = '<option value="">—</option>' + rooms.map(r => `<option value="${escHtml(r)}">${escHtml(r)}</option>`).join('');
+    ['cal-f-room','bl-room'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) { const v = el.value; el.innerHTML = roomOpts; el.value = v; }
+    });
+  }
+
+  function getConfigRooms() {
+    try { return JSON.parse(sessionStorage.getItem('cl_rooms') || '[]'); } catch { return []; }
+  }
+
+  function toggleCalProf(name) {
+    calFilterProf = (calFilterProf === name) ? null : name;
+    renderCalProfBar();
+    const wrap = document.getElementById('cal-grid-wrap');
+    calState.view === 'month' ? renderMonthView(wrap) : renderTimeGrid(wrap);
+  }
+
+  function applyCalFilters() {
+    calFilterRoom = document.getElementById('cal-room-filter')?.value || '';
+    const wrap = document.getElementById('cal-grid-wrap');
+    calState.view === 'month' ? renderMonthView(wrap) : renderTimeGrid(wrap);
+  }
+
   function renderTimeGrid(wrap) {
     const days = calState.view === 'week' ? 7 : 1;
     const ws = calState.view === 'week' ? calWeekStart(calState.date) : (() => { const d = new Date(calState.date); d.setHours(0,0,0,0); return d; })();
     const today = new Date(); today.setHours(0,0,0,0);
+    const cols = Array.from({ length: days }, (_, i) => { const d = new Date(ws); d.setDate(d.getDate() + i); return d; });
 
-    // Build date columns
-    const cols = Array.from({ length: days }, (_, i) => {
-      const d = new Date(ws); d.setDate(d.getDate() + i);
-      return d;
-    });
+    const STATUS_DOT = { pending:'#f59e0b', confirmed:'#16a34a', attended:'#16a34a', completed:'#16a34a', cancelled:'#94a3b8', no_show:'#ef4444' };
 
     let html = `<div class="cal-day-cols-hd"><div class="cal-time-col-hd"></div>`;
     cols.forEach(d => {
       const isToday = d.getTime() === today.getTime();
-      html += `<div class="cal-day-hd${isToday?' today':''}">
-        <span>${DAYS_ES[d.getDay()]}</span>
-        <span class="cal-day-hd-num">${d.getDate()}</span>
-      </div>`;
+      html += `<div class="cal-day-hd${isToday?' today':''}"><span>${DAYS_ES[d.getDay()]}</span><span class="cal-day-hd-num">${d.getDate()}</span></div>`;
     });
-    html += `</div><div class="cal-scroll" id="cal-scroll">
-      <div class="cal-time-col" style="height:${GRID_H}px">`;
+    html += `</div><div class="cal-scroll" id="cal-scroll"><div class="cal-time-col" style="height:${GRID_H}px">`;
     for (let h = CAL_START; h <= CAL_END; h++) {
       const top = (h - CAL_START) * SLOT;
       if (h < CAL_END) html += `<div class="cal-time-lbl" style="top:${top}px">${String(h).padStart(2,'0')}:00</div>`;
@@ -3622,29 +3993,65 @@
     html += `</div><div class="cal-cols" style="height:${GRID_H}px">`;
 
     cols.forEach((d, ci) => {
-      const dayAppts = calAppts.filter(a => {
+      const dayStart = d.getTime();
+      const dayEnd = dayStart + 86400000;
+
+      // Filter appointments
+      let dayAppts = calAppts.filter(a => {
         if (!a.scheduled_ts) return false;
         const ad = new Date(a.scheduled_ts); ad.setHours(0,0,0,0);
-        return ad.getTime() === d.getTime();
+        if (ad.getTime() !== dayStart) return false;
+        if (calFilterProf && a.professional !== calFilterProf) return false;
+        if (calFilterRoom && a.room !== calFilterRoom) return false;
+        return true;
+      });
+
+      // Filter blocked slots
+      const dayBlocked = calBlocked.filter(b => {
+        const bs = new Date(b.start_ts).getTime();
+        const be = new Date(b.end_ts).getTime();
+        if (bs >= dayEnd || be <= dayStart) return false;
+        if (calFilterProf && b.professional && b.professional !== calFilterProf) return false;
+        if (calFilterRoom && b.room && b.room !== calFilterRoom) return false;
+        return true;
       });
 
       html += `<div class="cal-col" data-col="${ci}" onclick="handleSlotClick(event,${ci})">`;
       for (let h = CAL_START; h < CAL_END; h++) {
         const top = (h - CAL_START) * SLOT;
-        html += `<div class="cal-hour-line" style="top:${top}px"></div>
-                 <div class="cal-half-line" style="top:${top + SLOT/2}px"></div>`;
+        html += `<div class="cal-hour-line" style="top:${top}px"></div><div class="cal-half-line" style="top:${top + SLOT/2}px"></div>`;
       }
 
+      // Render blocked slots first (below appointments)
+      dayBlocked.forEach(b => {
+        const bs = new Date(b.start_ts);
+        const be = new Date(b.end_ts);
+        const startMin = Math.max(0, (bs.getHours() - CAL_START) * 60 + bs.getMinutes());
+        const endMin   = Math.min((CAL_END - CAL_START) * 60, (be.getHours() - CAL_START) * 60 + be.getMinutes());
+        if (endMin <= startMin) return;
+        const top = (startMin / 60) * SLOT;
+        const h   = ((endMin - startMin) / 60) * SLOT;
+        html += `<div class="cal-blocked" style="top:${top}px;height:${h}px" onclick="event.stopPropagation();openBlockModal(${JSON.stringify(b).replace(/"/g,'&quot;')})">
+          <span class="cal-blocked-title">${escHtml(b.title||'Bloqueado')}</span>
+        </div>`;
+      });
+
+      // Render appointments with professional color
       dayAppts.forEach(a => {
         const ts = new Date(a.scheduled_ts);
         const offsetMin = (ts.getHours() - CAL_START) * 60 + ts.getMinutes();
         const dur = a.duration_min || 60;
         const top = Math.max(0, (offsetMin / 60) * SLOT);
-        const h = Math.max(20, (dur / 60) * SLOT - 3);
-        const st = a.status || 'pending';
-        html += `<div class="cal-appt ${st}" style="top:${top}px;height:${h}px" onclick="event.stopPropagation();openApptById(${a.id})">
-          <div class="cal-appt-name">${escHtml(a.patient_name || 'Sin nombre')}</div>
-          <div class="cal-appt-svc">${escHtml(a.service || '')}</div>
+        const h = Math.max(22, (dur / 60) * SLOT - 3);
+        const color = profColor(a.professional);
+        const dotColor = STATUS_DOT[a.status||'pending'] || '#94a3b8';
+        html += `<div class="cal-appt-prof" style="top:${top}px;height:${h}px;background:${color}" onclick="event.stopPropagation();openApptById(${a.id})">
+          <div class="cal-appt-prof-name">${escHtml(a.patient_name||'Sin nombre')}</div>
+          ${h > 30 ? `<div class="cal-appt-prof-svc">${escHtml(a.service||'')}</div>` : ''}
+          ${h > 45 ? `<div class="cal-appt-prof-meta">
+            <span class="cal-appt-status-dot" style="background:${dotColor}"></span>
+            ${a.room ? `<span class="cal-appt-room-lbl">${escHtml(a.room)}</span>` : ''}
+          </div>` : ''}
         </div>`;
       });
 
@@ -3669,7 +4076,6 @@
       }
     }
 
-    // Scroll to 8am
     const scroll = wrap.querySelector('#cal-scroll');
     if (scroll) scroll.scrollTop = Math.max(0, (8 - CAL_START) * SLOT - 20);
   }
@@ -3863,11 +4269,17 @@
       }
       document.getElementById('cal-f-dur').value = appt.duration_min || 60;
       document.getElementById('cal-f-notes').value = appt.notes || '';
+      document.getElementById('cal-f-prof').value = appt.professional || '';
+      document.getElementById('cal-f-room').value = appt.room || '';
+      document.getElementById('cal-f-price').value = appt.price || '';
     } else {
       ['cal-f-name','cal-f-phone','cal-f-service','cal-f-notes'].forEach(id => document.getElementById(id).value = '');
       document.getElementById('cal-f-date').value = preDate || new Date().toISOString().slice(0,10);
       document.getElementById('cal-f-time').value = preTime || '09:00';
       document.getElementById('cal-f-dur').value = '60';
+      document.getElementById('cal-f-prof').value = calFilterProf || '';
+      document.getElementById('cal-f-room').value = calFilterRoom || '';
+      document.getElementById('cal-f-price').value = '';
     }
     updateStatusBtns();
     document.getElementById('cal-modal-bg').classList.add('open');
@@ -3902,6 +4314,9 @@
       scheduled_ts,
       duration_min: parseInt(document.getElementById('cal-f-dur').value) || 60,
       notes: document.getElementById('cal-f-notes').value.trim() || null,
+      professional: document.getElementById('cal-f-prof').value.trim() || null,
+      room: document.getElementById('cal-f-room').value.trim() || null,
+      price: parseFloat(document.getElementById('cal-f-price').value) || null,
       notify_whatsapp: document.getElementById('cal-f-notify').checked,
     };
     try {
@@ -3930,6 +4345,77 @@
     closeApptModal();
     await renderCal();
     if (_pipeAppts.length) loadPipeline();
+  }
+
+  // ── Block time modal ────────────────────────────────────────────────────────
+  let _blockEditId = null;
+
+  function openBlockModal(blockObj, preDate, preTime) {
+    _blockEditId = blockObj?.id || null;
+    document.getElementById('bl-btn-del').style.display = _blockEditId ? '' : 'none';
+    if (blockObj && blockObj.id) {
+      document.getElementById('bl-title').value = blockObj.title || '';
+      const bs = new Date(blockObj.start_ts), be = new Date(blockObj.end_ts);
+      document.getElementById('bl-date-start').value = bs.toISOString().slice(0,10);
+      document.getElementById('bl-time-start').value = bs.toTimeString().slice(0,5);
+      document.getElementById('bl-date-end').value = be.toISOString().slice(0,10);
+      document.getElementById('bl-time-end').value = be.toTimeString().slice(0,5);
+      document.getElementById('bl-recurring').value = blockObj.recurring || 'none';
+      document.getElementById('bl-prof').value = blockObj.professional || '';
+      document.getElementById('bl-room').value = blockObj.room || '';
+    } else {
+      document.getElementById('bl-title').value = '';
+      const today = preDate || new Date().toISOString().slice(0,10);
+      document.getElementById('bl-date-start').value = today;
+      document.getElementById('bl-time-start').value = preTime || '09:00';
+      document.getElementById('bl-date-end').value = today;
+      document.getElementById('bl-time-end').value = '18:00';
+      document.getElementById('bl-recurring').value = 'none';
+      document.getElementById('bl-prof').value = '';
+      document.getElementById('bl-room').value = '';
+    }
+    document.getElementById('block-modal').classList.add('open');
+  }
+
+  function closeBlockModal() {
+    document.getElementById('block-modal').classList.remove('open');
+    _blockEditId = null;
+  }
+
+  async function saveBlock() {
+    const title = document.getElementById('bl-title').value.trim() || 'Bloqueado';
+    const ds = document.getElementById('bl-date-start').value;
+    const ts = document.getElementById('bl-time-start').value;
+    const de = document.getElementById('bl-date-end').value;
+    const te = document.getElementById('bl-time-end').value;
+    if (!ds || !ts || !de || !te) { alert('Completa fechas y horas'); return; }
+    const start_ts = new Date(`${ds}T${ts}:00`).toISOString();
+    const end_ts   = new Date(`${de}T${te}:00`).toISOString();
+    if (end_ts <= start_ts) { alert('La hora de fin debe ser posterior al inicio'); return; }
+    const body = {
+      title,
+      start_ts, end_ts,
+      professional: document.getElementById('bl-prof').value || null,
+      room: document.getElementById('bl-room').value || null,
+      recurring: document.getElementById('bl-recurring').value || 'none',
+    };
+    let resp;
+    if (_blockEditId) {
+      resp = await fetch(`/api/calendar/blocked/${_blockEditId}`, { method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) }).catch(()=>null);
+    } else {
+      resp = await fetch('/api/calendar/blocked', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) }).catch(()=>null);
+    }
+    if (!resp?.ok) { alert('Error guardando bloqueo'); return; }
+    closeBlockModal();
+    await renderCal();
+  }
+
+  async function deleteBlock() {
+    if (!_blockEditId) return;
+    if (!confirm('¿Eliminar este bloqueo?')) return;
+    await fetch(`/api/calendar/blocked/${_blockEditId}`, { method:'DELETE' });
+    closeBlockModal();
+    await renderCal();
   }
 
   function escHtml(s) {
