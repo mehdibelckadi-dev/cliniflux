@@ -505,6 +505,113 @@
     #pipe-toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#1e293b;color:#fff;font-size:13px;font-weight:600;padding:10px 20px;border-radius:var(--r-pill);z-index:1000;box-shadow:var(--shadow-lg);opacity:0;transition:opacity .25s;pointer-events:none}
     @media(max-width:700px){.p-pipeline{overflow-y:auto}.pipe-topbar{flex-wrap:wrap;padding:10px 12px}.pipe-board{padding:10px 8px 80px;gap:8px}.pipe-col{flex:0 0 220px}.pipe-filters{flex-wrap:nowrap;overflow-x:auto;padding-bottom:2px}.pipe-search{width:130px}}
 
+    /* ── PANEL 7: INICIO ── */
+    .p-inicio{flex-direction:column;background:var(--bg2);overflow-y:auto}
+    .ini-welcome{background:linear-gradient(135deg,#f0fdf4 0%,#dcfce7 60%,#bbf7d0 100%);border-bottom:1px solid rgba(22,163,74,0.15);padding:20px 28px 18px;flex-shrink:0}
+    .ini-welcome-row{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap}
+    .ini-greeting{font-size:22px;font-weight:900;letter-spacing:-.6px;color:var(--text);line-height:1.2}
+    .ini-greeting span{color:var(--green)}
+    .ini-date{font-size:12px;color:var(--text2);margin-top:4px;font-weight:500}
+    .ini-natalia-status{display:flex;align-items:center;gap:7px;background:rgba(255,255,255,0.75);backdrop-filter:blur(8px);border:1px solid rgba(22,163,74,0.2);border-radius:var(--r-pill);padding:7px 14px;font-size:12px;font-weight:600;color:var(--text)}
+    .ini-natalia-dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 2s ease-in-out infinite;flex-shrink:0}
+    .ini-natalia-sub{font-size:10px;color:var(--text3);margin-top:1px}
+    .ini-refresh{background:none;border:none;cursor:pointer;color:var(--text3);padding:6px;border-radius:6px;transition:all var(--dur-fast);font-size:16px;line-height:1}
+    .ini-refresh:hover{background:rgba(0,0,0,0.06);color:var(--text)}
+    /* KPI strip */
+    .ini-kpis{display:flex;gap:10px;padding:16px 28px;flex-shrink:0;overflow-x:auto}
+    .ini-kpis::-webkit-scrollbar{display:none}
+    .ini-kpi{background:#fff;border:1px solid var(--border);border-radius:var(--r);padding:14px 18px;flex:1;min-width:130px;box-shadow:var(--shadow-xs);transition:box-shadow var(--dur-fast);cursor:default;position:relative;overflow:hidden}
+    .ini-kpi::before{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;border-radius:0 0 var(--r) var(--r)}
+    .ini-kpi.green::before{background:var(--green)}
+    .ini-kpi.amber::before{background:#f59e0b}
+    .ini-kpi.blue::before{background:#0ea5e9}
+    .ini-kpi.purple::before{background:var(--ai)}
+    .ini-kpi.red::before{background:#ef4444}
+    .ini-kpi:hover{box-shadow:var(--shadow-md)}
+    .ini-kpi-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);margin-bottom:6px}
+    .ini-kpi-n{font-size:28px;font-weight:900;letter-spacing:-1.5px;color:var(--text);line-height:1}
+    .ini-kpi-sub{font-size:10px;color:var(--text3);margin-top:4px;font-weight:500}
+    /* Body 2-col */
+    .ini-body{display:grid;grid-template-columns:1fr 300px;gap:14px;padding:0 28px 32px;min-height:0}
+    /* Today timeline */
+    .ini-today{background:#fff;border:1px solid var(--border);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow-xs)}
+    .ini-sec-hd{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border)}
+    .ini-sec-title{font-size:13px;font-weight:800;color:var(--text);letter-spacing:-.3px}
+    .ini-sec-badge{font-size:10px;font-weight:700;background:var(--green-dim);color:var(--green);padding:3px 9px;border-radius:var(--r-pill)}
+    .ini-sec-link{font-size:11px;font-weight:600;color:var(--green);cursor:pointer;text-decoration:none;background:none;border:none;font-family:inherit;padding:0}
+    .ini-sec-link:hover{text-decoration:underline}
+    .ini-timeline{padding:8px 18px 14px;display:flex;flex-direction:column;gap:0}
+    .ini-tl-item{display:flex;gap:14px;padding:10px 0;border-bottom:1px solid rgba(0,0,0,0.04);position:relative}
+    .ini-tl-item:last-child{border-bottom:none}
+    .ini-tl-time{width:46px;flex-shrink:0;text-align:right}
+    .ini-tl-time-h{font-size:13px;font-weight:800;color:var(--text);letter-spacing:-.5px;line-height:1}
+    .ini-tl-time-m{font-size:10px;color:var(--text3)}
+    .ini-tl-line{width:1px;background:var(--border);flex-shrink:0;position:relative;margin:0 8px}
+    .ini-tl-dot{position:absolute;top:4px;left:50%;transform:translateX(-50%);width:9px;height:9px;border-radius:50%;border:2px solid #fff}
+    .ini-tl-card{flex:1;min-width:0}
+    .ini-tl-card-inner{background:var(--bg2);border-radius:var(--r-sm);padding:9px 12px;border-left:3px solid transparent;transition:background var(--dur-fast)}
+    .ini-tl-card-inner:hover{background:#f0f4f8}
+    .ini-tl-card-inner.status-confirmed{border-left-color:var(--green)}
+    .ini-tl-card-inner.status-pending{border-left-color:#f59e0b}
+    .ini-tl-card-inner.status-completed{border-left-color:#0ea5e9}
+    .ini-tl-card-inner.status-cancelled{border-left-color:#94a3b8;opacity:.65}
+    .ini-tl-card-inner.status-no_show{border-left-color:#ef4444;opacity:.65}
+    .ini-tl-top{display:flex;align-items:center;gap:8px;margin-bottom:3px}
+    .ini-tl-ava{width:24px;height:24px;border-radius:50%;font-size:9px;font-weight:800;color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .ini-tl-name{font-size:13px;font-weight:700;color:var(--text);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .ini-tl-price{font-size:11px;font-weight:700;color:var(--green);flex-shrink:0}
+    .ini-tl-svc{font-size:11px;color:var(--text2);margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .ini-tl-actions{display:flex;gap:5px;flex-wrap:wrap}
+    .ini-tl-btn{font-family:inherit;font-size:10px;font-weight:600;padding:3px 9px;border-radius:5px;border:1.5px solid var(--border);background:#fff;cursor:pointer;color:var(--text2);transition:all var(--dur-fast);white-space:nowrap}
+    .ini-tl-btn.confirm:hover{border-color:var(--green);color:var(--green);background:var(--green-dim)}
+    .ini-tl-btn.complete:hover{border-color:#0ea5e9;color:#0ea5e9;background:#eff6ff}
+    .ini-tl-btn.chat:hover{border-color:var(--ai);color:var(--ai-text);background:var(--ai-bg)}
+    .ini-empty-today{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;gap:8px;color:var(--text3)}
+    /* Right sidebar cards */
+    .ini-right{display:flex;flex-direction:column;gap:12px}
+    .ini-widget{background:#fff;border:1px solid var(--border);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow-xs)}
+    /* Week chart */
+    .ini-week-chart{display:flex;align-items:flex-end;gap:4px;height:60px;padding:0 18px 0;margin-top:4px;margin-bottom:2px}
+    .ini-week-bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;height:100%;justify-content:flex-end;position:relative}
+    .ini-week-bar-wrap:hover .ini-week-tip{opacity:1}
+    .ini-week-tip{position:absolute;bottom:calc(100% + 4px);left:50%;transform:translateX(-50%);background:#1e293b;color:#fff;font-size:9px;font-weight:700;padding:3px 6px;border-radius:4px;white-space:nowrap;opacity:0;transition:opacity var(--dur-fast);pointer-events:none;z-index:5}
+    .ini-week-bar{width:100%;border-radius:3px 3px 0 0;background:var(--green-dim2);transition:background var(--dur-fast);min-height:4px}
+    .ini-week-bar.today{background:var(--green)}
+    .ini-week-bar-wrap:hover .ini-week-bar{background:var(--green)}
+    .ini-week-lbl{font-size:9px;color:var(--text3);font-weight:600}
+    /* Quick actions */
+    .ini-qa-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;padding:12px 14px 14px}
+    .ini-qa-btn{display:flex;flex-direction:column;align-items:center;gap:5px;padding:12px 8px;background:var(--bg2);border:1.5px solid var(--border);border-radius:var(--r-sm);cursor:pointer;transition:all var(--dur-fast);text-decoration:none}
+    .ini-qa-btn:hover{border-color:var(--green);background:var(--green-light)}
+    .ini-qa-icon{font-size:20px;line-height:1}
+    .ini-qa-label{font-size:10px;font-weight:700;color:var(--text);text-align:center;line-height:1.3}
+    /* Activity feed */
+    .ini-feed{display:flex;flex-direction:column;max-height:260px;overflow-y:auto}
+    .ini-feed-item{display:flex;align-items:flex-start;gap:9px;padding:9px 14px;border-bottom:1px solid rgba(0,0,0,0.04);transition:background var(--dur-fast)}
+    .ini-feed-item:last-child{border-bottom:none}
+    .ini-feed-item:hover{background:var(--bg2)}
+    .ini-feed-icon{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;margin-top:1px}
+    .ini-feed-text{flex:1;min-width:0}
+    .ini-feed-main{font-size:12px;font-weight:600;color:var(--text);line-height:1.4}
+    .ini-feed-sub{font-size:10px;color:var(--text3);margin-top:1px}
+    .ini-feed-time{font-size:9px;color:var(--text3);flex-shrink:0;margin-top:2px}
+    /* At-risk card */
+    .ini-risk-list{padding:6px 14px 12px;display:flex;flex-direction:column;gap:5px}
+    .ini-risk-row{display:flex;align-items:center;gap:9px;padding:7px 10px;background:#fef2f2;border:1px solid rgba(239,68,68,0.15);border-radius:var(--r-sm)}
+    .ini-risk-ava{width:26px;height:26px;border-radius:50%;background:#ef4444;font-size:9px;font-weight:800;color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .ini-risk-name{font-size:12px;font-weight:600;color:var(--text);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .ini-risk-days{font-size:10px;font-weight:700;color:#dc2626;flex-shrink:0}
+    @media(max-width:1200px){.ini-body{grid-template-columns:1fr}}
+    @media(max-width:700px){
+      .ini-welcome{padding:14px 16px 12px}
+      .ini-greeting{font-size:18px}
+      .ini-kpis{padding:10px 12px;gap:8px}
+      .ini-kpi{min-width:110px;padding:11px 12px}
+      .ini-kpi-n{font-size:22px}
+      .ini-body{padding:0 12px 80px;grid-template-columns:1fr}
+      .ini-right{display:none}
+    }
+
     /* ── PANEL 6: CLIENTES ── */
     .p-clientes{flex-direction:row;background:var(--bg2);overflow:hidden;position:relative}
     .cl-main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
@@ -777,7 +884,11 @@
 <div class="app-layout">
   <!-- SIDEBAR -->
   <nav class="sidebar">
-    <div class="si active" data-panel="0" onclick="switchPanel(0)">
+    <div class="si active" data-panel="7" onclick="switchPanel(7)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <span class="si-label">Inicio</span>
+    </div>
+    <div class="si" data-panel="0" onclick="switchPanel(0)">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
       <span class="si-label">Conversaciones</span>
       <span class="si-badge" id="si-badge-msgs" style="display:none">0</span>
@@ -828,7 +939,7 @@
       </div>
     </div>
 
-    <div class="panel p-conv active" id="panel-0">
+    <div class="panel p-conv" id="panel-0">
       <div class="conv-list" id="conv-list">
         <div class="conv-list-hd">
           <span class="conv-list-title">WhatsApp <span class="conv-cnt" id="conv-cnt" style="display:none">0</span></span>
@@ -1625,11 +1736,142 @@
       </div>
     </div>
 
+    <!-- PANEL 7: INICIO -->
+    <div class="panel p-inicio active" id="panel-7">
+      <!-- Welcome header -->
+      <div class="ini-welcome">
+        <div class="ini-welcome-row">
+          <div>
+            <div class="ini-greeting" id="ini-greeting">Buenos días, <span id="ini-clinic-name">clínica</span> 👋</div>
+            <div class="ini-date" id="ini-date">—</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+            <div class="ini-natalia-status">
+              <div class="ini-natalia-dot"></div>
+              <div>
+                <div>Natalia activa</div>
+                <div class="ini-natalia-sub" id="ini-natalia-sub">0 conversaciones hoy</div>
+              </div>
+            </div>
+            <button class="ini-refresh" onclick="loadInicio()" title="Actualizar">↻</button>
+          </div>
+        </div>
+      </div>
+      <!-- KPI strip -->
+      <div class="ini-kpis">
+        <div class="ini-kpi green">
+          <div class="ini-kpi-label">Citas hoy</div>
+          <div class="ini-kpi-n" id="ini-kpi-total">—</div>
+          <div class="ini-kpi-sub" id="ini-kpi-total-sub">—</div>
+        </div>
+        <div class="ini-kpi amber">
+          <div class="ini-kpi-label">Pendientes</div>
+          <div class="ini-kpi-n" id="ini-kpi-pending">—</div>
+          <div class="ini-kpi-sub">Requieren confirmación</div>
+        </div>
+        <div class="ini-kpi blue">
+          <div class="ini-kpi-label">Ingresos hoy est.</div>
+          <div class="ini-kpi-n" id="ini-kpi-revenue">—</div>
+          <div class="ini-kpi-sub" id="ini-kpi-revenue-sub">—</div>
+        </div>
+        <div class="ini-kpi purple">
+          <div class="ini-kpi-label">Conversaciones</div>
+          <div class="ini-kpi-n" id="ini-kpi-convs">—</div>
+          <div class="ini-kpi-sub">Activas ahora</div>
+        </div>
+        <div class="ini-kpi green">
+          <div class="ini-kpi-label">Esta semana</div>
+          <div class="ini-kpi-n" id="ini-kpi-week">—</div>
+          <div class="ini-kpi-sub" id="ini-kpi-week-sub">citas programadas</div>
+        </div>
+      </div>
+      <!-- Body -->
+      <div class="ini-body">
+        <!-- Left: Today's timeline -->
+        <div>
+          <div class="ini-today">
+            <div class="ini-sec-hd">
+              <span class="ini-sec-title">Citas de hoy</span>
+              <span class="ini-sec-badge" id="ini-today-badge">0</span>
+              <button class="ini-sec-link" onclick="switchPanel(1)">Ver agenda →</button>
+            </div>
+            <div class="ini-timeline" id="ini-timeline"></div>
+          </div>
+          <!-- Weekly chart -->
+          <div class="ini-today" style="margin-top:12px">
+            <div class="ini-sec-hd">
+              <span class="ini-sec-title">Esta semana</span>
+              <button class="ini-sec-link" onclick="switchPanel(2)">Ver métricas →</button>
+            </div>
+            <div class="ini-week-chart" id="ini-week-chart"></div>
+            <div class="hm-lbl-row" id="ini-week-labels" style="padding:0 18px 12px;display:flex;gap:4px"></div>
+          </div>
+        </div>
+        <!-- Right sidebar -->
+        <div class="ini-right">
+          <!-- Quick actions -->
+          <div class="ini-widget">
+            <div class="ini-sec-hd" style="border-bottom:1px solid var(--border)">
+              <span class="ini-sec-title">Acciones rápidas</span>
+            </div>
+            <div class="ini-qa-grid">
+              <div class="ini-qa-btn" onclick="openApptModal(null)">
+                <span class="ini-qa-icon">📅</span>
+                <span class="ini-qa-label">Nueva cita</span>
+              </div>
+              <div class="ini-qa-btn" onclick="switchPanel(0)">
+                <span class="ini-qa-icon">💬</span>
+                <span class="ini-qa-label">Conversaciones</span>
+              </div>
+              <div class="ini-qa-btn" onclick="openBroadcast()">
+                <span class="ini-qa-icon">📣</span>
+                <span class="ini-qa-label">Campaña WA</span>
+              </div>
+              <div class="ini-qa-btn" onclick="switchPanel(6)">
+                <span class="ini-qa-icon">👥</span>
+                <span class="ini-qa-label">Pacientes</span>
+              </div>
+              <div class="ini-qa-btn" onclick="switchPanel(5)">
+                <span class="ini-qa-icon">🗂️</span>
+                <span class="ini-qa-label">Pipeline</span>
+              </div>
+              <div class="ini-qa-btn" onclick="switchPanel(2)">
+                <span class="ini-qa-icon">📊</span>
+                <span class="ini-qa-label">Métricas</span>
+              </div>
+            </div>
+          </div>
+          <!-- Activity feed -->
+          <div class="ini-widget">
+            <div class="ini-sec-hd">
+              <span class="ini-sec-title">Actividad reciente</span>
+              <button class="ini-sec-link" onclick="switchPanel(0)">Ver todo →</button>
+            </div>
+            <div class="ini-feed" id="ini-feed">
+              <div style="padding:20px;text-align:center;color:var(--text3);font-size:12px">Cargando...</div>
+            </div>
+          </div>
+          <!-- At-risk patients -->
+          <div class="ini-widget" id="ini-risk-widget" style="display:none">
+            <div class="ini-sec-hd" style="background:#fef2f2;border-bottom:1px solid rgba(239,68,68,0.15)">
+              <span class="ini-sec-title" style="color:#dc2626">⚠️ Pacientes en riesgo</span>
+              <button class="ini-sec-link" style="color:#dc2626" onclick="switchPanel(3)">Reactivar →</button>
+            </div>
+            <div class="ini-risk-list" id="ini-risk-list"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </main>
 
   <!-- BOTTOM NAV (mobile) -->
   <nav class="bottom-nav">
-    <div class="bn-item active" data-panel="0" onclick="switchPanel(0)" style="position:relative">
+    <div class="bn-item active" data-panel="7" onclick="switchPanel(7)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <span>Inicio</span>
+    </div>
+    <div class="bn-item" data-panel="0" onclick="switchPanel(0)" style="position:relative">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
       <span>Chats</span>
       <div class="bn-badge" id="bn-badge" style="display:none">0</div>
@@ -1641,10 +1883,6 @@
     <div class="bn-item" data-panel="2" onclick="switchPanel(2)">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
       <span>Métricas</span>
-    </div>
-    <div class="bn-item" data-panel="5" onclick="switchPanel(5)">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="5" height="18" rx="1"/><rect x="10" y="3" width="5" height="12" rx="1"/><rect x="17" y="3" width="5" height="8" rx="1"/></svg>
-      <span>Pipeline</span>
     </div>
     <div class="bn-item" data-panel="4" onclick="switchPanel(4)">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
@@ -2147,7 +2385,11 @@
       if (avaName) avaName.textContent = me.name || 'Mi cuenta';
       // First-run banner: mostrar si WhatsApp no está activo
       if (!me.whatsapp_number) document.getElementById('firstrun-banner').style.display = 'block';
+      // Set clinic name in greeting before loadInicio
+      const iniName = document.getElementById('ini-clinic-name');
+      if (iniName) iniName.textContent = me.name || 'clínica';
       loadData();
+      loadInicio();
     } catch { window.location.href = '/login'; }
   })();
 
@@ -2411,6 +2653,7 @@
       if (on) { p.classList.remove('animate-enter'); void p.offsetWidth; p.classList.add('animate-enter'); }
     });
     document.querySelectorAll('.si[data-panel],.bn-item[data-panel]').forEach(s => s.classList.toggle('active', parseInt(s.dataset.panel)===n));
+    if (n === 7) loadInicio();
     if (n === 4) { loadSettings(); loadUsage(); }
     if (n === 5) loadPipeline();
     if (n === 6) loadClientes();
@@ -3713,6 +3956,213 @@
     document.addEventListener(e, resetIdleTimer, { passive: true })
   );
   resetIdleTimer();
+
+  // ── Inicio ────────────────────────────────────────────────────────────────
+  let _iniLoaded = false;
+
+  function iniGreeting() {
+    const h = new Date().getHours();
+    return h < 13 ? 'Buenos días' : h < 20 ? 'Buenas tardes' : 'Buenas noches';
+  }
+  function iniDateStr() {
+    return new Date().toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'long',year:'numeric'}).replace(/^\w/,c=>c.toUpperCase());
+  }
+  function timeAgo(date) {
+    const s = Math.floor((Date.now() - new Date(date)) / 1000);
+    if (s < 60) return 'ahora';
+    if (s < 3600) return Math.floor(s/60) + 'min';
+    if (s < 86400) return Math.floor(s/3600) + 'h';
+    return Math.floor(s/86400) + 'd';
+  }
+
+  async function loadInicio() {
+    document.getElementById('ini-greeting').firstChild.textContent = iniGreeting() + ', ';
+    document.getElementById('ini-date').textContent = iniDateStr();
+
+    const now = new Date();
+    const todayStr = now.toISOString().slice(0,10);
+    const mon = new Date(now); mon.setDate(now.getDate() - ((now.getDay()+6)%7));
+    const sun = new Date(mon); sun.setDate(mon.getDate()+6);
+    const fmt = d => d.toISOString().slice(0,10);
+
+    try {
+      const [rToday, rWeek, rConvs] = await Promise.all([
+        fetch(`/api/calendar?start=${todayStr}&end=${todayStr}`),
+        fetch(`/api/calendar?start=${fmt(mon)}&end=${fmt(sun)}`),
+        fetch('/api/conversations')
+      ]);
+      const todayAppts = rToday.ok ? await rToday.json() : [];
+      const weekAppts = rWeek.ok ? await rWeek.json() : [];
+      const convs = rConvs.ok ? await rConvs.json() : [];
+
+      const clinicName = document.getElementById('tb-clinic-name-main')?.textContent || 'clínica';
+      document.getElementById('ini-clinic-name').textContent = clinicName;
+
+      // KPIs
+      const pending = todayAppts.filter(a => a.status==='pending').length;
+      const confirmed = todayAppts.filter(a => a.status==='confirmed').length;
+      const completed = todayAppts.filter(a => a.status==='completed').length;
+      const revenue = todayAppts.reduce((s,a) => s + parseFloat(a.price||0), 0);
+      const activeConvs = convs.filter(c => !c.closed_at).length;
+
+      document.getElementById('ini-kpi-total').textContent = todayAppts.length;
+      document.getElementById('ini-kpi-total-sub').textContent = `✓ ${confirmed} conf · ✓ ${completed} comp`;
+      document.getElementById('ini-kpi-pending').textContent = pending;
+      document.getElementById('ini-kpi-revenue').textContent = revenue > 0 ? revenue.toFixed(0)+'€' : '—';
+      document.getElementById('ini-kpi-revenue-sub').textContent = revenue > 0 ? `de ${todayAppts.filter(a=>a.price>0).length} citas con precio` : 'Sin precios registrados';
+      document.getElementById('ini-kpi-convs').textContent = activeConvs;
+      document.getElementById('ini-kpi-week').textContent = weekAppts.length;
+      document.getElementById('ini-natalia-sub').textContent = `${convs.length} conversaciones totales`;
+
+      // Today badge
+      document.getElementById('ini-today-badge').textContent = todayAppts.length;
+
+      // Timeline
+      renderIniTimeline(todayAppts);
+
+      // Weekly chart
+      renderIniWeekChart(weekAppts, mon);
+
+      // Activity feed
+      renderIniFeed(convs, todayAppts);
+
+      // At-risk (patients with days_since > 90 from appointments)
+      renderIniAtRisk(weekAppts);
+
+      _iniLoaded = true;
+    } catch(e) { console.error('loadInicio', e); }
+  }
+
+  function renderIniTimeline(appts) {
+    const tl = document.getElementById('ini-timeline');
+    const sorted = [...appts].sort((a,b) => new Date(a.scheduled_ts||0) - new Date(b.scheduled_ts||0));
+    if (!sorted.length) {
+      tl.innerHTML = `<div class="ini-empty-today"><div style="font-size:32px">📭</div><div style="font-size:14px;font-weight:700;color:var(--text)">Sin citas hoy</div><div style="font-size:12px;margin-top:4px">Puedes añadir una nueva cita desde Agenda.</div><button onclick="openApptModal(null)" style="margin-top:12px;font-family:inherit;font-size:12px;font-weight:700;background:var(--green);color:#fff;border:none;padding:8px 18px;border-radius:var(--r-pill);cursor:pointer">+ Nueva cita</button></div>`;
+      return;
+    }
+    const stColors = {confirmed:'#16a34a',pending:'#f59e0b',completed:'#0ea5e9',cancelled:'#94a3b8',no_show:'#ef4444'};
+    const stLabels = {confirmed:'Confirmada',pending:'Pendiente',completed:'Completada',cancelled:'Cancelada',no_show:'No asistió'};
+    tl.innerHTML = sorted.map(a => {
+      const d = new Date(a.scheduled_ts);
+      const hh = String(d.getHours()).padStart(2,'0');
+      const mm = String(d.getMinutes()).padStart(2,'0');
+      const st = a.status || 'pending';
+      const color = stColors[st] || '#94a3b8';
+      const avc = clAvatarColor(a.patient_name||'?');
+      const avI = clInitials(a.patient_name||'?');
+      const priceStr = a.price > 0 ? a.price+'€' : '';
+      const isPending = st === 'pending';
+      const isConfirmed = st === 'confirmed';
+      return `<div class="ini-tl-item">
+        <div class="ini-tl-time"><div class="ini-tl-time-h">${hh}:${mm}</div></div>
+        <div class="ini-tl-line"><div class="ini-tl-dot" style="background:${color}"></div></div>
+        <div class="ini-tl-card">
+          <div class="ini-tl-card-inner status-${st}" onclick="openApptById(${a.id})">
+            <div class="ini-tl-top">
+              <div class="ini-tl-ava" style="background:${avc}">${avI}</div>
+              <div class="ini-tl-name">${escHtml(a.patient_name||'Sin nombre')}</div>
+              ${priceStr?`<div class="ini-tl-price">${priceStr}</div>`:''}
+            </div>
+            <div class="ini-tl-svc">${escHtml(a.service||'Sin servicio')}${a.professional?' · '+escHtml(a.professional):''}</div>
+            <div class="ini-tl-actions">
+              ${isPending?`<button class="ini-tl-btn confirm" onclick="event.stopPropagation();iniQuickStatus(${a.id},'confirmed',this)">✓ Confirmar</button>`:''}
+              ${isConfirmed?`<button class="ini-tl-btn complete" onclick="event.stopPropagation();iniQuickStatus(${a.id},'completed',this)">✓ Completar</button>`:''}
+              <button class="ini-tl-btn" onclick="event.stopPropagation();openApptById(${a.id})">✏ Editar</button>
+              ${a.patient_phone?`<button class="ini-tl-btn chat" onclick="event.stopPropagation();switchPanel(0)">💬 Chat</button>`:''}
+            </div>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  async function iniQuickStatus(id, status, btn) {
+    const prev = btn.textContent;
+    btn.disabled = true; btn.textContent = '...';
+    try {
+      const r = await fetch(`/api/calendar/${id}`, { method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify({status}) });
+      if (r.ok) { loadInicio(); }
+      else { btn.disabled = false; btn.textContent = prev; }
+    } catch { btn.disabled = false; btn.textContent = prev; }
+  }
+
+  function renderIniWeekChart(appts, mon) {
+    const days = ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
+    const today = new Date(); today.setHours(0,0,0,0);
+    const counts = Array(7).fill(0);
+    appts.forEach(a => {
+      if (!a.scheduled_ts) return;
+      const d = new Date(a.scheduled_ts); d.setHours(0,0,0,0);
+      const idx = Math.round((d - mon) / 86400000);
+      if (idx >= 0 && idx < 7) counts[idx]++;
+    });
+    const max = Math.max(...counts, 1);
+    const chart = document.getElementById('ini-week-chart');
+    const labels = document.getElementById('ini-week-labels');
+    chart.innerHTML = counts.map((c, i) => {
+      const dayDate = new Date(mon); dayDate.setDate(mon.getDate()+i);
+      const isToday = dayDate.getTime() === today.getTime();
+      const h = Math.max(Math.round(c / max * 100), c > 0 ? 8 : 4);
+      return `<div class="ini-week-bar-wrap">
+        <div class="ini-week-tip">${c} cita${c!==1?'s':''}</div>
+        <div class="ini-week-bar${isToday?' today':''}" style="height:${h}%"></div>
+      </div>`;
+    }).join('');
+    labels.innerHTML = days.map((d,i) => {
+      const dd = new Date(mon); dd.setDate(mon.getDate()+i);
+      const isToday = dd.getTime() === today.getTime();
+      return `<div class="hm-lbl" style="flex:1;text-align:center;${isToday?'color:var(--green);font-weight:800;':''}">${d}</div>`;
+    }).join('');
+  }
+
+  function renderIniFeed(convs, todayAppts) {
+    const feed = document.getElementById('ini-feed');
+    const items = [];
+
+    // Recent appointments
+    const recentAppts = [...todayAppts].sort((a,b) => new Date(b.updated_at||b.created_at||0) - new Date(a.updated_at||a.created_at||0)).slice(0,3);
+    recentAppts.forEach(a => {
+      const stIcons = {confirmed:'✅',pending:'⏳',completed:'🏁',cancelled:'❌',no_show:'🔴'};
+      const stLabels = {confirmed:'Confirmada',pending:'Creada',completed:'Completada',cancelled:'Cancelada',no_show:'No asistió'};
+      items.push({ icon: stIcons[a.status||'pending'] || '📅', bg:'#f0fdf4', text:`Cita ${stLabels[a.status||'pending']?.toLowerCase()}`, sub: escHtml(a.patient_name||'Paciente') + (a.service?' · '+escHtml(a.service):''), time: a.updated_at||a.created_at||'' });
+    });
+
+    // Recent conversations
+    const recentConvs = [...convs].sort((a,b) => new Date(b.last_message_at||b.updated_at||0) - new Date(a.last_message_at||a.updated_at||0)).slice(0,4);
+    recentConvs.forEach(c => {
+      items.push({ icon:'💬', bg:'var(--ai-bg)', text:`Conversación con ${escHtml(c.patient_name||c.name||c.phone||'Paciente')}`, sub: c.last_message ? escHtml(c.last_message.slice(0,60))+'...' : 'Nueva conversación', time: c.last_message_at||c.updated_at||'' });
+    });
+
+    // Sort all by time desc
+    items.sort((a,b) => new Date(b.time||0) - new Date(a.time||0));
+    const top = items.slice(0,7);
+
+    if (!top.length) { feed.innerHTML = `<div style="padding:20px;text-align:center;color:var(--text3);font-size:12px">Sin actividad reciente</div>`; return; }
+    feed.innerHTML = top.map(item => `<div class="ini-feed-item">
+      <div class="ini-feed-icon" style="background:${item.bg}">${item.icon}</div>
+      <div class="ini-feed-text">
+        <div class="ini-feed-main">${item.text}</div>
+        <div class="ini-feed-sub">${item.sub}</div>
+      </div>
+      <div class="ini-feed-time">${item.time ? timeAgo(item.time) : ''}</div>
+    </div>`).join('');
+  }
+
+  function renderIniAtRisk(weekAppts) {
+    // Quick heuristic from weekly appointments — show unique patients seen recently
+    // Full at-risk comes from _clientes if loaded, otherwise skip
+    if (!_clientes?.length) { document.getElementById('ini-risk-widget').style.display='none'; return; }
+    const atRisk = _clientes.filter(c => c.risk === 'high').slice(0,4);
+    if (!atRisk.length) { document.getElementById('ini-risk-widget').style.display='none'; return; }
+    document.getElementById('ini-risk-widget').style.display='';
+    document.getElementById('ini-risk-list').innerHTML = atRisk.map(c => `
+      <div class="ini-risk-row" onclick="switchPanel(6);setTimeout(()=>openClienteDetail('${escHtml(c.phone)}'),400)" style="cursor:pointer">
+        <div class="ini-risk-ava">${clInitials(c.name)}</div>
+        <div class="ini-risk-name">${escHtml(c.name)}</div>
+        <div class="ini-risk-days">${c.days_since}d</div>
+      </div>`).join('');
+  }
+  // ── end Inicio ─────────────────────────────────────────────────────────────
 
   // ── Clientes ──────────────────────────────────────────────────────────────
   let _clientes = [];
