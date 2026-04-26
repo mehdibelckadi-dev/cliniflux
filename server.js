@@ -427,6 +427,7 @@ app.post('/webhook/whatsapp', express.raw({ type: 'application/json' }), async (
     const prompt   = clinic ? await buildPromptWithSlots(clinic) : buildDemoPrompt();
     const clinicId = clinic?.id || 1;
     sessionId = `wa_${clinicId}_` + from.slice(-10);
+    console.log(`[WA] from=${from} to=${to} clinicId=${clinicId} clinic=${clinic?.name||'NO MATCH — fallback'} session=${sessionId}`);
 
     if (clinic?.id) {
       const usage = await incrementConversation(clinic.id);
@@ -475,7 +476,10 @@ app.post('/webhook/whatsapp', express.raw({ type: 'application/json' }), async (
       saveMessage({ clinic_id: clinicId, session_id: sessionId, direction: 'inbound', content: msg, from_number: from }).catch(() => {}),
       setConvState(sessionId, clinicId, { status: 'open', last_msg_at: new Date() }).catch(() => {}),
     ]);
-    io?.to(`clinic_${clinicId}`).emit('message:new', {
+    const room = `clinic_${clinicId}`;
+    const roomSockets = io?.sockets?.adapter?.rooms?.get(room)?.size || 0;
+    console.log(`[WA] emit message:new → ${room} (${roomSockets} sockets conectados)`);
+    io?.to(room).emit('message:new', {
       session_id: sessionId, from_number: from, content: msg, direction: 'inbound',
       created_at: savedAt, responded_by: 'human', urgent, manual: inManual
     });
