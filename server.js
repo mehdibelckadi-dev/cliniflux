@@ -1254,13 +1254,14 @@ app.get('/api/settings', requireAuth, async (req, res) => {
 });
 
 app.post('/api/settings', requireAuth, async (req, res) => {
-  const { name, logo_url, phone, email_clinic, address, hours, services, extra, assistant_name, whatsapp_number, google_review_url, urgent_keywords, auto_reactivacion, reactivacion_msg, auto_reminders, reminder_hours, auto_followup, followup_hours, auto_review } = req.body;
+  const { name, logo_url, phone, email_clinic, address, hours, services, extra, assistant_name, whatsapp_number, google_review_url, urgent_keywords, quick_chips, auto_reactivacion, reactivacion_msg, auto_reminders, reminder_hours, auto_followup, followup_hours, auto_review } = req.body;
   try {
     const { rows } = await pool.query('SELECT config FROM clinics WHERE id=$1', [req.session.clinic.id]);
     const cfg = { ...(rows[0]?.config || {}), phone, email: email_clinic, address, hours, services, extra, assistant_name };
     if (logo_url !== undefined) cfg.logo_url = logo_url || null;
     if (google_review_url !== undefined) cfg.google_review_url = google_review_url || null;
     if (urgent_keywords !== undefined) cfg.urgent_keywords = urgent_keywords || null;
+    if (Array.isArray(quick_chips)) cfg.quick_chips = quick_chips.filter(Boolean);
     if (auto_reactivacion !== undefined) cfg.auto_reactivacion = !!auto_reactivacion;
     if (reactivacion_msg !== undefined) cfg.reactivacion_msg = reactivacion_msg || null;
     if (auto_reminders !== undefined) cfg.auto_reminders = String(!!auto_reminders);

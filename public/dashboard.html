@@ -218,7 +218,8 @@
     .mi{background:#fff;color:#1a1a2e;align-self:flex-start;border-bottom-left-radius:4px;box-shadow:var(--shadow-xs)}
     .mo{background:var(--ai-bg);color:var(--ai-text);align-self:flex-end;border-bottom-right-radius:4px}
     .mo-green{background:#dcfce7;color:#14532d;align-self:flex-end;border-bottom-right-radius:4px}
-    .msg-ts{font-size:10px;margin-top:4px;text-align:right;opacity:.45}
+    .msg-ts{font-size:10px;margin-top:3px;text-align:right;opacity:0;height:14px;transition:opacity 150ms}
+    .msg:hover .msg-ts{opacity:.5}
     .typing{display:flex;gap:5px;align-items:center;padding:2px 0}
     .td{width:7px;height:7px;border-radius:50%;background:var(--green);animation:tb 1.2s ease infinite}
     .td:nth-child(2){animation-delay:.2s}.td:nth-child(3){animation-delay:.4s}
@@ -314,7 +315,16 @@
     .cf-cnt{font-size:9px;font-weight:800;background:rgba(0,0,0,0.08);padding:1px 5px;border-radius:8px;margin-left:3px}
     .cf.active .cf-cnt{background:rgba(22,163,74,0.2)}
     /* ── Date separator ── */
-    .msg-date-sep{text-align:center;font-size:10px;font-weight:600;color:var(--text3);padding:4px 0;letter-spacing:.04em}
+    .msg-date-sep{display:flex;align-items:center;gap:8px;font-size:10px;font-weight:600;color:var(--text3);padding:6px 0;letter-spacing:.04em}
+    .msg-date-sep::before,.msg-date-sep::after{content:'';flex:1;height:1px;background:var(--border)}
+    /* ── Chat search bar ── */
+    .chat-search-bar{display:none;align-items:center;gap:8px;padding:7px 14px;border-bottom:1px solid var(--border);background:var(--bg2);flex-shrink:0}
+    .chat-search-bar.visible{display:flex}
+    .chat-search-bar input{flex:1;font-family:inherit;font-size:12px;color:var(--text);background:#fff;border:1.5px solid var(--border);border-radius:8px;padding:6px 10px;outline:none;transition:border-color var(--dur-base)}
+    .chat-search-bar input:focus{border-color:var(--green)}
+    .chat-search-bar-close{background:none;border:none;cursor:pointer;color:var(--text3);font-size:15px;padding:0;line-height:1}
+    .msg-highlight mark{background:#fef08a;color:inherit;border-radius:2px}
+    .msg.hidden-search{display:none}
     /* ── Leads tabs ── */
     .leads-tabs{display:flex;gap:0;border-bottom:1px solid var(--border);flex-shrink:0;background:#fff}
     .lt{font-size:12px;font-weight:600;color:var(--text3);padding:10px 20px;cursor:pointer;border-bottom:2.5px solid transparent;transition:all var(--dur-fast)}
@@ -1121,8 +1131,15 @@
             <div class="chat-hd-sub" id="chat-hd-sub"><span class="wa-dot"></span>WhatsApp · IA activa</div>
           </div>
           <button class="toggle-manual" id="toggle-manual-btn" onclick="toggleManualMode()" title="Pausar IA y tomar control manual" style="display:none">IA activa</button>
+          <button id="chat-search-btn" onclick="toggleChatSearch()" title="Buscar en conversación" style="display:none;background:none;border:none;cursor:pointer;padding:5px;color:var(--text3);line-height:0"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
           <button id="close-conv-btn" onclick="closeConversation()" title="Cerrar conversación" style="display:none;font-size:11px;font-weight:600;padding:5px 11px;border-radius:var(--r-sm);border:1px solid var(--border);background:#fff;cursor:pointer;color:#ef4444;font-family:inherit">✕ Cerrar</button>
           <div class="chat-status" id="chat-hd-status" style="display:none">En progreso</div>
+        </div>
+        <div class="chat-search-bar" id="chat-search-bar">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--text3)" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input id="chat-search-input" placeholder="Buscar en esta conversación..." oninput="applyChatSearch()" onkeydown="if(event.key==='Escape')closeChatSearch()">
+          <span id="chat-search-count" style="font-size:11px;color:var(--text3);white-space:nowrap"></span>
+          <button class="chat-search-bar-close" onclick="closeChatSearch()">✕</button>
         </div>
         <div class="chat-msgs" id="chat-msgs">
           <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:8px;color:var(--text3)">
@@ -1695,6 +1712,9 @@
             <span class="set-label" style="margin-top:10px">Palabras clave de escalado urgente</span>
             <input class="set-input" id="s-urgent-kw" placeholder="dolor fuerte, sangrado, alergia (separadas por coma)">
             <div style="font-size:11px;color:var(--text3);margin-top:-8px">Se suman a las palabras por defecto del sistema.</div>
+            <span class="set-label" style="margin-top:10px">Respuestas rápidas (una por línea)</span>
+            <textarea class="set-textarea" id="s-chips" placeholder="✓ Confirmar cita&#10;📞 Llamar ahora&#10;👤 Pasar a especialista" style="min-height:90px"></textarea>
+            <div style="font-size:11px;color:var(--text3);margin-top:-8px">Aparecen como chips debajo del chat para responder rápido.</div>
             <div style="display:flex;align-items:center;gap:10px;margin-top:10px">
               <input type="checkbox" id="s-auto-react" style="width:16px;height:16px;accent-color:var(--green)">
               <span class="set-label" style="margin:0">Reactivación automática de pacientes en riesgo (cada 6h)</span>
@@ -2516,6 +2536,9 @@
     document.getElementById('s-extra').value = cfg.extra || '';
     document.getElementById('s-review-url').value = cfg.google_review_url || '';
     document.getElementById('s-urgent-kw').value = cfg.urgent_keywords || '';
+    const chips = cfg.quick_chips || [];
+    document.getElementById('s-chips').value = chips.join('\n');
+    renderChips(chips);
     document.getElementById('s-auto-react').checked = !!cfg.auto_reactivacion;
     document.getElementById('s-react-msg').value = cfg.reactivacion_msg || '';
     const autoRem = cfg.auto_reminders !== 'false';
@@ -2724,6 +2747,7 @@
       extra: document.getElementById('s-extra').value,
       google_review_url: document.getElementById('s-review-url').value,
       urgent_keywords: document.getElementById('s-urgent-kw').value,
+      quick_chips: document.getElementById('s-chips').value.split('\n').map(s=>s.trim()).filter(Boolean),
       auto_reactivacion: document.getElementById('s-auto-react').checked,
       reactivacion_msg: document.getElementById('s-react-msg').value,
       whatsapp_number: document.getElementById('s-wa').value,
@@ -3432,6 +3456,7 @@
     const btn = document.getElementById('toggle-manual-btn');
     btn.style.display = '';
     document.getElementById('close-conv-btn').style.display = '';
+    document.getElementById('chat-search-btn').style.display = '';
     updateManualBtn(conv.session_id);
 
     // Update patient panel
@@ -3489,7 +3514,9 @@
     const ts = d.toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'});
     const by = isOut ? (m.responded_by==='ai'?'IA':'Manual') : 'Paciente';
     const tick = isOut ? `<span class="msg-tick ${m.responded_by==='ai'?'ai':'manual'}">${m.responded_by==='ai'?'✓':'✓✓'}</span>` : '';
-    div.innerHTML = esc(m.content) + `<div class="msg-ts">${ts} · ${by}${tick}</div>`;
+    const fullDt = d.toLocaleString('es-ES',{weekday:'short',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+    div.title = fullDt;
+    div.innerHTML = `<span class="msg-text">${esc(m.content)}</span><div class="msg-ts">${ts} · ${by}${tick}</div>`;
     return div;
   }
 
@@ -3507,8 +3534,9 @@
       if (dayKey !== lastDate) {
         const sep = document.createElement('div');
         sep.className = 'msg-date-sep';
-        const isToday = dayKey === new Date().toDateString();
-        sep.textContent = isToday ? 'Hoy' : d.toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'long'});
+        const now = new Date(); const today = now.toDateString();
+        const ayer = new Date(now - 86400000).toDateString();
+        sep.textContent = dayKey === today ? 'Hoy' : dayKey === ayer ? 'Ayer' : d.toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'long'});
         chatMsgs.appendChild(sep);
         lastDate = dayKey;
       }
@@ -3548,6 +3576,45 @@
     inp.value = ''; autoGrow(inp);
     document.getElementById('manual-banner').classList.toggle('on', isManual);
     if (!isManual) dismissCopilot();
+  }
+
+  // ── Chat search ──────────────────────────────────────────────────────────
+  function toggleChatSearch() {
+    const bar = document.getElementById('chat-search-bar');
+    bar.classList.toggle('visible');
+    if (bar.classList.contains('visible')) { document.getElementById('chat-search-input').focus(); }
+    else { closeChatSearch(); }
+  }
+  function closeChatSearch() {
+    document.getElementById('chat-search-bar').classList.remove('visible');
+    document.getElementById('chat-search-input').value = '';
+    applyChatSearch();
+  }
+  function applyChatSearch() {
+    const q = document.getElementById('chat-search-input').value.trim().toLowerCase();
+    const msgs = document.querySelectorAll('#chat-msgs .msg');
+    let found = 0;
+    msgs.forEach(el => {
+      const textEl = el.querySelector('.msg-text');
+      if (!textEl) return;
+      const raw = textEl.dataset.raw || textEl.textContent;
+      textEl.dataset.raw = raw;
+      if (!q) { el.classList.remove('hidden-search'); textEl.innerHTML = esc(raw); return; }
+      const match = raw.toLowerCase().includes(q);
+      el.classList.toggle('hidden-search', !match);
+      if (match) { found++; const escaped = esc(raw); const re = new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'gi'); textEl.innerHTML = escaped.replace(re, m => `<mark>${m}</mark>`); }
+    });
+    document.getElementById('chat-search-count').textContent = q ? `${found} resultado${found!==1?'s':''}` : '';
+  }
+
+  // ── Quick chips (configurable) ───────────────────────────────────────────
+  const DEFAULT_CHIPS = ['✓ Confirmar cita','📞 Llamar ahora','👤 Pasar a especialista','🙏 Pedir disculpas','📱 Dar teléfono'];
+  function renderChips(lines) {
+    const el = document.getElementById('quick-chips');
+    if (!el) return;
+    const chips = (lines || []).filter(l => l.trim());
+    const src = chips.length ? chips : DEFAULT_CHIPS;
+    el.innerHTML = src.map(c => `<div class="qc" onclick="insertChip(${JSON.stringify(c)})">${esc(c)}</div>`).join('');
   }
 
   function dismissCopilot() {
