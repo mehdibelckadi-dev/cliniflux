@@ -82,9 +82,11 @@
     .si-collapse-btn svg{width:14px;height:14px;stroke:var(--text3);transition:transform 220ms var(--ease-out),stroke var(--dur-fast);flex-shrink:0}
     .sidebar.collapsed .si-collapse-btn svg{transform:rotate(180deg)}
     .sidebar.collapsed .si-collapse-btn{justify-content:center;padding:0}
-    .si-ava-row{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:8px;cursor:pointer;transition:background var(--dur-fast);overflow:hidden}
+    .si-ava-row{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:8px;cursor:pointer;transition:background var(--dur-fast),padding 220ms var(--ease-out);overflow:hidden}
     .si-ava-row:hover{background:var(--bg2)}
-    .si-ava{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#16a34a,#22c55e);font-size:9px;font-weight:800;color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .sidebar.collapsed .si-ava-row{justify-content:center;padding:8px 0}
+    .si-ava{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#16a34a,#22c55e);font-size:9px;font-weight:800;color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden}
+    .si-ava img{width:100%;height:100%;object-fit:cover;border-radius:50%}
     .si-ava-name{font-size:12px;font-weight:600;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;transition:opacity 160ms,width 220ms var(--ease-out)}
     /* Tooltip on collapsed sidebar */
     .si{position:relative}
@@ -1599,6 +1601,14 @@
             <input class="set-input" id="s-address" placeholder="Calle, número, ciudad">
             <span class="set-label">Horario de atención</span>
             <input class="set-input" id="s-hours" placeholder="L-V 9:00-20:00, Sáb 10:00-14:00">
+            <span class="set-label" style="margin-top:12px">Logo de la clínica (URL)</span>
+            <div style="display:flex;gap:8px;align-items:center">
+              <input class="set-input" id="s-logo-url" type="url" placeholder="https://tuclinica.com/logo.png" style="flex:1" oninput="previewLogo(this.value)">
+              <div id="s-logo-preview" style="width:36px;height:36px;border-radius:50%;border:1.5px solid var(--border);overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:var(--bg2)">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text3)" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+              </div>
+            </div>
+            <div style="font-size:11px;color:var(--text3);margin-top:3px">Aparecerá como icono en el panel. Usa una URL pública (tu web, Dropbox, etc.)</div>
             <button class="set-btn" onclick="saveSettings('clinic')">Guardar cambios</button>
             <div class="set-saved" id="saved-clinic">✓ Guardado</div>
           </div>
@@ -2409,6 +2419,10 @@
     const cfg = d.config || {};
     document.getElementById('s-name').value = d.name || '';
     document.getElementById('s-phone').value = cfg.phone || '';
+    const logoUrl = cfg.logo_url || '';
+    document.getElementById('s-logo-url').value = logoUrl;
+    previewLogo(logoUrl);
+    applyClinicLogo(logoUrl, d.name || '');
     document.getElementById('s-email').value = cfg.email || '';
     document.getElementById('s-address').value = cfg.address || '';
     document.getElementById('s-hours').value = cfg.hours || '';
@@ -2615,6 +2629,7 @@
   async function saveSettings(section) {
     const body = {
       name: document.getElementById('s-name').value,
+      logo_url: document.getElementById('s-logo-url').value.trim(),
       phone: document.getElementById('s-phone').value,
       email_clinic: document.getElementById('s-email').value,
       address: document.getElementById('s-address').value,
@@ -2679,9 +2694,11 @@
       if (iniName) iniName.textContent = me.name || 'clínica';
       loadData();
       loadInicio();
-      // Pre-cache rooms for calendar
+      // Pre-cache rooms + logo from settings
       fetch('/api/settings').then(r=>r.ok?r.json():null).then(d=>{
-        if (d?.config?.rooms) sessionStorage.setItem('cl_rooms', JSON.stringify(d.config.rooms));
+        if (!d) return;
+        if (d.config?.rooms) sessionStorage.setItem('cl_rooms', JSON.stringify(d.config.rooms));
+        if (d.config?.logo_url) applyClinicLogo(d.config.logo_url, d.name);
       }).catch(()=>{});
     } catch { window.location.href = '/login'; }
   })();
@@ -4466,6 +4483,29 @@
 
   function escHtml(s) {
     return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  // ── Clinic logo ───────────────────────────────────────────────────────────
+  function previewLogo(url) {
+    const el = document.getElementById('s-logo-preview');
+    if (!el) return;
+    if (url) {
+      el.innerHTML = `<img src="${escHtml(url)}" style="width:100%;height:100%;object-fit:cover;border-radius:50%" onerror="this.parentElement.innerHTML='<svg width=16 height=16 viewBox=&quot;0 0 24 24&quot; fill=none stroke=var(--text3) stroke-width=1.5><rect x=3 y=3 width=18 height=18 rx=3/><circle cx=8.5 cy=8.5 r=1.5/><polyline points=&quot;21 15 16 10 5 21&quot;/></svg>'">`;
+    } else {
+      el.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text3)" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>`;
+    }
+  }
+
+  function applyClinicLogo(url, name) {
+    const ava = document.getElementById('si-ava');
+    if (!ava) return;
+    if (url) {
+      ava.style.background = 'var(--bg2)';
+      ava.innerHTML = `<img src="${escHtml(url)}" alt="" onerror="this.parentElement.style.background='linear-gradient(135deg,#16a34a,#22c55e)';this.parentElement.textContent='${(name||'CF').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase()}'">`;
+    } else {
+      ava.style.background = 'linear-gradient(135deg,#16a34a,#22c55e)';
+      ava.textContent = (name||'CF').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    }
   }
 
   // ── Count-up animation ────────────────────────────────────────────────────
