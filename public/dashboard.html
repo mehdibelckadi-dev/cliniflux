@@ -198,11 +198,16 @@
 
     /* Chat */
     .chat-area{flex:1;display:flex;flex-direction:column;background:#fff;min-width:0}
-    .chat-hd{padding:11px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-shrink:0;background:#fff}
+    .chat-hd{padding:11px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-shrink:0;background:#fff;transition:background var(--dur-base),border-bottom-color var(--dur-base)}
+    .chat-hd.manual-mode{background:#f0f6ff;border-bottom-color:#bfdbfe}
     .chat-hd-av{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0}
     .chat-hd-title{font-size:14px;font-weight:700;color:var(--text);flex:1}
     .chat-hd-sub{font-size:11px;color:var(--text3);display:flex;align-items:center;gap:5px;margin-top:1px}
-    .wa-dot{width:7px;height:7px;background:#25d366;border-radius:50%}
+    .wa-dot{width:7px;height:7px;background:#25d366;border-radius:50%;flex-shrink:0}
+    .manual-dot{width:7px;height:7px;background:#3b82f6;border-radius:50%;flex-shrink:0;animation:pulse 2s ease-in-out infinite}
+    .natalia-typing-bubble{background:var(--ai-bg);border:1px solid var(--ai-dim);align-self:flex-start;border-bottom-left-radius:4px}
+    .natalia-typing-label{font-size:9px;color:var(--ai);margin-top:3px;text-align:left;opacity:.7}
+    .notes-status{font-size:10px;color:var(--text3);margin-top:3px;min-height:14px;transition:opacity 300ms}
     .chat-status{font-size:10px;font-weight:700;background:#fef3c7;color:#92400e;padding:4px 10px;border-radius:var(--r-pill)}
     .chat-msgs{flex:1;padding:16px;display:flex;flex-direction:column;gap:10px;overflow-y:auto;background:#f0f2f5}
     .copilot-bar{display:none;flex-direction:column;gap:6px;padding:10px 14px;background:#eff6ff;border-top:1px solid #bfdbfe}
@@ -1210,7 +1215,7 @@
         <div id="pp-patient" style="padding:0 0 4px;font-size:11px;color:var(--text3)">—</div>
         <div class="pp-sect" style="margin-top:12px">Notas internas</div>
         <textarea id="pp-notes" placeholder="Notas del equipo (solo visibles en el dashboard)..." style="width:100%;font-size:12px;font-family:inherit;color:var(--text);background:var(--bg2);border:1.5px solid var(--border);border-radius:8px;padding:8px 10px;resize:vertical;min-height:72px;outline:none;margin-top:4px" oninput="scheduleNotesSave()"></textarea>
-        <button onclick="saveNotes()" id="notes-save-btn" style="margin-top:6px;font-size:11px;font-weight:600;font-family:inherit;background:var(--green);color:#fff;border:none;padding:5px 14px;border-radius:var(--r-pill);cursor:pointer;display:none">Guardar</button>
+        <div class="notes-status" id="notes-status"></div>
       </div>
     </div>
 
@@ -2239,7 +2244,7 @@
     </div>
     <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text3);margin-bottom:8px">Notas internas</div>
     <textarea id="pp-sheet-notes" placeholder="Notas del equipo..." style="width:100%;font-size:13px;font-family:inherit;color:var(--text);background:var(--bg2);border:1.5px solid var(--border);border-radius:var(--r-sm);padding:10px 12px;resize:none;min-height:80px;outline:none;transition:border-color var(--dur-base)" oninput="scheduleNotesSave()"></textarea>
-    <button onclick="document.getElementById('pp-notes').value=document.getElementById('pp-sheet-notes').value;saveNotes()" style="margin-top:8px;width:100%;font-size:13px;font-weight:700;font-family:inherit;background:var(--green);color:#fff;border:none;padding:11px;border-radius:var(--r-pill);cursor:pointer">Guardar notas</button>
+    <div class="notes-status" id="notes-status-sheet" style="margin-top:4px;text-align:center"></div>
   </div>
 
   <!-- IMPORT MODAL -->
@@ -3575,7 +3580,30 @@
     inp.placeholder = isManual ? 'Escribe tu respuesta...' : 'Activa modo manual para responder';
     inp.value = ''; autoGrow(inp);
     document.getElementById('manual-banner').classList.toggle('on', isManual);
+    document.getElementById('chat-hd').classList.toggle('manual-mode', isManual);
+    document.getElementById('chat-hd-sub').innerHTML = isManual
+      ? '<span class="manual-dot"></span>Modo manual activo'
+      : '<span class="wa-dot"></span>WhatsApp · IA respondiendo';
     if (!isManual) dismissCopilot();
+  }
+
+  // ── Typing indicator ─────────────────────────────────────────────────────
+  let _typingTimeout = null;
+  function showTypingIndicator() {
+    const chatMsgs = document.getElementById('chat-msgs');
+    if (!chatMsgs) return;
+    hideTypingIndicator();
+    const el = document.createElement('div');
+    el.id = 'natalia-typing';
+    el.className = 'msg natalia-typing-bubble';
+    el.innerHTML = '<div class="typing"><div class="td"></div><div class="td"></div><div class="td"></div></div><div class="natalia-typing-label">Natalia escribiendo…</div>';
+    chatMsgs.appendChild(el);
+    if (isNearBottom()) chatMsgs.scrollTop = chatMsgs.scrollHeight;
+    _typingTimeout = setTimeout(hideTypingIndicator, 12000);
+  }
+  function hideTypingIndicator() {
+    clearTimeout(_typingTimeout);
+    document.getElementById('natalia-typing')?.remove();
   }
 
   // ── Chat search ──────────────────────────────────────────────────────────
@@ -3866,12 +3894,14 @@
         chatMsgs.appendChild(appendMsg(chatMsgs, { ...msg, direction:'inbound', responded_by: msg.urgent ? 'urgent' : 'patient' }));
         if (near) chatMsgs.scrollTop = chatMsgs.scrollHeight;
         else { _scrollNewCount++; const b = document.getElementById('scroll-new-badge'); b.textContent=_scrollNewCount; b.style.display=''; document.getElementById('scroll-bottom-btn').classList.add('visible'); }
+        if (!manualSet.has(msg.session_id)) showTypingIndicator();
       }
     });
 
     // Respuesta IA
     socket.on('message:sent', (msg) => {
       if (activeSessionId === msg.session_id) {
+        hideTypingIndicator();
         const chatMsgs = document.getElementById('chat-msgs');
         const near = isNearBottom();
         chatMsgs.appendChild(appendMsg(chatMsgs, { ...msg, direction:'outbound', responded_by: msg.responded_by || 'ai' }));
@@ -3890,6 +3920,8 @@
         document.getElementById('chat-msgs').innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:8px;color:var(--text3)"><div style="font-size:28px">✓</div><div style="font-size:13px">Conversación cerrada</div></div>';
         document.getElementById('toggle-manual-btn').style.display = 'none';
         document.getElementById('close-conv-btn').style.display = 'none';
+        document.getElementById('chat-hd').classList.remove('manual-mode');
+        hideTypingIndicator();
       }
     });
 
@@ -3940,24 +3972,28 @@
 
   // ── Paso 8: Notas internas ─────────────────────────────────────────────────
   let notesSaveTimer = null;
+  function _setNotesStatus(msg) {
+    ['notes-status','notes-status-sheet'].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = msg; });
+  }
   function scheduleNotesSave() {
-    // Sync both textareas
     const mainNotes = document.getElementById('pp-notes');
     const sheetNotes = document.getElementById('pp-sheet-notes');
     if (document.activeElement === sheetNotes) mainNotes.value = sheetNotes.value;
     else sheetNotes.value = mainNotes.value;
-    document.getElementById('notes-save-btn').style.display = '';
+    _setNotesStatus('');
     clearTimeout(notesSaveTimer);
-    notesSaveTimer = setTimeout(saveNotes, 2000);
+    notesSaveTimer = setTimeout(saveNotes, 1500);
   }
   async function saveNotes() {
     if (!activePhone) return;
     const notes = document.getElementById('pp-notes').value;
     document.getElementById('pp-sheet-notes').value = notes;
+    _setNotesStatus('Guardando…');
     await fetch(`/api/patient-note/${encodeURIComponent(activePhone)}`, {
       method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ notes })
     }).catch(() => {});
-    document.getElementById('notes-save-btn').style.display = 'none';
+    _setNotesStatus('✓ Guardado');
+    setTimeout(() => _setNotesStatus(''), 2500);
   }
 
   const churnColors = { low:'var(--green)', medium:'#f59e0b', high:'#dc2626', none:'var(--text3)' };
@@ -4009,7 +4045,7 @@
     if (!r?.ok) return;
     const { notes } = await r.json();
     document.getElementById('pp-notes').value = notes || '';
-    document.getElementById('notes-save-btn').style.display = 'none';
+    _setNotesStatus('');
   }
 
   // ── Paso 7: Web Push ───────────────────────────────────────────────────────
