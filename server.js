@@ -1,9 +1,9 @@
 require('dotenv').config();
 
 // ── Startup guard: variables críticas ────────────────────────────────────────
-if (process.env.NODE_ENV === 'production' && !process.env.SESSION_SECRET) {
-  console.error('[FATAL] SESSION_SECRET no está configurado en producción. Abortando.');
-  process.exit(1);
+if (process.env.NODE_ENV === 'production') {
+  const missing = ['SESSION_SECRET','ADMIN_SECRET'].filter(k => !process.env[k]);
+  if (missing.length) { console.error(`[FATAL] Variables no configuradas: ${missing.join(', ')}. Abortando.`); process.exit(1); }
 }
 const http = require('http');
 const express = require('express');
