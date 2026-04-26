@@ -61,22 +61,46 @@
     .app-layout{display:flex;height:calc(100vh - 56px);margin-top:56px}
 
     /* ── SIDEBAR (desktop) ── */
-    .sidebar{width:200px;background:#fff;border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:stretch;padding:8px 6px;flex-shrink:0;gap:1px}
-    .si{height:38px;border-radius:8px;display:flex;align-items:center;justify-content:flex-start;padding:0 12px;gap:10px;cursor:pointer;transition:all var(--dur-fast);position:relative;flex-shrink:0}
+    .sidebar{width:200px;background:#fff;border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:stretch;padding:8px 6px;flex-shrink:0;gap:1px;transition:width 220ms var(--ease-out)}
+    .sidebar.collapsed{width:52px}
+    .si{height:38px;border-radius:8px;display:flex;align-items:center;justify-content:flex-start;padding:0 12px;gap:10px;cursor:pointer;transition:all var(--dur-fast);position:relative;flex-shrink:0;overflow:hidden}
     .si:hover{background:var(--bg2)}
     .si.active{background:var(--green-dim)}
     .si svg{width:17px;height:17px;stroke:var(--text3);transition:stroke var(--dur-fast);flex-shrink:0}
     .si.active svg{stroke:var(--green)}
-    .si-label{font-size:13px;font-weight:600;color:var(--text2);transition:color var(--dur-fast)}
+    .si-label{font-size:13px;font-weight:600;color:var(--text2);transition:color var(--dur-fast),opacity 160ms,width 220ms var(--ease-out);white-space:nowrap;overflow:hidden}
     .si.active .si-label{color:var(--green)}
-    .si-badge{position:absolute;top:7px;right:9px;min-width:16px;height:16px;padding:0 4px;border-radius:8px;background:#ef4444;font-size:8px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center;border:2px solid #fff}
+    .sidebar.collapsed .si-label{opacity:0;width:0;pointer-events:none}
+    .sidebar.collapsed .si-ava-name{opacity:0;width:0;pointer-events:none}
+    .sidebar.collapsed .si-divider{margin:6px 8px}
+    .si-badge{position:absolute;top:7px;right:9px;min-width:16px;height:16px;padding:0 4px;border-radius:8px;background:#ef4444;font-size:8px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center;border:2px solid #fff;transition:right 220ms var(--ease-out)}
+    .sidebar.collapsed .si-badge{right:3px;top:3px}
     .si-divider{height:1px;background:var(--border);margin:6px 4px}
     .si-bottom{margin-top:auto;padding:4px 2px}
-    .si-ava-row{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:8px;cursor:pointer;transition:background var(--dur-fast)}
+    .si-collapse-btn{height:32px;border-radius:8px;display:flex;align-items:center;justify-content:flex-end;padding:0 10px;cursor:pointer;transition:background var(--dur-fast);margin-bottom:2px;flex-shrink:0}
+    .si-collapse-btn:hover{background:var(--bg2)}
+    .si-collapse-btn svg{width:14px;height:14px;stroke:var(--text3);transition:transform 220ms var(--ease-out),stroke var(--dur-fast);flex-shrink:0}
+    .sidebar.collapsed .si-collapse-btn svg{transform:rotate(180deg)}
+    .sidebar.collapsed .si-collapse-btn{justify-content:center;padding:0}
+    .si-ava-row{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:8px;cursor:pointer;transition:background var(--dur-fast);overflow:hidden}
     .si-ava-row:hover{background:var(--bg2)}
     .si-ava{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#16a34a,#22c55e);font-size:9px;font-weight:800;color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-    .si-ava-name{font-size:12px;font-weight:600;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-    .si-tooltip{display:none}
+    .si-ava-name{font-size:12px;font-weight:600;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;transition:opacity 160ms,width 220ms var(--ease-out)}
+    /* Tooltip on collapsed sidebar */
+    .si{position:relative}
+    .si-tip{display:none;position:absolute;left:calc(100% + 10px);top:50%;transform:translateY(-50%);background:#1d1d1f;color:#fff;font-size:11px;font-weight:600;padding:5px 10px;border-radius:6px;white-space:nowrap;pointer-events:none;z-index:500;box-shadow:0 4px 12px rgba(0,0,0,.2)}
+    .si-tip::before{content:'';position:absolute;right:100%;top:50%;transform:translateY(-50%);border:5px solid transparent;border-right-color:#1d1d1f}
+    .sidebar.collapsed .si:hover .si-tip{display:block}
+
+    /* ── SKELETON LOADERS ── */
+    @keyframes shimmer{0%{background-position:-400px 0}100%{background-position:400px 0}}
+    .skel{background:linear-gradient(90deg,var(--bg2) 25%,var(--bg3) 50%,var(--bg2) 75%);background-size:800px 100%;animation:shimmer 1.4s ease-in-out infinite;border-radius:6px}
+    .skel-n{height:28px;width:56px;border-radius:8px}
+    .skel-sub{height:10px;width:80px;margin-top:6px;border-radius:4px}
+    .skel-line{height:10px;border-radius:4px}
+    .skel-line.w40{width:40%}.skel-line.w60{width:60%}.skel-line.w80{width:80%}.skel-line.w100{width:100%}
+    .skel-avatar{width:34px;height:34px;border-radius:50%;flex-shrink:0}
+    .skel-block{height:54px;border-radius:var(--r)}
 
     /* ── MAIN ── */
     .main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
@@ -570,8 +594,8 @@
     .ini-kpi.purple::before{background:var(--ai)}
     .ini-kpi.red::before{background:#ef4444}
     .ini-kpi:hover{box-shadow:var(--shadow-md)}
-    .ini-kpi-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);margin-bottom:6px}
-    .ini-kpi-n{font-size:28px;font-weight:900;letter-spacing:-1.5px;color:var(--text);line-height:1}
+    .ini-kpi-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--text3);margin-bottom:8px}
+    .ini-kpi-n{font-size:32px;font-weight:900;letter-spacing:-1.5px;color:var(--text);line-height:1;font-variant-numeric:tabular-nums}
     .ini-kpi-sub{font-size:10px;color:var(--text3);margin-top:4px;font-weight:500}
     /* Body 2-col */
     .ini-body{display:grid;grid-template-columns:1fr 300px;gap:14px;padding:0 28px 32px;min-height:0}
@@ -925,44 +949,55 @@
 
 <div class="app-layout">
   <!-- SIDEBAR -->
-  <nav class="sidebar">
+  <nav class="sidebar" id="sidebar">
+    <div class="si-collapse-btn" onclick="toggleSidebar()" title="Colapsar menú">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+    </div>
     <div class="si active" data-panel="7" onclick="switchPanel(7)">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
       <span class="si-label">Inicio</span>
+      <span class="si-tip">Inicio</span>
     </div>
     <div class="si" data-panel="0" onclick="switchPanel(0)">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
       <span class="si-label">Conversaciones</span>
       <span class="si-badge" id="si-badge-msgs" style="display:none">0</span>
+      <span class="si-tip">Conversaciones</span>
     </div>
     <div class="si" data-panel="1" onclick="switchPanel(1)">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
       <span class="si-label">Calendario</span>
+      <span class="si-tip">Calendario</span>
     </div>
     <div class="si" data-panel="2" onclick="switchPanel(2)">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
       <span class="si-label">Métricas</span>
+      <span class="si-tip">Métricas</span>
     </div>
     <div class="si" data-panel="3" onclick="switchPanel(3)">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
       <span class="si-label">Reactivación</span>
+      <span class="si-tip">Reactivación</span>
     </div>
     <div class="si" data-panel="5" onclick="switchPanel(5)">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="5" height="18" rx="1"/><rect x="10" y="3" width="5" height="12" rx="1"/><rect x="17" y="3" width="5" height="8" rx="1"/></svg>
       <span class="si-label">Pipeline</span>
+      <span class="si-tip">Pipeline</span>
     </div>
     <div class="si" data-panel="6" onclick="switchPanel(6)">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
       <span class="si-label">Clientes</span>
       <span class="si-badge" id="si-badge-clientes" style="display:none">0</span>
+      <span class="si-tip">Clientes</span>
     </div>
     <div class="si-divider"></div>
     <div class="si" data-panel="4" onclick="switchPanel(4)">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
       <span class="si-label">Ajustes</span>
+      <span class="si-tip">Ajustes</span>
     </div>
     <div class="si-bottom">
-      <div class="si-ava-row">
+      <div class="si-ava-row" onclick="switchPanel(4)">
         <div class="si-ava" id="si-ava">CF</div>
         <span class="si-ava-name" id="si-ava-name">Mi cuenta</span>
       </div>
@@ -999,6 +1034,9 @@
             <div style="font-size:28px;margin-bottom:8px">💬</div>
             <div>Sin conversaciones aún</div>
             <div style="font-size:11px;margin-top:4px">Los mensajes de WhatsApp aparecerán aquí en tiempo real</div>
+          </div>
+          <div id="conv-skeleton" style="display:flex;flex-direction:column">
+            ${[1,2,3,4].map(()=>`<div style="display:flex;gap:10px;padding:11px 13px;border-bottom:1px solid rgba(0,0,0,.04);align-items:flex-start"><span class="skel skel-avatar"></span><div style="flex:1;padding-top:3px"><span class="skel skel-line w60" style="margin-bottom:7px;display:block"></span><span class="skel skel-line w80" style="display:block"></span></div></div>`).join('')}
           </div>
         </div>
         <div class="conv-stats">
@@ -1915,27 +1953,27 @@
       <div class="ini-kpis">
         <div class="ini-kpi green">
           <div class="ini-kpi-label">Citas hoy</div>
-          <div class="ini-kpi-n" id="ini-kpi-total">—</div>
-          <div class="ini-kpi-sub" id="ini-kpi-total-sub">—</div>
+          <div class="ini-kpi-n" id="ini-kpi-total"><span class="skel skel-n"></span></div>
+          <div class="ini-kpi-sub" id="ini-kpi-total-sub"><span class="skel skel-sub"></span></div>
         </div>
         <div class="ini-kpi amber">
           <div class="ini-kpi-label">Pendientes</div>
-          <div class="ini-kpi-n" id="ini-kpi-pending">—</div>
+          <div class="ini-kpi-n" id="ini-kpi-pending"><span class="skel skel-n"></span></div>
           <div class="ini-kpi-sub">Requieren confirmación</div>
         </div>
         <div class="ini-kpi blue">
           <div class="ini-kpi-label">Ingresos hoy est.</div>
-          <div class="ini-kpi-n" id="ini-kpi-revenue">—</div>
-          <div class="ini-kpi-sub" id="ini-kpi-revenue-sub">—</div>
+          <div class="ini-kpi-n" id="ini-kpi-revenue"><span class="skel skel-n"></span></div>
+          <div class="ini-kpi-sub" id="ini-kpi-revenue-sub"><span class="skel skel-sub"></span></div>
         </div>
         <div class="ini-kpi purple">
           <div class="ini-kpi-label">Conversaciones</div>
-          <div class="ini-kpi-n" id="ini-kpi-convs">—</div>
+          <div class="ini-kpi-n" id="ini-kpi-convs"><span class="skel skel-n"></span></div>
           <div class="ini-kpi-sub">Activas ahora</div>
         </div>
         <div class="ini-kpi green">
           <div class="ini-kpi-label">Esta semana</div>
-          <div class="ini-kpi-n" id="ini-kpi-week">—</div>
+          <div class="ini-kpi-n" id="ini-kpi-week"><span class="skel skel-n"></span></div>
           <div class="ini-kpi-sub" id="ini-kpi-week-sub">citas programadas</div>
         </div>
       </div>
@@ -1949,7 +1987,13 @@
               <span class="ini-sec-badge" id="ini-today-badge">0</span>
               <button class="ini-sec-link" onclick="switchPanel(1)">Ver agenda →</button>
             </div>
-            <div class="ini-timeline" id="ini-timeline"></div>
+            <div class="ini-timeline" id="ini-timeline">
+              <div style="display:flex;flex-direction:column;gap:10px;padding:14px 0">
+                <div style="display:flex;gap:10px;align-items:center"><span class="skel skel-avatar" style="width:36px;height:36px;border-radius:8px;flex-shrink:0"></span><div style="flex:1"><span class="skel skel-line w80" style="margin-bottom:6px;display:block"></span><span class="skel skel-line w40" style="display:block"></span></div></div>
+                <div style="display:flex;gap:10px;align-items:center"><span class="skel skel-avatar" style="width:36px;height:36px;border-radius:8px;flex-shrink:0"></span><div style="flex:1"><span class="skel skel-line w60" style="margin-bottom:6px;display:block"></span><span class="skel skel-line w40" style="display:block"></span></div></div>
+                <div style="display:flex;gap:10px;align-items:center"><span class="skel skel-avatar" style="width:36px;height:36px;border-radius:8px;flex-shrink:0"></span><div style="flex:1"><span class="skel skel-line w80" style="margin-bottom:6px;display:block"></span><span class="skel skel-line w40" style="display:block"></span></div></div>
+              </div>
+            </div>
           </div>
           <!-- Weekly chart -->
           <div class="ini-today" style="margin-top:12px">
@@ -3156,7 +3200,9 @@
   function renderConvList(convs) {
     const container = document.getElementById('conv-items-container');
     const empty = document.getElementById('conv-empty');
-    const cnt = document.getElementById('conv-cnt');
+    const skel  = document.getElementById('conv-skeleton');
+    const cnt   = document.getElementById('conv-cnt');
+    if (skel) skel.remove();
     if (!convs.length) {
       container.innerHTML = '';
       container.appendChild(empty);
@@ -4422,6 +4468,33 @@
     return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
 
+  // ── Count-up animation ────────────────────────────────────────────────────
+  function countUp(el, target, suffix, duration) {
+    if (!el) return;
+    if (target === null || isNaN(target)) { el.textContent = suffix || '—'; return; }
+    const start = 0, t0 = performance.now();
+    const isFloat = target !== Math.floor(target);
+    function step(t) {
+      const prog = Math.min((t - t0) / (duration || 600), 1);
+      const ease = 1 - Math.pow(1 - prog, 3);
+      const val  = start + (target - start) * ease;
+      el.textContent = (isFloat ? val.toFixed(0) : Math.round(val)) + (suffix || '');
+      if (prog < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+
+  // ── Sidebar collapse ──────────────────────────────────────────────────────
+  function toggleSidebar() {
+    const sb = document.getElementById('sidebar');
+    const collapsed = sb.classList.toggle('collapsed');
+    localStorage.setItem('sb_collapsed', collapsed ? '1' : '0');
+  }
+  // Restore state on load
+  if (localStorage.getItem('sb_collapsed') === '1') {
+    document.getElementById('sidebar')?.classList.add('collapsed');
+  }
+
   // ── Inactividad: aviso a los 25min, logout a los 30min ────────────────────
   let idleTimer, idleWarnTimer;
   const IDLE_WARN = 25 * 60 * 1000;
@@ -4491,13 +4564,14 @@
       const revenue = todayAppts.reduce((s,a) => s + parseFloat(a.price||0), 0);
       const activeConvs = convs.filter(c => !c.closed_at).length;
 
-      document.getElementById('ini-kpi-total').textContent = todayAppts.length;
-      document.getElementById('ini-kpi-total-sub').textContent = `✓ ${confirmed} conf · ✓ ${completed} comp`;
-      document.getElementById('ini-kpi-pending').textContent = pending;
-      document.getElementById('ini-kpi-revenue').textContent = revenue > 0 ? revenue.toFixed(0)+'€' : '—';
+      countUp(document.getElementById('ini-kpi-total'), todayAppts.length, '');
+      document.getElementById('ini-kpi-total-sub').textContent = `✓ ${confirmed} conf · ${completed} comp`;
+      countUp(document.getElementById('ini-kpi-pending'), pending, '');
+      if (revenue > 0) countUp(document.getElementById('ini-kpi-revenue'), revenue, '€');
+      else document.getElementById('ini-kpi-revenue').textContent = '—';
       document.getElementById('ini-kpi-revenue-sub').textContent = revenue > 0 ? `de ${todayAppts.filter(a=>a.price>0).length} citas con precio` : 'Sin precios registrados';
-      document.getElementById('ini-kpi-convs').textContent = activeConvs;
-      document.getElementById('ini-kpi-week').textContent = weekAppts.length;
+      countUp(document.getElementById('ini-kpi-convs'), activeConvs, '');
+      countUp(document.getElementById('ini-kpi-week'), weekAppts.length, '');
       document.getElementById('ini-natalia-sub').textContent = `${convs.length} conversaciones totales`;
 
       // Today badge
