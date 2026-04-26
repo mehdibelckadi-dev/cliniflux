@@ -557,6 +557,29 @@
     .sum-row:last-child{border-bottom:none}
     @media(max-width:1100px){.met-kpis{grid-template-columns:repeat(2,1fr)}.patient-panel{display:none}.met-grid{grid-template-columns:1fr}.met-grid-3{grid-template-columns:1fr 1fr}}
     @media(max-width:700px){.met-grid-3{grid-template-columns:1fr}}
+    @media print{body *{visibility:hidden}#panel-2,#panel-2 *{visibility:visible}#panel-2{position:absolute;top:0;left:0;width:100%;overflow:visible!important;padding:24px}#met-skel,#met-skel-kpis,.met-export-btn,.met-period{display:none!important}}
+
+    /* ── Métricas premium ── */
+    .met-insight{background:linear-gradient(135deg,#f0fdf4,#ecfdf5);border:1px solid #bbf7d0;border-radius:var(--r);padding:12px 18px;margin-bottom:16px;font-size:12px;font-weight:600;color:#166534;display:flex;align-items:center;gap:10px;line-height:1.6;flex-wrap:wrap}
+    .met-insight-pulse{width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0;animation:pulse 2s infinite}
+    .met-export-btn{font-family:inherit;font-size:11px;font-weight:700;color:var(--text3);background:#fff;border:1.5px solid var(--border);padding:5px 12px;border-radius:var(--r-sm);cursor:pointer;display:flex;align-items:center;gap:5px;white-space:nowrap;transition:all var(--dur-fast)}
+    .met-export-btn:hover{border-color:var(--green);color:var(--green)}
+    .kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:var(--r) var(--r) 0 0;background:var(--border);transition:background .4s}
+    .kpi.kpi-up::before{background:var(--green)}
+    .kpi.kpi-dn::before{background:#ef4444}
+    .kpi.kpi-neu::before{background:#94a3b8}
+    .met-bar{background:linear-gradient(to top,rgba(22,163,74,0.1),rgba(22,163,74,0.3));animation:bar-rise .5s var(--ease-out) both}
+    .met-bar.today{background:linear-gradient(to top,#16a34a,#4ade80)}
+    .met-bar-wrap:hover .met-bar{background:linear-gradient(to top,#15803d,#22c55e)}
+    @keyframes bar-rise{from{transform:scaleY(0);transform-origin:bottom}to{transform:scaleY(1);transform-origin:bottom}}
+    .rank-bar-wrap,.status-dist-bar-wrap{width:100px}
+    @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+    .met-skel-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+    .skel-kpi{height:108px;border-radius:var(--r);background:linear-gradient(90deg,#f1f5f9 25%,#e2e8f0 50%,#f1f5f9 75%);background-size:200%;animation:shimmer 1.4s ease infinite}
+    .skel-row{height:200px;border-radius:var(--r);background:linear-gradient(90deg,#f1f5f9 25%,#e2e8f0 50%,#f1f5f9 75%);background-size:200%;animation:shimmer 1.4s ease infinite;margin-bottom:12px}
+    .nps-ring-svg{flex-shrink:0;transform:rotate(-90deg)}
+    .nps-ring-track{fill:none;stroke:#f1f5f9;stroke-width:3}
+    .nps-ring-arc{fill:none;stroke:#16a34a;stroke-width:3;stroke-linecap:round;transition:stroke-dasharray .8s var(--ease-out)}
 
     /* ── PANEL 3: REACTIVACIÓN ── */
     .p-leads{flex-direction:column;background:var(--bg2);overflow:hidden}
@@ -1446,15 +1469,30 @@
           <div class="met-title">Métricas</div>
           <div class="met-sub" id="met-sub">—</div>
         </div>
-        <div class="met-period">
-          <button class="mp-btn active" data-days="30" onclick="setMetPeriod(30,this)">Este mes</button>
-          <button class="mp-btn" data-days="7" onclick="setMetPeriod(7,this)">7 días</button>
-          <button class="mp-btn" data-days="90" onclick="setMetPeriod(90,this)">3 meses</button>
+        <div style="display:flex;align-items:center;gap:8px">
+          <button class="met-export-btn" onclick="exportMetricsPDF()">⬇ PDF</button>
+          <div class="met-period">
+            <button class="mp-btn active" data-days="30" onclick="setMetPeriod(30,this)">Este mes</button>
+            <button class="mp-btn" data-days="7" onclick="setMetPeriod(7,this)">7 días</button>
+            <button class="mp-btn" data-days="90" onclick="setMetPeriod(90,this)">3 meses</button>
+          </div>
         </div>
       </div>
 
+      <!-- Insight strip -->
+      <div class="met-insight" id="met-insight" style="display:none">
+        <div class="met-insight-pulse"></div>
+        <span id="met-insight-text"></span>
+      </div>
+
+      <!-- Skeleton (shown while loading) -->
+      <div id="met-skel" style="display:none">
+        <div class="met-skel-grid"><div class="skel-kpi"></div><div class="skel-kpi"></div><div class="skel-kpi"></div><div class="skel-kpi"></div></div>
+        <div class="skel-row"></div><div class="skel-row" style="height:160px"></div>
+      </div>
+
       <!-- KPIs -->
-      <div class="met-kpis">
+      <div class="met-kpis" id="met-kpis-grid">
         <div class="kpi">
           <div class="kpi-l">Mensajes recibidos</div>
           <div class="kpi-n" id="kpi-msgs">—</div>
@@ -1518,11 +1556,17 @@
       <div class="met-grid-3">
         <div class="met-card" style="grid-column:span 2">
           <div class="met-card-title">Satisfacción del paciente (NPS)</div>
-          <div style="display:flex;align-items:center;gap:32px;margin-top:4px">
-            <div>
-              <div style="font-size:42px;font-weight:900;letter-spacing:-3px;color:var(--text);line-height:1" id="nps-avg">—</div>
-              <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);margin-top:2px">Valoración /10</div>
-              <div id="nps-stars" style="display:flex;gap:2px;margin-top:6px"></div>
+          <div style="display:flex;align-items:center;gap:24px;margin-top:4px">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0">
+              <div style="position:relative;width:80px;height:80px;display:flex;align-items:center;justify-content:center">
+                <svg class="nps-ring-svg" viewBox="0 0 36 36" width="80" height="80">
+                  <circle class="nps-ring-track" cx="18" cy="18" r="15.9"/>
+                  <circle class="nps-ring-arc" cx="18" cy="18" r="15.9" id="nps-ring-arc" stroke-dasharray="0 100"/>
+                </svg>
+                <div style="position:absolute;font-size:20px;font-weight:900;letter-spacing:-1px;color:var(--text);line-height:1" id="nps-avg">—</div>
+              </div>
+              <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text3)">Valoración /10</div>
+              <div id="nps-stars" style="display:flex;gap:2px"></div>
             </div>
             <div style="flex:1">
               <div style="display:flex;justify-content:space-between;font-size:11px;font-weight:600;color:var(--text2);margin-bottom:4px">
@@ -3123,53 +3167,86 @@
     el.textContent = (pct > 0 ? '↑ +' : '↓ ') + pct + suffix;
   }
 
+  function _kpiAccent(elId, trendClass) {
+    const el = document.getElementById(elId)?.closest('.kpi');
+    if (el) { el.classList.remove('kpi-up','kpi-dn','kpi-neu'); el.classList.add(trendClass); }
+  }
+
   function renderAnalytics(d) {
     const avg_ticket = 80;
     const msgs = _metPeriodDays <= 7 ? d.week_messages : d.month_messages;
     const citas = d.citas_mes;
     const revenue = citas * avg_ticket;
+    const now = new Date();
 
     // Period label
-    const now = new Date();
     const periodLabel = _metPeriodDays === 7 ? 'Últimos 7 días'
       : _metPeriodDays === 90 ? 'Últimos 3 meses'
       : now.toLocaleDateString('es-ES',{month:'long',year:'numeric'}).replace(/^\w/,c=>c.toUpperCase());
     document.getElementById('met-sub').textContent = periodLabel;
 
+    // Insight strip
+    const peakHour = d.hourly.indexOf(Math.max(...d.hourly));
+    const insightParts = [];
+    if (peakHour >= 0 && Math.max(...d.hourly) > 0) insightParts.push(`⏰ Hora pico: ${peakHour}:00h`);
+    if (d.ia_resolution) insightParts.push(`🤖 IA resuelve el ${d.ia_resolution}% sin intervención`);
+    if (d.citas_trend > 0) insightParts.push(`📈 +${d.citas_trend}% citas vs semana anterior`);
+    if (revenue > 0) insightParts.push(`💶 ${revenue.toLocaleString('es-ES')}€ valor estimado`);
+    const insightEl = document.getElementById('met-insight');
+    if (insightParts.length) {
+      document.getElementById('met-insight-text').textContent = insightParts.join('  ·  ');
+      insightEl.style.display = 'flex';
+    } else { insightEl.style.display = 'none'; }
+
     // KPIs
     document.getElementById('kpi-msgs').textContent = msgs;
     trendEl('kpi-msgs-trend', d.week_trend_pct);
     spark('kpi-spark-msgs', d.spark_msgs);
+    _kpiAccent('kpi-msgs', d.week_trend_pct > 0 ? 'kpi-up' : d.week_trend_pct < 0 ? 'kpi-dn' : 'kpi-neu');
 
     document.getElementById('kpi-res').textContent = d.ia_resolution + '%';
     const resEl = document.getElementById('kpi-res-sub');
-    resEl.className = 'kpi-trend ' + (d.ia_resolution >= 80 ? 'up' : d.ia_resolution >= 60 ? 'neu' : 'dn');
-    resEl.textContent = d.ia_resolution >= 80 ? '✓ Excelente' : d.ia_resolution >= 60 ? 'Buena' : 'Mejorable';
-    spark('kpi-spark-res', d.spark_msgs.map((_,i) => i === d.spark_msgs.length-1 ? d.ia_resolution : 0).map((v,i) => d.spark_msgs[i] ? d.ia_resolution : 0));
+    const resClass = d.ia_resolution >= 80 ? 'up' : d.ia_resolution >= 60 ? 'neu' : 'dn';
+    resEl.className = 'kpi-trend ' + resClass;
+    resEl.textContent = d.ia_resolution >= 80 ? '✓ Excelente' : d.ia_resolution >= 60 ? '~ Buena' : '↓ Mejorable';
+    spark('kpi-spark-res', d.spark_msgs.map(v => v ? d.ia_resolution : 0));
+    _kpiAccent('kpi-res', 'kpi-' + resClass);
 
     const secs = d.avg_response_s;
     document.getElementById('kpi-resp').textContent = !secs ? '—' : secs < 60 ? secs+'s' : (secs/60).toFixed(1)+'min';
     const respEl = document.getElementById('kpi-resp-sub');
-    respEl.className = 'kpi-trend ' + (secs < 5 ? 'up' : secs < 30 ? 'up' : 'neu');
-    respEl.textContent = !secs ? '' : secs < 5 ? '⚡ Instantáneo' : secs < 30 ? 'Muy rápido' : 'Normal';
+    const respClass = secs < 30 ? 'up' : 'neu';
+    respEl.className = 'kpi-trend ' + respClass;
+    respEl.textContent = !secs ? '' : secs < 5 ? '⚡ Instantáneo' : secs < 30 ? '↑ Muy rápido' : '→ Normal';
+    _kpiAccent('kpi-resp', 'kpi-' + respClass);
 
     document.getElementById('kpi-appts').textContent = citas;
     trendEl('kpi-appts-trend', d.citas_trend, '% vs semana ant.');
     spark('kpi-spark-appts', d.spark_appts);
+    _kpiAccent('kpi-appts', d.citas_trend > 0 ? 'kpi-up' : d.citas_trend < 0 ? 'kpi-dn' : 'kpi-neu');
 
-    // Bar chart (last 14 days)
+    // Bar chart — animated, gradient bars
     const chart = document.getElementById('met-chart');
     chart.innerHTML = '';
     const todayStr = now.toDateString();
     if (d.daily.length) {
       const maxVal = Math.max(...d.daily.map(x => parseInt(x.cnt)), 1);
-      d.daily.forEach(x => {
+      d.daily.forEach((x, idx) => {
         const cnt = parseInt(x.cnt);
         const hPct = Math.max(Math.round(cnt / maxVal * 100), 4);
         const isToday = new Date(x.date).toDateString() === todayStr;
         const wrap = document.createElement('div');
         wrap.className = 'met-bar-wrap';
-        wrap.innerHTML = `<div class="met-tip">${x.day} · ${cnt}</div><div class="met-bar${isToday?' today':''}" style="height:${hPct}%"></div><div class="met-bar-lbl">${x.day}</div>`;
+        const bar = document.createElement('div');
+        bar.className = 'met-bar' + (isToday ? ' today' : '');
+        bar.style.cssText = `height:${hPct}%;animation-delay:${idx * 25}ms`;
+        const tip = document.createElement('div');
+        tip.className = 'met-tip';
+        tip.textContent = `${x.day} · ${cnt} msgs`;
+        const lbl = document.createElement('div');
+        lbl.className = 'met-bar-lbl';
+        lbl.textContent = x.day;
+        wrap.append(tip, bar, lbl);
         chart.appendChild(wrap);
       });
     } else {
@@ -3196,13 +3273,9 @@
     const hmLbls = document.getElementById('met-heatmap-lbls');
     const hmMax = Math.max(...d.hourly, 1);
     hm.innerHTML = d.hourly.map((cnt, h) => {
-      const intensity = cnt / hmMax;
-      const bg = intensity < 0.01 ? 'var(--bg3)'
-        : intensity < 0.25 ? 'var(--green-dim2)'
-        : intensity < 0.5  ? 'rgba(22,163,74,0.25)'
-        : intensity < 0.75 ? 'rgba(22,163,74,0.5)'
-        : 'var(--green)';
-      return `<div class="hm-cell" style="background:${bg}"><div class="met-tip" style="left:50%;transform:translateX(-50%) translateY(4px)">${h}:00 · ${cnt} msgs</div></div>`;
+      const t = cnt / hmMax;
+      const bg = t < 0.01 ? 'var(--bg3)' : t < 0.25 ? 'rgba(22,163,74,0.12)' : t < 0.5 ? 'rgba(22,163,74,0.3)' : t < 0.75 ? 'rgba(22,163,74,0.55)' : 'var(--green)';
+      return `<div class="hm-cell" style="background:${bg};box-shadow:${t>0.5?'0 0 0 1px rgba(22,163,74,0.25)':'none'}"><div class="met-tip" style="left:50%;transform:translateX(-50%) translateY(4px)">${h}:00 · ${cnt} msgs</div></div>`;
     }).join('');
     hmLbls.innerHTML = d.hourly.map((_,h) => `<div class="hm-lbl">${h%4===0?h+':00':''}</div>`).join('');
 
@@ -3218,9 +3291,24 @@
         <span style="font-size:12px;color:var(--text2)">${icon} ${label}</span>
         <strong style="font-size:13px;color:var(--text)">${val}</strong>
       </div>`).join('');
+
+    // NPS ring arc
+    const arc = document.getElementById('nps-ring-arc');
+    if (arc && d.nps_data) {
+      const avg = d.nps_data.avg || 0;
+      const pct = Math.round(avg / 10 * 100);
+      arc.setAttribute('stroke-dasharray', `${pct} 100`);
+      const color = avg >= 8 ? '#16a34a' : avg >= 6 ? '#f59e0b' : '#ef4444';
+      arc.setAttribute('stroke', color);
+    }
   }
 
   async function loadAnalytics() {
+    // Skeleton
+    const skel = document.getElementById('met-skel');
+    const kpisGrid = document.getElementById('met-kpis-grid');
+    if (skel) skel.style.display = 'block';
+    if (kpisGrid) kpisGrid.style.visibility = 'hidden';
     try {
       const now = new Date();
       const start = new Date(now.getFullYear(), now.getMonth() - 2, 1);
@@ -3234,6 +3322,18 @@
       renderAnalytics(_analyticsData);
       if (rAppts.ok) renderApptRankings(await rAppts.json());
     } catch(e) { console.error('analytics:', e); }
+    finally {
+      if (skel) skel.style.display = 'none';
+      if (kpisGrid) kpisGrid.style.visibility = '';
+    }
+  }
+
+  function exportMetricsPDF() {
+    const panel = document.getElementById('panel-2');
+    const prev = panel.style.overflow;
+    panel.style.overflow = 'visible';
+    window.print();
+    panel.style.overflow = prev;
   }
 
   function renderApptRankings(appts) {
