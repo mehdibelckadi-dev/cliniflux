@@ -421,7 +421,8 @@ app.post('/webhook/whatsapp', express.raw({ type: 'application/json' }), async (
     const from = message.from;
     const to   = change?.metadata?.display_phone_number?.replace(/\D/g,'');
     const msg  = message.text?.body?.trim().slice(0, 500);
-    if (!from || !msg) return;
+    console.log(`[WA] from=${from||'VACÍO'} msg=${msg?.slice(0,30)||'VACÍO'} to=${to||'VACÍO'}`);
+    if (!from || !msg) { console.warn('[WA] from o msg vacío — descartado'); return; }
     if (waRateLimit(from)) { console.warn(`[RateLimit] ${from} excedió 5 msgs/10s`); return; }
 
     const clinic   = to ? await getClinicByWhatsapp(to).catch(() => null) : null;
