@@ -1,4 +1,10 @@
 require('dotenv').config();
+
+// ── Startup guard: variables críticas ────────────────────────────────────────
+if (process.env.NODE_ENV === 'production' && !process.env.SESSION_SECRET) {
+  console.error('[FATAL] SESSION_SECRET no está configurado en producción. Abortando.');
+  process.exit(1);
+}
 const http = require('http');
 const express = require('express');
 const { Server: SocketServer } = require('socket.io');
@@ -404,6 +410,7 @@ app.post('/webhook/whatsapp', express.raw({ type: 'application/json' }), async (
   let body;
   try { body = JSON.parse(req.body); } catch { return; }
 
+  let sessionId;
   try {
     const entry   = body?.entry?.[0];
     const change  = entry?.changes?.[0]?.value;
@@ -419,7 +426,7 @@ app.post('/webhook/whatsapp', express.raw({ type: 'application/json' }), async (
     const clinic   = to ? await getClinicByWhatsapp(to).catch(() => null) : null;
     const prompt   = clinic ? await buildPromptWithSlots(clinic) : buildDemoPrompt();
     const clinicId = clinic?.id || 1;
-    const sessionId = `wa_${clinicId}_` + from.slice(-10);
+    sessionId = `wa_${clinicId}_` + from.slice(-10);
 
     if (clinic?.id) {
       const usage = await incrementConversation(clinic.id);
@@ -452,6 +459,12 @@ app.post('/webhook/whatsapp', express.raw({ type: 'application/json' }), async (
         }
       }
     }
+
+    if (processingSessions.has(sessionId)) {
+      console.warn(`[Concurrent] ${sessionId} ya en proceso, mensaje descartado`);
+      return;
+    }
+    processingSessions.add(sessionId);
 
     const urgent   = isUrgent(msg, clinic);
     const inManual = manualSessions.has(sessionId);
@@ -519,6 +532,8 @@ app.post('/webhook/whatsapp', express.raw({ type: 'application/json' }), async (
     });
   } catch(err) {
     console.error('[WA]', err.message);
+  } finally {
+    processingSessions.delete(sessionId);
   }
 });
 
@@ -681,6 +696,7 @@ function isUrgent(text, clinic) {
 
 // In-memory manual mode per session (cleared on restart — fine for now)
 const manualSessions = new Set();
+const processingSessions = new Set(); // guard contra mensajes concurrentes
 
 // ── Demo prompt (BarnaDental) ─────────────────────────────────────────────────
 function buildDemoPrompt() {
