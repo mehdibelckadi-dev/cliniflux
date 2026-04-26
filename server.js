@@ -481,7 +481,9 @@ app.post('/webhook/whatsapp', express.raw({ type: 'application/json' }), async (
     });
 
     const pushTitle = urgent ? '🔴 Mensaje urgente' : '💬 Nuevo mensaje WhatsApp';
-    sendPushToClinic(clinicId, pushTitle, msg.slice(0, 80)).catch(() => {});
+    const fromD = from.replace(/\D/g,'');
+    const fromFmt = fromD.length >= 11 ? `+${fromD.slice(0,2)} ${fromD.slice(2,5)} ${fromD.slice(5,8)} ${fromD.slice(8)}` : from;
+    sendPushToClinic(clinicId, pushTitle, `${fromFmt}: ${msg.slice(0, 60)}`).catch(() => {});
 
     const history     = await getHistoryFromMessages(clinicId, sessionId, 30);
     const contextMsgs = buildContextMessages(history, 1200);
@@ -1006,6 +1008,17 @@ app.get('/admin/new-clinic', async (req, res) => {
   } catch(e) {
     res.status(500).send(e.message);
   }
+});
+
+// GET /admin/set-plan?secret=X&email=X&plan=pro
+app.get('/admin/set-plan', async (req, res) => {
+  if (req.query.secret !== (process.env.ADMIN_SECRET || 'cliniflux-admin')) return res.status(403).send('Forbidden');
+  const { email, plan } = req.query;
+  if (!email || !plan) return res.status(400).send('email y plan requeridos');
+  try {
+    const { rowCount } = await pool.query('UPDATE clinics SET plan=$1 WHERE email=$2', [plan, email]);
+    res.json({ ok: true, updated: rowCount });
+  } catch(e) { res.status(500).send(e.message); }
 });
 
 app.get('/onboarding', async (req, res) => {

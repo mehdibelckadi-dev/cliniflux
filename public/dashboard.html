@@ -3886,7 +3886,7 @@
       const idx = allConvs.findIndex(c => c.session_id === msg.session_id);
       if (idx >= 0) allConvs.splice(idx, 1);
       allConvs.unshift({ ...msg });
-      renderConvList(allConvs);
+      applyConvFilter();
 
       if (activeSessionId === msg.session_id) {
         const chatMsgs = document.getElementById('chat-msgs');
@@ -3908,13 +3908,13 @@
         if (near) chatMsgs.scrollTop = chatMsgs.scrollHeight;
       }
       const c = allConvs.find(c => c.session_id === msg.session_id);
-      if (c) { c.content = msg.content; c.direction = 'outbound'; c.created_at = msg.created_at; renderConvList(allConvs); }
+      if (c) { c.content = msg.content; c.direction = 'outbound'; c.created_at = msg.created_at; applyConvFilter(); }
     });
 
     socket.on('conv:closed', (data) => {
       // Quitar de la lista
       allConvs = allConvs.filter(c => c.session_id !== data.session_id);
-      renderConvList(allConvs);
+      applyConvFilter();
       if (activeSessionId === data.session_id) {
         activeSessionId = null;
         document.getElementById('chat-msgs').innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:8px;color:var(--text3)"><div style="font-size:28px">✓</div><div style="font-size:13px">Conversación cerrada</div></div>';
@@ -3927,7 +3927,7 @@
 
     socket.on('mode:changed', (data) => {
       if (data.manual) manualSet.add(data.session_id); else manualSet.delete(data.session_id);
-      renderConvList(allConvs);
+      applyConvFilter();
       if (activeSessionId === data.session_id) updateManualBtn(data.session_id);
     });
 
@@ -5257,8 +5257,10 @@
 
     document.getElementById('cl-detail').classList.add('open');
 
-    // Load notes from server
-    fetch(`/api/patient-note/${encodeURIComponent(phone)}`)
+    // Load notes — abort any previous in-flight request to avoid race condition
+    if (window._notesAbortCtrl) window._notesAbortCtrl.abort();
+    window._notesAbortCtrl = new AbortController();
+    fetch(`/api/patient-note/${encodeURIComponent(phone)}`, { signal: window._notesAbortCtrl.signal })
       .then(r => r.json()).then(d => {
         const ta = document.getElementById('cl-notes-ta');
         if (ta && d.notes) ta.value = d.notes;
