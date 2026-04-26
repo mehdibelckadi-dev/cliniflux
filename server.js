@@ -344,6 +344,16 @@ app.use((req, res, next) => {
 
 // ── Rate limiting simple (sin dependencias) ────────────────────────────────
 const rateLimits = new Map();
+const waRateLimits = new Map(); // por número de teléfono entrante
+function waRateLimit(from, max = 5, windowMs = 10000) {
+  const now = Date.now();
+  const e = waRateLimits.get(from) || { count: 0, start: now };
+  if (now - e.start > windowMs) { e.count = 1; e.start = now; waRateLimits.set(from, e); return false; }
+  e.count++;
+  waRateLimits.set(from, e);
+  return e.count > max;
+}
+setInterval(() => waRateLimits.clear(), 3600000);
 function rateLimit(max, windowMs) {
   return (req, res, next) => {
     const key = req.ip + req.path;
@@ -404,6 +414,7 @@ app.post('/webhook/whatsapp', express.raw({ type: 'application/json' }), async (
     const to   = change?.metadata?.display_phone_number?.replace(/\D/g,'');
     const msg  = message.text?.body?.trim().slice(0, 500);
     if (!from || !msg) return;
+    if (waRateLimit(from)) { console.warn(`[RateLimit] ${from} excedió 5 msgs/10s`); return; }
 
     const clinic   = to ? await getClinicByWhatsapp(to).catch(() => null) : null;
     const prompt   = clinic ? await buildPromptWithSlots(clinic) : buildDemoPrompt();
