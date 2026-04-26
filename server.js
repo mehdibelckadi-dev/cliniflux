@@ -1010,8 +1010,8 @@ app.get('/admin/new-clinic', async (req, res) => {
   }
 });
 
-// GET /admin/set-plan?secret=X&email=X&plan=pro
-app.get('/admin/set-plan', async (req, res) => {
+// GET /ops/set-plan?secret=X&email=X&plan=pro
+app.get('/ops/set-plan', async (req, res) => {
   if (req.query.secret !== (process.env.ADMIN_SECRET || 'cliniflux-admin')) return res.status(403).send('Forbidden');
   const { email, plan } = req.query;
   if (!email || !plan) return res.status(400).send('email y plan requeridos');
