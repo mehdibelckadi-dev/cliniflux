@@ -359,6 +359,158 @@ function rateLimit(max, windowMs) {
 // Limpiar mapa cada hora
 setInterval(() => rateLimits.clear(), 3600000);
 
+// ── WhatsApp webhook (raw body ANTES de express.json) ────────────────────────
+app.get('/webhook/whatsapp', (req, res) => {
+  const mode      = req.query['hub.mode'];
+  const token     = req.query['hub.verify_token'];
+  const challenge = req.query['hub.challenge'];
+  if (mode === 'subscribe' && token === process.env.WHATSAPP_VERIFY_TOKEN) {
+    return res.status(200).send(challenge);
+  }
+  res.sendStatus(403);
+});
+
+app.post('/webhook/whatsapp', express.raw({ type: 'application/json' }), async (req, res) => {
+  // Validar firma HMAC-SHA256 de Meta
+  const appSecret = process.env.WHATSAPP_APP_SECRET;
+  if (appSecret) {
+    const sigHeader = req.headers['x-hub-signature-256'] || '';
+    const expected  = 'sha256=' + crypto.createHmac('sha256', appSecret).update(req.body).digest('hex');
+    try {
+      if (!crypto.timingSafeEqual(Buffer.from(sigHeader), Buffer.from(expected))) {
+        console.warn('[WA] Firma inválida — petición rechazada');
+        return res.sendStatus(403);
+      }
+    } catch {
+      console.warn('[WA] Error comparando firma — petición rechazada');
+      return res.sendStatus(403);
+    }
+  } else {
+    console.warn('[WA] WHATSAPP_APP_SECRET no configurado — firma no validada');
+  }
+
+  res.sendStatus(200); // Meta requiere 200 inmediato
+
+  let body;
+  try { body = JSON.parse(req.body); } catch { return; }
+
+  try {
+    const entry   = body?.entry?.[0];
+    const change  = entry?.changes?.[0]?.value;
+    const message = change?.messages?.[0];
+    if (!message || message.type !== 'text') return;
+
+    const from = message.from;
+    const to   = change?.metadata?.display_phone_number?.replace(/\D/g,'');
+    const msg  = message.text?.body?.trim().slice(0, 500);
+    if (!from || !msg) return;
+
+    const clinic   = to ? await getClinicByWhatsapp(to).catch(() => null) : null;
+    const prompt   = clinic ? await buildPromptWithSlots(clinic) : buildDemoPrompt();
+    const clinicId = clinic?.id || 1;
+    const sessionId = `wa_${clinicId}_` + from.slice(-10);
+
+    if (clinic?.id) {
+      const usage = await incrementConversation(clinic.id);
+      checkAndNotifyUsage(usage, clinic.id).catch(e => console.error('usage notify:', e.message));
+      if (usage.blocked) {
+        await sendWhatsAppMessage(from, 'Lo sentimos, la clínica ha alcanzado el límite de conversaciones este mes. Llámenos directamente para ayudarle.');
+        return;
+      }
+      recordConsent(clinic.id, from, 'inbound').catch(() => {});
+    }
+
+    // NPS score detection
+    const scoreMatch = msg.match(/^(\d{1,2})$/);
+    if (scoreMatch) {
+      const score = parseInt(scoreMatch[1]);
+      if (score >= 1 && score <= 10) {
+        const { rows: npsRows } = await pool.query(
+          'SELECT id FROM nps_pending WHERE session_id=$1 AND sent_at IS NOT NULL AND score IS NULL',
+          [sessionId]
+        ).catch(() => ({ rows: [] }));
+        if (npsRows.length) {
+          await saveNpsScore(sessionId, score).catch(() => {});
+          const cfg = clinic?.config || {};
+          let thankMsg = score >= 7 ? '¡Muchas gracias por su valoración! 😊 Nos alegra saber que estuvo satisfecho.' : '¡Gracias por su opinión! Trabajaremos para mejorar su experiencia 💪';
+          if (score >= 8 && cfg.google_review_url) {
+            thankMsg += `\n\nSi tiene un momento, le agradecemos mucho una reseña: ${cfg.google_review_url} ⭐`;
+          }
+          await sendWhatsAppMessage(from, thankMsg).catch(() => {});
+          return;
+        }
+      }
+    }
+
+    const urgent   = isUrgent(msg, clinic);
+    const inManual = manualSessions.has(sessionId);
+    const io       = req.app.get('io');
+
+    const savedAt = new Date().toISOString();
+    await Promise.all([
+      saveMessage({ clinic_id: clinicId, session_id: sessionId, direction: 'inbound', content: msg, from_number: from }).catch(() => {}),
+      setConvState(sessionId, clinicId, { status: 'open', last_msg_at: new Date() }).catch(() => {}),
+    ]);
+    io?.to(`clinic_${clinicId}`).emit('message:new', {
+      session_id: sessionId, from_number: from, content: msg, direction: 'inbound',
+      created_at: savedAt, responded_by: 'human', urgent, manual: inManual
+    });
+
+    const pushTitle = urgent ? '🔴 Mensaje urgente' : '💬 Nuevo mensaje WhatsApp';
+    sendPushToClinic(clinicId, pushTitle, msg.slice(0, 80)).catch(() => {});
+
+    const history     = await getHistoryFromMessages(clinicId, sessionId, 30);
+    const contextMsgs = buildContextMessages(history, 1200);
+
+    if (inManual) {
+      openai.chat.completions.create({
+        model: process.env.AI_MODEL || 'gpt-4o-mini',
+        messages: [{ role:'system', content: prompt + '\n[Modo co-pilot: redacta la respuesta ideal pero el agente humano la revisará antes de enviar]' }, ...contextMsgs, { role:'user', content: msg }],
+        max_tokens: 250, temperature: 0.3
+      }).then(r => {
+        const suggestion = r.choices[0].message.content.replace(/\nCITA_CONFIRMADA\|.+/, '').trim();
+        io?.to(`clinic_${clinicId}`).emit('copilot:suggestion', { session_id: sessionId, suggestion });
+      }).catch(() => {});
+      return;
+    }
+
+    const completion = await openai.chat.completions.create({
+      model: process.env.AI_MODEL || 'gpt-4o-mini',
+      messages: [{ role:'system', content: prompt }, ...contextMsgs, { role:'user', content: msg }],
+      max_tokens: 320, temperature: 0.6
+    });
+    let reply = completion.choices[0].message.content;
+    const match = reply.match(/CITA_CONFIRMADA\|(.+)/);
+    if (match) {
+      reply = reply.replace(/\nCITA_CONFIRMADA\|.+/, '').trim();
+      const parts = Object.fromEntries(match[1].split('|').map(p => p.split('=')));
+      const scheduledTs = parseApptTimestamp(parts.fecha, parts.hora);
+      createAppointmentFull({
+        clinic_id: clinicId, patient_name: parts.nombre || 'Paciente',
+        patient_phone: from, service: parts.tratamiento || null,
+        scheduled_ts: scheduledTs, scheduled_at: `${parts.fecha||''} ${parts.hora||''}`.trim(),
+        bot_booked: true, status: 'confirmed',
+      }).then(appt => {
+        auditLog(clinicId, null, 'bot_booking', { appt_id: appt?.id, phone: from, service: parts.tratamiento }).catch(() => {});
+        if (appt) io?.to(`clinic_${clinicId}`).emit('appt:created', appt);
+      }).catch(e => console.error('[Bot] appt create:', e.message));
+      scheduleNps(clinicId, sessionId, from).catch(() => {});
+    }
+
+    const repliedAt = new Date().toISOString();
+    await Promise.all([
+      saveMessage({ clinic_id: clinicId, session_id: sessionId, direction: 'outbound', content: reply, from_number: from, responded_by: 'ai' }).catch(() => {}),
+      sendWhatsAppMessage(from, reply),
+    ]);
+    io?.to(`clinic_${clinicId}`).emit('message:sent', {
+      session_id: sessionId, from_number: from, content: reply, direction: 'outbound',
+      created_at: repliedAt, responded_by: 'ai', urgent
+    });
+  } catch(err) {
+    console.error('[WA]', err.message);
+  }
+});
+
 // ── Stripe webhook (raw body ANTES de express.json) ──────────────────────────
 app.post('/webhook/stripe', express.raw({ type: 'application/json' }), async (req, res) => {
   console.log('[Stripe] Webhook recibido:', req.headers['stripe-signature'] ? 'con firma' : 'SIN FIRMA');
@@ -1029,148 +1181,6 @@ async function sendWhatsAppMessage(to, text) {
 }
 
 // Verificación del webhook (Meta hace GET al configurarlo)
-app.get('/webhook/whatsapp', (req, res) => {
-  const mode  = req.query['hub.mode'];
-  const token = req.query['hub.verify_token'];
-  const challenge = req.query['hub.challenge'];
-  if (mode === 'subscribe' && token === process.env.WHATSAPP_VERIFY_TOKEN) {
-    return res.status(200).send(challenge);
-  }
-  res.sendStatus(403);
-});
-
-app.post('/webhook/whatsapp', async (req, res) => {
-  res.sendStatus(200); // Meta requiere 200 inmediato
-
-  try {
-    const entry = req.body?.entry?.[0];
-    const change = entry?.changes?.[0]?.value;
-    const message = change?.messages?.[0];
-    if (!message || message.type !== 'text') return;
-
-    const from = message.from; // número del paciente (e.g. "34612345678")
-    const to   = change?.metadata?.display_phone_number?.replace(/\D/g,'');
-    const msg  = message.text?.body?.trim().slice(0, 500);
-    if (!from || !msg) return;
-
-    const clinic   = to ? await getClinicByWhatsapp(to).catch(() => null) : null;
-    const prompt   = clinic ? await buildPromptWithSlots(clinic) : buildDemoPrompt();
-    const clinicId = clinic?.id || 1;
-    const sessionId = `wa_${clinicId}_` + from.slice(-10);
-
-    if (clinic?.id) {
-      const usage = await incrementConversation(clinic.id);
-      checkAndNotifyUsage(usage, clinic.id).catch(e => console.error('usage notify:', e.message));
-      if (usage.blocked) {
-        await sendWhatsAppMessage(from, 'Lo sentimos, la clínica ha alcanzado el límite de conversaciones este mes. Llámenos directamente para ayudarle.');
-        return;
-      }
-      // RGPD: registrar consentimiento en primer contacto (inbound = opt-in implícito)
-      recordConsent(clinic.id, from, 'inbound').catch(() => {});
-    }
-
-    // NPS score detection: si hay NPS pendiente y el mensaje es un número 1-10
-    const scoreMatch = msg.match(/^(\d{1,2})$/);
-    if (scoreMatch) {
-      const score = parseInt(scoreMatch[1]);
-      if (score >= 1 && score <= 10) {
-        const { rows: npsRows } = await pool.query(
-          'SELECT id FROM nps_pending WHERE session_id=$1 AND sent_at IS NOT NULL AND score IS NULL',
-          [sessionId]
-        ).catch(() => ({ rows: [] }));
-        if (npsRows.length) {
-          await saveNpsScore(sessionId, score).catch(() => {});
-          const cfg = clinic?.config || {};
-          let thankMsg = score >= 7 ? '¡Muchas gracias por su valoración! 😊 Nos alegra saber que estuvo satisfecho.' : '¡Gracias por su opinión! Trabajaremos para mejorar su experiencia 💪';
-          if (score >= 8 && cfg.google_review_url) {
-            thankMsg += `\n\nSi tiene un momento, le agradecemos mucho una reseña: ${cfg.google_review_url} ⭐`;
-          }
-          await sendWhatsAppMessage(from, thankMsg).catch(() => {});
-          return;
-        }
-      }
-    }
-
-    // Detectar urgencia antes de cualquier espera
-    const urgent = isUrgent(msg, clinic);
-    const inManual = manualSessions.has(sessionId);
-    const io = req.app.get('io');
-
-    // Persistir mensaje + actualizar last_msg_at + reabrir si cerrada
-    const savedAt = new Date().toISOString();
-    await Promise.all([
-      saveMessage({ clinic_id: clinicId, session_id: sessionId, direction: 'inbound', content: msg, from_number: from }).catch(() => {}),
-      setConvState(sessionId, clinicId, { status: 'open', last_msg_at: new Date() }).catch(() => {}),
-    ]);
-    io?.to(`clinic_${clinicId}`).emit('message:new', {
-      session_id: sessionId, from_number: from, content: msg, direction: 'inbound',
-      created_at: savedAt, responded_by: 'human', urgent, manual: inManual
-    });
-
-    // Push notification al dispositivo (aunque el dashboard esté cerrado)
-    const pushTitle = urgent ? '🔴 Mensaje urgente' : '💬 Nuevo mensaje WhatsApp';
-    sendPushToClinic(clinicId, pushTitle, msg.slice(0, 80)).catch(() => {});
-
-    // Leer historial (sirve tanto para IA como para co-pilot)
-    const history = await getHistoryFromMessages(clinicId, sessionId, 30);
-    const contextMsgs = buildContextMessages(history, 1200);
-
-    // Modo manual: generar sugerencia co-pilot pero NO enviar
-    if (inManual) {
-      openai.chat.completions.create({
-        model: process.env.AI_MODEL || 'gpt-4o-mini',
-        messages: [{ role:'system', content: prompt + '\n[Modo co-pilot: redacta la respuesta ideal pero el agente humano la revisará antes de enviar]' }, ...contextMsgs, { role:'user', content: msg }],
-        max_tokens: 250, temperature: 0.3
-      }).then(r => {
-        const suggestion = r.choices[0].message.content.replace(/\nCITA_CONFIRMADA\|.+/, '').trim();
-        io?.to(`clinic_${clinicId}`).emit('copilot:suggestion', { session_id: sessionId, suggestion });
-      }).catch(() => {});
-      return;
-    }
-
-    const completion = await openai.chat.completions.create({
-      model: process.env.AI_MODEL || 'gpt-4o-mini',
-      messages: [{ role:'system', content: prompt }, ...contextMsgs, { role:'user', content: msg }],
-      max_tokens: 320, temperature: 0.6
-    });
-    let reply = completion.choices[0].message.content;
-    const match = reply.match(/CITA_CONFIRMADA\|(.+)/);
-    if (match) {
-      reply = reply.replace(/\nCITA_CONFIRMADA\|.+/, '').trim();
-      const parts = Object.fromEntries(match[1].split('|').map(p => p.split('=')));
-      const scheduledTs = parseApptTimestamp(parts.fecha, parts.hora);
-      createAppointmentFull({
-        clinic_id: clinicId,
-        patient_name: parts.nombre || 'Paciente',
-        patient_phone: from,
-        service: parts.tratamiento || null,
-        scheduled_ts: scheduledTs,
-        scheduled_at: `${parts.fecha||''} ${parts.hora||''}`.trim(),
-        bot_booked: true,
-        status: 'confirmed',
-      }).then(appt => {
-        auditLog(clinicId, null, 'bot_booking', { appt_id: appt?.id, phone: from, service: parts.tratamiento }).catch(() => {});
-        const io = req.app.get('io');
-        if (appt) io?.to(`clinic_${clinicId}`).emit('appt:created', appt);
-      }).catch(e => console.error('[Bot] appt create:', e.message));
-      scheduleNps(clinicId, sessionId, from).catch(() => {});
-    }
-
-    // Persistir + enviar + emitir en paralelo
-    const repliedAt = new Date().toISOString();
-    await Promise.all([
-      saveMessage({ clinic_id: clinicId, session_id: sessionId, direction: 'outbound', content: reply, from_number: from, responded_by: 'ai' }).catch(() => {}),
-      sendWhatsAppMessage(from, reply),
-    ]);
-    io?.to(`clinic_${clinicId}`).emit('message:sent', {
-      session_id: sessionId, from_number: from, content: reply, direction: 'outbound',
-      created_at: repliedAt, responded_by: 'ai', urgent
-    });
-  } catch(err) {
-    console.error('[WA]', err.message);
-  }
-});
-
 // ── POST /chat ──────────────────────────────────────────────────────────────
 
 app.post('/chat', rateLimit(30, 60000), async (req, res) => {
@@ -1999,3 +2009,12 @@ initDb()
     httpServer.listen(PORT, () => console.log(`Cliniflux en http://localhost:${PORT}`));
   })
   .catch(err => { console.error('DB init failed:', err.message); process.exit(1); });
+
+// Evitar crash por errores async no capturados
+process.on('unhandledRejection', (reason) => {
+  console.error('[unhandledRejection]', reason instanceof Error ? reason.message : reason);
+});
+process.on('uncaughtException', (err) => {
+  console.error('[uncaughtException]', err.message);
+  // No cerramos el proceso — Railway reiniciaría de todas formas, pero es mejor seguir sirviendo
+});
