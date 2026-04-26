@@ -1042,6 +1042,59 @@ app.get('/ops/clear-demo-appts', async (req, res) => {
   } catch(e) { res.status(500).send(e.message); }
 });
 
+// GET /ops/restore-demo?secret=X&email=demo@cliniflux.com
+app.get('/ops/restore-demo', async (req, res) => {
+  if (req.query.secret !== (process.env.ADMIN_SECRET || 'cliniflux-admin')) return res.status(403).send('Forbidden');
+  const email = req.query.email || 'demo@cliniflux.com';
+  try {
+    const { rows } = await pool.query('SELECT id FROM clinics WHERE email=$1', [email]);
+    if (!rows.length) return res.status(404).send('Clínica no encontrada');
+    const cid = rows[0].id;
+
+    const appts = [
+      // Lunes 27 abril
+      { ts:'2026-04-27T09:00:00', patient:'Ana García',    phone:'612100001', service:'Limpieza dental',       professional:'Sara Llopis',      room:'Box 1', price:65,  dur:60,  status:'confirmed' },
+      { ts:'2026-04-27T10:30:00', patient:'Roberto Silva', phone:'612100002', service:'Revisión general',      professional:'Dr. Pau Ferrer',   room:'Box 2', price:35,  dur:30,  status:'confirmed' },
+      { ts:'2026-04-27T12:00:00', patient:'Marta Puig',    phone:'612100003', service:'Empaste resina',        professional:'Dr. Pau Ferrer',   room:'Box 2', price:90,  dur:60,  status:'pending'   },
+      // Martes 28 abril
+      { ts:'2026-04-28T09:30:00', patient:'Josep Roca',    phone:'612100004', service:'Consulta ortodoncia',   professional:'Dra. Carmen Vidal',room:'Box 3', price:0,   dur:30,  status:'confirmed' },
+      { ts:'2026-04-28T11:00:00', patient:'Laura Díaz',    phone:'612100005', service:'Blanqueamiento LED',    professional:null,               room:'Box 1', price:280, dur:90,  status:'confirmed' },
+      { ts:'2026-04-28T16:00:00', patient:'Carlos Méndez', phone:'612100006', service:'Extracción simple',     professional:'Dr. Pau Ferrer',   room:'Box 3', price:80,  dur:45,  status:'confirmed' },
+      // Miércoles 29 abril
+      { ts:'2026-04-29T11:30:00', patient:'Isabel Valls',  phone:'612100007', service:'Endodoncia',            professional:'Dr. Pau Ferrer',   room:'Box 2', price:350, dur:90,  status:'confirmed' },
+      // Ayer (25 abril — sábado) — completed
+      { ts:'2026-04-25T09:00:00', patient:'Ana García',    phone:'612100001', service:'Limpieza dental',       professional:'Sara Llopis',      room:'Box 1', price:65,  dur:60,  status:'completed' },
+      { ts:'2026-04-25T10:00:00', patient:'Roberto Silva', phone:'612100002', service:'Revisión general',      professional:'Dr. Pau Ferrer',   room:'Box 2', price:35,  dur:30,  status:'completed' },
+      { ts:'2026-04-25T11:00:00', patient:'Pedro Ruiz',    phone:'612100008', service:'Implante dental',       professional:'Dr. Pau Ferrer',   room:'Box 2', price:1200,dur:120, status:'completed' },
+      // Hace 3 días (23 abril — jueves) — no show
+      { ts:'2026-04-23T10:00:00', patient:'Sofía Martín',  phone:'612100009', service:'Limpieza dental',       professional:'Sara Llopis',      room:'Box 1', price:65,  dur:60,  status:'no_show',  notes:'Paciente no se presentó' },
+    ];
+
+    let inserted = 0;
+    for (const a of appts) {
+      const d = new Date(a.ts); const day = d.getDate(); const h = d.getHours(); const m = d.getMinutes();
+      await pool.query(
+        `INSERT INTO appointments (clinic_id,patient_name,patient_phone,service,scheduled_ts,scheduled_at,duration_min,status,professional,price,room,source,notes)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,'manual',$12)`,
+        [cid, a.patient, a.phone, a.service, a.ts,
+         `${day.toString().padStart(2,'0')}/${d.getMonth()===3?'04':'0'+d.getMonth()}/2026 ${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}`,
+         a.dur, a.status, a.professional||null, a.price||null, a.room, a.notes||null]
+      );
+      inserted++;
+    }
+
+    // Bloqueo recurrente miércoles 10:00-11:00
+    await pool.query(
+      `INSERT INTO blocked_slots (clinic_id,title,start_ts,end_ts,room,professional,recurring)
+       VALUES ($1,'Reunión de equipo','2026-04-29T10:00:00','2026-04-29T11:00:00',null,null,'weekly')
+       ON CONFLICT DO NOTHING`,
+      [cid]
+    );
+
+    res.json({ ok: true, inserted, blocked_slots: 1 });
+  } catch(e) { res.status(500).send(e.message); }
+});
+
 
 app.get('/onboarding', async (req, res) => {
   const clinic = await getClinicBySetupToken(req.query.token).catch(() => null);
