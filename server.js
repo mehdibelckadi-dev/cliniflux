@@ -433,8 +433,10 @@ app.post('/webhook/whatsapp', express.raw({ type: 'application/json' }), async (
 
     if (clinic?.id) {
       const usage = await incrementConversation(clinic.id);
+      console.log(`[WA] usage count=${usage?.count} blocked=${usage?.blocked}`);
       checkAndNotifyUsage(usage, clinic.id).catch(e => console.error('usage notify:', e.message));
       if (usage.blocked) {
+        console.warn('[WA] BLOCKED by usage limit — returning');
         await sendWhatsAppMessage(from, 'Lo sentimos, la clínica ha alcanzado el límite de conversaciones este mes. Llámenos directamente para ayudarle.');
         return;
       }
@@ -443,6 +445,7 @@ app.post('/webhook/whatsapp', express.raw({ type: 'application/json' }), async (
 
     // NPS score detection
     const scoreMatch = msg.match(/^(\d{1,2})$/);
+    console.log(`[WA] scoreMatch=${!!scoreMatch} processingSessions.has=${processingSessions.has(sessionId)}`);
     if (scoreMatch) {
       const score = parseInt(scoreMatch[1]);
       if (score >= 1 && score <= 10) {
