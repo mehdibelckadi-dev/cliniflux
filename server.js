@@ -415,6 +415,7 @@ app.post('/webhook/whatsapp', express.raw({ type: 'application/json' }), async (
     const entry   = body?.entry?.[0];
     const change  = entry?.changes?.[0]?.value;
     const message = change?.messages?.[0];
+    console.log(`[WA] payload field=${entry?.changes?.[0]?.field} hasMsg=${!!message} type=${message?.type} hasStatus=${!!change?.statuses?.[0]}`);
     if (!message || message.type !== 'text') return;
 
     const from = message.from;
