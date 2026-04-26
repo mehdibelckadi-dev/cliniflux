@@ -3365,12 +3365,12 @@
     document.getElementById('cf-cnt-open').textContent = allConvs.filter(c => !manualSet.has(c.session_id) && !urgentSet.has(c.session_id)).length;
     document.getElementById('cf-cnt-manual').textContent = allConvs.filter(c => manualSet.has(c.session_id)).length;
     document.getElementById('cf-cnt-urgent').textContent = allConvs.filter(c => urgentSet.has(c.session_id)).length;
-    // Sidebar + bottom nav badge
-    const openCnt = allConvs.filter(c => urgentSet.has(c.session_id) || manualSet.has(c.session_id)).length;
+    // Badge = only conversations requiring human attention (urgent or manual)
+    const needsHuman = allConvs.filter(c => urgentSet.has(c.session_id) || manualSet.has(c.session_id)).length;
     const siBadge = document.getElementById('si-badge-msgs');
     const bnBadge = document.getElementById('bn-badge');
-    if (siBadge) { siBadge.textContent = openCnt || convs.length; siBadge.style.display = (openCnt || convs.length) ? '' : 'none'; }
-    if (bnBadge) { bnBadge.textContent = convs.length; bnBadge.style.display = convs.length ? '' : 'none'; }
+    if (siBadge) { siBadge.textContent = needsHuman; siBadge.style.display = needsHuman ? '' : 'none'; }
+    if (bnBadge) { bnBadge.textContent = needsHuman; bnBadge.style.display = needsHuman ? '' : 'none'; }
 
     container.innerHTML = '';
     convs.forEach((c, i) => {

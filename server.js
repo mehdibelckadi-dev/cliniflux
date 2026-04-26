@@ -646,7 +646,12 @@ function requireAuth(req, res, next) {
 }
 
 function requirePlan(...plans) {
-  return (req, res, next) => {
+  return async (req, res, next) => {
+    // Refresh plan from DB so upgrades take effect without re-login
+    try {
+      const { rows } = await pool.query('SELECT plan FROM clinics WHERE id=$1', [req.session.clinic.id]);
+      if (rows[0]) req.session.clinic.plan = rows[0].plan;
+    } catch {}
     if (plans.includes(req.session?.clinic?.plan)) return next();
     res.status(403).json({ error: 'Esta función requiere el plan Pro o Clínica.', upgrade: true });
   };
