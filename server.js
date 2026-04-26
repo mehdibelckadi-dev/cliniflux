@@ -1026,6 +1026,106 @@ app.get('/ops/set-plan', async (req, res) => {
   } catch(e) { res.status(500).send(e.message); }
 });
 
+// GET /ops/seed-demo-appts?secret=X&email=demo@cliniflux.com
+app.get('/ops/seed-demo-appts', async (req, res) => {
+  if (req.query.secret !== (process.env.ADMIN_SECRET || 'cliniflux-admin')) return res.status(403).send('Forbidden');
+  const email = req.query.email || 'demo@cliniflux.com';
+  try {
+    const { rows } = await pool.query('SELECT id FROM clinics WHERE email=$1', [email]);
+    if (!rows.length) return res.status(404).send('Clínica no encontrada');
+    const cid = rows[0].id;
+
+    // Clear April 2026
+    await pool.query("DELETE FROM appointments WHERE clinic_id=$1 AND scheduled_ts >= '2026-04-01' AND scheduled_ts < '2026-05-01'", [cid]);
+
+    const profs = [
+      { name:'Dra. Ana García',    box:'Box 1' },
+      { name:'Dr. Carlos López',   box:'Box 2' },
+      { name:'Dra. María Sánchez', box:'Box 3' },
+    ];
+    const svcs = [
+      { name:'Revisión general',          price:40,   dur:30  },
+      { name:'Higiene dental',            price:55,   dur:60  },
+      { name:'Blanqueamiento LED',        price:280,  dur:90  },
+      { name:'Empaste resina',            price:90,   dur:60  },
+      { name:'Extracción simple',         price:80,   dur:45  },
+      { name:'Extracción muela cordal',   price:180,  dur:60  },
+      { name:'Implante dental',           price:1200, dur:120 },
+      { name:'Periodoncia fase I',        price:200,  dur:90  },
+      { name:'Endodoncia',                price:320,  dur:90  },
+      { name:'Radiografía panorámica',    price:50,   dur:15  },
+      { name:'Ortodoncia (revisión)',     price:0,    dur:30  },
+      { name:'Carilla de porcelana',      price:650,  dur:120 },
+    ];
+    const patients = [
+      ['María González López','612001001'],['Carlos Martínez Ruiz','612001002'],
+      ['Ana Fernández García','612001003'],['Pedro Sánchez Torres','612001004'],
+      ['Laura Jiménez Díaz','612001005'],  ['Miguel Rodríguez Moreno','612001006'],
+      ['Isabel Herrera Castillo','612001007'],['Antonio López Pérez','612001008'],
+      ['Carmen Navarro Gómez','612001009'],['Francisco Álvarez Muñoz','612001010'],
+      ['Sofía Romero Ortega','612001011'], ['David Torres Medina','612001012'],
+      ['Elena Vega Soria','612001013'],    ['Roberto Molina Santos','612001014'],
+      ['Cristina Ramos Blanco','612001015'],['Javier Suárez Iglesias','612001016'],
+      ['Patricia Castro Méndez','612001017'],['Fernando Delgado Reyes','612001018'],
+      ['Marta Flores Cano','612001019'],  ['Alejandro Núñez Prieto','612001020'],
+    ];
+
+    // Weekday slots (minutes from midnight)
+    const wdSlots  = [9*60,9*60+30,10*60,10*60+30,11*60,11*60+30,12*60,12*60+30,13*60,16*60,16*60+30,17*60,17*60+30,18*60,18*60+30,19*60];
+    const satSlots = [10*60,10*60+30,11*60,11*60+30,12*60,12*60+30,13*60];
+
+    const today = new Date(); today.setHours(0,0,0,0);
+    let seed = 7; const rnd = (n) => { seed = (seed * 1664525 + 1013904223) & 0x7fffffff; return seed % n; };
+
+    const insert = [];
+    for (let d = 1; d <= 30; d++) {
+      const date = new Date(2026, 3, d); // April
+      const dow = date.getDay();
+      if (dow === 0 || d === 2 || d === 3) continue; // Skip Sun + Easter
+      const slots = dow === 6 ? satSlots : wdSlots;
+      const numPerProf = dow === 6 ? 3 : 5 + rnd(2); // 5-6 weekday, 3 sat
+
+      for (let pi = 0; pi < profs.length; pi++) {
+        const p = profs[pi];
+        const chosen = []; let step = Math.max(1, Math.floor(slots.length / numPerProf));
+        for (let s = 0; s < numPerProf; s++) {
+          const slotIdx = Math.min(s * step + rnd(Math.max(1,step)), slots.length - 1);
+          chosen.push(slots[slotIdx]);
+        }
+        chosen.forEach((slotMin, s) => {
+          const pat = patients[(rnd(patients.length) + pi + d) % patients.length];
+          const svc = svcs[(rnd(svcs.length) + pi + d + s) % svcs.length];
+          const h = Math.floor(slotMin/60), m = slotMin%60;
+          const ts = new Date(2026, 3, d, h, m, 0);
+          const isPast   = ts < today;
+          const isToday  = ts.toDateString() === today.toDateString();
+          let status;
+          if (isPast)       { const r=rnd(10); status=r<7?'completed':r<9?'no_show':'cancelled'; }
+          else if (isToday) { status=rnd(2)?'confirmed':'pending'; }
+          else              { status=rnd(3)?'pending':'confirmed'; }
+          const notes =
+            status==='no_show'    ? 'Paciente no se presentó' :
+            status==='cancelled'  ? 'Cancelado — reagendar' :
+            svc.name.includes('Implante') ? 'Revisar radiografía previa · ayuno 6h' :
+            svc.name.includes('Ortodoncia') ? 'Revisión mensual brackets' :
+            svc.name.includes('Endodoncia') ? 'Anestesia incluida — informar riesgos' : null;
+          insert.push([cid, pat[0], pat[1], svc.name,
+            ts.toISOString(),
+            `${d.toString().padStart(2,'0')}/04/2026 ${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}`,
+            svc.dur, status, p.name, svc.price||null, p.box, 'manual', notes]);
+        });
+      }
+    }
+
+    for (const row of insert) {
+      await pool.query(
+        `INSERT INTO appointments (clinic_id,patient_name,patient_phone,service,scheduled_ts,scheduled_at,duration_min,status,professional,price,room,source,notes)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)`, row);
+    }
+    res.json({ ok:true, inserted:insert.length });
+  } catch(e) { res.status(500).send(e.message); }
+});
+
 app.get('/onboarding', async (req, res) => {
   const clinic = await getClinicBySetupToken(req.query.token).catch(() => null);
   if (!clinic) return res.redirect('/login');
