@@ -471,6 +471,7 @@ app.post('/webhook/whatsapp', express.raw({ type: 'application/json' }), async (
       return;
     }
     processingSessions.add(sessionId);
+    console.log('[WA] past concurrent check — saving message...');
 
     const urgent   = isUrgent(msg, clinic);
     const inManual = manualSessions.has(sessionId);
@@ -542,7 +543,8 @@ app.post('/webhook/whatsapp', express.raw({ type: 'application/json' }), async (
       created_at: repliedAt, responded_by: 'ai', urgent
     });
   } catch(err) {
-    console.error('[WA]', err.message);
+    console.error('[WA] CATCH:', err?.message || String(err) || 'unknown error');
+    console.error('[WA] STACK:', err?.stack?.slice(0, 300));
   } finally {
     processingSessions.delete(sessionId);
   }
