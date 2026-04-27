@@ -432,9 +432,17 @@ app.post('/webhook/whatsapp', express.raw({ type: 'application/json' }), async (
     console.log(`[WA] from=${from} to=${to} clinicId=${clinicId} clinic=${clinic?.name||'NO MATCH — fallback'} session=${sessionId}`);
 
     if (clinic?.id) {
-      const usage = await incrementConversation(clinic.id);
-      console.log(`[WA] usage count=${usage?.count} blocked=${usage?.blocked}`);
-      checkAndNotifyUsage(usage, clinic.id).catch(e => console.error('usage notify:', e.message));
+      let usage = { count: 0, limit: null, pct: 0, blocked: false };
+      try {
+        usage = await Promise.race([
+          incrementConversation(clinic.id),
+          new Promise((_, rej) => setTimeout(() => rej(new Error('incrementConversation timeout')), 4000))
+        ]);
+        console.log(`[WA] usage count=${usage?.count} blocked=${usage?.blocked}`);
+        checkAndNotifyUsage(usage, clinic.id).catch(e => console.error('usage notify:', e.message));
+      } catch(e) {
+        console.warn('[WA] incrementConversation failed:', e.message, '— continuing');
+      }
       if (usage.blocked) {
         console.warn('[WA] BLOCKED by usage limit — returning');
         await sendWhatsAppMessage(from, 'Lo sentimos, la clínica ha alcanzado el límite de conversaciones este mes. Llámenos directamente para ayudarle.');
