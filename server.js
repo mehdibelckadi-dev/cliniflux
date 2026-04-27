@@ -518,17 +518,28 @@ app.post('/webhook/whatsapp', express.raw({ type: 'application/json' }), async (
     const match = reply.match(/CITA_CONFIRMADA\|(.+)/);
     if (match) {
       reply = reply.replace(/\nCITA_CONFIRMADA\|.+/, '').trim();
-      const parts = Object.fromEntries(match[1].split('|').map(p => p.split('=')));
+      const parts = Object.fromEntries(match[1].split('|').map(p => {
+        const idx = p.indexOf('=');
+        return idx < 0 ? [p, ''] : [p.slice(0, idx), p.slice(idx + 1)];
+      }));
       const scheduledTs = parseApptTimestamp(parts.fecha, parts.hora);
+      const patientName  = parts.nombre  || null;
+      const patientEmail = parts.email   || null;
       createAppointmentFull({
-        clinic_id: clinicId, patient_name: parts.nombre || 'Paciente',
+        clinic_id: clinicId, patient_name: patientName || 'Paciente',
         patient_phone: from, service: parts.tratamiento || null,
         scheduled_ts: scheduledTs, scheduled_at: `${parts.fecha||''} ${parts.hora||''}`.trim(),
-        bot_booked: true, status: 'confirmed',
+        source: 'bot', status: 'confirmed',
+        professional: parts.profesional || null,
+        patient_email: patientEmail,
       }).then(appt => {
         auditLog(clinicId, null, 'bot_booking', { appt_id: appt?.id, phone: from, service: parts.tratamiento }).catch(() => {});
         if (appt) io?.to(`clinic_${clinicId}`).emit('appt:created', appt);
       }).catch(e => console.error('[Bot] appt create:', e.message));
+      // Save patient data to conversation profile
+      if (patientName || patientEmail) {
+        setConvState(sessionId, clinicId, { patient_name: patientName, patient_email: patientEmail }).catch(() => {});
+      }
       scheduleNps(clinicId, sessionId, from).catch(() => {});
     }
 
@@ -725,9 +736,13 @@ Saludo: "¡${saludo}! Soy Natalia, de BarnaDental 😊 ¿En qué le ayudo?"
 🚇 Metro Diagonal (L3/L5) | 🅿️ 1h gratis Carrer d'Aragó | ✉ info@barnadental.cat
 Servicios: Higiene 55€ · Blanqueamiento LED 280€ · Invisalign desde 2.900€ (valoración GRATIS) · Implante desde 850€ · Urgencias 40€ · 1ª visita GRATUITA
 Seguros: Adeslas, Sanitas, Mapfre. Equipo: Dra. Laia Puig (Implantología) · Dr. Marc Soler (Ortodoncia).
-Citas: recoge nombre→servicio→franja. Di que Marta llamará en <30min para confirmar. Cancelar con 24h+.
-Desconocido: "Llámenos al +34 932 123 456, le atendemos encantados." No confirmes ser IA salvo pregunta directa.
-Con nombre+servicio+franja: CITA_CONFIRMADA|tratamiento=...|fecha=...|hora=...|nombre=...|email=...`;
+CITAS — 4 pasos obligatorios en orden:
+1) Pide nombre y apellidos ANTES de hablar de días u horas.
+2) Ofrece SOLO huecos de DISPONIBILIDAD REAL. Si el paciente pide uno que no está: "Ese horario no está libre, pero tengo [opciones reales]." Si no hay disponibilidad online: "Le llama el equipo hoy para cuadrar fecha" — NO emitas CITA_CONFIRMADA.
+3) Pide email para el recordatorio (opcional si no quiere darlo).
+4) Resume y pide confirmación explícita: "Confirmo [servicio] el [día] a las [hora] para [nombre], ¿verdad?" — SOLO tras el sí del paciente emite: CITA_CONFIRMADA|tratamiento=...|fecha=...|hora=...|nombre=...|email=...|profesional=...
+NUNCA emitas CITA_CONFIRMADA sin confirmación explícita. NUNCA inventes horas fuera de DISPONIBILIDAD REAL. Cancelar con 24h+.
+Desconocido: "Llámenos al +34 932 123 456, le atendemos encantados." No confirmes ser IA salvo pregunta directa.`;
 }
 
 // Convierte "Lun 23/01" + "10:00" → Date ISO para scheduled_ts
@@ -759,8 +774,8 @@ async function buildPromptWithSlots(clinic) {
     ]);
     const base = buildPromptForClinic(clinic, staffRows);
     const lines = Object.entries(slots).map(([day, times]) => `  ${day}: ${times.join(', ')}`).join('\n');
-    if (!lines) return base;
-    return base + `\n\nDISPONIBILIDAD REAL (próximos 5 días — usa estos huecos al proponer citas):\n${lines}`;
+    if (!lines) return base + `\n\nDISPONIBILIDAD REAL: No hay huecos disponibles los próximos días. NO ofrezcas fechas ni horas. Indica que el equipo contactará al paciente para confirmar.`;
+    return base + `\n\nDISPONIBILIDAD REAL (próximos 5 días — USA SOLO ESTOS HUECOS, no inventes otros):\n${lines}`;
   } catch { return buildPromptForClinic(clinic); }
 }
 

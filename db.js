@@ -266,6 +266,9 @@ async function initDb() {
   `);
   await pool.query(`CREATE INDEX IF NOT EXISTS idx_gdpr_clinic ON gdpr_consents(clinic_id, consented_at DESC)`);
   await pool.query(`ALTER TABLE imported_leads ADD COLUMN IF NOT EXISTS gdpr_consent BOOLEAN DEFAULT FALSE`);
+  await pool.query(`ALTER TABLE conv_states ADD COLUMN IF NOT EXISTS patient_name TEXT`);
+  await pool.query(`ALTER TABLE conv_states ADD COLUMN IF NOT EXISTS patient_email TEXT`);
+  await pool.query(`ALTER TABLE appointments ADD COLUMN IF NOT EXISTS patient_email TEXT`);
 
   // Seed demo clinic if not exists
   const { rows } = await pool.query("SELECT id FROM clinics WHERE email = 'demo@cliniflux.com'");
@@ -387,13 +390,31 @@ ${cfg.services || 'Consultar directamente con la clínica'}
 ${cfg.extra ? '\nINFORMACIÓN ADICIONAL\n' + cfg.extra : ''}
 ${staffSection}
 
-GESTIÓN DE CITAS — FLUJO NATURAL
-No es un formulario. Es una conversación. Recoge el motivo, luego la franja, luego el nombre — en el orden que salga. Cuando tengas los tres:
-Di algo como: "Perfecto [nombre], le anoto para [servicio]${activeStaff.length ? ' con [profesional]' : ''} en esa franja. Le confirmamos la hora exacta enseguida 😊"
-Y en la misma respuesta, al final (el sistema lo procesa, el paciente no lo ve):
-CITA_CONFIRMADA|tratamiento=...|fecha=...|hora=...|nombre=...|profesional=...|email=...
-Deja vacío lo que el paciente no mencionó. Nunca inventes horas exactas si no las tienes.
-Cancelaciones y cambios: mínimo 24 horas de antelación.
+GESTIÓN DE CITAS — 4 PASOS OBLIGATORIOS (sigue este orden siempre)
+
+PASO 1 · NOMBRE: En cuanto el paciente pide cita, antes de hablar de días u horas:
+"Para apuntarle, ¿me dice su nombre y apellidos?"
+No pases al paso 2 hasta tener nombre completo.
+
+PASO 2 · FECHA Y HORA — solo de DISPONIBILIDAD REAL: Ofrece únicamente los huecos que aparezcan en esa sección.
+Si el paciente pide un día u hora que no está ahí: "Ese horario no está disponible, pero tengo [opciones reales]. ¿Le viene alguno?"
+Si no hay DISPONIBILIDAD REAL disponible: "En este momento no veo huecos libres online. Le llamamos hoy mismo para cuadrar una fecha, ¿le parece bien?"
+En ese caso NO emitas CITA_CONFIRMADA — el equipo gestionará la cita por teléfono.
+
+PASO 3 · EMAIL: Una vez acordado el hueco:
+"¿Me da su email para enviarle la confirmación?"
+Es opcional — si no quiere darlo, continúa sin él.
+
+PASO 4 · CONFIRMACIÓN EXPLÍCITA: Resume y espera el sí del paciente:
+"Entonces confirmo [tratamiento]${activeStaff.length ? ' con [profesional]' : ''} el [día] a las [hora] para [nombre], ¿verdad?"
+SOLO cuando el paciente responda afirmativamente (sí / vale / perfecto / confirmado / ok / claro / por supuesto…):
+— Responde: "¡Perfecto, cita confirmada! Le esperamos el [día] a las [hora]${phone ? '. Cualquier cambio al ' + phone : ''}. 😊"
+— Añade al final de la respuesta (el sistema lo procesa, el paciente no lo ve):
+CITA_CONFIRMADA|tratamiento=...|fecha=...|hora=...|nombre=...|email=...|profesional=...
+
+⚠ REGLA ABSOLUTA: NUNCA emitas CITA_CONFIRMADA sin que el paciente haya confirmado explícitamente.
+⚠ REGLA ABSOLUTA: NUNCA inventes fechas ni horas — solo las de DISPONIBILIDAD REAL.
+Cancelaciones y cambios: mínimo 24h de antelación.
 
 URGENCIAS Y DOLOR AGUDO
 Si alguien describe dolor intenso, sangrado, golpe, o cualquier emergencia — no le hagas esperar ni un mensaje más.
@@ -506,18 +527,20 @@ async function getRecentConversations(clinic_id, limit = 30) {
   return rows.sort((a, b) => new Date(b.created_at) - new Date(a.created_at)).slice(0, limit);
 }
 
-async function setConvState(session_id, clinic_id, { manual_mode, priority, notes, status, last_msg_at } = {}) {
+async function setConvState(session_id, clinic_id, { manual_mode, priority, notes, status, last_msg_at, patient_name, patient_email } = {}) {
   await pool.query(`
     INSERT INTO conv_states (session_id, clinic_id, manual_mode, priority, notes, status, last_msg_at, updated_at)
     VALUES ($1, $2, $3, $4, $5, $6, COALESCE($7, NOW()), NOW())
     ON CONFLICT (session_id) DO UPDATE
-      SET manual_mode = COALESCE($3, conv_states.manual_mode),
-          priority    = COALESCE($4, conv_states.priority),
-          notes       = COALESCE($5, conv_states.notes),
-          status      = COALESCE($6, conv_states.status),
-          last_msg_at = COALESCE($7, conv_states.last_msg_at),
-          updated_at  = NOW()
-  `, [session_id, clinic_id, manual_mode ?? null, priority ?? null, notes ?? null, status ?? null, last_msg_at ?? null]);
+      SET manual_mode    = COALESCE($3, conv_states.manual_mode),
+          priority       = COALESCE($4, conv_states.priority),
+          notes          = COALESCE($5, conv_states.notes),
+          status         = COALESCE($6, conv_states.status),
+          last_msg_at    = COALESCE($7, conv_states.last_msg_at),
+          patient_name   = COALESCE($8, conv_states.patient_name),
+          patient_email  = COALESCE($9, conv_states.patient_email),
+          updated_at     = NOW()
+  `, [session_id, clinic_id, manual_mode ?? null, priority ?? null, notes ?? null, status ?? null, last_msg_at ?? null, patient_name ?? null, patient_email ?? null]);
 }
 
 // Cierra conversaciones sin actividad — llamado por cron interno
@@ -912,11 +935,11 @@ async function getAppointmentsByRange(clinic_id, start, end) {
   return rows;
 }
 
-async function createAppointmentFull({ clinic_id, patient_name, patient_phone, service, scheduled_ts, duration_min, notes, patient_id, source, professional, price, room }) {
+async function createAppointmentFull({ clinic_id, patient_name, patient_phone, service, scheduled_ts, duration_min, notes, patient_id, source, status, professional, price, room, patient_email }) {
   const { rows } = await pool.query(
-    `INSERT INTO appointments (clinic_id, patient_name, patient_phone, service, scheduled_ts, duration_min, notes, patient_id, source, status, professional, price, room)
-     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,'pending',$10,$11,$12) RETURNING *`,
-    [clinic_id, patient_name||null, patient_phone||null, service||null, scheduled_ts, duration_min||60, notes||null, patient_id||null, source||'manual', professional||null, price||null, room||null]
+    `INSERT INTO appointments (clinic_id, patient_name, patient_phone, service, scheduled_ts, duration_min, notes, patient_id, source, status, professional, price, room, patient_email)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14) RETURNING *`,
+    [clinic_id, patient_name||null, patient_phone||null, service||null, scheduled_ts, duration_min||60, notes||null, patient_id||null, source||'manual', status||'pending', professional||null, price||null, room||null, patient_email||null]
   );
   return rows[0];
 }
