@@ -313,8 +313,9 @@
     .bc-status.pending{background:#f1f5f9;color:var(--text3)}
     .bc-status.failed{background:#fef2f2;color:#dc2626}
     /* ── Conv filter tabs ── */
-    .conv-filters{display:flex;gap:2px;padding:6px 8px;border-bottom:1px solid var(--border);background:#fff}
-    .cf{font-size:10px;font-weight:600;color:var(--text3);padding:4px 9px;border-radius:var(--r-pill);cursor:pointer;border:1.5px solid transparent;transition:all var(--dur-fast);white-space:nowrap}
+    .conv-filters{display:flex;gap:2px;padding:6px 8px;border-bottom:1px solid var(--border);background:#fff;overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none}
+    .conv-filters::-webkit-scrollbar{display:none}
+    .cf{font-size:10px;font-weight:600;color:var(--text3);padding:4px 7px;border-radius:var(--r-pill);cursor:pointer;border:1.5px solid transparent;transition:all var(--dur-fast);white-space:nowrap;flex-shrink:0}
     .cf.active{background:var(--green-dim);color:var(--green);border-color:rgba(22,163,74,0.25)}
     .cf:hover:not(.active){background:var(--bg2)}
     .cf-cnt{font-size:9px;font-weight:800;background:rgba(0,0,0,0.08);padding:1px 5px;border-radius:8px;margin-left:3px}
