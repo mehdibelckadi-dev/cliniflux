@@ -767,6 +767,32 @@ async function getAtRiskPatients(clinic_id) {
   return rows;
 }
 
+async function getPatientMemory(clinic_id, session_id, phone) {
+  const clean = phone.replace(/\D/g, '').slice(-9);
+  const [stateRow, apptRows] = await Promise.all([
+    pool.query('SELECT patient_name FROM conv_states WHERE session_id=$1', [session_id]),
+    pool.query(
+      `SELECT service, scheduled_ts, scheduled_ts > NOW() AS upcoming
+       FROM appointments
+       WHERE clinic_id=$1 AND right(regexp_replace(coalesce(patient_phone,''),'\\D','','g'),9)=$2
+       ORDER BY scheduled_ts DESC LIMIT 5`,
+      [clinic_id, clean]
+    )
+  ]);
+  const name = stateRow.rows[0]?.patient_name;
+  const appts = apptRows.rows;
+  if (!name && !appts.length) return null;
+
+  const fmt = d => new Date(d).toLocaleDateString('es-ES', { day:'numeric', month:'short' });
+  const past   = appts.filter(r => !r.upcoming);
+  const future = appts.filter(r => r.upcoming);
+  const parts  = [];
+  if (name)          parts.push(name);
+  if (past.length)   parts.push(`${past.length} visita${past.length>1?'s':''} | última: ${past[0].service||'consulta'} ${fmt(past[0].scheduled_ts)}`);
+  if (future.length) parts.push(`próxima: ${future[0].service||'cita'} ${fmt(future[0].scheduled_ts)}`);
+  return `\nPACIENTE CONOCIDO · ${parts.join(' · ')}`;
+}
+
 async function scheduleNps(clinic_id, session_id, from_number, delayHours = 24) {
   await pool.query(`
     INSERT INTO nps_pending (clinic_id, session_id, from_number, scheduled_at)
@@ -1202,4 +1228,4 @@ async function getPatientNote(clinicId, phone) {
   return rows[0]?.notes || '';
 }
 
-module.exports = { pool, initDb, createBroadcast, getBroadcasts, updateBroadcast, getUpcomingAppointments, markReminderSent, getAtRiskForAutoReact, markLeadsContactado, getAnalytics, getSession, saveSession, saveLead, getClinicByEmail, getClinicByWhatsapp, getClinicBySetupToken, createClinic, updateClinicConfig, buildPromptForClinic, getLeads, saveAppointment, getAppointments, verifyPassword, hashPassword, importLeads, getImportedLeads, updateLeadEstado, incrementConversation, PLAN_LIMITS, saveMessage, getMessages, getRecentConversations, getHistoryFromMessages, setConvState, getManualSessions, getConvNotes, savePushSubscription, getPushSubscriptions, removePushSubscription, closeInactiveConversations, getPatientData, getAtRiskPatients, scheduleNps, getPendingNps, markNpsSent, saveNpsScore, getAppointmentsByRange, createAppointmentFull, updateAppointmentFull, deleteAppointment, createStaff, getStaff, getStaffByEmail, updateStaffRole, deactivateStaff, auditLog, getAuditLogs, recordConsent, hasConsent, getConsents, revokeConsent, getAppointmentsForFollowup, getAppointmentsForReview, markFollowupSent, markReviewSent, getAvailableSlotsForBot, getEnrichedPatientProfile, savePatientNote, getPatientNote, getBlockedSlots, createBlockedSlot, deleteBlockedSlot, updateStaffColor };
+module.exports = { pool, initDb, createBroadcast, getBroadcasts, updateBroadcast, getUpcomingAppointments, markReminderSent, getAtRiskForAutoReact, markLeadsContactado, getAnalytics, getSession, saveSession, saveLead, getClinicByEmail, getClinicByWhatsapp, getClinicBySetupToken, createClinic, updateClinicConfig, buildPromptForClinic, getLeads, saveAppointment, getAppointments, verifyPassword, hashPassword, importLeads, getImportedLeads, updateLeadEstado, incrementConversation, PLAN_LIMITS, saveMessage, getMessages, getRecentConversations, getHistoryFromMessages, setConvState, getManualSessions, getConvNotes, savePushSubscription, getPushSubscriptions, removePushSubscription, closeInactiveConversations, getPatientData, getAtRiskPatients, scheduleNps, getPendingNps, markNpsSent, saveNpsScore, getAppointmentsByRange, createAppointmentFull, updateAppointmentFull, deleteAppointment, createStaff, getStaff, getStaffByEmail, updateStaffRole, deactivateStaff, auditLog, getAuditLogs, recordConsent, hasConsent, getConsents, revokeConsent, getAppointmentsForFollowup, getAppointmentsForReview, markFollowupSent, markReviewSent, getAvailableSlotsForBot, getEnrichedPatientProfile, savePatientNote, getPatientNote, getBlockedSlots, createBlockedSlot, deleteBlockedSlot, updateStaffColor, getPatientMemory };

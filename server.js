@@ -13,7 +13,7 @@ const PgSession = require('connect-pg-simple')(session);
 const OpenAI = require('openai');
 const crypto = require('crypto');
 const Stripe = require('stripe');
-const { pool, initDb, getAnalytics, getSession, saveSession, saveLead, getClinicByEmail, getClinicByWhatsapp, getClinicBySetupToken, createClinic, updateClinicConfig, buildPromptForClinic, getLeads, getAppointments, saveAppointment, verifyPassword, hashPassword, importLeads, getImportedLeads, updateLeadEstado, incrementConversation, PLAN_LIMITS, saveMessage, getMessages, getRecentConversations, getHistoryFromMessages, setConvState, getManualSessions, getConvNotes, savePushSubscription, getPushSubscriptions, removePushSubscription, closeInactiveConversations, getPatientData, getAtRiskPatients, scheduleNps, getPendingNps, markNpsSent, saveNpsScore, createBroadcast, getBroadcasts, updateBroadcast, getUpcomingAppointments, markReminderSent, getAtRiskForAutoReact, markLeadsContactado, getAppointmentsByRange, createAppointmentFull, updateAppointmentFull, deleteAppointment, createStaff, getStaff, getStaffByEmail, updateStaffRole, deactivateStaff, auditLog, getAuditLogs, recordConsent, hasConsent, getConsents, revokeConsent, getAppointmentsForFollowup, getAppointmentsForReview, markFollowupSent, markReviewSent, getAvailableSlotsForBot, getEnrichedPatientProfile, savePatientNote, getPatientNote, getBlockedSlots, createBlockedSlot, deleteBlockedSlot, updateStaffColor } = require('./db');
+const { pool, initDb, getAnalytics, getSession, saveSession, saveLead, getClinicByEmail, getClinicByWhatsapp, getClinicBySetupToken, createClinic, updateClinicConfig, buildPromptForClinic, getLeads, getAppointments, saveAppointment, verifyPassword, hashPassword, importLeads, getImportedLeads, updateLeadEstado, incrementConversation, PLAN_LIMITS, saveMessage, getMessages, getRecentConversations, getHistoryFromMessages, setConvState, getManualSessions, getConvNotes, savePushSubscription, getPushSubscriptions, removePushSubscription, closeInactiveConversations, getPatientData, getAtRiskPatients, scheduleNps, getPendingNps, markNpsSent, saveNpsScore, createBroadcast, getBroadcasts, updateBroadcast, getUpcomingAppointments, markReminderSent, getAtRiskForAutoReact, markLeadsContactado, getAppointmentsByRange, createAppointmentFull, updateAppointmentFull, deleteAppointment, createStaff, getStaff, getStaffByEmail, updateStaffRole, deactivateStaff, auditLog, getAuditLogs, recordConsent, hasConsent, getConsents, revokeConsent, getAppointmentsForFollowup, getAppointmentsForReview, markFollowupSent, markReviewSent, getAvailableSlotsForBot, getEnrichedPatientProfile, savePatientNote, getPatientNote, getBlockedSlots, createBlockedSlot, deleteBlockedSlot, updateStaffColor, getPatientMemory } = require('./db');
 const PDFDocument = require('pdfkit');
 const webpush = require('web-push');
 
@@ -424,9 +424,9 @@ app.post('/webhook/whatsapp', express.raw({ type: 'application/json' }), async (
     if (waRateLimit(from)) { console.warn(`[RateLimit] ${from} excedió 5 msgs/10s`); return; }
 
     const clinic   = to ? await getClinicByWhatsapp(to).catch(() => null) : null;
-    const prompt   = clinic ? await buildPromptWithSlots(clinic) : buildDemoPrompt();
     const clinicId = clinic?.id || 1;
     sessionId = `wa_${clinicId}_` + from.slice(-10);
+    const prompt   = clinic ? await buildPromptWithSlots(clinic, from, sessionId) : buildDemoPrompt();
 
     if (clinic?.id) {
       let usage = { count: 0, limit: null, pct: 0, blocked: false };
@@ -766,16 +766,20 @@ function parseApptTimestamp(fechaStr = '', horaStr = '') {
   } catch { return null; }
 }
 
-async function buildPromptWithSlots(clinic) {
+async function buildPromptWithSlots(clinic, phone = null, sessionId = null) {
   try {
-    const [slots, staffRows] = await Promise.all([
+    const [slots, staffRows, memory] = await Promise.all([
       getAvailableSlotsForBot(clinic.id, 5).catch(() => ({})),
-      getStaff(clinic.id).catch(() => [])
+      getStaff(clinic.id).catch(() => []),
+      (phone && sessionId) ? getPatientMemory(clinic.id, sessionId, phone).catch(() => null) : Promise.resolve(null)
     ]);
-    const base = buildPromptForClinic(clinic, staffRows);
+    const base  = buildPromptForClinic(clinic, staffRows);
+    const mem   = memory || '';
     const lines = Object.entries(slots).map(([day, times]) => `  ${day}: ${times.join(', ')}`).join('\n');
-    if (!lines) return base + `\n\nDISPONIBILIDAD REAL: No hay huecos disponibles los próximos días. NO ofrezcas fechas ni horas. Indica que el equipo contactará al paciente para confirmar.`;
-    return base + `\n\nDISPONIBILIDAD REAL (próximos 5 días — USA SOLO ESTOS HUECOS, no inventes otros):\n${lines}`;
+    const slots_section = lines
+      ? `\n\nDISPONIBILIDAD REAL (próximos 5 días — USA SOLO ESTOS HUECOS, no inventes otros):\n${lines}`
+      : `\n\nDISPONIBILIDAD REAL: No hay huecos disponibles los próximos días. NO ofrezcas fechas ni horas. Indica que el equipo contactará al paciente para confirmar.`;
+    return base + mem + slots_section;
   } catch { return buildPromptForClinic(clinic); }
 }
 
