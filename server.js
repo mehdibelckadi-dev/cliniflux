@@ -479,15 +479,15 @@ app.post('/webhook/whatsapp', express.raw({ type: 'application/json' }), async (
     const io       = req.app.get('io');
 
     const savedAt = new Date().toISOString();
-    await Promise.all([
-      saveMessage({ clinic_id: clinicId, session_id: sessionId, direction: 'inbound', content: msg, from_number: from }).catch(() => {}),
-      setConvState(sessionId, clinicId, { status: 'open', last_msg_at: new Date() }).catch(() => {}),
-    ]);
     const room = `clinic_${clinicId}`;
+    // Emit immediately — don't wait for DB writes to avoid blocking on slow queries
     io?.to(room).emit('message:new', {
       session_id: sessionId, from_number: from, content: msg, direction: 'inbound',
       created_at: savedAt, responded_by: 'human', urgent, manual: inManual
     });
+    // DB writes are fire-and-forget in the critical path
+    saveMessage({ clinic_id: clinicId, session_id: sessionId, direction: 'inbound', content: msg, from_number: from }).catch(() => {});
+    setConvState(sessionId, clinicId, { status: 'open', last_msg_at: new Date() }).catch(() => {});
 
     const pushTitle = urgent ? '🔴 Mensaje urgente' : '💬 Nuevo mensaje WhatsApp';
     const fromD = from.replace(/\D/g,'');

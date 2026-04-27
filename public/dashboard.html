@@ -5452,15 +5452,28 @@
     } catch(e) { console.error(e); }
   }
 
-  function openWhatsAppForClient() {
+  async function openWhatsAppForClient() {
     if (!_clSelected) return;
-    // Switch to conversations panel and open that patient's conversation
-    const phone = _clSelected.phone;
+    const rawPhone = (_clSelected.phone || '').replace(/\D/g, '');
+    const suffix9  = rawPhone.slice(-9);
     switchPanel(0);
-    setTimeout(() => {
-      const item = document.querySelector(`.conv-item[data-phone="${CSS.escape(phone)}"]`);
-      if (item) item.click();
-    }, 300);
+    await new Promise(r => setTimeout(r, 300));
+
+    // Find conversation in allConvs by phone suffix (handles formatting differences)
+    let conv = allConvs.find(c => (c.from_number || '').replace(/\D/g, '').endsWith(suffix9));
+    if (!conv) {
+      // Not in current list — show search so user can find it
+      const si = document.getElementById('conv-search-input');
+      if (si) { si.value = suffix9; applyConvFilter(); }
+      return;
+    }
+
+    // Make sure it's visible (might be filtered out)
+    if (convFilter !== 'all') setConvFilter('all');
+    await new Promise(r => setTimeout(r, 50));
+
+    const item = document.querySelector(`.conv-item[data-session-id="${CSS.escape(conv.session_id)}"]`);
+    if (item) item.click();
   }
 
   function openNewApptForClient() {
