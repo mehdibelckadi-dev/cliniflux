@@ -499,7 +499,7 @@ app.post('/webhook/whatsapp', express.raw({ type: 'application/json' }), async (
 
     if (inManual) {
       openai.chat.completions.create({
-        model: process.env.AI_MODEL || 'gpt-4o-mini',
+        model: process.env.AI_MODEL || 'gpt-4o',
         messages: [{ role:'system', content: prompt + '\n[Modo co-pilot: redacta la respuesta ideal pero el agente humano la revisará antes de enviar]' }, ...contextMsgs, { role:'user', content: msg }],
         max_tokens: 250, temperature: 0.3
       }).then(r => {
@@ -510,7 +510,7 @@ app.post('/webhook/whatsapp', express.raw({ type: 'application/json' }), async (
     }
 
     const completion = await openai.chat.completions.create({
-      model: process.env.AI_MODEL || 'gpt-4o-mini',
+      model: process.env.AI_MODEL || 'gpt-4o',
       messages: [{ role:'system', content: prompt }, ...contextMsgs, { role:'user', content: msg }],
       max_tokens: 320, temperature: 0.3
     });
@@ -1343,7 +1343,7 @@ app.post('/chat', rateLimit(30, 60000), async (req, res) => {
     }
     const history = await getSession(safeId);
     const completion = await openai.chat.completions.create({
-      model: process.env.AI_MODEL || 'gpt-4o-mini',
+      model: process.env.AI_MODEL || 'gpt-4o',
       messages: [{ role:'system', content: prompt }, ...history, { role:'user', content: msg }],
       max_tokens: 350, temperature: 0.4
     });
