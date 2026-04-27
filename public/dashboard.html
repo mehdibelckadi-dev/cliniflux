@@ -1041,7 +1041,6 @@
     <button id="notif-btn" onclick="requestNotifPermission()" title="Activar notificaciones push" style="display:none;background:none;border:none;cursor:pointer;padding:4px 8px;border-radius:6px;font-size:14px;position:relative" aria-label="Activar notificaciones">
       🔔<span style="position:absolute;top:2px;right:4px;width:7px;height:7px;background:#ef4444;border-radius:50%;border:1.5px solid #fff"></span>
     </button>
-    <button id="notif-test-btn" onclick="testNotification()" title="Probar notificación" style="display:none;background:none;border:none;cursor:pointer;padding:4px 6px;border-radius:6px;font-size:12px;color:var(--text3)" aria-label="Probar notificación">✓test</button>
     <div class="tb-ia"><div class="tb-ia-dot"></div>IA activa</div>
     <button class="mob-patient-btn" id="mob-patient-btn" onclick="openPatientSheet()" title="Ver ficha paciente">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
@@ -3991,7 +3990,6 @@
 
     // Nuevo mensaje entrante
     socket.on('message:new', (msg) => {
-      console.log('[WS] message:new received', msg.session_id, msg.content?.slice(0,30));
       if (msg.urgent) urgentSet.add(msg.session_id);
       if (msg.direction === 'inbound' && msg.session_id !== activeSessionId) unreadSet.add(msg.session_id);
       const idx = allConvs.findIndex(c => c.session_id === msg.session_id);
@@ -4181,11 +4179,6 @@
     } catch(e) { console.warn('Notif:', e.message); }
   }
 
-  async function testNotification() {
-    if (Notification.permission !== 'granted') { toast('Primero activa las notificaciones con el botón 🔔', 'error'); return; }
-    await _showNotif('✅ Prueba Cliniflux', 'Las notificaciones funcionan correctamente', 'test');
-    toast('Notificación de prueba enviada', 'success');
-  }
 
   async function _registerPushSubscription() {
     if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
@@ -4212,8 +4205,6 @@
     const perm = Notification.permission;
     if (perm === 'granted') {
       btn.style.display = 'none';
-      const testBtn = document.getElementById('notif-test-btn');
-      if (testBtn) testBtn.style.display = '';
       await _registerPushSubscription();
     } else if (perm === 'denied') {
       // Show bell with tooltip explaining manual steps
@@ -4233,8 +4224,6 @@
     const btn = document.getElementById('notif-btn');
     if (perm === 'granted') {
       if (btn) btn.style.display = 'none';
-      const testBtn = document.getElementById('notif-test-btn');
-      if (testBtn) testBtn.style.display = '';
       await _registerPushSubscription();
       toast('Notificaciones activadas — recibirás avisos aunque el dashboard esté en segundo plano', 'success', '🔔 Listo');
     } else {

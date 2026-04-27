@@ -415,21 +415,18 @@ app.post('/webhook/whatsapp', express.raw({ type: 'application/json' }), async (
     const entry   = body?.entry?.[0];
     const change  = entry?.changes?.[0]?.value;
     const message = change?.messages?.[0];
-    console.log(`[WA] payload field=${entry?.changes?.[0]?.field} hasMsg=${!!message} type=${message?.type} hasStatus=${!!change?.statuses?.[0]}`);
     if (!message || message.type !== 'text') return;
 
     const from = message.from;
     const to   = change?.metadata?.display_phone_number?.replace(/\D/g,'');
     const msg  = message.text?.body?.trim().slice(0, 500);
-    console.log(`[WA] from=${from||'VACÍO'} msg=${msg?.slice(0,30)||'VACÍO'} to=${to||'VACÍO'}`);
-    if (!from || !msg) { console.warn('[WA] from o msg vacío — descartado'); return; }
+    if (!from || !msg) return;
     if (waRateLimit(from)) { console.warn(`[RateLimit] ${from} excedió 5 msgs/10s`); return; }
 
     const clinic   = to ? await getClinicByWhatsapp(to).catch(() => null) : null;
     const prompt   = clinic ? await buildPromptWithSlots(clinic) : buildDemoPrompt();
     const clinicId = clinic?.id || 1;
     sessionId = `wa_${clinicId}_` + from.slice(-10);
-    console.log(`[WA] from=${from} to=${to} clinicId=${clinicId} clinic=${clinic?.name||'NO MATCH — fallback'} session=${sessionId}`);
 
     if (clinic?.id) {
       let usage = { count: 0, limit: null, pct: 0, blocked: false };
@@ -438,13 +435,11 @@ app.post('/webhook/whatsapp', express.raw({ type: 'application/json' }), async (
           incrementConversation(clinic.id),
           new Promise((_, rej) => setTimeout(() => rej(new Error('incrementConversation timeout')), 4000))
         ]);
-        console.log(`[WA] usage count=${usage?.count} blocked=${usage?.blocked}`);
         checkAndNotifyUsage(usage, clinic.id).catch(e => console.error('usage notify:', e.message));
       } catch(e) {
-        console.warn('[WA] incrementConversation failed:', e.message, '— continuing');
+        console.warn('[WA] incrementConversation failed:', e.message);
       }
       if (usage.blocked) {
-        console.warn('[WA] BLOCKED by usage limit — returning');
         await sendWhatsAppMessage(from, 'Lo sentimos, la clínica ha alcanzado el límite de conversaciones este mes. Llámenos directamente para ayudarle.');
         return;
       }
@@ -453,7 +448,6 @@ app.post('/webhook/whatsapp', express.raw({ type: 'application/json' }), async (
 
     // NPS score detection
     const scoreMatch = msg.match(/^(\d{1,2})$/);
-    console.log(`[WA] scoreMatch=${!!scoreMatch} processingSessions.has=${processingSessions.has(sessionId)}`);
     if (scoreMatch) {
       const score = parseInt(scoreMatch[1]);
       if (score >= 1 && score <= 10) {
@@ -479,7 +473,6 @@ app.post('/webhook/whatsapp', express.raw({ type: 'application/json' }), async (
       return;
     }
     processingSessions.add(sessionId);
-    console.log('[WA] past concurrent check — saving message...');
 
     const urgent   = isUrgent(msg, clinic);
     const inManual = manualSessions.has(sessionId);
@@ -491,8 +484,6 @@ app.post('/webhook/whatsapp', express.raw({ type: 'application/json' }), async (
       setConvState(sessionId, clinicId, { status: 'open', last_msg_at: new Date() }).catch(() => {}),
     ]);
     const room = `clinic_${clinicId}`;
-    const roomSockets = io?.sockets?.adapter?.rooms?.get(room)?.size || 0;
-    console.log(`[WA] emit message:new → ${room} (${roomSockets} sockets conectados)`);
     io?.to(room).emit('message:new', {
       session_id: sessionId, from_number: from, content: msg, direction: 'inbound',
       created_at: savedAt, responded_by: 'human', urgent, manual: inManual
@@ -551,8 +542,7 @@ app.post('/webhook/whatsapp', express.raw({ type: 'application/json' }), async (
       created_at: repliedAt, responded_by: 'ai', urgent
     });
   } catch(err) {
-    console.error('[WA] CATCH:', err?.message || String(err) || 'unknown error');
-    console.error('[WA] STACK:', err?.stack?.slice(0, 300));
+    console.error('[WA] error:', err?.message || err);
   } finally {
     processingSessions.delete(sessionId);
   }
@@ -1115,21 +1105,6 @@ app.get('/ops/restore-demo', async (req, res) => {
 });
 
 
-// GET /ops/test-socket?secret=X&clinic_id=1
-app.get('/ops/test-socket', (req, res) => {
-  if (req.query.secret !== (process.env.ADMIN_SECRET || 'cliniflux-admin')) return res.status(403).send('Forbidden');
-  const clinicId = parseInt(req.query.clinic_id) || 1;
-  const io = req.app.get('io');
-  const room = `clinic_${clinicId}`;
-  const sockets = io?.sockets?.adapter?.rooms?.get(room)?.size || 0;
-  io?.to(room).emit('message:new', {
-    session_id: `test_${Date.now()}`, from_number: '34600000000',
-    content: '🔧 Test socket — si ves esto el socket funciona',
-    direction: 'inbound', created_at: new Date().toISOString(),
-    responded_by: 'human', urgent: false, manual: false,
-  });
-  res.json({ ok: true, room, sockets_in_room: sockets });
-});
 
 app.get('/onboarding', async (req, res) => {
   const clinic = await getClinicBySetupToken(req.query.token).catch(() => null);
