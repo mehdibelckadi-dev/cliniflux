@@ -2070,9 +2070,10 @@
         <div class="cl-detail-body" id="cl-detail-body">
           <div style="text-align:center;padding:40px;color:var(--text3)">Selecciona un paciente</div>
         </div>
-        <div class="cl-detail-footer">
-          <button class="cl-action-btn cl-action-wa" id="cl-detail-wa-btn" onclick="openWhatsAppForClient()">💬 WhatsApp</button>
-          <button class="cl-action-btn cl-action-cita" onclick="openNewApptForClient()">+ Nueva cita</button>
+        <div class="cl-detail-footer" style="flex-wrap:wrap;gap:6px">
+          <button class="cl-action-btn cl-action-wa" id="cl-detail-wa-btn" onclick="openWhatsAppForClient()" style="flex:1 1 calc(50% - 3px)">💬 WhatsApp</button>
+          <button class="cl-action-btn cl-action-cita" onclick="openNewApptForClient()" style="flex:1 1 calc(50% - 3px)">+ Nueva cita</button>
+          <button class="cl-action-btn" id="cl-detail-delete-btn" onclick="deleteCliente()" style="flex:1 1 100%;background:#fef2f2;color:#dc2626;border:1px solid rgba(220,38,38,0.2)">🗑 Eliminar paciente</button>
         </div>
       </div>
     </div>
@@ -5459,6 +5460,27 @@
     document.getElementById('cl-detail').classList.remove('open');
     _clSelected = null;
     renderClientes();
+  }
+
+  async function deleteCliente() {
+    const c = _clSelected;
+    if (!c) return;
+    const name = c.name || c.phone;
+    const confirmed = confirm(`¿Eliminar a ${name}?\n\nSe borrarán todas sus conversaciones, historial y citas.\nEsta acción no se puede deshacer.`);
+    if (!confirmed) return;
+    const btn = document.getElementById('cl-detail-delete-btn');
+    if (btn) { btn.disabled = true; btn.textContent = 'Eliminando...'; }
+    try {
+      const r = await fetch(`/api/patients/${encodeURIComponent(c.phone)}`, { method: 'DELETE' });
+      if (!r.ok) throw new Error();
+      closeClienteDetail();
+      _clientes = _clientes.filter(p => p.phone !== c.phone);
+      renderClientes();
+      toast(`Paciente ${name} eliminado`, 'success');
+    } catch {
+      if (btn) { btn.disabled = false; btn.textContent = '🗑 Eliminar paciente'; }
+      toast('Error al eliminar el paciente', 'error');
+    }
   }
 
   async function saveClienteNotes(phone) {

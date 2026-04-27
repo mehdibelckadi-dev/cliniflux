@@ -1730,6 +1730,28 @@ app.get('/api/patients/:phone', requireAuth, async (req, res) => {
   res.json(data);
 });
 
+app.delete('/api/patients/:phone', requireAuth, async (req, res) => {
+  const clinicId = req.session.clinic.id;
+  const raw = decodeURIComponent(req.params.phone).replace(/\D/g, '');
+  const suffix10 = raw.slice(-10);
+  const suffix9  = raw.slice(-9);
+  try {
+    // Delete messages (from_number ends with last 10 digits)
+    await pool.query(`DELETE FROM messages WHERE clinic_id=$1 AND right(replace(from_number,'+',''),10)=$2`, [clinicId, suffix10]);
+    // Delete conv_states (session_id = wa_{clinicId}_{last10})
+    await pool.query(`DELETE FROM conv_states WHERE clinic_id=$1 AND session_id=$2`, [clinicId, `wa_${clinicId}_${suffix10}`]);
+    // Delete appointments
+    await pool.query(`DELETE FROM appointments WHERE clinic_id=$1 AND right(replace(patient_phone,'+',''),10)=$2`, [clinicId, suffix10]);
+    // Delete patient notes
+    await pool.query(`DELETE FROM patient_notes WHERE clinic_id=$1 AND right(phone,9)=$2`, [clinicId, suffix9]);
+    // Delete imported leads
+    await pool.query(`DELETE FROM imported_leads WHERE clinic_id=$1 AND right(replace(telefono,'+',''),9)=$2`, [clinicId, suffix9]);
+    // Delete GDPR consents
+    await pool.query(`DELETE FROM gdpr_consents WHERE clinic_id=$1 AND right(replace(phone,'+',''),9)=$2`, [clinicId, suffix9]);
+    res.json({ ok: true });
+  } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
 app.get('/api/patient-profile/:phone', requireAuth, async (req, res) => {
   try {
     const profile = await getEnrichedPatientProfile(req.session.clinic.id, decodeURIComponent(req.params.phone));
