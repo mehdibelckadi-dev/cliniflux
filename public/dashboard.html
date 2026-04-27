@@ -3441,22 +3441,25 @@
     } catch(e) { console.error('loadConversations:', e); }
   }
 
+  // Cache conv-empty across renders — innerHTML='' would destroy it otherwise
+  let _convEmptyEl = null;
   function renderConvList(convs) {
     const container = document.getElementById('conv-items-container');
-    const empty = document.getElementById('conv-empty');
+    if (!_convEmptyEl) _convEmptyEl = document.getElementById('conv-empty');
+    const empty = _convEmptyEl;
     const skel  = document.getElementById('conv-skeleton');
     const cnt   = document.getElementById('conv-cnt');
     if (skel) skel.remove();
+    // Detach empty before innerHTML clear so it's not destroyed
+    if (empty?.parentNode) empty.remove();
     if (!convs.length) {
       container.innerHTML = '';
-      container.appendChild(empty);
-      empty.style.display = 'block';
+      if (empty) { empty.style.display = 'block'; container.appendChild(empty); }
       cnt.style.display = 'none';
       document.getElementById('cs-total').textContent = 0;
       document.getElementById('cs-today').textContent = 0;
       return;
     }
-    empty.style.display = 'none';
     cnt.textContent = convs.length;
     cnt.style.display = '';
     const today = new Date().toDateString();
