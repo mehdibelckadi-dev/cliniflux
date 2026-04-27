@@ -1115,6 +1115,22 @@ app.get('/ops/restore-demo', async (req, res) => {
 });
 
 
+// GET /ops/test-socket?secret=X&clinic_id=1
+app.get('/ops/test-socket', (req, res) => {
+  if (req.query.secret !== (process.env.ADMIN_SECRET || 'cliniflux-admin')) return res.status(403).send('Forbidden');
+  const clinicId = parseInt(req.query.clinic_id) || 1;
+  const io = req.app.get('io');
+  const room = `clinic_${clinicId}`;
+  const sockets = io?.sockets?.adapter?.rooms?.get(room)?.size || 0;
+  io?.to(room).emit('message:new', {
+    session_id: `test_${Date.now()}`, from_number: '34600000000',
+    content: '🔧 Test socket — si ves esto el socket funciona',
+    direction: 'inbound', created_at: new Date().toISOString(),
+    responded_by: 'human', urgent: false, manual: false,
+  });
+  res.json({ ok: true, room, sockets_in_room: sockets });
+});
+
 app.get('/onboarding', async (req, res) => {
   const clinic = await getClinicBySetupToken(req.query.token).catch(() => null);
   if (!clinic) return res.redirect('/login');

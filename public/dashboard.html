@@ -3986,6 +3986,7 @@
 
     // Nuevo mensaje entrante
     socket.on('message:new', (msg) => {
+      console.log('[WS] message:new received', msg.session_id, msg.content?.slice(0,30));
       if (msg.urgent) urgentSet.add(msg.session_id);
       const idx = allConvs.findIndex(c => c.session_id === msg.session_id);
       if (idx >= 0) allConvs.splice(idx, 1);
