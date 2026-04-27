@@ -1654,6 +1654,12 @@ app.post('/api/conversations/:sessionId/close', requireAuth, async (req, res) =>
   res.json({ ok: true });
 });
 
+// Reapertura de conversación (desde perfil de cliente)
+app.post('/api/conversations/:sessionId/reopen', requireAuth, async (req, res) => {
+  await setConvState(req.params.sessionId, req.session.clinic.id, { status: 'open' }).catch(() => {});
+  res.json({ ok: true });
+});
+
 // ── F4: Broadcast ─────────────────────────────────────────────────────────────
 
 async function runBroadcast(broadcast, clinicId, io) {

@@ -515,15 +515,18 @@ async function getMessages(clinic_id, session_id, limit = 50) {
   return rows;
 }
 
-async function getRecentConversations(clinic_id, limit = 30) {
+async function getRecentConversations(clinic_id, limit = 100) {
   const { rows } = await pool.query(`
-    SELECT DISTINCT ON (session_id)
-      session_id, from_number, content, direction, responded_by, created_at
-    FROM messages
-    WHERE clinic_id=$1
-    ORDER BY session_id, created_at DESC
+    SELECT DISTINCT ON (m.session_id)
+      m.session_id, m.from_number, m.content, m.direction, m.responded_by, m.created_at,
+      COALESCE(cs.status, 'open') AS status,
+      COALESCE(cs.manual_mode, false) AS manual_mode,
+      cs.patient_name, cs.patient_email
+    FROM messages m
+    LEFT JOIN conv_states cs ON cs.session_id = m.session_id AND cs.clinic_id = $1
+    WHERE m.clinic_id = $1
+    ORDER BY m.session_id, m.created_at DESC
   `, [clinic_id]);
-  // Ordenar por created_at DESC y limitar en JS (DISTINCT ON requiere ORDER BY session_id primero)
   return rows.sort((a, b) => new Date(b.created_at) - new Date(a.created_at)).slice(0, limit);
 }
 

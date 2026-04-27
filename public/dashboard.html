@@ -1126,10 +1126,11 @@
         </div>
         <div class="conv-search"><input id="conv-search-input" placeholder="🔍  Buscar por número o mensaje..." oninput="applyConvFilter()"></div>
         <div class="conv-filters">
-          <div class="cf active" data-f="all" onclick="setConvFilter('all')">Todos<span class="cf-cnt" id="cf-cnt-all">0</span></div>
-          <div class="cf" data-f="open" onclick="setConvFilter('open')">Abierta<span class="cf-cnt" id="cf-cnt-open">0</span></div>
+          <div class="cf active" data-f="all" onclick="setConvFilter('all')">Todas<span class="cf-cnt" id="cf-cnt-all">0</span></div>
+          <div class="cf" data-f="open" onclick="setConvFilter('open')">Abiertas<span class="cf-cnt" id="cf-cnt-open">0</span></div>
           <div class="cf" data-f="manual" onclick="setConvFilter('manual')">Manual<span class="cf-cnt" id="cf-cnt-manual">0</span></div>
           <div class="cf" data-f="urgent" onclick="setConvFilter('urgent')">Urgente<span class="cf-cnt" id="cf-cnt-urgent">0</span></div>
+          <div class="cf" data-f="closed" onclick="setConvFilter('closed')">Cerradas<span class="cf-cnt" id="cf-cnt-closed">0</span></div>
         </div>
         <div id="conv-items-container" style="flex:1;overflow-y:auto">
           <div id="conv-empty" style="padding:32px 16px;text-align:center;color:var(--text3);font-size:13px">
@@ -3411,6 +3412,7 @@
   const manualSet  = new Set();   // sessions in manual mode (client mirror)
   const urgentSet  = new Set();   // sessions flagged urgent
   const unreadSet  = new Set();   // sessions with unread inbound messages
+  const closedSet  = new Set();   // sessions with status=closed
   const CONV_COLORS = ['#16a34a,#22c55e','#0ea5e9,#0284c7','#f43f5e,#e11d48','#f97316,#ea580c','#8b5cf6,#7c3aed'];
 
   function phoneLabel(num) {
@@ -3437,7 +3439,13 @@
       const r = await fetch('/api/conversations');
       if (!r.ok) return;
       allConvs = await r.json();
-      renderConvList(allConvs);
+      // Sync closedSet and manualSet from initial load
+      closedSet.clear();
+      allConvs.forEach(c => {
+        if (c.status === 'closed') closedSet.add(c.session_id);
+        if (c.manual_mode) manualSet.add(c.session_id);
+      });
+      applyConvFilter();
     } catch(e) { console.error('loadConversations:', e); }
   }
 
@@ -3468,12 +3476,15 @@
     document.getElementById('cs-today').textContent = todayCount;
 
     // Update filter badge counts (always from allConvs, not filtered subset)
-    document.getElementById('cf-cnt-all').textContent = allConvs.length;
-    document.getElementById('cf-cnt-open').textContent = allConvs.filter(c => !manualSet.has(c.session_id) && !urgentSet.has(c.session_id)).length;
-    document.getElementById('cf-cnt-manual').textContent = allConvs.filter(c => manualSet.has(c.session_id)).length;
-    document.getElementById('cf-cnt-urgent').textContent = allConvs.filter(c => urgentSet.has(c.session_id)).length;
-    // Badge = urgent + manual + unread (any unread inbound message)
-    const needsHuman = allConvs.filter(c => urgentSet.has(c.session_id) || manualSet.has(c.session_id) || unreadSet.has(c.session_id)).length;
+    const openConvs = allConvs.filter(c => !closedSet.has(c.session_id));
+    document.getElementById('cf-cnt-all').textContent = openConvs.length;
+    document.getElementById('cf-cnt-open').textContent = openConvs.filter(c => !manualSet.has(c.session_id) && !urgentSet.has(c.session_id)).length;
+    document.getElementById('cf-cnt-manual').textContent = openConvs.filter(c => manualSet.has(c.session_id)).length;
+    document.getElementById('cf-cnt-urgent').textContent = openConvs.filter(c => urgentSet.has(c.session_id)).length;
+    const cfClosed = document.getElementById('cf-cnt-closed');
+    if (cfClosed) cfClosed.textContent = allConvs.filter(c => closedSet.has(c.session_id)).length;
+    // Badge = urgent + manual + unread (only open conversations)
+    const needsHuman = openConvs.filter(c => urgentSet.has(c.session_id) || manualSet.has(c.session_id) || unreadSet.has(c.session_id)).length;
     const siBadge = document.getElementById('si-badge-msgs');
     const bnBadge = document.getElementById('bn-badge');
     if (siBadge) { siBadge.textContent = needsHuman; siBadge.style.display = needsHuman ? '' : 'none'; }
@@ -3663,14 +3674,24 @@
   function setConvFilter(f) {
     convFilter = f;
     document.querySelectorAll('.cf').forEach(el => el.classList.toggle('active', el.dataset.f === f));
+    // Clear unread badge when switching to inbox views
+    if (f === 'all' || f === 'open') {
+      unreadSet.clear();
+    }
     applyConvFilter();
   }
   function applyConvFilter() {
     const q = document.getElementById('conv-search-input').value.toLowerCase();
     let list = allConvs;
-    if (convFilter === 'open')   list = list.filter(c => !manualSet.has(c.session_id) && !urgentSet.has(c.session_id));
-    if (convFilter === 'manual') list = list.filter(c => manualSet.has(c.session_id));
-    if (convFilter === 'urgent') list = list.filter(c => urgentSet.has(c.session_id));
+    if (convFilter === 'closed') {
+      list = list.filter(c => closedSet.has(c.session_id));
+    } else {
+      // All non-closed filters exclude closed conversations
+      list = list.filter(c => !closedSet.has(c.session_id));
+      if (convFilter === 'open')   list = list.filter(c => !manualSet.has(c.session_id) && !urgentSet.has(c.session_id));
+      if (convFilter === 'manual') list = list.filter(c => manualSet.has(c.session_id));
+      if (convFilter === 'urgent') list = list.filter(c => urgentSet.has(c.session_id));
+    }
     if (q) list = list.filter(c => (c.from_number||'').includes(q) || (c.content||'').toLowerCase().includes(q));
     renderConvList(list);
   }
@@ -3991,6 +4012,8 @@
     // Nuevo mensaje entrante
     socket.on('message:new', (msg) => {
       if (msg.urgent) urgentSet.add(msg.session_id);
+      // Reopen closed conversation when new message arrives
+      if (closedSet.has(msg.session_id)) closedSet.delete(msg.session_id);
       if (msg.direction === 'inbound' && msg.session_id !== activeSessionId) unreadSet.add(msg.session_id);
       const idx = allConvs.findIndex(c => c.session_id === msg.session_id);
       if (idx >= 0) allConvs.splice(idx, 1);
@@ -4029,8 +4052,8 @@
     });
 
     socket.on('conv:closed', (data) => {
-      // Quitar de la lista
-      allConvs = allConvs.filter(c => c.session_id !== data.session_id);
+      closedSet.add(data.session_id);
+      unreadSet.delete(data.session_id);
       applyConvFilter();
       if (activeSessionId === data.session_id) {
         activeSessionId = null;
@@ -5459,17 +5482,24 @@
     switchPanel(0);
     await new Promise(r => setTimeout(r, 300));
 
-    // Find conversation in allConvs by phone suffix (handles formatting differences)
-    let conv = allConvs.find(c => (c.from_number || '').replace(/\D/g, '').endsWith(suffix9));
+    const conv = allConvs.find(c => (c.from_number || '').replace(/\D/g, '').endsWith(suffix9));
     if (!conv) {
-      // Not in current list — show search so user can find it
       const si = document.getElementById('conv-search-input');
       if (si) { si.value = suffix9; applyConvFilter(); }
       return;
     }
 
-    // Make sure it's visible (might be filtered out)
-    if (convFilter !== 'all') setConvFilter('all');
+    const isClosed = closedSet.has(conv.session_id);
+    if (isClosed) {
+      // Reopen on server and remove from closedSet
+      closedSet.delete(conv.session_id);
+      fetch(`/api/conversations/${encodeURIComponent(conv.session_id)}/reopen`, { method: 'POST' }).catch(() => {});
+    }
+
+    // Switch to appropriate filter
+    const targetFilter = isClosed ? 'all' : convFilter === 'closed' ? 'all' : convFilter;
+    if (convFilter !== targetFilter) setConvFilter(targetFilter);
+    else applyConvFilter();
     await new Promise(r => setTimeout(r, 50));
 
     const item = document.querySelector(`.conv-item[data-session-id="${CSS.escape(conv.session_id)}"]`);
