@@ -3409,8 +3409,9 @@
   let allConvs = [];
   let activeSessionId = null;
   let activePhone = null;
-  const manualSet = new Set();   // sessions in manual mode (client mirror)
-  const urgentSet = new Set();   // sessions flagged urgent
+  const manualSet  = new Set();   // sessions in manual mode (client mirror)
+  const urgentSet  = new Set();   // sessions flagged urgent
+  const unreadSet  = new Set();   // sessions with unread inbound messages
   const CONV_COLORS = ['#16a34a,#22c55e','#0ea5e9,#0284c7','#f43f5e,#e11d48','#f97316,#ea580c','#8b5cf6,#7c3aed'];
 
   function phoneLabel(num) {
@@ -3472,8 +3473,8 @@
     document.getElementById('cf-cnt-open').textContent = allConvs.filter(c => !manualSet.has(c.session_id) && !urgentSet.has(c.session_id)).length;
     document.getElementById('cf-cnt-manual').textContent = allConvs.filter(c => manualSet.has(c.session_id)).length;
     document.getElementById('cf-cnt-urgent').textContent = allConvs.filter(c => urgentSet.has(c.session_id)).length;
-    // Badge = only conversations requiring human attention (urgent or manual)
-    const needsHuman = allConvs.filter(c => urgentSet.has(c.session_id) || manualSet.has(c.session_id)).length;
+    // Badge = urgent + manual + unread (any unread inbound message)
+    const needsHuman = allConvs.filter(c => urgentSet.has(c.session_id) || manualSet.has(c.session_id) || unreadSet.has(c.session_id)).length;
     const siBadge = document.getElementById('si-badge-msgs');
     const bnBadge = document.getElementById('bn-badge');
     if (siBadge) { siBadge.textContent = needsHuman; siBadge.style.display = needsHuman ? '' : 'none'; }
@@ -3543,6 +3544,7 @@
     el.classList.add('active');
     activeSessionId = conv.session_id;
     activePhone = conv.from_number;
+    unreadSet.delete(conv.session_id);
 
     // Activate conv panel state
     document.getElementById('panel-0').classList.add('conv-active');
@@ -3991,6 +3993,7 @@
     socket.on('message:new', (msg) => {
       console.log('[WS] message:new received', msg.session_id, msg.content?.slice(0,30));
       if (msg.urgent) urgentSet.add(msg.session_id);
+      if (msg.direction === 'inbound' && msg.session_id !== activeSessionId) unreadSet.add(msg.session_id);
       const idx = allConvs.findIndex(c => c.session_id === msg.session_id);
       if (idx >= 0) allConvs.splice(idx, 1);
       allConvs.unshift({ ...msg });
