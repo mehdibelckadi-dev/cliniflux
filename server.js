@@ -494,8 +494,8 @@ app.post('/webhook/whatsapp', express.raw({ type: 'application/json' }), async (
     const fromFmt = fromD.length >= 11 ? `+${fromD.slice(0,2)} ${fromD.slice(2,5)} ${fromD.slice(5,8)} ${fromD.slice(8)}` : from;
     sendPushToClinic(clinicId, pushTitle, `${fromFmt}: ${msg.slice(0, 60)}`).catch(() => {});
 
-    const history     = await getHistoryFromMessages(clinicId, sessionId, 30);
-    const contextMsgs = buildContextMessages(history, 1200);
+    const history     = await getHistoryFromMessages(clinicId, sessionId, 40);
+    const contextMsgs = buildContextMessages(history, 1800);
 
     if (inManual) {
       openai.chat.completions.create({
@@ -512,7 +512,7 @@ app.post('/webhook/whatsapp', express.raw({ type: 'application/json' }), async (
     const completion = await openai.chat.completions.create({
       model: process.env.AI_MODEL || 'gpt-4o-mini',
       messages: [{ role:'system', content: prompt }, ...contextMsgs, { role:'user', content: msg }],
-      max_tokens: 320, temperature: 0.6
+      max_tokens: 320, temperature: 0.3
     });
     let reply = completion.choices[0].message.content;
     const match = reply.match(/CITA_CONFIRMADA\|(.+)/);
