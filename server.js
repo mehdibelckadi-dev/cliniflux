@@ -415,13 +415,40 @@ app.post('/webhook/whatsapp', express.raw({ type: 'application/json' }), async (
     const entry   = body?.entry?.[0];
     const change  = entry?.changes?.[0]?.value;
     const message = change?.messages?.[0];
-    if (!message || message.type !== 'text') return;
+    if (!message || !['text','audio','image'].includes(message.type)) return;
 
     const from = message.from;
     const to   = change?.metadata?.display_phone_number?.replace(/\D/g,'');
-    const msg  = message.text?.body?.trim().slice(0, 500);
-    if (!from || !msg) return;
+    if (!from) return;
     if (waRateLimit(from)) { console.warn(`[RateLimit] ${from} excedió 5 msgs/10s`); return; }
+
+    let msg          = message.text?.body?.trim().slice(0, 500) || '';
+    let visionContent = null;
+
+    if (!msg && message.type === 'audio' && message.audio?.id) {
+      try {
+        const { buffer, mimeType } = await downloadWaMedia(message.audio.id);
+        const transcript = await transcribeAudio(buffer, mimeType);
+        msg = transcript ? `🎤 ${transcript}` : '';
+      } catch(e) { console.error('[WA] audio:', e.message); }
+    }
+
+    if (!msg && message.type === 'image' && message.image?.id) {
+      try {
+        const caption = (message.image?.caption || '').trim();
+        const { buffer, mimeType } = await downloadWaMedia(message.image.id);
+        if (buffer.length <= 4 * 1024 * 1024) {
+          const b64 = buffer.toString('base64');
+          msg = `📷${caption ? ' ' + caption : ' Imagen'}`;
+          visionContent = [
+            { type: 'text', text: caption || 'El paciente ha enviado una imagen. Analízala y responde en el contexto de la clínica.' },
+            { type: 'image_url', image_url: { url: `data:${mimeType};base64,${b64}`, detail: 'low' } }
+          ];
+        }
+      } catch(e) { console.error('[WA] image:', e.message); }
+    }
+
+    if (!msg) return;
 
     const clinic   = to ? await getClinicByWhatsapp(to).catch(() => null) : null;
     const clinicId = clinic?.id || 1;
@@ -511,7 +538,7 @@ app.post('/webhook/whatsapp', express.raw({ type: 'application/json' }), async (
 
     const completion = await openai.chat.completions.create({
       model: process.env.AI_MODEL || 'gpt-4o',
-      messages: [{ role:'system', content: prompt }, ...contextMsgs, { role:'user', content: msg }],
+      messages: [{ role:'system', content: prompt }, ...contextMsgs, { role:'user', content: visionContent || msg }],
       max_tokens: 320, temperature: 0.3
     });
     let reply = completion.choices[0].message.content;
@@ -1325,6 +1352,24 @@ app.get('/api/analytics', requireAuth, async (req, res) => {
 });
 
 // ── WhatsApp Business API (Meta) ────────────────────────────────────────────
+
+async function downloadWaMedia(mediaId) {
+  const token = process.env.WHATSAPP_TOKEN;
+  const metaRes = await fetch(`https://graph.facebook.com/v19.0/${mediaId}`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  const { url, mime_type } = await metaRes.json();
+  const mediaRes = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
+  const buffer = Buffer.from(await mediaRes.arrayBuffer());
+  return { buffer, mimeType: mime_type || 'application/octet-stream' };
+}
+
+async function transcribeAudio(buffer, mimeType) {
+  const ext  = mimeType.includes('ogg') ? 'ogg' : mimeType.includes('mp4') ? 'mp4' : mimeType.includes('webm') ? 'webm' : 'ogg';
+  const file = new File([buffer], `audio.${ext}`, { type: mimeType });
+  const res  = await openai.audio.transcriptions.create({ model: 'whisper-1', file, language: 'es' });
+  return res.text?.trim() || '';
+}
 
 async function sendWhatsAppMessage(to, text) {
   const phoneId = process.env.WHATSAPP_PHONE_ID;
