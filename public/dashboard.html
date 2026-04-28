@@ -4999,15 +4999,16 @@
     document.getElementById('ini-date').textContent = iniDateStr();
 
     const now = new Date();
-    const todayStr = now.toISOString().slice(0,10);
-    const mon = new Date(now); mon.setDate(now.getDate() - ((now.getDay()+6)%7));
-    const sun = new Date(mon); sun.setDate(mon.getDate()+6);
-    const fmt = d => d.toISOString().slice(0,10);
+    // Use same ISO timestamp format as the calendar panel so the same DB query handles both consistently
+    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
+    const startOfTmrw  = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 0);
+    const mon = new Date(now.getFullYear(), now.getMonth(), now.getDate() - ((now.getDay()+6)%7), 0, 0, 0);
+    const nextMon = new Date(mon.getFullYear(), mon.getMonth(), mon.getDate() + 7, 0, 0, 0);
 
     try {
       const [rToday, rWeek, rConvs] = await Promise.all([
-        fetch(`/api/calendar?start=${todayStr}&end=${todayStr}`),
-        fetch(`/api/calendar?start=${fmt(mon)}&end=${fmt(sun)}`),
+        fetch(`/api/calendar?start=${startOfToday.toISOString()}&end=${startOfTmrw.toISOString()}`),
+        fetch(`/api/calendar?start=${mon.toISOString()}&end=${nextMon.toISOString()}`),
         fetch('/api/conversations?limit=20')
       ]);
       const todayAppts = rToday.ok ? await rToday.json() : [];
@@ -5109,11 +5110,12 @@
   function renderIniWeekChart(appts, mon) {
     const days = ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
     const today = new Date(); today.setHours(0,0,0,0);
+    const monMidnight = new Date(mon); monMidnight.setHours(0,0,0,0);
     const counts = Array(7).fill(0);
     appts.forEach(a => {
       if (!a.scheduled_ts) return;
       const d = new Date(a.scheduled_ts); d.setHours(0,0,0,0);
-      const idx = Math.round((d - mon) / 86400000);
+      const idx = Math.round((d - monMidnight) / 86400000);
       if (idx >= 0 && idx < 7) counts[idx]++;
     });
     const max = Math.max(...counts, 1);

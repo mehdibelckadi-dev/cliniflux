@@ -999,8 +999,8 @@ async function getAppointmentsByRange(clinic_id, start, end) {
   const { rows } = await pool.query(`
     SELECT * FROM appointments
     WHERE clinic_id=$1
-      AND scheduled_ts >= $2::date
-      AND scheduled_ts < ($3::date + interval '1 day')
+      AND scheduled_ts >= $2
+      AND scheduled_ts < $3
     ORDER BY scheduled_ts ASC
   `, [clinic_id, start, end]);
   return rows;
