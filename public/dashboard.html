@@ -4144,15 +4144,15 @@
     try {
       const r = await fetch(`/api/patient-profile/${encodeURIComponent(phone)}`);
       const p = await r.json();
-      statVisits.textContent = p.totalVisits ?? '0';
-      statLtv.textContent    = p.ltv != null ? `${p.ltv}€` : '—';
-      const risk = p.churnRisk || 'none';
+      statVisits.textContent = p.stats?.total_visits ?? '0';
+      statLtv.textContent    = p.stats?.ltv != null ? `${p.stats.ltv}€` : '—';
+      const risk = p.stats?.churn_risk || 'none';
       statChurn.textContent  = churnLabels[risk] || '—';
       statChurn.style.color  = churnColors[risk] || 'var(--text3)';
       let html = '';
       if (p.lead?.nombre) html += `<div style="font-weight:600;color:var(--text);margin-bottom:4px">${esc(p.lead.nombre)}</div>`;
-      if (p.daysSinceLast != null) {
-        html += `<div style="margin-bottom:4px">Última visita: <b>${p.daysSinceLast}d</b> atrás</div>`;
+      if (p.stats?.days_since_last != null) {
+        html += `<div style="margin-bottom:4px">Última visita: <b>${p.stats.days_since_last}d</b> atrás</div>`;
       }
       if (p.appointments?.length) {
         html += `<div style="font-weight:600;color:var(--text2);margin:6px 0 4px">Historial:</div>`;
@@ -4607,7 +4607,7 @@
     document.getElementById('cal-grid-wrap').classList.toggle('list-hidden', isList);
     document.querySelectorAll('.cal-view-btn').forEach(b => b.classList.remove('active'));
     document.getElementById(`cal-view-${v}`)?.classList.add('active');
-    if (isList) { loadCitasList(); return; }
+    if (isList) { calState.view = v; loadCitasList(); return; }
     calState.view = v;
     renderCal();
   }
@@ -4786,7 +4786,9 @@
     });
   }
 
+  let _savingAppt = false;
   async function saveAppt() {
+    if (_savingAppt) return;
     const dateVal = document.getElementById('cal-f-date').value;
     const timeVal = document.getElementById('cal-f-time').value;
     if (!dateVal || !timeVal) { toast('Fecha y hora requeridas', 'warning'); return; }
@@ -4803,6 +4805,9 @@
       price: parseFloat(document.getElementById('cal-f-price').value) || null,
       notify_whatsapp: document.getElementById('cal-f-notify').checked,
     };
+    _savingAppt = true;
+    const saveBtn = document.querySelector('.cal-btn-save');
+    if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = 'Guardando…'; }
     try {
       let resp;
       if (calEditId) {
@@ -4817,6 +4822,9 @@
       if (_pipeAppts.length) loadPipeline();
     } catch(e) {
       toast('Error guardando cita: ' + e.message, 'error');
+    } finally {
+      _savingAppt = false;
+      if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = 'Guardar'; }
     }
   }
 
