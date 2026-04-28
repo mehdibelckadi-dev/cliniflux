@@ -744,22 +744,22 @@
     .ini-week-bar.today{background:var(--green)}
     .ini-week-bar-wrap:hover .ini-week-bar{background:var(--green)}
     .ini-week-lbl{font-size:9px;color:var(--text3);font-weight:600}
-    /* Quick actions */
-    .ini-qa-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;padding:12px 14px 14px}
-    .ini-qa-btn{display:flex;flex-direction:column;align-items:center;gap:5px;padding:12px 8px;background:var(--bg2);border:1.5px solid var(--border);border-radius:var(--r-sm);cursor:pointer;transition:all var(--dur-fast);text-decoration:none}
-    .ini-qa-btn:hover{border-color:var(--green);background:var(--green-light)}
-    .ini-qa-icon{font-size:20px;line-height:1}
-    .ini-qa-label{font-size:10px;font-weight:700;color:var(--text);text-align:center;line-height:1.3}
-    /* Activity feed */
-    .ini-feed{display:flex;flex-direction:column;max-height:260px;overflow-y:auto}
-    .ini-feed-item{display:flex;align-items:flex-start;gap:9px;padding:9px 14px;border-bottom:1px solid rgba(0,0,0,0.04);transition:background var(--dur-fast)}
-    .ini-feed-item:last-child{border-bottom:none}
-    .ini-feed-item:hover{background:var(--bg2)}
-    .ini-feed-icon{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;margin-top:1px}
-    .ini-feed-text{flex:1;min-width:0}
-    .ini-feed-main{font-size:12px;font-weight:600;color:var(--text);line-height:1.4}
-    .ini-feed-sub{font-size:10px;color:var(--text3);margin-top:1px}
-    .ini-feed-time{font-size:9px;color:var(--text3);flex-shrink:0;margin-top:2px}
+    /* Messages widget */
+    .ini-msgs{display:flex;flex-direction:column;overflow:hidden}
+    .ini-msg-item{display:flex;align-items:center;gap:10px;padding:9px 14px;border-bottom:1px solid rgba(0,0,0,0.04);cursor:pointer;transition:background var(--dur-fast)}
+    .ini-msg-item:last-child{border-bottom:none}
+    .ini-msg-item:hover{background:var(--bg2)}
+    .ini-msg-ava{width:32px;height:32px;border-radius:50%;font-size:11px;font-weight:800;color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative}
+    .ini-msg-unread-dot{position:absolute;top:-1px;right:-1px;width:9px;height:9px;border-radius:50%;background:#ef4444;border:2px solid #fff}
+    .ini-msg-body{flex:1;min-width:0}
+    .ini-msg-name{font-size:12px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .ini-msg-preview{font-size:11px;color:var(--text3);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .ini-msg-preview.unread{color:var(--text);font-weight:600}
+    .ini-msg-meta{display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex-shrink:0}
+    .ini-msg-time{font-size:9px;color:var(--text3);white-space:nowrap}
+    .ini-msg-badge{font-size:9px;font-weight:700;background:#ef4444;color:#fff;padding:1px 5px;border-radius:10px;display:none}
+    .ini-msg-badge.show{display:block}
+    .ini-msgs-empty{padding:28px 14px;text-align:center;color:var(--text3);font-size:12px}
     /* At-risk card */
     .ini-risk-list{padding:6px 14px 12px;display:flex;flex-direction:column;gap:5px}
     .ini-risk-row{display:flex;align-items:center;gap:9px;padding:7px 10px;background:#fef2f2;border:1px solid rgba(239,68,68,0.15);border-radius:var(--r-sm)}
@@ -2145,59 +2145,28 @@
               </div>
             </div>
           </div>
-          <!-- Weekly chart -->
-          <div class="ini-today" style="margin-top:12px">
-            <div class="ini-sec-hd">
-              <span class="ini-sec-title">Esta semana</span>
-              <button class="ini-sec-link" onclick="switchPanel(2)">Ver métricas →</button>
-            </div>
-            <div class="ini-week-chart" id="ini-week-chart"></div>
-            <div class="hm-lbl-row" id="ini-week-labels" style="padding:0 18px 12px;display:flex;gap:4px"></div>
-          </div>
         </div>
         <!-- Right sidebar -->
         <div class="ini-right">
-          <!-- Quick actions -->
-          <div class="ini-widget">
-            <div class="ini-sec-hd" style="border-bottom:1px solid var(--border)">
-              <span class="ini-sec-title">Acciones rápidas</span>
-            </div>
-            <div class="ini-qa-grid">
-              <div class="ini-qa-btn" onclick="openApptModal(null)">
-                <span class="ini-qa-icon">📅</span>
-                <span class="ini-qa-label">Nueva cita</span>
-              </div>
-              <div class="ini-qa-btn" onclick="switchPanel(0)">
-                <span class="ini-qa-icon">💬</span>
-                <span class="ini-qa-label">Conversaciones</span>
-              </div>
-              <div class="ini-qa-btn" onclick="openBroadcast()">
-                <span class="ini-qa-icon">📣</span>
-                <span class="ini-qa-label">Campaña WA</span>
-              </div>
-              <div class="ini-qa-btn" onclick="switchPanel(6)">
-                <span class="ini-qa-icon">👥</span>
-                <span class="ini-qa-label">Pacientes</span>
-              </div>
-              <div class="ini-qa-btn" onclick="switchPanel(5)">
-                <span class="ini-qa-icon">🗂️</span>
-                <span class="ini-qa-label">Pipeline</span>
-              </div>
-              <div class="ini-qa-btn" onclick="switchPanel(2)">
-                <span class="ini-qa-icon">📊</span>
-                <span class="ini-qa-label">Métricas</span>
-              </div>
-            </div>
-          </div>
-          <!-- Activity feed -->
+          <!-- Recent WhatsApp messages -->
           <div class="ini-widget">
             <div class="ini-sec-hd">
-              <span class="ini-sec-title">Actividad reciente</span>
+              <span class="ini-sec-title">Mensajes recientes</span>
+              <span class="ini-sec-badge" id="ini-unread-badge" style="display:none">0 nuevos</span>
               <button class="ini-sec-link" onclick="switchPanel(0)">Ver todo →</button>
             </div>
-            <div class="ini-feed" id="ini-feed">
-              <div style="padding:20px;text-align:center;color:var(--text3);font-size:12px">Cargando...</div>
+            <div class="ini-msgs" id="ini-msgs">
+              <div class="ini-msgs-empty">Cargando...</div>
             </div>
+          </div>
+          <!-- Weekly chart -->
+          <div class="ini-widget">
+            <div class="ini-sec-hd">
+              <span class="ini-sec-title">Esta semana</span>
+              <button class="ini-sec-link" onclick="switchPanel(2)">Métricas →</button>
+            </div>
+            <div class="ini-week-chart" id="ini-week-chart" style="margin-top:8px"></div>
+            <div class="hm-lbl-row" id="ini-week-labels" style="padding:0 18px 12px;display:flex;gap:4px"></div>
           </div>
           <!-- At-risk patients -->
           <div class="ini-widget" id="ini-risk-widget" style="display:none">
@@ -5039,7 +5008,7 @@
       const [rToday, rWeek, rConvs] = await Promise.all([
         fetch(`/api/calendar?start=${todayStr}&end=${todayStr}`),
         fetch(`/api/calendar?start=${fmt(mon)}&end=${fmt(sun)}`),
-        fetch('/api/conversations')
+        fetch('/api/conversations?limit=20')
       ]);
       const todayAppts = rToday.ok ? await rToday.json() : [];
       const weekAppts = rWeek.ok ? await rWeek.json() : [];
@@ -5074,10 +5043,10 @@
       // Weekly chart
       renderIniWeekChart(weekAppts, mon);
 
-      // Activity feed
-      renderIniFeed(convs, todayAppts);
+      // Messages panel
+      renderIniMessages(convs);
 
-      // At-risk (patients with days_since > 90 from appointments)
+      // At-risk
       renderIniAtRisk(weekAppts);
 
       _iniLoaded = true;
@@ -5166,37 +5135,56 @@
     }).join('');
   }
 
-  function renderIniFeed(convs, todayAppts) {
-    const feed = document.getElementById('ini-feed');
-    const items = [];
+  function renderIniMessages(convs) {
+    const container = document.getElementById('ini-msgs');
+    const badge     = document.getElementById('ini-unread-badge');
+    const sorted    = [...convs]
+      .filter(c => !c.closed_at)
+      .sort((a,b) => new Date(b.last_msg_at||b.created_at||0) - new Date(a.last_msg_at||a.created_at||0))
+      .slice(0, 8);
 
-    // Recent appointments
-    const recentAppts = [...todayAppts].sort((a,b) => new Date(b.updated_at||b.created_at||0) - new Date(a.updated_at||a.created_at||0)).slice(0,3);
-    recentAppts.forEach(a => {
-      const stIcons = {confirmed:'✅',pending:'⏳',completed:'🏁',cancelled:'❌',no_show:'🔴'};
-      const stLabels = {confirmed:'Confirmada',pending:'Creada',completed:'Completada',cancelled:'Cancelada',no_show:'No asistió'};
-      items.push({ icon: stIcons[a.status||'pending'] || '📅', bg:'#f0fdf4', text:`Cita ${stLabels[a.status||'pending']?.toLowerCase()}`, sub: escHtml(a.patient_name||'Paciente') + (a.service?' · '+escHtml(a.service):''), time: a.updated_at||a.created_at||'' });
-    });
+    if (!sorted.length) {
+      container.innerHTML = `<div class="ini-msgs-empty">Sin mensajes recientes</div>`;
+      badge.style.display = 'none';
+      return;
+    }
 
-    // Recent conversations
-    const recentConvs = [...convs].sort((a,b) => new Date(b.last_message_at||b.updated_at||0) - new Date(a.last_message_at||a.updated_at||0)).slice(0,4);
-    recentConvs.forEach(c => {
-      items.push({ icon:'💬', bg:'var(--ai-bg)', text:`Conversación con ${escHtml(c.patient_name||c.name||c.phone||'Paciente')}`, sub: c.last_message ? escHtml(c.last_message.slice(0,60))+'...' : 'Nueva conversación', time: c.last_message_at||c.updated_at||'' });
-    });
+    const unreadCount = sorted.filter(c => c.direction === 'inbound' || unreadSet.has(c.session_id)).length;
+    if (unreadCount > 0) {
+      badge.textContent = `${unreadCount} nuevo${unreadCount>1?'s':''}`;
+      badge.style.display = '';
+    } else {
+      badge.style.display = 'none';
+    }
 
-    // Sort all by time desc
-    items.sort((a,b) => new Date(b.time||0) - new Date(a.time||0));
-    const top = items.slice(0,7);
+    container.innerHTML = sorted.map(c => {
+      const name     = escHtml(c.patient_name || c.from_number || c.phone || 'Desconocido');
+      const preview  = escHtml((c.content || '').slice(0, 55) || 'Nueva conversación');
+      const isUnread = c.direction === 'inbound' || unreadSet.has(c.session_id);
+      const color    = clAvatarColor(c.patient_name || c.from_number || '');
+      const initials = clInitials(c.patient_name || c.from_number || '?');
+      const ts       = c.last_msg_at || c.created_at || '';
+      const sid      = c.session_id;
+      return `<div class="ini-msg-item" onclick="iniOpenMsg('${escHtml(sid)}')">
+        <div class="ini-msg-ava" style="background:${color}">${initials}${isUnread?'<div class="ini-msg-unread-dot"></div>':''}</div>
+        <div class="ini-msg-body">
+          <div class="ini-msg-name">${name}</div>
+          <div class="ini-msg-preview${isUnread?' unread':''}">${preview}</div>
+        </div>
+        <div class="ini-msg-meta">
+          <div class="ini-msg-time">${ts ? timeAgo(ts) : ''}</div>
+          ${isUnread?'<div class="ini-msg-badge show">•</div>':''}
+        </div>
+      </div>`;
+    }).join('');
+  }
 
-    if (!top.length) { feed.innerHTML = `<div style="padding:20px;text-align:center;color:var(--text3);font-size:12px">Sin actividad reciente</div>`; return; }
-    feed.innerHTML = top.map(item => `<div class="ini-feed-item">
-      <div class="ini-feed-icon" style="background:${item.bg}">${item.icon}</div>
-      <div class="ini-feed-text">
-        <div class="ini-feed-main">${item.text}</div>
-        <div class="ini-feed-sub">${item.sub}</div>
-      </div>
-      <div class="ini-feed-time">${item.time ? timeAgo(item.time) : ''}</div>
-    </div>`).join('');
+  function iniOpenMsg(sessionId) {
+    switchPanel(0);
+    setTimeout(() => {
+      const el = document.querySelector(`.conv-item[data-session-id="${sessionId}"]`);
+      if (el) el.click();
+    }, 350);
   }
 
   function renderIniAtRisk(weekAppts) {
