@@ -4109,6 +4109,26 @@
       calAppts = calAppts.filter(a => a.id !== id);
       if (document.getElementById('panel-1')?.classList.contains('active')) renderCal();
     });
+
+    socket.on('conv:sentiment', (data) => {
+      if (data.level !== 'negativo') return;
+      const c = allConvs.find(c => c.session_id === data.session_id);
+      urgentSet.add(data.session_id);
+      applyConvFilter();
+      toast('Paciente insatisfecho', 'warning', c ? (c.from_number || data.from_number) : data.from_number);
+    });
+
+    socket.on('conv:insight', (data) => {
+      const labels = { seguro: 'Seguro', interes: 'Interés', referido: 'Referido' };
+      const parts  = Object.entries(data.insights).map(([k,v]) => `${labels[k]||k}: ${v}`);
+      if (!parts.length) return;
+      toast(parts.join(' · '), 'info', 'Dato capturado');
+      // Refresh open detail panel if it belongs to this conversation
+      const c = allConvs.find(c => c.session_id === data.session_id);
+      if (c && _clSelected && (c.from_number||'').slice(-9) === (_clSelected.phone||'').slice(-9)) {
+        openClienteDetail(_clSelected.phone);
+      }
+    });
   }
 
 

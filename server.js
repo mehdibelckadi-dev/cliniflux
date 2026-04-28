@@ -13,7 +13,7 @@ const PgSession = require('connect-pg-simple')(session);
 const OpenAI = require('openai');
 const crypto = require('crypto');
 const Stripe = require('stripe');
-const { pool, initDb, getAnalytics, getSession, saveSession, saveLead, getClinicByEmail, getClinicByWhatsapp, getClinicBySetupToken, createClinic, updateClinicConfig, buildPromptForClinic, getLeads, getAppointments, saveAppointment, verifyPassword, hashPassword, importLeads, getImportedLeads, updateLeadEstado, incrementConversation, PLAN_LIMITS, saveMessage, getMessages, getRecentConversations, getHistoryFromMessages, setConvState, getManualSessions, getConvNotes, savePushSubscription, getPushSubscriptions, removePushSubscription, closeInactiveConversations, getPatientData, getAtRiskPatients, scheduleNps, getPendingNps, markNpsSent, saveNpsScore, createBroadcast, getBroadcasts, updateBroadcast, getUpcomingAppointments, markReminderSent, getAtRiskForAutoReact, markLeadsContactado, getAppointmentsByRange, createAppointmentFull, updateAppointmentFull, deleteAppointment, createStaff, getStaff, getStaffByEmail, updateStaffRole, deactivateStaff, auditLog, getAuditLogs, recordConsent, hasConsent, getConsents, revokeConsent, getAppointmentsForFollowup, getAppointmentsForReview, markFollowupSent, markReviewSent, getAvailableSlotsForBot, getEnrichedPatientProfile, savePatientNote, getPatientNote, getBlockedSlots, createBlockedSlot, deleteBlockedSlot, updateStaffColor, getPatientMemory } = require('./db');
+const { pool, initDb, getAnalytics, getSession, saveSession, saveLead, getClinicByEmail, getClinicByWhatsapp, getClinicBySetupToken, createClinic, updateClinicConfig, buildPromptForClinic, getLeads, getAppointments, saveAppointment, verifyPassword, hashPassword, importLeads, getImportedLeads, updateLeadEstado, incrementConversation, PLAN_LIMITS, saveMessage, getMessages, getRecentConversations, getHistoryFromMessages, setConvState, getManualSessions, getConvNotes, savePushSubscription, getPushSubscriptions, removePushSubscription, closeInactiveConversations, getPatientData, getAtRiskPatients, scheduleNps, getPendingNps, markNpsSent, saveNpsScore, createBroadcast, getBroadcasts, updateBroadcast, getUpcomingAppointments, markReminderSent, getAtRiskForAutoReact, markLeadsContactado, getAppointmentsByRange, createAppointmentFull, updateAppointmentFull, deleteAppointment, createStaff, getStaff, getStaffByEmail, updateStaffRole, deactivateStaff, auditLog, getAuditLogs, recordConsent, hasConsent, getConsents, revokeConsent, getAppointmentsForFollowup, getAppointmentsForReview, markFollowupSent, markReviewSent, getAvailableSlotsForBot, getEnrichedPatientProfile, savePatientNote, getPatientNote, getBlockedSlots, createBlockedSlot, deleteBlockedSlot, updateStaffColor, getPatientMemory, updatePatientInsights } = require('./db');
 const PDFDocument = require('pdfkit');
 const webpush = require('web-push');
 
@@ -541,6 +541,28 @@ app.post('/webhook/whatsapp', express.raw({ type: 'application/json' }), async (
         setConvState(sessionId, clinicId, { patient_name: patientName, patient_email: patientEmail }).catch(() => {});
       }
       scheduleNps(clinicId, sessionId, from).catch(() => {});
+    }
+
+    // Sentiment detection
+    const sentMatch = reply.match(/\nSENTIMIENTO\|(.+)/);
+    if (sentMatch) {
+      reply = reply.replace(/\nSENTIMIENTO\|.+/, '').trim();
+      if (sentMatch[1].trim() === 'negativo') {
+        io?.to(`clinic_${clinicId}`).emit('conv:sentiment', { session_id: sessionId, from_number: from, level: 'negativo' });
+      }
+    }
+
+    // CRM data extraction
+    const dataMatch = reply.match(/\nDATOS\|(.+)/);
+    if (dataMatch) {
+      reply = reply.replace(/\nDATOS\|.+/, '').trim();
+      const insights = Object.fromEntries(
+        dataMatch[1].split('|').map(p => { const i = p.indexOf('='); return i < 0 ? null : [p.slice(0,i), p.slice(i+1)]; }).filter(Boolean)
+      );
+      if (Object.keys(insights).length) {
+        updatePatientInsights(sessionId, insights).catch(() => {});
+        io?.to(`clinic_${clinicId}`).emit('conv:insight', { session_id: sessionId, from_number: from, insights });
+      }
     }
 
     const repliedAt = new Date().toISOString();

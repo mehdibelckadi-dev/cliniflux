@@ -269,6 +269,7 @@ async function initDb() {
   await pool.query(`ALTER TABLE conv_states ADD COLUMN IF NOT EXISTS patient_name TEXT`);
   await pool.query(`ALTER TABLE conv_states ADD COLUMN IF NOT EXISTS patient_email TEXT`);
   await pool.query(`ALTER TABLE appointments ADD COLUMN IF NOT EXISTS patient_email TEXT`);
+  await pool.query(`ALTER TABLE conv_states ADD COLUMN IF NOT EXISTS patient_insights JSONB DEFAULT '{}'`);
 
   // Seed demo clinic if not exists
   const { rows } = await pool.query("SELECT id FROM clinics WHERE email = 'demo@cliniflux.com'");
@@ -444,7 +445,13 @@ SI PREGUNTAN SI ERES IA
 "Soy un asistente, sí — pero hay un equipo real detrás que lo revisa todo. Si necesita hablar con alguien ahora mismo, dígamelo."
 
 PRIMER MENSAJE (solo en el primer mensaje de la conversación)
-"¡${saludo}! Soy ${name}, de ${clinic.name} 😊 ¿En qué le ayudo?"`;
+"¡${saludo}! Soy ${name}, de ${clinic.name} 😊 ¿En qué le ayudo?"
+
+SEÑALES DE SISTEMA (invisibles para el paciente — solo al final del mensaje, nunca en medio)
+1. Si el paciente muestra frustración, enfado o queja clara: añade en línea separada al final → SENTIMIENTO|negativo
+2. Si el paciente menciona seguro médico, cómo conoció la clínica, o tratamiento de interés concreto: añade → DATOS|campo=valor
+   Campos válidos: seguro (ej: Adeslas), interes (ej: ortodoncia), referido (ej: su dentista anterior)
+   Solo incluye campos mencionados explícitamente. No inventes.`;
 }
 
 async function getLeads(clinic_id, limit = 50) {
@@ -770,7 +777,7 @@ async function getAtRiskPatients(clinic_id) {
 async function getPatientMemory(clinic_id, session_id, phone) {
   const clean = phone.replace(/\D/g, '').slice(-9);
   const [stateRow, apptRows] = await Promise.all([
-    pool.query('SELECT patient_name FROM conv_states WHERE session_id=$1', [session_id]),
+    pool.query('SELECT patient_name, patient_insights FROM conv_states WHERE session_id=$1', [session_id]),
     pool.query(
       `SELECT service, scheduled_ts, scheduled_ts > NOW() AS upcoming
        FROM appointments
@@ -779,18 +786,31 @@ async function getPatientMemory(clinic_id, session_id, phone) {
       [clinic_id, clean]
     )
   ]);
-  const name = stateRow.rows[0]?.patient_name;
-  const appts = apptRows.rows;
-  if (!name && !appts.length) return null;
+  const name     = stateRow.rows[0]?.patient_name;
+  const insights = stateRow.rows[0]?.patient_insights || {};
+  const appts    = apptRows.rows;
+  if (!name && !appts.length && !Object.keys(insights).length) return null;
 
-  const fmt = d => new Date(d).toLocaleDateString('es-ES', { day:'numeric', month:'short' });
-  const past   = appts.filter(r => !r.upcoming);
-  const future = appts.filter(r => r.upcoming);
-  const parts  = [];
+  const fmt  = d => new Date(d).toLocaleDateString('es-ES', { day:'numeric', month:'short' });
+  const past = appts.filter(r => !r.upcoming);
+  const next = appts.filter(r => r.upcoming);
+  const parts = [];
   if (name)          parts.push(name);
-  if (past.length)   parts.push(`${past.length} visita${past.length>1?'s':''} | última: ${past[0].service||'consulta'} ${fmt(past[0].scheduled_ts)}`);
-  if (future.length) parts.push(`próxima: ${future[0].service||'cita'} ${fmt(future[0].scheduled_ts)}`);
+  if (past.length)   parts.push(`${past.length} visita${past.length>1?'s':''} · última: ${past[0].service||'consulta'} ${fmt(past[0].scheduled_ts)}`);
+  if (next.length)   parts.push(`próxima: ${next[0].service||'cita'} ${fmt(next[0].scheduled_ts)}`);
+  if (insights.seguro)  parts.push(`seguro: ${insights.seguro}`);
+  if (insights.interes) parts.push(`interés declarado: ${insights.interes}`);
+  if (insights.referido) parts.push(`referido: ${insights.referido}`);
   return `\nPACIENTE CONOCIDO · ${parts.join(' · ')}`;
+}
+
+async function updatePatientInsights(session_id, insights) {
+  await pool.query(
+    `UPDATE conv_states
+     SET patient_insights = COALESCE(patient_insights,'{}')::jsonb || $2::jsonb
+     WHERE session_id = $1`,
+    [session_id, JSON.stringify(insights)]
+  );
 }
 
 async function scheduleNps(clinic_id, session_id, from_number, delayHours = 24) {
@@ -1228,4 +1248,4 @@ async function getPatientNote(clinicId, phone) {
   return rows[0]?.notes || '';
 }
 
-module.exports = { pool, initDb, createBroadcast, getBroadcasts, updateBroadcast, getUpcomingAppointments, markReminderSent, getAtRiskForAutoReact, markLeadsContactado, getAnalytics, getSession, saveSession, saveLead, getClinicByEmail, getClinicByWhatsapp, getClinicBySetupToken, createClinic, updateClinicConfig, buildPromptForClinic, getLeads, saveAppointment, getAppointments, verifyPassword, hashPassword, importLeads, getImportedLeads, updateLeadEstado, incrementConversation, PLAN_LIMITS, saveMessage, getMessages, getRecentConversations, getHistoryFromMessages, setConvState, getManualSessions, getConvNotes, savePushSubscription, getPushSubscriptions, removePushSubscription, closeInactiveConversations, getPatientData, getAtRiskPatients, scheduleNps, getPendingNps, markNpsSent, saveNpsScore, getAppointmentsByRange, createAppointmentFull, updateAppointmentFull, deleteAppointment, createStaff, getStaff, getStaffByEmail, updateStaffRole, deactivateStaff, auditLog, getAuditLogs, recordConsent, hasConsent, getConsents, revokeConsent, getAppointmentsForFollowup, getAppointmentsForReview, markFollowupSent, markReviewSent, getAvailableSlotsForBot, getEnrichedPatientProfile, savePatientNote, getPatientNote, getBlockedSlots, createBlockedSlot, deleteBlockedSlot, updateStaffColor, getPatientMemory };
+module.exports = { pool, initDb, createBroadcast, getBroadcasts, updateBroadcast, getUpcomingAppointments, markReminderSent, getAtRiskForAutoReact, markLeadsContactado, getAnalytics, getSession, saveSession, saveLead, getClinicByEmail, getClinicByWhatsapp, getClinicBySetupToken, createClinic, updateClinicConfig, buildPromptForClinic, getLeads, saveAppointment, getAppointments, verifyPassword, hashPassword, importLeads, getImportedLeads, updateLeadEstado, incrementConversation, PLAN_LIMITS, saveMessage, getMessages, getRecentConversations, getHistoryFromMessages, setConvState, getManualSessions, getConvNotes, savePushSubscription, getPushSubscriptions, removePushSubscription, closeInactiveConversations, getPatientData, getAtRiskPatients, scheduleNps, getPendingNps, markNpsSent, saveNpsScore, getAppointmentsByRange, createAppointmentFull, updateAppointmentFull, deleteAppointment, createStaff, getStaff, getStaffByEmail, updateStaffRole, deactivateStaff, auditLog, getAuditLogs, recordConsent, hasConsent, getConsents, revokeConsent, getAppointmentsForFollowup, getAppointmentsForReview, markFollowupSent, markReviewSent, getAvailableSlotsForBot, getEnrichedPatientProfile, savePatientNote, getPatientNote, getBlockedSlots, createBlockedSlot, deleteBlockedSlot, updateStaffColor, getPatientMemory, updatePatientInsights };
